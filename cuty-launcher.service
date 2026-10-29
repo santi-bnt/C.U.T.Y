@@ -1,0 +1,18 @@
+[Unit]
+Description=C.U.T.Y Touchscreen Launcher (WiFi, Terminal, Face)
+Wants=NetworkManager.service
+After=NetworkManager.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/santi/C.U.T.Y
+Environment=PYTHONPATH=/home/santi
+ExecStartPre=/bin/sh -c 'i=0; while [ ! -e /dev/fb1 ] && [ "$i" -lt 60 ]; do i=$((i+1)); sleep 1; done; test -e /dev/fb1'
+ExecStart=/usr/bin/python3 -u /home/santi/C.U.T.Y/cuty_launcher.py
+Restart=on-failure
+RestartSec=4
+TimeoutStartSec=75
+
+[Install]
+WantedBy=multi-user.target

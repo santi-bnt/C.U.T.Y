@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+*.bak*
+*.log
+*.wav
+cuty_touch_calibration.json
+*.nmconnection
+*.key
+*.pem
+.aws/
+.codex/
+.agents/
