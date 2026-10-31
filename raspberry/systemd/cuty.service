@@ -1,0 +1,17 @@
+[Unit]
+# Placeholder: Phase 1 push-to-talk requires a keyboard and is not a daemon.
+Description=C.U.T.Y desktop companion voice service
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=<pi-user>
+WorkingDirectory=<absolute-path-to-cuty>
+EnvironmentFile=<absolute-path-to-private-env-file>
+ExecStart=<absolute-path-to-cuty>/.venv/bin/python -m cuty
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

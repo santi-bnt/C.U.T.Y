@@ -1,2 +1,2 @@
-Pillow
-evdev
+-e ./raspberry
+pytest>=8,<10
