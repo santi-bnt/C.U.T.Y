@@ -1,3 +1,0 @@
-# Scripts and units must remain usable after checkout on Windows or Raspberry Pi.
-*.sh text eol=lf
-*.service text eol=lf
