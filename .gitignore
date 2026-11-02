@@ -14,3 +14,6 @@ cuty_touch_calibration.json
 .aws/
 .codex/
 .agents/
+.pytest_cache/
+.mypy_cache/
+*.egg-info/

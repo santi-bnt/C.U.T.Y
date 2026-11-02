@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cuty-companion"
+version = "0.1.0"
+description = "Phase 1 desktop voice companion"
+requires-python = ">=3.11"
+dependencies = [
+  "openai[realtime]>=3.8,<4",
+  "google-genai>=1.0,<2",
+  "sounddevice>=0.5,<1",
+  "python-dotenv>=1,<2",
+  "ddgs>=9.15,<10",
+  "edge-tts>=7,<8",
+  "av>=14,<18",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cuty*"]
