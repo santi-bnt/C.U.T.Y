@@ -10,16 +10,18 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from evdev import InputDevice, ecodes, list_devices
+from cuty_display import find_touchscreen
 
-FB = Path('/dev/fb1')
-SYS = Path('/sys/class/graphics/fb1')
 WIFI = 'wlan0'
 USER = 'santi'
 
 if os.geteuid() != 0:
     raise SystemExit('Ejecuta con sudo')
-if not FB.exists():
-    raise SystemExit('No existe /dev/fb1. Comprueba waveshare35a.')
+try:
+    FB, SYS = find_touchscreen()
+except RuntimeError as error:
+    raise SystemExit(str(error))
+print(f'Pantalla C.U.T.Y: {FB}', flush=True)
 W, H = map(int, (SYS/'virtual_size').read_text().strip().split(','))
 if int((SYS/'bits_per_pixel').read_text()) != 16:
     raise SystemExit('La pantalla debe utilizar RGB565 de 16 bits')

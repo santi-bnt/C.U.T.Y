@@ -52,6 +52,8 @@ def test_calibrated_touch_mapping_and_bounds_are_preserved():
 def test_service_and_compatibility_launch_paths_exist():
     service = (RASPBERRY / "touchscreen/cuty-launcher.service").read_text(encoding="utf-8")
     assert "ExecStart=/usr/bin/python3 -u /home/santi/C.U.T.Y/raspberry/touchscreen/cuty_launcher.py" in service
+    assert 'cuty_display.py --wait 60' in service
+    assert '/dev/fb1' not in service
     for filename in ("cuty.py", "cuty_launcher.py", "cuty_wifi_panel.py"):
         compile((ROOT / filename).read_text(encoding="utf-8"), filename, "exec")
     for filename in ("cuty_launcher.py", "cuty_wifi_panel.py"):

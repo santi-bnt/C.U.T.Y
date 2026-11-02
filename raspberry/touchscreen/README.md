@@ -12,7 +12,9 @@ Utiliza Pillow, evdev, NetworkManager y el framebuffer Linux, sin HDMI.
 ## Raspberry actual
 
 Directorio: `/home/santi/C.U.T.Y`. Servicio: `cuty-launcher.service`.
-Pantalla: `/dev/fb1`, RGB565, overlay `waveshare35a`.
+Pantalla: SPI `fb_ili9486`, 480 × 320, RGB565, overlay `waveshare35a`.
+Se detecta por nombre y formato, sin depender de que sea `/dev/fb0` o `/dev/fb1`
+ni de que haya HDMI conectado. El servicio espera hasta 60 segundos a que aparezca.
 El táctil ADS7846 se localiza por nombre, no por número de evento.
 La calibración validada se conserva en `/home/santi/cuty_touch_calibration.json`
 y no se incluye en Git. No es necesario reinstalar drivers ni recalibrar.
