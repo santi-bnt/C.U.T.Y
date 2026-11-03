@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""C.U.T.Y 3.5in launcher: menu / basic terminal / Wi-Fi / demo face.
+"""C.U.T.Y 3.5in launcher: menu / basic terminal / Wi-Fi / animated face.
 
 Reuses the already-calibrated cuty_wifi_panel.py and ADS7846 framebuffer.
 Run on the Raspberry Pi as root. No HDMI, X11, Wayland or Internet needed.
@@ -9,6 +9,7 @@ import os
 import re
 import select
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -17,6 +18,18 @@ from evdev import ecodes
 
 # Import the WORKING Wi-Fi panel from the same directory, without rewriting it.
 import cuty_wifi_panel as wifi
+
+# The animated face, camera tracking and voice link live in the cuty package.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+try:
+    from cuty.face.framebuffer import FramebufferWriter, to_rgb565
+    from cuty.face.link import FaceLinkReceiver
+    from cuty.face.renderer import Face
+    from cuty.vision.camera import camera_mode
+    from cuty.vision.face_tracker import FaceTracker
+    FACE_ERROR = ''
+except ImportError as error:  # e.g. NumPy missing: keep menus working.
+    FACE_ERROR = f'Cara no disponible: {error}'
 
 W, H = wifi.W, wifi.H
 FB = wifi.FB
@@ -30,6 +43,10 @@ WHITE = '#f5f8ff'
 MUTED = '#b7c7d8'
 GREEN = '#48e0bd'
 RED = '#ff7878'
+
+FACE_FPS = max(5.0, min(40.0, float(os.getenv('CUTY_FACE_FPS', '20') or 20)))
+FACE_SSAA = {'1': 1, '2': 2, '3': 3}.get(os.getenv('CUTY_FACE_SSAA', '2').strip(), 2)
+START_MODE = os.getenv('CUTY_START_MODE', 'menu').strip().lower()
 
 FONT_PATH = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 BOLD_PATH = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
@@ -117,8 +134,11 @@ class Launcher(wifi.Panel):
         self.term_symbols = False
         self.term_shift = False
         self.test_lines = []
-        self.face_blink_until = 0
-        self.face_state = ''
+        self.face = None
+        self.face_writer = None
+        self.tracker = None
+        self.next_face_frame = 0.0
+        self.link = None if FACE_ERROR else FaceLinkReceiver.from_env()
         self.is_pressed = False
         self.hold_since = None
         self.released_at = None
@@ -260,21 +280,58 @@ class Launcher(wifi.Panel):
         self.term_lines = self.term_lines[-40:]
         self.render()
 
-    def draw_face(self, d):
-        # Demo only; real robot/servos/voice integration is a later stage.
-        blink = time.monotonic() < self.face_blink_until
-        eye_y = H//2-18
-        if blink:
-            d.rounded_rectangle((92, eye_y+35, 197, eye_y+42), 4, fill=GREEN)
-            d.rounded_rectangle((283, eye_y+35, 388, eye_y+42), 4, fill=GREEN)
-        else:
-            d.ellipse((100, eye_y-8, 191, eye_y+80), fill=GREEN)
-            d.ellipse((289, eye_y-8, 380, eye_y+80), fill=GREEN)
-            d.ellipse((141, eye_y+31, 158, eye_y+49), fill=BG)
-            d.ellipse((330, eye_y+31, 347, eye_y+49), fill=BG)
-        d.arc((200, 222, 280, 263), 12, 168, fill=GREEN, width=5)
-        text(d, (W//2-41, 271), 'C.U.T.Y', FONT, MUTED)
-        # Intentionally NO back button or exit hint.
+    def draw_face_error(self, d):
+        text(d, (18, 120), 'C.U.T.Y', LARGE)
+        text(d, (18, 160), FACE_ERROR, SMALL, RED, W-36)
+        text(d, (18, 184), 'Instala python3-numpy y reinicia el servicio.', SMALL, MUTED)
+
+    # ----- animated face -------------------------------------------------
+    def enter_face(self):
+        """Start the animated face; never let a camera problem stop the menu."""
+        self.mode, self.screen = 'face', 'home'
+        if FACE_ERROR:
+            return
+        if self.face is None:
+            self.face = Face(W, H, ssaa=FACE_SSAA)
+        if self.face_writer is None:
+            self.face_writer = FramebufferWriter(FB, W, H)
+        self.face_writer.invalidate()
+        if self.tracker is None and camera_mode() != 'off':
+            self.tracker = FaceTracker()
+        if self.tracker is not None:
+            self.tracker.start()
+        self.next_face_frame = 0.0
+
+    def leave_face(self):
+        if self.tracker is not None:
+            self.tracker.stop()
+        if self.face is not None:
+            self.face.clear_target()
+        if self.face_writer is not None:
+            self.face_writer.invalidate()
+
+    def apply_link_messages(self):
+        """Expressions, mouth level and blinks sent by the voice app."""
+        if self.link is None:
+            return
+        for msg in self.link.poll():
+            if self.face is None:
+                continue
+            if msg.type == 'expression':
+                self.face.set_expression(msg.expression, msg.intensity)
+            elif msg.type == 'mouth':
+                self.face.set_mouth_open(msg.level)
+            elif msg.type == 'look' and (self.tracker is None or self.tracker.latest() is None):
+                self.face.look_at(msg.x, msg.y)
+            elif msg.type == 'blink':
+                self.face.blink()
+
+    def draw_face_frame(self, now):
+        if self.tracker is not None:
+            target = self.tracker.latest()
+            if target is not None:
+                self.face.look_at(target.x, target.y)
+        self.face_writer.write(to_rgb565(self.face.render(now)))
 
     def add_wifi_back_overlay(self):
         """Draw a tiny Menu arrow on inherited Wi-Fi screens without editing them."""
@@ -315,7 +372,10 @@ class Launcher(wifi.Panel):
         elif self.mode == 'terminal':
             self.draw_terminal(d)
         elif self.mode == 'face':
-            self.draw_face(d)
+            if not FACE_ERROR:
+                self.next_face_frame = 0.0  # drawn by the animation loop
+                return
+            self.draw_face_error(d)
         render_frame(im)
 
     def action(self, act):
@@ -325,8 +385,11 @@ class Launcher(wifi.Panel):
             self.render()
             return
         if isinstance(act, tuple) and act[0] == 'mode':
-            self.mode = act[1]
-            self.screen = 'home'
+            if act[1] == 'face':
+                self.enter_face()
+            else:
+                self.mode = act[1]
+                self.screen = 'home'
             self.render()
             return
         if self.mode == 'internet':
@@ -364,12 +427,20 @@ class Launcher(wifi.Panel):
         return max(0, min(W-1, sx)), max(0, min(H-1, sy))
 
     def run(self):
+        if START_MODE == 'face':
+            self.enter_face()
         self.render()
         try:
             while True:
-                readable, _, _ = select.select([self.touch.fd], [], [], 0.10)
+                watch = [self.touch.fd] + ([self.link.fileno()] if self.link else [])
+                timeout = 0.10
+                if self.mode == 'face' and not FACE_ERROR:
+                    timeout = max(0.0, self.next_face_frame - time.monotonic())
+                readable, _, _ = select.select(watch, [], [], timeout)
                 now = time.monotonic()
-                if readable:
+                if self.link is not None and self.link.fileno() in readable:
+                    self.apply_link_messages()
+                if self.touch.fd in readable:
                     try:
                         events = self.touch.read()
                     except BlockingIOError:
@@ -398,9 +469,8 @@ class Launcher(wifi.Panel):
                                                    now-self.hold_since < 0.7)
                                     self.hold_since = None
                                     self.released_at = now
-                                    if short_press:
-                                        self.face_blink_until = now+0.18
-                                        self.render()
+                                    if short_press and self.face is not None:
+                                        self.face.blink()
                                 else:
                                     if (self.raw_x is not None and self.raw_y is not None
                                             and now-self.last_release >= 0.16):
@@ -416,20 +486,26 @@ class Launcher(wifi.Panel):
                         self.is_pressed = False
                         self.ignore_next_release = True
                         self.hold_since = self.released_at = None
+                        self.leave_face()
                         self.mode = 'menu'
                         self.render()
-                    elif (not self.is_pressed and self.released_at is not None and
-                          now-self.released_at > 0.35):
+                        continue
+                    if (not self.is_pressed and self.released_at is not None and
+                            now-self.released_at > 0.35):
                         self.hold_since = self.released_at = None
-                    elif (self.face_blink_until and
-                          now > self.face_blink_until and self.face_state != 'normal'):
-                        self.face_state = 'normal'
-                        self.render()
-                    elif now < self.face_blink_until:
-                        self.face_state = 'blink'
+                    if not FACE_ERROR and now >= self.next_face_frame:
+                        self.draw_face_frame(now)
+                        self.next_face_frame += 1/FACE_FPS
+                        if self.next_face_frame < now:  # ran late: skip, don't burst
+                            self.next_face_frame = now + 1/FACE_FPS
         except KeyboardInterrupt:
             pass
         finally:
+            self.leave_face()
+            if self.face_writer is not None:
+                self.face_writer.close()
+            if self.link is not None:
+                self.link.close()
             self.touch.ungrab()
             self.touch.close()
 

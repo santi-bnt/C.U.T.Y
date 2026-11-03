@@ -1,2 +1,5 @@
 Pillow
 evdev
+numpy
+# Optional: eyes follow people (or apt: python3-opencv python3-picamera2)
+opencv-python-headless

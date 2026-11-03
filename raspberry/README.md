@@ -75,7 +75,7 @@ The CLI logs connection and state changes, expression events, assistant transcri
 
 ## Architecture
 
-`src/cuty/brain/` owns conversation and states; `llm/` owns both cloud providers and web lookup; `audio/` owns microphone, speaker, and thinking asides. `src/cuty/main.py` is the entry point and `app.py` wires the CLI. `face/` contains working expression events and a console sink, not a screen renderer. Other robot modules are placeholders; see [architecture](../docs/architecture.md).
+`src/cuty/brain/` owns conversation and states; `llm/` owns both cloud providers and web lookup; `audio/` owns microphone, speaker, and thinking asides. `src/cuty/main.py` is the entry point and `app.py` wires the CLI. `face/` contains expression events, the animated touchscreen face and the UDP link that carries expressions and lip-sync levels to it; `vision/` tracks the person for the eyes. Other robot modules are placeholders; see [architecture](../docs/architecture.md).
 
 Baseline expressions follow `IDLE`, `LISTENING`, `THINKING`, and `SPEAKING` states. The model may call `set_expression` for a temporary emotion. Invalid tool arguments are rejected and returned to the model without emitting a robot event. No keyword-based emotion matching is used. There is no serial transport or defined UART protocol in this phase.
 

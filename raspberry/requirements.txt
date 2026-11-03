@@ -1,2 +1,5 @@
 -e .
 pytest>=8,<10
+# Face/vision tests (the voice app itself does not need them)
+Pillow
+numpy

@@ -19,16 +19,16 @@ Camera → detector → tracker → normalized X/Y target.
 - face consumes it for pupil rendering.
 - future brain/behavior consumes it for head goals → hardware bridge → UART → STM32 motion/safety.
 - STM32 IMU → STM32 body PID → servos/safety; measurements feed telemetry.
-- Raspberry audio and LLM → speaking state/expression → face (future visual integration).
+- Raspberry audio and LLM → expression + lip-sync level over local UDP → face.
 - Raspberry aggregates subsystem and STM32 status for web observation.
 
 Never let vision/face/dashboard generate PWM or move the real-time feedback loop into Raspberry. Keep AI expression tool events distinct from UART records.
 
 ## Current versus planned
 
-Current: standalone Raspberry touchscreen menu/demo face/Wi-Fi imported from GitHub; desktop CLI audio conversation, Gemini default and OpenAI adapter, web lookup, session context, language instructions, Spanish thinking clips, state machine, expression events/console sink.
+Current: Raspberry touchscreen menu/Wi-Fi with the animated face (camera eye tracking, voice expressions and lip sync); desktop CLI audio conversation, Gemini default and OpenAI adapter, web lookup, session context, language instructions, Spanish thinking clips, state machine, expression events/console sink.
 
-Planned: Pi hardware validation, local LLM fallback, standalone STT/TTS, a reusable face renderer connected to voice, camera/detection/tracking, persistent memory/behavior, bridge/protocol implementation, telemetry server, STM32 firmware, dashboard, CAD, PCB.
+Planned: Pi hardware validation, local LLM fallback, standalone STT/TTS, face recognition, persistent memory/behavior, bridge/protocol implementation, telemetry server, STM32 firmware, dashboard, CAD, PCB.
 
 Python TODO modules and C/H comment templates define locations only; they are not fake functional interfaces. Existing dependencies and provider selection are preserved. The [migration inventory](reorganization.md) explains compatibility and untouched local files.
 

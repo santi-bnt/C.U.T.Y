@@ -1,5 +1,5 @@
-# Vision Plan
+# Vision
 
-Camera → face detector → face tracker → normalized target (X/Y, confidence). See [vision contract sketch](../raspberry/src/cuty/vision/README.md).
+Camera → face detector (YuNet, Haar fallback) → face tracker → normalized target (X/Y, confidence). See the [vision module](../raspberry/src/cuty/vision/README.md).
 
-The same target can feed pupil rendering and high-level head behavior independently. No vision PWM or direct servo access. Camera selection, frame orientation, detector, identity tracking, confidence thresholds, timestamps, and lost-target handling are open. Recognition/registration is later work, not a prerequisite for basic tracking. Nothing is implemented in this restructure.
+Working: Raspberry Pi camera or USB webcam capture, face detection, closest-person selection with stickiness, smoothing, lost-target handling and camera reconnection. The touchscreen face uses the target for the pupils. No vision PWM or direct servo access. Recognition/registration and head goals remain later work. Not yet validated with the robot's physical camera.

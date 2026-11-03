@@ -1,28 +1,36 @@
 # C.U.T.Y Face
 
-Responsibilities:
-- eyes and pupils
-- mouth
-- blinking
-- expressions
-- speaking animations
-- visual eye tracking
+Animated face for the 480 × 320 touchscreen: big sparkly eyes that blink,
+wander and **follow the person through the camera**, cheeks, and a mouth that
+**opens and closes with C.U.T.Y's voice**. It only produces pixels; it never
+controls motors, servos, the IMU or the STM32.
 
-Does NOT control motors, servos, IMU, STM32, or camera detection.
-
-Inputs: expression, normalized eye-target X/Y, speaking state, optional audio amplitude. Output: rendered facial display.
-
-Working today: `expressions.py` contains validated expression events; `expression_sink.py` contains a console sink and state-based expression controller. These were moved intact from `src/cuty/robot`; they do not render a screen.
-
-Future interface examples (not implemented):
 ```python
-face.set_expression("happy")
-face.look_at(x=0.72, y=0.43)
-face.set_mouth_open(0.6)
+from cuty.face.renderer import Face
+
+face = Face()                      # 480x320, 2x supersampled
+face.set_expression("happy", 0.8)  # any Expression value
+face.look_at(x=0.72, y=0.43)       # normalized target, 0.5 = straight ahead
+face.set_mouth_open(0.6)           # live speech level 0..1
+face.blink()
+image = face.render()              # PIL RGB image
 ```
 
-`renderer.py`, `eyes.py`, `mouth.py`, and `animations.py` are TODO-only placeholders. Keep the existing expression controller API distinct from the planned visual facade.
+| File | Role |
+| --- | --- |
+| `animations.py` | Expression presets and blending, gaze spring, idle wandering, random/double blinks, breathing, speech smoothing → `FacePose` |
+| `eyes.py`, `mouth.py` | Drawing (masks for lids, iris clipping, tongue) |
+| `renderer.py` | `Face` facade and `FaceRenderer` composition |
+| `framebuffer.py` | NumPy RGB565 conversion and changed-rows-only `mmap` writes for the SPI panel |
+| `link.py` | UDP messages from the voice app (expression, mouth level, look, blink) |
+| `expressions.py`, `expression_sink.py` | Validated expression events, state baseline controller, console/face-link sinks |
 
-## Existing touchscreen application
+Each of the ten `Expression` values has a face. Intensity blends from
+neutral. When a new person appears the eyes blink and "perk up". Without a
+camera target the eyes look around on their own.
 
-The real Raspberry framebuffer demo, touch menu and Wi-Fi panel are preserved in [touchscreen](../../../touchscreen/README.md). They are a standalone application, not an implementation of the future `face` facade above. They do not yet consume conversation expressions or speaking state. Keep the existing working UI intact until a separate runtime integration task.
+Lip sync lives in `cuty/audio/lipsync.py`: every chunk written to the speaker
+is measured in 20 ms windows and placed on a playback timeline, so the level
+sent ~30 times per second matches what is audible, not when the network
+delivered it. The touchscreen launcher (`touchscreen/cuty_launcher.py`) runs
+the face, the camera tracker and the UDP listener in its C.U.T.Y mode.

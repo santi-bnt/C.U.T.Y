@@ -20,7 +20,11 @@ from cuty.brain.conversation import ConversationService
 from cuty.brain.states import State, StateMachine
 from cuty.config import Config, ConfigurationError
 from cuty.audio.thinking import ThinkingVoice
-from cuty.face.expression_sink import ConsoleExpressionSink, ExpressionController
+from cuty.audio.lipsync import LipSyncSpeaker
+from cuty.face.expression_sink import (
+    CompositeExpressionSink, ConsoleExpressionSink, ExpressionController, FaceLinkExpressionSink,
+)
+from cuty.face.link import FaceLinkSender
 from cuty.utils.logging import configure_logging
 
 
@@ -56,7 +60,13 @@ async def run(config: Config) -> int:
     logging.getLogger("AUDIO").info("Microphone: %s", input_name)
     logging.getLogger("AUDIO").info("Speaker: %s", output_name)
 
-    expressions = ExpressionController(ConsoleExpressionSink())
+    # The animated face (touchscreen launcher) listens on a local UDP port.
+    face_link = FaceLinkSender.from_env()
+    sink = ConsoleExpressionSink()
+    if face_link is not None:
+        sink = CompositeExpressionSink(sink, FaceLinkExpressionSink(face_link))
+        log.info("Cara animada: enviando expresiones y boca a %s:%d", *face_link.address)
+    expressions = ExpressionController(sink)
     state = StateMachine(expressions.on_state)
     expressions.on_state(State.IDLE)
     provider = (
@@ -65,6 +75,8 @@ async def run(config: Config) -> int:
         else OpenAIRealtimeProvider(config.api_key, config.model)
     )
     speaker = SoundDeviceSpeaker(output_id)
+    if face_link is not None:
+        speaker = LipSyncSpeaker(speaker, face_link)
     thinking_voice = ThinkingVoice()
     prepare_thinking = asyncio.create_task(thinking_voice.prepare())
     try:
@@ -99,6 +111,8 @@ async def run(config: Config) -> int:
             await provider.close()
         finally:
             await speaker.close()
+            if face_link is not None:
+                face_link.close()
 
 
 def main() -> int:

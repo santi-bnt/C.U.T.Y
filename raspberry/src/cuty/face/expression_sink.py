@@ -19,6 +19,25 @@ class ConsoleExpressionSink:
         logging.getLogger("CUTY FACE").info("%s intensity=%.1f", event.expression.value.upper(), event.intensity)
 
 
+class FaceLinkExpressionSink:
+    """Forwards expressions to the animated face on the touchscreen."""
+
+    def __init__(self, link) -> None:
+        self.link = link
+
+    def set_expression(self, expression: Expression, intensity: float = 1.0) -> None:
+        self.link.expression(expression, intensity)
+
+
+class CompositeExpressionSink:
+    def __init__(self, *sinks: ExpressionSink) -> None:
+        self.sinks = sinks
+
+    def set_expression(self, expression: Expression, intensity: float = 1.0) -> None:
+        for sink in self.sinks:
+            sink.set_expression(expression, intensity)
+
+
 _BASELINE = {
     State.IDLE: Expression.IDLE,
     State.LISTENING: Expression.LISTENING,

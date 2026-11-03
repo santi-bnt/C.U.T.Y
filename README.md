@@ -25,9 +25,9 @@ Los archivos de arranque de la raíz son wrappers de compatibilidad, no otras co
 ## Estado
 
 - Voz: push-to-talk, Gemini predeterminado, OpenAI opcional, búsqueda web, contexto de sesión, idioma según la pregunta y frases de espera en español.
-- Pantalla: menú Terminal/Internet/C.U.T.Y, Wi-Fi, cara demo, toque para parpadear y pulsación continua de cinco segundos para volver al menú.
-- Ambas partes están integradas en el repositorio. La cara todavía **no está conectada** a las expresiones ni al audio de la conversación.
-- Servos, cámara, firmware, dashboard, PCB y mecánica siguen sin implementarse.
+- Pantalla: menú Terminal/Internet/C.U.T.Y, Wi-Fi y **cara animada**: ojos que parpadean y miran alrededor, toque para parpadear y pulsación continua de cinco segundos para volver al menú.
+- Cara conectada: con cámara, los ojos **siguen a la persona**; las expresiones de la conversación aparecen en la cara y la **boca se mueve con la voz** (enlace UDP local entre la voz y la pantalla). Ver [cara](docs/face.md).
+- Servos, firmware, dashboard, PCB y mecánica siguen sin implementarse.
 
 Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Los ejemplos UART siguen siendo propuestas.
 
