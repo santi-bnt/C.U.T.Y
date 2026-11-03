@@ -76,6 +76,21 @@ def test_continuous_noise_cannot_record_forever():
     assert mic.read < 40
 
 
+def test_speech_can_start_with_short_quiet_consonants_between_voiced_frames():
+    # Six voiced frames in 240 ms, with small gaps: no 120 ms continuous vowel.
+    chunks, mic, stop = capture([0] * 30 + [1200, 0] * 8 + [0] * 100)
+    assert chunks and stop.is_set() and mic.closed
+    assert sum(array("h", chunk)[0] == 1200 for chunk in chunks) == 8
+
+
+def test_idle_level_diagnostics_distinguish_low_level_from_missing_pcm(caplog):
+    with caplog.at_level("INFO", logger="AUDIO"):
+        chunks, mic, _ = capture([100] * 260)
+    assert not chunks and mic.closed
+    assert "Micrófono entregando audio" in caplog.text
+    assert "Esperando voz" in caplog.text
+
+
 def test_cancelling_listener_closes_microphone():
     async def run():
         closed = asyncio.Event()
@@ -133,6 +148,7 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
         AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Quiero salir."), AIEvent(EventKind.DONE),
     ])
     speaker = FakeSpeaker()
+    speaker.active = False
 
     async def greeting():
         lifecycle.append("greeting")
@@ -141,7 +157,14 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
         lifecycle.append("provider closed")
 
     async def close_speaker():
-        lifecycle.append("speaker closed")
+        if speaker.active:
+            lifecycle.append("speaker closed")
+        speaker.active = False
+
+    async def open_speaker():
+        assert not speaker.active
+        speaker.active = True
+        lifecycle.append("speaker opened")
 
     class Mic:
         def __init__(self, device, rate):
@@ -149,9 +172,13 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
 
         async def chunks(self, stop):
             assert speaker.audio  # Greeting was actually played before listening.
+            assert not speaker.active  # Physical output must be closed during capture.
             lifecycle.append("listening")
-            yield b"\x00\x00" * 320
-            stop.set()
+            try:
+                yield b"\x00\x00" * 320
+                stop.set()
+            finally:
+                lifecycle.append("microphone closed")
 
     class Thinking:
         async def prepare(self):
@@ -170,6 +197,7 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
     provider.request_greeting = greeting
     provider.close = close_provider
     speaker.close = close_speaker
+    speaker.open = open_speaker
     monkeypatch.setattr(app, "list_devices", lambda: [
         {"index": 7, "name": "seeed2micvoicec", "inputs": 2, "outputs": 2},
     ])
@@ -183,4 +211,5 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
     monkeypatch.setattr(app.FaceLinkSender, "from_env", lambda: None)
     monkeypatch.delenv("CUTY_AUDIO_REMOTE_OUTPUT", raising=False)
     assert asyncio.run(app.run(Config(api_key="fake-key"), hands_free=True)) == 0
-    assert lifecycle == ["greeting", "listening", "provider closed", "speaker closed"]
+    assert lifecycle == ["speaker opened", "greeting", "speaker closed", "listening",
+                         "microphone closed", "speaker opened", "provider closed", "speaker closed"]

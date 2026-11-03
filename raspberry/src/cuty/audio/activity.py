@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import math
 import os
 from array import array
@@ -39,7 +40,11 @@ class SpeechMicrophone:
     async def chunks(self, stop: asyncio.Event):
         pre_roll = deque()
         buffered = loud = quiet = elapsed = 0.0
+        observed = interval_peak = 0.0
+        first_chunk = True
         started = False
+        log = logging.getLogger("AUDIO")
+        log.info("Escucha local: umbral RMS %.2f%%, pausa %.2f s", self.threshold / 32768 * 100, self.silence)
         async with aclosing(self.microphone.chunks(stop)) as source:
             async for pcm in source:
                 samples = array("h", pcm)
@@ -47,17 +52,29 @@ class SpeechMicrophone:
                 if not samples:
                     continue
                 rms = math.sqrt(sum(value * value for value in samples) / len(samples))
+                if first_chunk:
+                    log.info("Micrófono entregando audio; primer bloque RMS %.2f%%", rms / 32768 * 100)
+                    first_chunk = False
                 voiced = rms >= self.threshold
                 if not started:
-                    pre_roll.append((pcm, duration))
+                    pre_roll.append((pcm, duration, voiced))
                     buffered += duration
+                    loud += duration if voiced else 0.0
                     while pre_roll and buffered - pre_roll[0][1] > 0.3:
-                        buffered -= pre_roll.popleft()[1]
-                    loud = loud + duration if voiced else 0.0
+                        _, old_duration, old_voiced = pre_roll.popleft()
+                        buffered -= old_duration
+                        loud -= old_duration if old_voiced else 0.0
+                    observed += duration
+                    interval_peak = max(interval_peak, rms)
                     if loud + 1e-9 < self.minimum:
+                        if observed >= 5:
+                            log.info("Esperando voz: RMS máximo %.2f%%; umbral %.2f%%", interval_peak / 32768 * 100,
+                                     self.threshold / 32768 * 100)
+                            observed = interval_peak = 0.0
                         continue
                     started = True
-                    for chunk, _ in pre_roll:
+                    log.info("Voz detectada; enviando intervención.")
+                    for chunk, _, _ in pre_roll:
                         yield chunk
                     pre_roll.clear()
                 else:
@@ -65,5 +82,6 @@ class SpeechMicrophone:
                 elapsed += duration
                 quiet = 0.0 if voiced else quiet + duration
                 if quiet + 1e-9 >= self.silence or elapsed + 1e-9 >= self.maximum:
+                    log.info("Fin de intervención: %s", "pausa" if quiet + 1e-9 >= self.silence else "límite de tiempo")
                     stop.set()
                     return

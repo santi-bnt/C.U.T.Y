@@ -126,6 +126,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         service = ConversationService(
             provider, microphone, speaker, state, expressions,
             thinking_voice=thinking_voice,
+            half_duplex=hands_free,
         )
         if hands_free:
             await run_hands_free(service)

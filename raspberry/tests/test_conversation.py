@@ -292,3 +292,26 @@ def test_keyboard_mode_does_not_exit_on_spoken_salir():
     ])
     asyncio.run(service.run_turn(asyncio.Event()))
     assert speaker.audio and state.current == State.IDLE
+
+
+def test_send_failure_closes_microphone_before_leaving_conversation():
+    closed = []
+
+    class Microphone:
+        async def chunks(self, stop):
+            try:
+                yield b"\x00\x00" * 320
+                await asyncio.Event().wait()
+            finally:
+                closed.append(True)
+
+    async def fail(pcm):
+        raise ProviderError("Disconnected while recording")
+
+    service, provider, _, _, state = make_service([])
+    service.microphone = Microphone()
+    service.half_duplex = True
+    provider.send_audio = fail
+    with pytest.raises(ProviderError, match="Disconnected while recording"):
+        asyncio.run(service.run_turn(asyncio.Event()))
+    assert closed == [True] and state.current == State.ERROR

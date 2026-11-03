@@ -60,6 +60,13 @@ interrupción de voz mientras habla. En sitios ruidosos puede requerir ajustar
 (inicial `0.9`, segundos) en `.env`. Cada intervención tiene un límite
 aproximado de veinte segundos. La sensibilidad requiere validación física.
 
+La salida física se cierra antes de abrir la captura y vuelve a abrirse
+después de cerrar el micrófono, para evitar mantener dos streams ALSA
+simultáneos en el HAT. La detección inicial acumula voz dentro de una ventana
+de 300 ms y permite interrupciones cortas entre sonidos. El registro indica
+si llegan bloques PCM, su nivel RMS, el inicio de voz y el final por pausa;
+estos mensajes no guardan grabaciones ni requieren paquetes adicionales.
+
 Para conservar solo la cara, define `CUTY_MENU_VOICE=off` en el entorno
 del launcher. Puedes probar la conversación por SSH, sin el menú, con
 `python -m cuty --hands-free` dentro del entorno virtual.

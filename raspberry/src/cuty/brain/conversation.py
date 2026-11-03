@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 from dataclasses import asdict
+from contextlib import aclosing
 from time import monotonic
 
 from cuty.llm.provider import AIProvider, EventKind, ProviderError, ToolCall
@@ -36,6 +37,7 @@ class ConversationService:
         web_search: WebSearchService | None = None,
         thinking_voice: ThinkingVoice | None = None,
         voice_exit: bool = False,
+        half_duplex: bool = False,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -45,6 +47,7 @@ class ConversationService:
         self.web_search = web_search or WebSearchService()
         self.thinking_voice = thinking_voice
         self.voice_exit = voice_exit
+        self.half_duplex = half_duplex
         self._log = logging.getLogger("CUTY")
 
     async def greet(self) -> None:
@@ -63,20 +66,29 @@ class ConversationService:
         if self.state.current != State.IDLE:
             raise RuntimeError("A conversation turn is already in progress.")
         try:
+            if self.half_duplex:
+                # Release the physical playback stream, not just its audio queue.
+                # Some I2S HATs cannot reliably start capture while it is open.
+                await self.speaker.close()
+                await asyncio.sleep(0.1)
             await self.provider.start_turn()
             self.state.set(State.LISTENING)
             chunks = 0
             bytes_sent = 0
-            async for pcm16 in self.microphone.chunks(stop):
-                if pcm16:
-                    await self.provider.send_audio(pcm16)
-                    chunks += 1
-                    bytes_sent += len(pcm16)
+            async with aclosing(self.microphone.chunks(stop)) as source:
+                async for pcm16 in source:
+                    if pcm16:
+                        await self.provider.send_audio(pcm16)
+                        chunks += 1
+                        bytes_sent += len(pcm16)
             if chunks == 0:
                 self._log.warning("No se capturó audio del micrófono.")
                 self.state.set(State.IDLE)
                 return False
             self._log.info("Audio del micrófono enviado: %d bytes PCM16", bytes_sent)
+            if self.half_duplex:
+                # The microphone generator has closed before playback reopens.
+                await self.speaker.open()
             await self.provider.finish_input()
             self.state.set(State.THINKING)
             await self._receive_response()
