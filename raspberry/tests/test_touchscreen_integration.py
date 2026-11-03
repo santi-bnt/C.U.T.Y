@@ -4,6 +4,8 @@ import ast
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 RASPBERRY = Path(__file__).resolve().parents[1]
 ROOT = RASPBERRY.parent
 
@@ -58,3 +60,27 @@ def test_service_and_compatibility_launch_paths_exist():
         compile((ROOT / filename).read_text(encoding="utf-8"), filename, "exec")
     for filename in ("cuty_launcher.py", "cuty_wifi_panel.py"):
         compile((RASPBERRY / "touchscreen" / filename).read_text(encoding="utf-8"), filename, "exec")
+
+
+@pytest.mark.parametrize("code", [0, 1])
+def test_finished_voice_returns_to_menu_and_releases_resources(code):
+    calls = []
+    check = load_function("check_voice", method=True)
+    panel = SimpleNamespace(
+        mode="face", screen="home", hold_since=1, released_at=2, is_pressed=True,
+        voice=SimpleNamespace(process=object(), poll=lambda: code),
+        leave_face=lambda: calls.append("stop voice and camera"),
+        render=lambda: calls.append("render menu"),
+    )
+    assert check(panel)
+    assert panel.mode == "menu" and panel.screen == "home"
+    assert calls == ["stop voice and camera", "render menu"]
+    assert panel.ignore_next_release and panel.hold_since is None
+    assert bool(panel.voice_error) == bool(code)
+
+
+def test_active_voice_does_not_leave_the_face():
+    check = load_function("check_voice", method=True)
+    panel = SimpleNamespace(mode="face", voice=SimpleNamespace(process=object(), poll=lambda: None))
+    assert not check(panel)
+    assert panel.mode == "face"

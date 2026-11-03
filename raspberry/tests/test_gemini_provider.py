@@ -19,6 +19,9 @@ class FakeSession:
     async def send_tool_response(self, *, function_responses):
         self.tool_results.extend(function_responses)
 
+    async def send_client_content(self, **kwargs):
+        self.sent.append(kwargs)
+
     async def receive(self):
         yield types.LiveServerMessage(tool_call=types.LiveServerToolCall(function_calls=[
             types.FunctionCall(id="call-1", name="set_expression", args={"expression": "happy", "intensity": 0.8})
@@ -116,6 +119,40 @@ def test_manual_activity_boundaries_are_sent_once_per_nonempty_turn():
         "activity_start", "audio", "audio", "activity_end",
         "activity_start", "audio", "audio", "activity_end",
     ]
+
+
+def test_greeting_requests_audio_without_recording_or_keyboard():
+    provider = GeminiLiveProvider("fake-key", hands_free=True)
+    session = FakeSession()
+    provider._session = session
+    asyncio.run(provider.request_greeting())
+    assert len(session.sent) == 1
+    assert session.sent[0]["turn_complete"] is True
+    assert session.sent[0]["turns"][0]["role"] == "user"
+
+
+def test_menu_config_adds_exit_tool_without_changing_keyboard_config():
+    captured = []
+
+    class Manager:
+        async def __aenter__(self):
+            return FakeSession()
+
+        async def __aexit__(self, *args):
+            pass
+
+    class Live:
+        def connect(self, *, model, config):
+            captured.append(types.LiveConnectConfig(**config))
+            return Manager()
+
+    from types import SimpleNamespace
+    provider = GeminiLiveProvider("fake-key", hands_free=True)
+    provider._client = SimpleNamespace(aio=SimpleNamespace(live=Live()))
+    asyncio.run(provider.connect())
+    assert captured[0].tools[0].function_declarations[-1].name == "return_to_menu"
+    assert "return_to_menu" in captured[0].system_instruction
+    assert len(_CONFIG["tools"][0]["function_declarations"]) == 2
 
 
 def test_grounded_search_sources_are_emitted_before_done_and_deduplicated_per_turn():

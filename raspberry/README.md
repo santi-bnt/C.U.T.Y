@@ -110,6 +110,17 @@ If the ReSpeaker does not appear on the Pi, its USB/HAT setup must be resolved
 before testing the voice app. Lip sync still runs on the Pi; network latency
 may require adjusting `CUTY_LIPSYNC_DELAY`.
 
+## Conversación automática en la pantalla
+
+El botón C.U.T.Y del menú inicia una sesión Gemini con saludo hablado y
+escucha sin ENTER. Di «salir», «quiero salir» o «regresa al menú principal»
+cuando escuche para volver al inicio. El launcher utiliza este entorno
+virtual y carga `raspberry/.env`; no recibe las variables exportadas en una
+terminal SSH. Consulta la [configuración del menú](touchscreen/README.md#conversación-desde-el-menú).
+
+Para probar ese modo desde una terminal: `python -m cuty --hands-free`.
+La CLI habitual `python -m cuty` conserva los turnos con ENTER.
+
 ## Tests
 
 ```powershell
@@ -150,4 +161,4 @@ The sample `systemd/cuty.service` is a placeholder for a later phase. This Phase
 
 ## Raspberry touchscreen
 
-The existing [touch menu, demo face and Wi-Fi panel](touchscreen/README.md) are preserved separately in `touchscreen/`. This voice application is not yet connected to that demo. Screen dependencies are in `touchscreen/requirements.txt` and are not required for Windows voice development. Setup helpers now live in `scripts/` within this Raspberry directory.
+The [touch menu, animated face and Wi-Fi panel](touchscreen/README.md) live in `touchscreen/`. The C.U.T.Y button starts hands-free Gemini voice, expressions and lip sync, with a spoken exit back to the menu. Screen dependencies are in `touchscreen/requirements.txt` and are not required for Windows voice development. Setup helpers live in `scripts/` within this Raspberry directory.

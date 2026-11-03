@@ -16,7 +16,7 @@ class State(str, Enum):
 
 
 _ALLOWED = {
-    State.IDLE: {State.LISTENING, State.ERROR},
+    State.IDLE: {State.LISTENING, State.THINKING, State.ERROR},
     State.LISTENING: {State.THINKING, State.ERROR, State.IDLE},
     State.THINKING: {State.SPEAKING, State.IDLE, State.ERROR},
     State.SPEAKING: {State.IDLE, State.ERROR},

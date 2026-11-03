@@ -23,6 +23,7 @@ import cuty_wifi_panel as wifi
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 try:
     from cuty.face.framebuffer import FramebufferWriter, to_rgb565
+    from cuty.brain.menu_voice import MenuVoice
     from cuty.face.link import FaceLinkReceiver
     from cuty.face.renderer import Face
     from cuty.vision.camera import camera_mode
@@ -146,6 +147,8 @@ class Launcher(wifi.Panel):
         self.last_release = 0
         self.ignore_next_release = False
         self.last_status_check = 0
+        self.voice = MenuVoice(Path(__file__).resolve().parents[1], NORM_USER) if not FACE_ERROR else None
+        self.voice_error = ''
 
     def draw_button(self, d, rect, title, action, font=FONT):
         x1, y1, x2, y2 = rect
@@ -166,7 +169,7 @@ class Launcher(wifi.Panel):
         options = [
             (70, 'Terminal', 'Comandos y diagnóstico', 'terminal'),
             (151, 'Internet', 'Wi-Fi, IP y conexión', 'internet'),
-            (232, 'C.U.T.Y', 'Expresiones del robot', 'face'),
+            (232, 'C.U.T.Y', self.voice_error or 'Toca para conversar', 'face'),
         ]
         for y, title, description, action in options:
             d.rounded_rectangle((12, y, W-12, y+70), radius=12, fill=CARD)
@@ -301,14 +304,40 @@ class Launcher(wifi.Panel):
         if self.tracker is not None:
             self.tracker.start()
         self.next_face_frame = 0.0
+        if self.voice is not None and os.getenv('CUTY_MENU_VOICE', 'on').lower() not in ('off', '0', 'false'):
+            try:
+                self.voice_error = ''
+                self.voice.start()
+            except (OSError, RuntimeError) as error:
+                print('C.U.T.Y voz:', error, flush=True)
+                self.voice_error = 'Voz no disponible; revisa el registro'
+                self.leave_face()
+                self.mode, self.screen = 'menu', 'home'
 
     def leave_face(self):
+        if self.voice is not None:
+            self.voice.stop()
         if self.tracker is not None:
             self.tracker.stop()
         if self.face is not None:
             self.face.clear_target()
         if self.face_writer is not None:
             self.face_writer.invalidate()
+
+    def check_voice(self):
+        """A normal voice exit returns home; a failure also leaves the menu usable."""
+        if self.voice is None or self.voice.process is None:
+            return False
+        code = self.voice.poll()
+        if code is None:
+            return False
+        self.voice_error = '' if code == 0 else 'Error de voz; revisa el registro'
+        self.leave_face()
+        self.hold_since = self.released_at = None
+        self.ignore_next_release = self.is_pressed
+        self.mode, self.screen = 'menu', 'home'
+        self.render()
+        return True
 
     def apply_link_messages(self):
         """Expressions, mouth level and blinks sent by the voice app."""
@@ -380,6 +409,8 @@ class Launcher(wifi.Panel):
 
     def action(self, act):
         if act == ('menu',):
+            if self.mode == 'face':
+                self.leave_face()
             self.mode, self.screen = 'menu', 'home'
             self.value = ''  # never leave passwords displayed
             self.render()
@@ -481,6 +512,8 @@ class Launcher(wifi.Panel):
                                                 self.action(action)
                                                 break
                 if self.mode == 'face':
+                    if self.check_voice():
+                        continue
                     if (self.is_pressed and self.hold_since is not None and
                             now - self.hold_since >= 5.0):
                         self.is_pressed = False

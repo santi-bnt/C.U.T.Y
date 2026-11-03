@@ -55,6 +55,7 @@ def launcher(tmp_path, monkeypatch):
     monkeypatch.setitem(sys.modules, "cuty_wifi_panel", wifi)
     monkeypatch.syspath_prepend(str(TOUCHSCREEN))
     monkeypatch.setenv("CUTY_CAMERA", "off")
+    monkeypatch.setenv("CUTY_MENU_VOICE", "off")
     monkeypatch.setenv("CUTY_FACE_LISTEN", "127.0.0.1:0")
     sys.modules.pop("cuty_launcher", None)
     import cuty_launcher

@@ -16,8 +16,13 @@ from cuty.face.expressions import Expression
 from cuty.face.expression_sink import ExpressionController
 from cuty.llm.web_search import WebSearchError, WebSearchService
 from cuty.audio.thinking import ThinkingVoice
+from cuty.brain.voice_commands import wants_menu
 
 RESPONSE_START_TIMEOUT = 15.0
+
+
+class ReturnToMenu(Exception):
+    """Normal termination requested by the user, not a provider failure."""
 
 
 class ConversationService:
@@ -30,6 +35,7 @@ class ConversationService:
         expressions: ExpressionController,
         web_search: WebSearchService | None = None,
         thinking_voice: ThinkingVoice | None = None,
+        voice_exit: bool = False,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -38,7 +44,19 @@ class ConversationService:
         self.expressions = expressions
         self.web_search = web_search or WebSearchService()
         self.thinking_voice = thinking_voice
+        self.voice_exit = voice_exit
         self._log = logging.getLogger("CUTY")
+
+    async def greet(self) -> None:
+        """Ask the hands-free provider to speak before opening the microphone."""
+        self.state.set(State.THINKING)
+        try:
+            await self.provider.request_greeting()
+            await self._receive_response()
+            self.state.set(State.IDLE)
+        except Exception:
+            self.state.set(State.ERROR)
+            raise
 
     async def run_turn(self, stop: asyncio.Event) -> bool:
         """Record until stop, then stream and play a response. Return False for empty input."""
@@ -64,6 +82,9 @@ class ConversationService:
             await self._receive_response()
             self.state.set(State.IDLE)
             return True
+        except ReturnToMenu:
+            self.state.set(State.IDLE)
+            raise
         except Exception:
             self.state.set(State.ERROR)
             raise
@@ -111,6 +132,7 @@ class ConversationService:
 
     async def _collect_response(self, audio_queue: asyncio.Queue[bytes | None]) -> None:
         first_audio = False
+        input_transcript = ""
         deadline = monotonic() + RESPONSE_START_TIMEOUT
         # A function call can require another response before speech begins.
         for _ in range(5):
@@ -136,6 +158,7 @@ class ConversationService:
                     self._log.info("C.U.T.Y: %s", event.transcript)
                 elif event.kind == EventKind.INPUT_TRANSCRIPT and event.transcript:
                     self._log.info("Escuché: %s", event.transcript)
+                    input_transcript += " " + event.transcript
                 elif event.kind == EventKind.WEB_SEARCH:
                     web_log = logging.getLogger("WEB")
                     for query in event.search_queries:
@@ -143,6 +166,8 @@ class ConversationService:
                     for source in event.sources:
                         web_log.info("Fuente: %s — %s", source.title, source.url)
                 elif event.kind == EventKind.DONE:
+                    if self.voice_exit and wants_menu(input_transcript):
+                        raise ReturnToMenu
                     if event.tool_calls:
                         for call in event.tool_calls:
                             await self._handle_tool(call)
@@ -177,6 +202,11 @@ class ConversationService:
                 expression = Expression(args["expression"])
                 event = self.expressions.set_emotion(expression, args["intensity"])
                 result = {"ok": True, "event": event.as_dict()}
+            elif call.name == "return_to_menu" and self.voice_exit:
+                if args:
+                    raise ValueError("Return to menu takes no arguments")
+                await self.provider.submit_tool_result(call.call_id, json.dumps({"ok": True}))
+                raise ReturnToMenu
             else:
                 raise ValueError("Unknown tool")
         except WebSearchError as exc:

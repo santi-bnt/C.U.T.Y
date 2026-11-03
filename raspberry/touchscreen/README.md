@@ -11,6 +11,59 @@ Utiliza Pillow, evdev, NetworkManager y el framebuffer Linux, sin HDMI.
   Un toque corto la hace parpadear. Mantén presionada cualquier zona durante
   **5 segundos continuos** para regresar; soltar antes cancela la pulsación.
 
+## Conversación desde el menú
+
+Al tocar **C.U.T.Y**, el menú abre la cara e inicia la voz con
+`raspberry/.venv/bin/python -m cuty --hands-free`, como el usuario `santi`.
+Gemini saluda primero; después escucha automáticamente y responde cuando
+terminas de hablar y haces una pausa. No hay que pulsar ENTER.
+
+Di **«salir»**, **«quiero salir»** o **«regresa al menú principal»** cuando
+esté escuchando para cerrar la conversación y regresar al inicio. También
+se conserva la pulsación de cinco segundos para salir. Salir cierra la voz,
+libera el micrófono y detiene la cámara. Al volver a entrar empieza una
+conversación nueva. Si la voz falla, vuelve al menú y muestra un aviso.
+
+Usa las dependencias ya preparadas en `raspberry/.venv`; esta función no
+instala paquetes ni modifica el arranque, los overlays, ALSA o GPIO.
+Selecciona automáticamente `seeed2micvoicec` si no hay dispositivos
+explícitos en la configuración. No ejecutes otra sesión de voz a la vez.
+
+La clave debe estar en `/home/santi/C.U.T.Y/raspberry/.env`:
+
+```dotenv
+GEMINI_API_KEY=TU_CLAVE_REAL
+```
+
+Ese archivo está excluido de Git. Una clave exportada en una terminal SSH
+no llega al servicio del menú. Puedes editarlo con `nano` y limitar su
+lectura con `chmod 600 /home/santi/C.U.T.Y/raspberry/.env`.
+No pegues claves en GitHub, comandos compartidos o registros.
+
+Después de actualizar el código, reinicia únicamente el launcher:
+
+```sh
+sudo systemctl restart cuty-launcher.service
+```
+
+Para revisar fallos sin mostrar el archivo de la clave:
+
+```sh
+journalctl -u cuty-launcher.service -n 60 --no-pager
+```
+
+El modo automático usa Gemini y detección local de energía, sin dependencias
+nuevas. El micrófono se abre al escuchar y se cierra durante la respuesta:
+espera a que termine de hablar para responder o pedir salir. No hay
+interrupción de voz mientras habla. En sitios ruidosos puede requerir ajustar
+`CUTY_VAD_THRESHOLD` (inicial `350`, RMS PCM16) o `CUTY_VAD_SILENCE`
+(inicial `0.9`, segundos) en `.env`. Cada intervención tiene un límite
+aproximado de veinte segundos. La sensibilidad requiere validación física.
+
+Para conservar solo la cara, define `CUTY_MENU_VOICE=off` en el entorno
+del launcher. Puedes probar la conversación por SSH, sin el menú, con
+`python -m cuty --hands-free` dentro del entorno virtual.
+
 ## Raspberry actual
 
 Directorio: `/home/santi/C.U.T.Y`. Servicio: `cuty-launcher.service`.
@@ -39,7 +92,8 @@ envía por SPI las filas que cambiaron. La cámara corre en un hilo aparte
 únicamente mientras la cara está en pantalla.
 
 La voz (`python -m cuty`) envía expresiones y el nivel de la boca al puerto
-UDP local 5005; se puede iniciar antes o después del launcher. Prueba rápida
+UDP local 5005. El menú inicia su propia voz al entrar en C.U.T.Y; no abras
+una segunda instancia. Prueba rápida
 sin voz, con la cara en pantalla:
 
 ```sh

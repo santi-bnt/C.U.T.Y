@@ -243,3 +243,52 @@ def test_failed_web_search_still_allows_a_spoken_explanation():
     asyncio.run(service.run_turn(asyncio.Event()))
     assert provider.results == [("search1", {"ok": False, "error": "Buscador no disponible", "results": []})]
     assert speaker.audio and state.current == State.IDLE
+
+
+def test_spoken_exit_is_normal_and_does_not_require_an_audio_reply():
+    from cuty.brain.conversation import ReturnToMenu
+
+    service, _, speaker, _, state = make_service([
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Quiero"),
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="salir."),
+        AIEvent(EventKind.DONE),
+    ])
+    service.voice_exit = True
+    with pytest.raises(ReturnToMenu):
+        asyncio.run(service.run_turn(asyncio.Event()))
+    assert not speaker.audio and state.current == State.IDLE
+
+
+def test_partial_exit_phrase_inside_a_longer_request_does_not_close():
+    service, _, speaker, _, state = make_service([
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Quiero salir"),
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="a caminar."),
+        AIEvent(EventKind.AUDIO, audio=b"\x00\x00" * 480),
+        AIEvent(EventKind.DONE),
+    ])
+    service.voice_exit = True
+    asyncio.run(service.run_turn(asyncio.Event()))
+    assert speaker.audio and state.current == State.IDLE
+
+
+def test_model_menu_tool_ends_session_instead_of_continuing():
+    from cuty.brain.conversation import ReturnToMenu
+
+    service, provider, _, _, state = make_service([
+        AIEvent(EventKind.DONE, tool_calls=(ToolCall("exit", "return_to_menu", '{}'),)),
+    ])
+    service.voice_exit = True
+    with pytest.raises(ReturnToMenu):
+        asyncio.run(service.run_turn(asyncio.Event()))
+    assert provider.results == [("exit", {"ok": True})]
+    assert not provider.continued and state.current == State.IDLE
+
+
+def test_keyboard_mode_does_not_exit_on_spoken_salir():
+    service, _, speaker, _, state = make_service([
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Quiero salir."),
+        AIEvent(EventKind.AUDIO, audio=b"\x00\x00" * 480),
+        AIEvent(EventKind.DONE),
+    ])
+    asyncio.run(service.run_turn(asyncio.Event()))
+    assert speaker.audio and state.current == State.IDLE

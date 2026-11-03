@@ -14,7 +14,7 @@ from google import genai
 from google.genai import types
 
 from cuty.llm.provider import AIEvent, EventKind, ProviderError, ToolCall, WebSource
-from cuty.brain.personality import INSTRUCTIONS, WEB_INSTRUCTIONS
+from cuty.brain.personality import INSTRUCTIONS, WEB_INSTRUCTIONS, MENU_INSTRUCTIONS
 from cuty.face.expressions import Expression
 
 
@@ -54,9 +54,10 @@ _CONFIG = {
 
 
 class GeminiLiveProvider:
-    def __init__(self, api_key: str, model: str = "gemini-3.8-live") -> None:
+    def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False) -> None:
         self._api_key = api_key
         self._model = model
+        self._hands_free = hands_free
         self._client = genai.Client(api_key=api_key)
         self._manager: Any = None
         self._session: Any = None
@@ -84,6 +85,14 @@ class GeminiLiveProvider:
                     "system_instruction": _CONFIG["system_instruction"]
                     + f"\nCurrent local date: {datetime.now().astimezone().date().isoformat()}.",
                 }
+                if self._hands_free:
+                    config["system_instruction"] += MENU_INSTRUCTIONS
+                    declarations = [*_CONFIG["tools"][0]["function_declarations"], {
+                        "name": "return_to_menu", "behavior": "BLOCKING",
+                        "description": "End this conversation and return to the touchscreen main menu when requested.",
+                        "parameters": {"type": "OBJECT", "properties": {}},
+                    }]
+                    config["tools"] = [{"function_declarations": declarations}]
                 manager = self._client.aio.live.connect(model=self._model, config=config)
                 self._session = await manager.__aenter__()
                 self._manager = manager
@@ -133,6 +142,16 @@ class GeminiLiveProvider:
         if self._activity_started:
             await self._connected().send_realtime_input(activity_end=types.ActivityEnd())
             self._activity_started = False
+
+    async def request_greeting(self) -> None:
+        await self.start_turn()
+        await self._connected().send_client_content(
+            turns=[{"role": "user", "parts": [{"text":
+                "Acabo de tocar C.U.T.Y en el menu. Saludame brevemente en espanol, "
+                "pregunta en que me puedes ayudar y menciona que puedo decir quiero salir "
+                "para volver al menu. Esto es una instruccion de bienvenida, no quiero salir ahora."
+            }]}], turn_complete=True,
+        )
 
     async def receive(self) -> AIEvent:
         if self._pending:
