@@ -49,7 +49,9 @@ RESPEAKER_MUST_BE_OPEN = (11, 19, 23, 32, 33)
 
 # --------------------------------------------------------------------------
 # WeAct Black Pill STM32F401CCU6 (two 1x20 rows, 15.24 mm apart)
-# Pins 1..20: row with PB12 at the USB-C end; 21..40: row with VBAT at the USB-C end.
+# DIP-40 numbering identical to WeAct's own KiCad footprint and pinout diagram:
+# pins 1..20 = row PB12..3V3 (PB12 at the USB-C end), pins 21..40 = row VBAT..5V
+# (5V, pin 40, at the USB-C end, across from PB12). Geometry lives in gen_lib.pad_xy().
 # --------------------------------------------------------------------------
 BP_ROW_A = ["PB12", "PB13", "PB14", "PB15", "PA8", "PA9", "PA10", "PA11", "PA12", "PA15",
             "PB3", "PB4", "PB5", "PB6", "PB7", "PB8", "PB9", "5V", "GND", "3V3"]
@@ -59,7 +61,7 @@ BP_NAMES = {str(i + 1): n for i, n in enumerate(BP_ROW_A)} | {str(i + 21): n for
 BP_NET_BY_NAME = {
     "PB6": "PWM1", "PB7": "PWM2", "PB8": "PWM3", "PB9": "PWM4", "PA8": "PWM5",
     "PA2": "PI_RXD", "PA3": "PI_TXD",         # USART2: PA2=TX -> Pi RX, PA3=RX <- Pi TX
-    "PA0": "VBAT_SENSE",
+    "PA1": "VBAT_SENSE",                      # PA0 carries the module's KEY button
     "PB10": "I2C2_SCL", "PB3": "I2C2_SDA",
     "5V": "+5V_BP", "3V3": "+3V3_BP", "GND": "GND",
 }
@@ -114,9 +116,9 @@ def build() -> list[Part]:
              {str(p): PI_HEADER.get(p, "") for p in range(1, 41)},
              "Cable plano 40 vias a la Raspberry Pi 5", "Box header 2x20 2.54 mm", "logic"))
     add(Part("J13", "PANTALLA 3.5", "Connector_Generic:Conn_02x13_Odd_Even",
-             ("Connector_PinHeader_2.54mm", "PinHeader_2x13_P2.54mm_Vertical"),
+             ("Connector_IDC", "IDC-Header_2x13_P2.54mm_Vertical"),
              {str(p): (PI_HEADER.get(p, "") if p in DISPLAY_USED else "") for p in range(1, 27)},
-             "Display-G 26 pines (waveshare35a)", "Tira de pines 2x13 2.54 mm", "logic"))
+             "Display-G 26 pines (waveshare35a), por cable", "Box header 2x13 2.54 mm", "logic"))
     add(Part("J14", "RESPEAKER", "Connector_Generic:Conn_02x20_Odd_Even",
              ("Connector_PinHeader_2.54mm", "PinHeader_2x20_P2.54mm_Vertical"),
              {str(p): (PI_HEADER.get(p, "") if p in RESPEAKER_USED else "") for p in range(1, 41)},

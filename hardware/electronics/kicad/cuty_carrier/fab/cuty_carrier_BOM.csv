@@ -19,7 +19,7 @@ J9,1,SERVO3,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Bra
 J10,1,SERVO4,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Base 1 (S + -)
 J11,1,SERVO5,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Base 2 (S + -)
 J12,1,RPI5 GPIO,IDC-Header_2x20_P2.54mm_Vertical,Box header 2x20 2.54 mm,Cable plano 40 vias a la Raspberry Pi 5
-J13,1,PANTALLA 3.5,PinHeader_2x13_P2.54mm_Vertical,Tira de pines 2x13 2.54 mm,Display-G 26 pines (waveshare35a)
+J13,1,PANTALLA 3.5,IDC-Header_2x13_P2.54mm_Vertical,Box header 2x13 2.54 mm,"Display-G 26 pines (waveshare35a), por cable"
 J14,1,RESPEAKER,PinHeader_2x20_P2.54mm_Vertical,Tira de pines 2x20 2.54 mm,ReSpeaker 2-Mics Pi HAT V2.0
 U1,1,BlackPill F401CC,WeAct_BlackPill_Socket,2x zocalo hembra 1x20 2.54 mm,WeAct Black Pill STM32F401CCU6
 JP1,1,5V STM32,PinHeader_1x02_P2.54mm_Vertical,Tira 1x2 + jumper,Puente: 5 V de la Pi a la Black Pill
@@ -31,5 +31,6 @@ D2,1,5V,LED_D3.0mm,LED 3 mm verde,
 J15,1,I2C IMU,PinHeader_1x04_P2.54mm_Vertical,Tira de pines 1x4 2.54 mm,IMU futura en I2C2 de la STM32
 -,2,Fusible mini blade,-,Fusible automotriz mini 10 A + 5 A,Para F1 (servos) y F2 (Pi)
 -,1,Cable plano 40 vias,-,Cable IDC 2x20 hembra-hembra 10-15 cm,J12 a la Raspberry Pi 5
+-,1,Cable pantalla 26 vias,-,Extension GPIO 26 vias hembra-macho (o IDC 2x13 H-H + tira 2x13 macho-macho),J13 a la pantalla Display-G
 -,1,Jumper,-,Jumper 2.54 mm,JP1
 -,4,Tornillo M3,-,Separador M3 10 mm + tornillo,H1-H4

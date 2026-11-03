@@ -116,7 +116,7 @@ TEXTS = [
     (232, 35, "J13 y J14 replican la numeracion fisica de la Pi; solo se cablean los pines indicados.", 1.8),
     (232, 40, "ReSpeaker: pines 8, 10, 11, 19, 23, 32, 33 y libres sin conectar.", 1.8),
     (20, 198, "STM32F401 BLACK PILL: UART2 PA2 TX -> Pi RX (pin 10), PA3 RX <- Pi TX (pin 8). 5 V desde la Pi por JP1 + D1.", 1.8),
-    (20, 203, "La 3.3 V de la Black Pill (+3V3_BP) NO se une a la 3.3 V de la Pi. PA0 mide la bateria: Vbat * 22k / 122k.", 1.8),
+    (20, 203, "La 3.3 V de la Black Pill (+3V3_BP) NO se une a la 3.3 V de la Pi. PA1 mide la bateria: Vbat * 22k / 122k.", 1.8),
     (100, 268, "I2C2 para IMU futura (PB10 SCL, PB3 SDA).", 1.8),
 ]
 

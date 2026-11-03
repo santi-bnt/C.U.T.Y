@@ -1,10 +1,10 @@
-# C.U.T.Y — Placa base (carrier) v1.0
+# C.U.T.Y — Placa base (carrier) v1.1
 
 PCB de 2 capas que reemplaza la protoboard y los cables Dupont. Interconecta
 la Raspberry Pi 5, la STM32F401 Black Pill, la pantalla Display-G de 3.5 in,
 el ReSpeaker 2-Mics Pi HAT V2.0 y los cinco MG996R, y distribuye la energía
-de la LiPo 3S. Todos los módulos van enchufados (cable plano, zócalos y
-tiras de pines), así que se pueden quitar o reemplazar.
+de la LiPo 3S. Todos los módulos van enchufados (cables planos con llave,
+zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 
 | | |
 | --- | --- |
@@ -12,7 +12,7 @@ tiras de pines), así que se pueden quitar o reemplazar.
 | Capas | 2 (F.Cu / B.Cu), FR-4 1.6 mm |
 | Componentes | 100 % de agujero pasante (THT), fáciles de soldar a mano |
 | Pista / espacio mínimo | 0.30 mm / 0.25 mm (señales); 2.5–3.0 mm en potencia |
-| Taladro mínimo | 0.40 mm (vías) |
+| Taladro mínimo | 0.40 mm (vías 0.8/0.4); 2 ranuras de 0.6 mm (patas del XT60) |
 | DRC | 0 errores eléctricos, 0 pads sin conectar (`drc_report.txt`) |
 
 ![Vista superior](fab/preview/cuty_carrier_top.png)
@@ -53,6 +53,8 @@ LiPo 3S ─ J1 XT60 ─ J2 interruptor general ─┬─ F1 10 A ─ J3 interrup
   jumper si quieres alimentar la STM32 solo por USB mientras la programas.
   La 3.3 V de la Black Pill (`+3V3_BP`) es independiente de la 3.3 V de la Pi.
 - **LEDs.** BAT (rojo), 6V (azul) y 5V Pi (verde).
+- **Tornillos.** Alrededor de los 4 barrenos M3 no hay cobre, para que un separador
+  metálico no pueda unir GND y PGND a través del chasis.
 
 **Señales**
 
@@ -62,9 +64,9 @@ LiPo 3S ─ J1 XT60 ─ J2 interruptor general ─┬─ F1 10 A ─ J3 interrup
 | Pi pin 10 (RX) | PA2 USART2_TX | |
 | PB6 / PB7 / PB8 / PB9 | Servos 1–4 (J7–J10) | TIM4 CH1–CH4, 220 Ω en serie |
 | PA8 | Servo 5 (J11) | TIM1 CH1, 220 Ω en serie |
-| PA0 | Divisor de batería | V<sub>bat</sub> = V<sub>ADC</sub> × 122 / 22 (12.6 V → 2.27 V) |
+| PA1 | Divisor de batería | V<sub>bat</sub> = V<sub>ADC</sub> × 122 / 22 (12.6 V → 2.27 V). PA0 queda libre porque tiene el botón KEY de la Black Pill |
 | PB10 / PB3 | J15 I2C2 (SCL/SDA) | Para la IMU futura, con pull-ups de 4.7 kΩ |
-| J12 ↔ J13 | Pantalla | Pines 1, 2, 4, 6, 11, 17–26 y GND, numeración física idéntica a la Pi |
+| J12 ↔ J13 | Pantalla (por cable) | Pines 1, 2, 4, 6, 11, 17–26 y GND, numeración física idéntica a la Pi |
 | J12 ↔ J14 | ReSpeaker | Pines 1–7, 12, 17, 35, 37, 38, 40 y GND. Quedan libres 8, 10, 11, 19, 23, 32, 33 y los demás |
 
 Cada servo usa el orden estándar **– + S** (marrón, rojo, naranja). El
@@ -72,22 +74,30 @@ negativo queda hacia el borde de la placa.
 
 ## Antes de soldar y conectar (revisar sí o sí)
 
-1. **Orientación de la Black Pill.** El footprint usa el pinout WeAct V1.2/V3.0:
-   la fila PB12…3V3 y la fila VBAT…5V, con el USB-C hacia el borde derecho y los
-   componentes hacia arriba. Imprime `fab/cuty_carrier_capa_superior.pdf` a
-   escala 1:1, pon tu módulo encima y confirma que las etiquetas coinciden.
-   Si las filas resultaran al revés, el módulo funciona volteado (componentes
-   hacia la placa); no hace falta rehacer la PCB.
+1. **Black Pill.** Va con los componentes hacia arriba y el USB-C hacia el borde
+   derecho. Arriba queda la fila PB12…3V3 (PB12 junto al USB) y abajo la fila
+   VBAT…5V (5V junto al USB). El footprint sigue la numeración y la geometría
+   del modelo STEP oficial de WeAct (filas a 15.215 mm). Los nombres de los pines
+   están impresos entre los zócalos para que compruebes antes de insertar.
+   Si a tu módulo le soldaron el header SWD hacia abajo, la placa tiene
+   barrenos libres para esos 4 pines.
 2. **Ajusta el buck a 6.0 V con el multímetro antes de conectarlo a J5.**
 3. **Polaridad.** Revisa la polaridad del XT60: el pad de arriba es **+**. La
    PCB lleva el XT60 **macho**; la batería debe tener XT60 hembra.
-4. **Cable plano.** El cable a la Pi debe ser recto, de pin 1 a pin 1 (hilo
-   rojo al pin 1). La flecha ▽ marca el pin 1 en J12.
-5. **Pantalla y ReSpeaker.** Se insertan como sobre la Pi: el pin 1 está a la
-   derecha (cuadro). El cuerpo de la pantalla sale por el borde superior. El
-   ReSpeaker queda sobre el área de pistas, donde solo hay componentes bajos.
-6. **UART.** En la Pi 5 activa la UART de GPIO14/15 (`dtparam=uart0=on` en
-   `config.txt`) y valida el enlace antes de dar el diseño por definitivo.
+4. **Cables planos.** Ambos van rectos, de pin 1 a pin 1 (hilo rojo al pin 1);
+   la flecha ▽ marca el pin 1 y el box header no deja conectarlos al revés.
+   - **J12 → Raspberry Pi 5:** cable IDC de 40 vías hembra–hembra.
+   - **J13 → pantalla:** la pantalla va en la cabeza, que se mueve, así que se
+     conecta por cable: extensión GPIO de 26 vías **hembra–macho** (o un cable
+     IDC hembra–hembra más una tira 2×13 macho–macho). Insértala en la pantalla
+     igual que en una Pi.
+5. **ReSpeaker.** Se inserta directo en J14 como sobre la Pi, con el pin 1 a la
+   derecha (cuadro). Su placa (65 × 30 mm) queda sobre el área de pistas, donde solo
+   hay componentes bajos, y termina 2.5 mm antes del conector de la Pi.
+6. **Raspberry Pi 5.** En `config.txt` activa la UART de GPIO14/15
+   (`dtparam=uart0=on`). Si el regulador de 5.1 V no negocia USB-PD, agrega
+   `usb_max_current_enable=1` para que la Pi no limite sus puertos USB a 600 mA.
+   Valida el enlace UART antes de dar el diseño por definitivo.
 7. **Batería.** La placa solo protege con fusibles. La LiPo sigue necesitando
    una alarma o BMS de sobredescarga y un cargador balanceador 3S.
 

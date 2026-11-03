@@ -16,6 +16,7 @@ for (value, fp, mpn, note), refs in groups.items():
 extra = [
     ("-", 2, "Fusible mini blade", "-", "Fusible automotriz mini 10 A + 5 A", "Para F1 (servos) y F2 (Pi)"),
     ("-", 1, "Cable plano 40 vias", "-", "Cable IDC 2x20 hembra-hembra 10-15 cm", "J12 a la Raspberry Pi 5"),
+    ("-", 1, "Cable pantalla 26 vias", "-", "Extension GPIO 26 vias hembra-macho (o IDC 2x13 H-H + tira 2x13 macho-macho)", "J13 a la pantalla Display-G"),
     ("-", 1, "Jumper", "-", "Jumper 2.54 mm", "JP1"),
     ("-", 4, "Tornillo M3", "-", "Separador M3 10 mm + tornillo", "H1-H4"),
 ]
