@@ -14,6 +14,7 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 | Pista / espacio mínimo | 0.30 mm / 0.25 mm (señales); 2.5–3.0 mm en potencia |
 | Taladro mínimo | 0.40 mm (vías 0.8/0.4); 2 ranuras de 0.6 mm (patas del XT60) |
 | DRC | 0 errores eléctricos, 0 pads sin conectar (`drc_report.txt`) |
+| Gerbers | 0 cortos, 0 abiertos, taladro y máscara en cada pad (`scripts/verify_gerbers.py`) |
 
 ![Vista superior](fab/preview/cuty_carrier_top.png)
 
@@ -125,6 +126,8 @@ python3 gen_lib.py && python3 gen_sch.py
 /usr/bin/python3 gen_pcb.py             # Python de KiCad (pcbnew)
 /usr/bin/python3 route.py freerouting.jar 60   # o "reuse" para reusar _route/board.ses
 /usr/bin/python3 verify_pcb.py          # paridad pad por pad con netlist.py
+/usr/bin/python3 verify_spec.py         # la PCB contra las tablas de info.md
+/usr/bin/python3 verify_gerbers.py      # cortos/abiertos, taladros y mascara en los Gerbers reales
 ```
 
 `netlist.py` es la única fuente de verdad: si cambias una conexión ahí,

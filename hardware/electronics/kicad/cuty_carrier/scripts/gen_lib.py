@@ -78,7 +78,7 @@ def write_footprint() -> None:
         # USB-C marker at the module end (inside the outline).
         f'  (fp_rect (start {f(x0 + 0.4)} {f(cy - 4.5)}) (end {f(x0 + 6.6)} {f(cy + 4.5)}) {sk} (fill none) (layer "F.SilkS"))',
         f'  (fp_text user "USB-C" (at {f(x0 + 3.5)} {f(cy)} 90) (layer "F.SilkS") (effects (font (size 1 1) (thickness 0.15))))',
-        f'  (fp_text user "SWD" (at {f(SWD_X - 2.2)} {f(sum(SWD_Y) / 4)} 90) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.13))))',
+        f'  (fp_text user "SWD" (at {f(SWD_X - 2.2)} {f(sum(SWD_Y) / 4)} 90) (layer "F.SilkS") (effects (font (size 0.9 0.9) (thickness 0.15))))',
     ]
     for y in (ROW_A_Y, ROW_B_Y):
         lines.append(f'  (fp_rect (start {f(X0 - 1.33)} {f(y - 1.33)}) (end {f(X0 + 19 * PITCH + 1.33)} {f(y + 1.33)}) {sk} (fill none) (layer "F.SilkS"))')
@@ -91,7 +91,7 @@ def write_footprint() -> None:
         lines.append(f'  (pad "{num}" thru_hole {shape} (at {f(x)} {f(y)}) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask"))')
         # Pin names between the rows: visible whenever the module is unplugged.
         ty = y - 3.0 if num <= 20 else y + 3.0
-        lines.append(f'  (fp_text user "{BP_NAMES[str(num)]}" (at {f(x)} {f(ty)} 90) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.13))))')
+        lines.append(f'  (fp_text user "{BP_NAMES[str(num)]}" (at {f(x)} {f(ty)} 90) (layer "F.SilkS") (effects (font (size 0.9 0.9) (thickness 0.15))))')
     # Clearance holes in case the module's SWD header pins point down.
     for y in SWD_Y:
         lines.append(f'  (pad "" np_thru_hole circle (at {f(SWD_X)} {f(y)}) (size 1.3 1.3) (drill 1.3) (layers "*.Cu" "*.Mask"))')
