@@ -71,8 +71,45 @@ def select_working_device(selector: str | None, *, input_device: bool, sample_ra
         raise AudioDeviceError(f"{first_error} Use --list-audio-devices and set CUTY_AUDIO_{'INPUT' if input_device else 'OUTPUT'}_DEVICE.") from first_error
 
 
+def open_output_stream(index: int, *, sample_rate: int = 24000) -> tuple[Any, int, int]:
+    """Open the selected speaker with a supported rate/channel count.
+
+    Direct ALSA hw devices do not perform the conversion supplied by plughw.
+    Prefer 16 kHz after the provider rate so Gemini capture and playback on a
+    shared-clock I2S HAT can use the same hardware rate.
+    """
+    sd = _sounddevice()
+    try:
+        info = sd.query_devices(index, "output")
+        rates = list(dict.fromkeys([sample_rate, 16000, int(info["default_samplerate"]), 48000, 44100]))
+        channels = [count for count in (1, 2) if count <= info["max_output_channels"]]
+    except (sd.PortAudioError, OSError, ValueError) as exc:
+        raise AudioDeviceError(f"Cannot inspect speaker device {index}: {exc}") from exc
+    last_error = None
+    for rate in rates:
+        for count in channels:
+            stream = None
+            try:
+                sd.check_output_settings(device=index, samplerate=rate, channels=count, dtype="int16")
+                stream = sd.RawOutputStream(samplerate=rate, channels=count, dtype="int16", device=index)
+                stream.start()
+                return stream, rate, count
+            except (sd.PortAudioError, OSError) as exc:
+                last_error = exc
+                if stream is not None:
+                    stream.close()
+    raise AudioDeviceError(f"Cannot open speaker device {index} at supported PCM16 settings: {last_error}")
+
+
 def _probe(index: int, *, input_device: bool, sample_rate: int) -> None:
     sd = _sounddevice()
+    if not input_device:
+        stream, _, _ = open_output_stream(index, sample_rate=sample_rate)
+        try:
+            stream.stop()
+        finally:
+            stream.close()
+        return
     stream_class = sd.RawInputStream if input_device else sd.RawOutputStream
     try:
         with stream_class(samplerate=sample_rate, channels=1, dtype="int16", device=index, blocksize=sample_rate // 50):
