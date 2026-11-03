@@ -16,6 +16,7 @@ from cuty.llm.gemini_provider import GeminiLiveProvider
 from cuty.audio.devices import AudioDeviceError, format_devices, select_working_device, test_microphone_level
 from cuty.audio.microphone import SoundDeviceMicrophone
 from cuty.audio.speaker import SoundDeviceSpeaker
+from cuty.audio.remote import RemoteSpeaker, serve_audio
 from cuty.brain.conversation import ConversationService
 from cuty.brain.states import State, StateMachine
 from cuty.config import Config, ConfigurationError
@@ -56,7 +57,13 @@ async def run(config: Config) -> int:
     log.info("Starting...")
     input_rate = 16_000 if config.provider == "gemini" else 24_000
     input_id, input_name = select_working_device(config.input_device, input_device=True, sample_rate=input_rate)
-    output_id, output_name = select_working_device(config.output_device, input_device=False)
+    remote_output = os.getenv("CUTY_AUDIO_REMOTE_OUTPUT")
+    if remote_output:
+        speaker = RemoteSpeaker(remote_output)
+        output_name = f"PC via {remote_output}"
+    else:
+        output_id, output_name = select_working_device(config.output_device, input_device=False)
+        speaker = SoundDeviceSpeaker(output_id)
     logging.getLogger("AUDIO").info("Microphone: %s", input_name)
     logging.getLogger("AUDIO").info("Speaker: %s", output_name)
 
@@ -74,7 +81,6 @@ async def run(config: Config) -> int:
         if config.provider == "gemini"
         else OpenAIRealtimeProvider(config.api_key, config.model)
     )
-    speaker = SoundDeviceSpeaker(output_id)
     if face_link is not None:
         speaker = LipSyncSpeaker(speaker, face_link)
     thinking_voice = ThinkingVoice()
@@ -119,12 +125,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="C.U.T.Y voice companion")
     parser.add_argument("--list-audio-devices", action="store_true", help="List microphone and speaker device indices")
     parser.add_argument("--test-microphone", action="store_true", help="Measure microphone level for 3 seconds without an API key")
+    parser.add_argument("--serve-audio", action="store_true", help="Play Pi audio on this PC through an SSH reverse tunnel; no API key needed")
     args = parser.parse_args()
     configure_logging()
     load_dotenv()
     try:
         if args.list_audio_devices:
             print(format_devices())
+            return 0
+        if args.serve_audio:
+            output_id, output_name = select_working_device(os.getenv("CUTY_AUDIO_OUTPUT_DEVICE"), input_device=False)
+            print(f"PC speaker: {output_name}", flush=True)
+            asyncio.run(serve_audio(output_id))
             return 0
         if args.test_microphone:
             print("Speak into your microphone for 3 seconds...", flush=True)

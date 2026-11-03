@@ -13,6 +13,11 @@ import pytest
 
 pytest.importorskip("PIL")
 
+pytestmark = pytest.mark.skipif(
+    sys.platform != "linux",
+    reason="The Raspberry touchscreen loop requires Linux fonts and select() on touch file descriptors.",
+)
+
 TOUCHSCREEN = Path(__file__).resolve().parents[1] / "touchscreen"
 
 

@@ -63,6 +63,53 @@ The default model is `gemini-3.8-live`, Google's current stable Live model for l
 
 Gemini can call `search_web` for current information through the public DDGS search library, without another API key or a Google Search API quota. Ask, for example, "Busca en internet cuál es la versión estable actual de Python y dime la fuente." C.U.T.Y replies by voice and logs actual queries and source links as `[WEB]`. Ordinary conversation does not need a search; a lookup may take longer. Searches return public page excerpts, not full browser sessions or actions on websites. The public search engines can rate-limit or become unavailable; C.U.T.Y reports an unsuccessful search instead of inventing a verified answer. This integration avoids the Gemini Live Google Search quota restriction observed on the configured free project. The optional OpenAI adapter does not enable this search tool.
 
+## ReSpeaker on the Pi, reply audio on a Windows PC
+
+Run the voice app on the Raspberry Pi, where the ReSpeaker is connected.
+The PC only receives reply audio. Both machines need the Python dependencies
+above. This temporary setup uses an SSH reverse tunnel, with the audio
+receiver listening only on localhost; no Windows inbound firewall rule is needed.
+
+On the PC, open PowerShell in `raspberry`, list devices, choose the index of
+your PC speakers (not the ReSpeaker), and leave the receiver running:
+
+```powershell
+.\.venv\Scripts\python.exe -m cuty --list-audio-devices
+$env:CUTY_AUDIO_OUTPUT_DEVICE = "8" # Replace with your Speakers index
+.\.venv\Scripts\python.exe -m cuty --serve-audio
+```
+
+In a second PC terminal, connect to the Pi (replace the user and host):
+
+```powershell
+ssh -o ExitOnForwardFailure=yes -R 8765:127.0.0.1:8765 santi@RASPBERRY_IP
+```
+
+Inside that SSH session, from the repository root on the Pi:
+
+```bash
+git pull --ff-only origin main
+cd raspberry
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m cuty --list-audio-devices
+export CUTY_AUDIO_INPUT_DEVICE="N" # Replace N with the ReSpeaker input index
+python -m cuty --test-microphone
+export CUTY_AUDIO_REMOTE_OUTPUT="127.0.0.1:8765"
+# Configure GEMINI_API_KEY locally on the Pi if it is not already in .env.
+python -m cuty
+```
+
+If no virtual environment exists on the Pi, create it first with
+`python3 -m venv .venv`. Speak during the three-second microphone test;
+Peak and RMS should rise above zero. Then press ENTER, speak into the Pi's
+ReSpeaker, and press ENTER again: the reply plays on the PC. Keep both PC
+terminals open. Ctrl+C stops the receiver; `q` quits the voice app.
+Unset `CUTY_AUDIO_REMOTE_OUTPUT` to restore local Pi playback.
+If the ReSpeaker does not appear on the Pi, its USB/HAT setup must be resolved
+before testing the voice app. Lip sync still runs on the Pi; network latency
+may require adjusting `CUTY_LIPSYNC_DELAY`.
+
 ## Tests
 
 ```powershell

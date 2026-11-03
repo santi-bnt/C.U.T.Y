@@ -33,8 +33,7 @@ class FramebufferWriter:
         self._size = width * height * 2
         self._fd = os.open(self.path, os.O_RDWR)
         try:
-            self._map: mmap.mmap | None = mmap.mmap(self._fd, self._size, mmap.MAP_SHARED,
-                                                     mmap.PROT_READ | mmap.PROT_WRITE)
+            self._map: mmap.mmap | None = mmap.mmap(self._fd, self._size, access=mmap.ACCESS_WRITE)
         except (OSError, ValueError):
             self._map = None  # Fall back to seek + write.
         self._previous: np.ndarray | None = None
