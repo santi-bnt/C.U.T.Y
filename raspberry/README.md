@@ -75,7 +75,7 @@ your PC speakers (not the ReSpeaker), and leave the receiver running:
 
 ```powershell
 .\.venv\Scripts\python.exe -m cuty --list-audio-devices
-$env:CUTY_AUDIO_OUTPUT_DEVICE = "8" # Replace with your Speakers index
+$env:CUTY_AUDIO_OUTPUT_DEVICE = "3" # Replace with your Speakers index
 .\.venv\Scripts\python.exe -m cuty --serve-audio
 ```
 
