@@ -1,0 +1,35 @@
+Referencias,Cantidad,Valor,Footprint,Comprar,Nota
+J1,1,XT60 BAT 3S,AMASS_XT60PW-M_1x02_P7.20mm_Horizontal,AMASS XT60PW-M,Bateria LiPo 3S
+J2,1,SW PRINCIPAL,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal","Phoenix MKDS 1,5/2-5,08",A interruptor general (>=10 A)
+F1,1,10A,Fuseholder_Blade_Mini_Keystone_3568,Keystone 3568 + fusible mini 10 A,Fusible servos (mini blade 10 A)
+F2,1,5A,Fuseholder_Blade_Mini_Keystone_3568,Keystone 3568 + fusible mini 5 A,Fusible Raspberry (mini blade 5 A)
+J3,1,SW SERVOS,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal","Phoenix MKDS 1,5/2-5,08",A interruptor de servos
+J4,1,BUCK IN,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal","Phoenix MKDS 1,5/2-5,08",Entrada del buck de servos
+J5,1,BUCK OUT 6V,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal","Phoenix MKDS 1,5/2-5,08",Salida del buck ajustado a 6 V
+J6,1,REG RPI,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal","Phoenix MKDS 1,5/2-5,08",Entrada del regulador 5.1 V / 5 A (USB-C a Pi 5)
+C1 C2,2,1000uF 16V,CP_Radial_D10.0mm_P5.00mm,Electrolitico 1000 uF 16 V low-ESR D10 P5,
+R9 R8,2,1k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Resistencia 1/4 W,
+D3,1,6V,LED_D3.0mm,LED 3 mm azul,
+R10 R11 R12,3,4.7k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Resistencia 1/4 W,
+D4,1,BAT,LED_D3.0mm,LED 3 mm rojo,
+R1 R2 R3 R4 R5,5,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Resistencia 1/4 W,
+J7,1,SERVO1,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Cabeza (S + -)
+J8,1,SERVO2,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Brazo izq (S + -)
+J9,1,SERVO3,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Brazo der (S + -)
+J10,1,SERVO4,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Base 1 (S + -)
+J11,1,SERVO5,PinHeader_1x03_P2.54mm_Vertical,Tira de pines 1x3 2.54 mm,MG996R Base 2 (S + -)
+J12,1,RPI5 GPIO,IDC-Header_2x20_P2.54mm_Vertical,Box header 2x20 2.54 mm,Cable plano 40 vias a la Raspberry Pi 5
+J13,1,PANTALLA 3.5,PinHeader_2x13_P2.54mm_Vertical,Tira de pines 2x13 2.54 mm,Display-G 26 pines (waveshare35a)
+J14,1,RESPEAKER,PinHeader_2x20_P2.54mm_Vertical,Tira de pines 2x20 2.54 mm,ReSpeaker 2-Mics Pi HAT V2.0
+U1,1,BlackPill F401CC,WeAct_BlackPill_Socket,2x zocalo hembra 1x20 2.54 mm,WeAct Black Pill STM32F401CCU6
+JP1,1,5V STM32,PinHeader_1x02_P2.54mm_Vertical,Tira 1x2 + jumper,Puente: 5 V de la Pi a la Black Pill
+D1,1,1N5819,D_DO-41_SOD81_P10.16mm_Horizontal,1N5819,
+R6,1,100k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Resistencia 1/4 W 1%,
+R7,1,22k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Resistencia 1/4 W 1%,
+C3,1,100nF,C_Disc_D5.0mm_W2.5mm_P5.00mm,Ceramico 100 nF 50 V,
+D2,1,5V,LED_D3.0mm,LED 3 mm verde,
+J15,1,I2C IMU,PinHeader_1x04_P2.54mm_Vertical,Tira de pines 1x4 2.54 mm,IMU futura en I2C2 de la STM32
+-,2,Fusible mini blade,-,Fusible automotriz mini 10 A + 5 A,Para F1 (servos) y F2 (Pi)
+-,1,Cable plano 40 vias,-,Cable IDC 2x20 hembra-hembra 10-15 cm,J12 a la Raspberry Pi 5
+-,1,Jumper,-,Jumper 2.54 mm,JP1
+-,4,Tornillo M3,-,Separador M3 10 mm + tornillo,H1-H4

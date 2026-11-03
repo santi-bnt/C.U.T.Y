@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "CUTY")(type "KiCad")(uri "${KIPRJMOD}/CUTY.kicad_sym")(options "")(descr "C.U.T.Y project symbols"))
+)

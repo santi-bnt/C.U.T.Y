@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "CUTY")(type "KiCad")(uri "${KIPRJMOD}/CUTY.pretty")(options "")(descr "C.U.T.Y project footprints"))
+)
