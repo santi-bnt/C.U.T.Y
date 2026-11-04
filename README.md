@@ -28,7 +28,8 @@ Los archivos de arranque de la raíz son wrappers de compatibilidad, no otras co
 - Pantalla: menú Terminal/Internet/C.U.T.Y, Wi-Fi y **cara animada**: ojos que parpadean y miran alrededor, toque para parpadear y pulsación continua de cinco segundos para volver al menú.
 - Cara conectada: con cámara, los ojos **siguen a la persona**; las expresiones de la conversación aparecen en la cara y la **boca se mueve con la voz** (enlace UDP local entre la voz y la pantalla). Ver [cara](docs/face.md).
 - Conversación desde el menú: toca C.U.T.Y para recibir un saludo y hablar sin ENTER; di «quiero salir» para volver al inicio. Usa Gemini, el entorno existente y una clave local en `.env`. Ver [configuración](raspberry/touchscreen/README.md#conversación-desde-el-menú).
-- Servos, firmware, dashboard, PCB y mecánica siguen sin implementarse.
+- Electrónica: [carrier PCB v1.1](hardware/electronics/kicad/cuty_carrier/README.md) para Raspberry Pi 5 y STM32F401 Black Pill, con KiCad, Gerbers, BOM y esquemático. Fabricación, montaje y validación eléctrica pendientes.
+- Firmware STM32F401, control de servos, dashboard y mecánica siguen pendientes de implementación.
 
 Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Los ejemplos UART siguen siendo propuestas.
 

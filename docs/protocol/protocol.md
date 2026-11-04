@@ -15,7 +15,7 @@ See [commands](commands.md) and [telemetry](telemetry.md).
 
 ## Decisions required before implementation
 
-- STM32H7 board, UART pins, baud rate, electrical levels and grounding.
+- Confirm the exact STM32F401 Black Pill variant/revision and validate the carrier's proposed UART mapping (Pi TX pin 8 to PA3, PA2 to Pi RX pin 10), baud rate, electrical levels and grounding before implementing firmware.
 - Units, coordinate frames, calibrated limits, and target versus measured meaning.
 - Startup/version negotiation, acknowledgements, errors, sequencing, retries.
 - Heartbeat, stale command timeout, disconnect behavior, and recovery.

@@ -1,8 +1,10 @@
-# C.U.T.Y STM32H7 Firmware
+# C.U.T.Y STM32F401 Firmware
 
 Owns real-time physical control: PWM, servo motion, head PAN/TILT, ears, future arms, body/base axes, IMU acquisition, PID feedback, and safety limits.
 
-`Core/` and `Drivers/` are reserved for a future selected STM32H7 board/CubeMX-generated project. No board, pinout, HAL, clock configuration, or build system has been guessed.
+The current control hardware is an **STM32F401 Black Pill**, also targeted by the [carrier PCB v1.1](../hardware/electronics/kicad/cuty_carrier/README.md). Confirm the exact MCU suffix and board revision before generating firmware.
+
+`Core/` and `Drivers/` are reserved for the STM32F401 board-specific CubeMX/startup and CMSIS/HAL project. No generated HAL, clock configuration or firmware build system is supplied yet. The carrier's UART/PWM/ADC pin assignments document the PCB design; firmware initialization and physical validation remain pending.
 
 `App/` separates communication, servos, IMU, control, and safety. Every C/H file is a comment-only template, not firmware. Raspberry sends high-level targets; STM32 validates and converts them into safe movement.
 

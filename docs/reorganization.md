@@ -1,5 +1,10 @@
 # Integración de Raspberry y estructura simplificada
 
+> Nota histórica: este documento describe la reorganización inicial. Las
+> referencias a visión, cara, PCB o publicación pendientes corresponden a
+> aquel momento. Para el estado actual consulta el [roadmap](roadmap.md),
+> la [arquitectura](architecture.md) y la [carrier v1.1](../hardware/electronics/kicad/cuty_carrier/README.md).
+
 ## Origen y alcance
 
 Se ejecutaron `git fetch origin` y `git merge --ff-only origin/main`: la rama local pasó de `39effb9` a `7bfb392`, incorporando también `d7790b5`. No se hizo force push ni se crearon commits adicionales para la reorganización. Los cambios locales previos se conservaron. Esta reorganización aún debe revisarse, añadirse y publicarse mediante Git para llegar a la Raspberry.

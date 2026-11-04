@@ -13,14 +13,21 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 | Componentes | 100 % de agujero pasante (THT), fáciles de soldar a mano |
 | Pista / espacio mínimo | 0.30 mm / 0.25 mm (señales); 2.5–3.0 mm en potencia |
 | Taladro mínimo | 0.40 mm (vías 0.8/0.4); 2 ranuras de 0.6 mm (patas del XT60) |
-| DRC | 0 errores eléctricos, 0 pads sin conectar (`drc_report.txt`) |
+| DRC guardado | 0 entradas de severidad error, 0 pads sin conectar y 50 advertencias de serigrafía (`drc_report.txt`) |
 | Gerbers | 0 cortos, 0 abiertos, taladro y máscara en cada pad (`scripts/verify_gerbers.py`) |
 
 ![Vista superior](fab/preview/cuty_carrier_top.png)
 
+Los archivos de diseño y fabricación están disponibles; la fabricación,
+el montaje y la validación eléctrica de la carrier siguen pendientes.
+Los resultados DRC y Gerber anteriores son los conservados en esta rama;
+integrarlos en `main` no equivale a repetir las verificaciones con KiCad.
+
 ## Pedido en PCBWay
 
-1. Sube **`CUTY_carrier_PCBWay_gerbers.zip`** en *PCB Instant Quote → Quick-order PCB*.
+1. Comprime el contenido de **`fab/gerbers/`** como `CUTY_carrier_PCBWay_gerbers.zip`
+   y súbelo en *PCB Instant Quote → Quick-order PCB*. El ZIP no está versionado;
+   los archivos Gerber y los taladros sí están incluidos.
    PCBWay detecta el tamaño (100 × 92 mm) y las 2 capas.
 2. Opciones:
    - Material FR-4, TG130 · Espesor 1.6 mm · Capas 2
@@ -126,7 +133,7 @@ python3 gen_lib.py && python3 gen_sch.py
 /usr/bin/python3 gen_pcb.py             # Python de KiCad (pcbnew)
 /usr/bin/python3 route.py freerouting.jar 60   # o "reuse" para reusar _route/board.ses
 /usr/bin/python3 verify_pcb.py          # paridad pad por pad con netlist.py
-/usr/bin/python3 verify_spec.py         # la PCB contra las tablas de info.md
+/usr/bin/python3 verify_spec.py         # la PCB contra las conexiones especificadas
 /usr/bin/python3 verify_gerbers.py      # cortos/abiertos, taladros y mascara en los Gerbers reales
 ```
 
