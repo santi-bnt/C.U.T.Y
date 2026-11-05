@@ -10,14 +10,10 @@ import random
 from cuty.audio.speaker import Speaker
 
 PHRASES = (
-    "Estoy conectando los puntitos.",
-    "Un segundo, estoy ordenando mis ideas.",
-    "Mis neuronas digitales están haciendo magia.",
-    "Déjame darle una vuelta a eso.",
-    "Estoy cocinando una idea.",
-    "A ver, déjame pensar tantito.",
-    "Estoy desenredando los cables de mi imaginación.",
-    "Buena pregunta, voy a pensarlo.",
+    "Dame un momento.",
+    "Estoy revisando.",
+    "Déjame pensarlo.",
+    "Estoy conectando ideas.",
 )
 VOICE = "es-MX-DaliaNeural"
 CHUNK_BYTES = 960  # 20 ms, mono PCM16 at 24 kHz.
@@ -52,9 +48,8 @@ async def synthesize(phrase: str) -> bytes:
 
 
 class ThinkingVoice:
-    def __init__(self, *, delay: float = 1.8, interval: float = 5.0) -> None:
+    def __init__(self, *, delay: float = 5.0) -> None:
         self.delay = delay
-        self.interval = interval
         self.clips: dict[str, bytes] = {}
         self._last: str | None = None
         self._log = logging.getLogger("VOZ")
@@ -80,22 +75,21 @@ class ThinkingVoice:
         self._last = phrase
         return phrase, self.clips[phrase]
 
-    async def run(self, speaker: Speaker, stop: asyncio.Event) -> None:
-        # This task is joined before the answer uses the same speaker. Never
-        # cancel a write running in a thread: let its tiny chunk finish first.
-        for index in range(2):
-            try:
-                await asyncio.wait_for(stop.wait(), self.delay if index == 0 else self.interval)
+    async def run(self, speaker: Speaker, stop: asyncio.Event, *, abort: asyncio.Event | None = None) -> None:
+        # A normal answer waits for one short phrase to finish. Errors, leaving
+        # the menu, or a user interruption stop after the current 20 ms write.
+        try:
+            await asyncio.wait_for(stop.wait(), self.delay)
+            return
+        except TimeoutError:
+            pass
+        clip = self.choose()
+        if clip is None or stop.is_set() or (abort is not None and abort.is_set()):
+            return
+        phrase, pcm = clip
+        self._log.info("Pensando: %s", phrase)
+        for offset in range(0, len(pcm), CHUNK_BYTES):
+            if abort is not None and abort.is_set():
                 return
-            except TimeoutError:
-                pass
-            clip = self.choose()
-            if clip is None or stop.is_set():
-                return
-            phrase, pcm = clip
-            self._log.info("Pensando: %s", phrase)
-            for offset in range(0, len(pcm), CHUNK_BYTES):
-                if stop.is_set():
-                    return
-                await speaker.write(pcm[offset:offset + CHUNK_BYTES])
-                await asyncio.sleep(0)
+            await speaker.write(pcm[offset:offset + CHUNK_BYTES])
+            await asyncio.sleep(0)

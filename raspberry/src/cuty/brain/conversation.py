@@ -106,8 +106,9 @@ class ConversationService:
         audio_queue: asyncio.Queue[bytes | None] = asyncio.Queue(maxsize=64)
         started = monotonic()
         stop_thinking = asyncio.Event()
+        abort_thinking = asyncio.Event()
         thinking_task = (
-            asyncio.create_task(self.thinking_voice.run(self.speaker, stop_thinking))
+            asyncio.create_task(self.thinking_voice.run(self.speaker, stop_thinking, abort=abort_thinking))
             if self.thinking_voice is not None else None
         )
 
@@ -135,6 +136,7 @@ class ConversationService:
             await asyncio.gather(*tasks)
         finally:
             stop_thinking.set()
+            abort_thinking.set()
             for task in tasks:
                 if not task.done():
                     task.cancel()
@@ -182,7 +184,7 @@ class ConversationService:
                         raise ReturnToMenu
                     if event.tool_calls:
                         for call in event.tool_calls:
-                            await self._handle_tool(call)
+                            await self._handle_tool(call, input_transcript=input_transcript)
                         await self.provider.continue_response()
                         break
                     if not first_audio:
@@ -190,7 +192,7 @@ class ConversationService:
                     return
         raise ProviderError("AI provider called tools too many times without finishing a reply.")
 
-    async def _handle_tool(self, call: ToolCall) -> None:
+    async def _handle_tool(self, call: ToolCall, *, input_transcript: str = "") -> None:
         result: dict[str, object]
         try:
             args = json.loads(call.arguments)
@@ -217,6 +219,8 @@ class ConversationService:
             elif call.name == "return_to_menu" and self.voice_exit:
                 if args:
                     raise ValueError("Return to menu takes no arguments")
+                if not wants_menu(input_transcript):
+                    raise ValueError("No explicit exit command was transcribed")
                 await self.provider.submit_tool_result(call.call_id, json.dumps({"ok": True}))
                 raise ReturnToMenu
             else:
@@ -225,6 +229,9 @@ class ConversationService:
             logging.getLogger("WEB").warning("%s", exc)
             result = {"ok": False, "error": str(exc), "results": []}
         except (ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
-            self._log.warning("Rejected model expression event: %s", exc)
-            result = {"ok": False, "error": "Invalid search arguments" if call.name == "search_web" else "Invalid expression arguments"}
+            self._log.warning("Rejected tool %s: %s", call.name, exc)
+            error = ("Invalid search arguments" if call.name == "search_web" else
+                     "Exit not confirmed by the user's transcription; continue the conversation"
+                     if call.name == "return_to_menu" else "Invalid expression arguments")
+            result = {"ok": False, "error": error}
         await self.provider.submit_tool_result(call.call_id, json.dumps(result))

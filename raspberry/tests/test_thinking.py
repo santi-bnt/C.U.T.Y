@@ -30,7 +30,7 @@ def test_fast_response_has_no_thinking_audio():
     assert speaker.audio == [answer]
 
 
-def test_answer_stops_filler_without_overlapping_writes():
+def test_started_filler_finishes_before_the_answer_without_overlapping_writes():
     async def exercise():
         answer = b"\x02\x00" * 480
         service, provider, speaker, _, state = make_service([
@@ -40,7 +40,7 @@ def test_answer_stops_filler_without_overlapping_writes():
         reply_received = asyncio.Event()
         writing = False
         service.thinking_voice = ThinkingVoice(delay=0.001)
-        service.thinking_voice.clips = {PHRASES[0]: b"\x01\x00" * 48_000}
+        service.thinking_voice.clips = {PHRASES[0]: b"\x01\x00" * 1440}
         original_receive = provider.receive
 
         async def receive():
@@ -66,7 +66,7 @@ def test_answer_stops_filler_without_overlapping_writes():
         provider.receive = receive
         speaker.write = write
         assert await asyncio.wait_for(service.run_turn(asyncio.Event()), 1)
-        assert len(speaker.audio) == 2
+        assert len(speaker.audio) == 4
         assert len(speaker.audio[0]) == CHUNK_BYTES
         assert speaker.audio[-1] == answer
         assert state.current == State.IDLE
@@ -114,7 +114,7 @@ def test_unavailable_synthesis_is_optional(monkeypatch):
     assert voice.choose() is None
 
 
-def test_at_most_two_phrases_per_wait():
+def test_at_most_one_phrase_per_wait():
     class Speaker:
         def __init__(self):
             self.audio = []
@@ -122,8 +122,8 @@ def test_at_most_two_phrases_per_wait():
         async def write(self, pcm):
             self.audio.append(pcm)
 
-    voice = ThinkingVoice(delay=0.001, interval=0.001)
+    voice = ThinkingVoice(delay=0.001)
     voice.clips = {PHRASES[0]: b"\x01\x00"}
     speaker = Speaker()
     asyncio.run(voice.run(speaker, asyncio.Event()))
-    assert len(speaker.audio) == 2
+    assert len(speaker.audio) == 1

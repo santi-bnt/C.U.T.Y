@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 from cuty.llm.openai_provider import OpenAIRealtimeProvider
 from cuty.llm.gemini_provider import GeminiLiveProvider
-from cuty.audio.devices import AudioDeviceError, format_devices, list_devices, select_working_device, test_microphone_level
+from cuty.audio.devices import AudioDeviceError, format_devices, list_devices, select_working_device, test_microphone_level, test_duplex_level
 from cuty.audio.activity import SpeechMicrophone
 from cuty.audio.microphone import SoundDeviceMicrophone
 from cuty.audio.speaker import SoundDeviceSpeaker
@@ -164,6 +164,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="C.U.T.Y voice companion")
     parser.add_argument("--list-audio-devices", action="store_true", help="List microphone and speaker device indices")
     parser.add_argument("--test-microphone", action="store_true", help="Measure microphone level for 3 seconds without an API key")
+    parser.add_argument("--test-duplex", action="store_true", help="Test simultaneous ReSpeaker capture/playback with silent output, without an API key")
     parser.add_argument("--serve-audio", action="store_true", help="Play Pi audio on this PC through an SSH reverse tunnel; no API key needed")
     parser.add_argument("--hands-free", action="store_true", help="Greet, listen without ENTER, and exit by voice (Gemini)")
     args = parser.parse_args()
@@ -186,6 +187,14 @@ def main() -> int:
             print(f"Microphone: {name}\nPeak: {peak:.1f}%  RMS: {rms:.1f}%")
             if peak < 1.0:
                 print("Very low input. Check Windows microphone permission, mute, and input device.")
+            return 0
+        if args.test_duplex:
+            print("Return to the touchscreen main menu first. Speak for 3 seconds; output stays silent.", flush=True)
+            input_name, output_name, peak, rms = test_duplex_level(
+                os.getenv("CUTY_AUDIO_INPUT_DEVICE") or "seeed2micvoicec",
+                os.getenv("CUTY_AUDIO_OUTPUT_DEVICE") or "seeed2micvoicec",
+            )
+            print(f"Duplex OK (16 kHz mono)\nMicrophone: {input_name}\nSpeaker: {output_name}\nPeak: {peak:.1f}%  RMS: {rms:.1f}%")
             return 0
         config = Config.from_env()
         configure_logging("DEBUG" if config.debug else config.log_level)

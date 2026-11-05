@@ -150,3 +150,39 @@ def test_microphone_level(selector: str | None, *, seconds: int = 3) -> tuple[st
         raise AudioDeviceError(f"Cannot test microphone device {index}: {exc}") from exc
     rms = sqrt(power / sample_count) if sample_count else 0.0
     return name, peak / 32768 * 100, rms / 32768 * 100
+
+
+def test_duplex_level(input_selector: str | None, output_selector: str | None, *, seconds: int = 3) -> tuple[str, str, float, float]:
+    """Check one simultaneous capture/playback stream, sending silence only.
+
+    No cloud calls, saved recordings, mixer writes or ALSA configuration.
+    This verifies PCM delivery, not wake-word recognition or echo cancellation.
+    """
+    input_id, input_name = resolve_device(input_selector, input_device=True)
+    output_id, output_name = resolve_device(output_selector, input_device=False)
+    sd = _sounddevice()
+    rate = 16000
+    peak = power = count = 0
+    statuses = []
+
+    def callback(indata, outdata, frames, timing, status):
+        nonlocal peak, power, count
+        outdata[:] = bytes(len(outdata))
+        samples = array("h", bytes(indata))
+        peak = max(peak, max((abs(sample) for sample in samples), default=0))
+        power += sum(sample * sample for sample in samples)
+        count += len(samples)
+        if status and len(statuses) < 3:
+            statuses.append(str(status))
+
+    try:
+        with sd.RawStream(samplerate=rate, channels=(1, 1), dtype="int16",
+                          device=(input_id, output_id), blocksize=rate // 50, callback=callback):
+            sd.sleep(seconds * 1000)
+    except (sd.PortAudioError, OSError) as exc:
+        raise AudioDeviceError(f"Cannot use simultaneous microphone/speaker: {exc}") from exc
+    if count < rate * seconds // 2:
+        raise AudioDeviceError("Duplex capture did not deliver enough PCM. Keep half-duplex mode enabled.")
+    if statuses:
+        raise AudioDeviceError("Duplex stream reported: " + "; ".join(statuses))
+    return input_name, output_name, peak / 32768 * 100, sqrt(power / count) / 32768 * 100

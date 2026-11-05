@@ -274,14 +274,25 @@ def test_partial_exit_phrase_inside_a_longer_request_does_not_close():
 def test_model_menu_tool_ends_session_instead_of_continuing():
     from cuty.brain.conversation import ReturnToMenu
 
-    service, provider, _, _, state = make_service([
-        AIEvent(EventKind.DONE, tool_calls=(ToolCall("exit", "return_to_menu", '{}'),)),
-    ])
+    service, provider, _, _, state = make_service([])
     service.voice_exit = True
     with pytest.raises(ReturnToMenu):
-        asyncio.run(service.run_turn(asyncio.Event()))
+        asyncio.run(service._handle_tool(ToolCall("exit", "return_to_menu", '{}'),
+                                         input_transcript="Cuty, quiero salir"))
     assert provider.results == [("exit", {"ok": True})]
     assert not provider.continued and state.current == State.IDLE
+
+
+def test_model_cannot_close_menu_for_an_unrelated_transcription():
+    service, provider, speaker, _, state = make_service([
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="curiosarte"),
+        AIEvent(EventKind.DONE, tool_calls=(ToolCall("exit", "return_to_menu", '{}'),)),
+        AIEvent(EventKind.AUDIO, audio=b"\x00\x00" * 480), AIEvent(EventKind.DONE),
+    ])
+    service.voice_exit = True
+    asyncio.run(service.run_turn(asyncio.Event()))
+    assert not provider.results[0][1]["ok"]
+    assert provider.continued == 1 and speaker.audio and state.current == State.IDLE
 
 
 def test_keyboard_mode_does_not_exit_on_spoken_salir():

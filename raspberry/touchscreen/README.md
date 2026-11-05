@@ -24,6 +24,13 @@ se conserva la pulsación de cinco segundos para salir. Salir cierra la voz,
 libera el micrófono y detiene la cámara. Al volver a entrar empieza una
 conversación nueva. Si la voz falla, vuelve al menú y muestra un aviso.
 
+También admite **«Cuty, quiero salir»**, «Oye Cuty, quiero salir» y el nombre
+transcrito como «C.U.T.Y.» o «Cuti». Una llamada del modelo para cerrar sin
+una orden explícita en la transcripción se rechaza; palabras ajenas como
+«curiosarte» no deben cerrar la conversación. Las frases de espera salen
+solo después de cinco segundos, como máximo una por turno; si ya empezó
+una frase corta, termina antes de reproducir la respuesta.
+
 Usa las dependencias ya preparadas en `raspberry/.venv`; esta función no
 instala paquetes ni modifica el arranque, los overlays, ALSA o GPIO.
 Selecciona automáticamente `seeed2micvoicec` si no hay dispositivos
@@ -70,6 +77,23 @@ estos mensajes no guardan grabaciones ni requieren paquetes adicionales.
 Para conservar solo la cara, define `CUTY_MENU_VOICE=off` en el entorno
 del launcher. Puedes probar la conversación por SSH, sin el menú, con
 `python -m cuty --hands-free` dentro del entorno virtual.
+
+### Diagnóstico previo a la interrupción por voz
+
+El modo actual cierra el micrófono mientras habla. No implementa todavía
+la interrupción al decir «Cuty» durante la respuesta. Para comprobar si el
+HAT puede capturar y reproducir de forma simultánea usando un único stream,
+vuelve al menú principal y ejecuta desde `raspberry`:
+
+```sh
+./.venv/bin/python -m cuty --test-duplex
+```
+
+Habla durante tres segundos. La salida transmite únicamente silencio; no
+se guardan grabaciones, no se llama a Gemini y no se cambian controles.
+El resultado `Duplex OK` y los niveles permiten evaluar el siguiente paso.
+Esta prueba por sí sola no implementa reconocimiento del nombre ni
+cancelación de eco, y no activa otro modo de conversación.
 
 ## Raspberry actual
 

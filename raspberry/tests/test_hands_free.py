@@ -14,6 +14,7 @@ from cuty.brain.voice_commands import wants_menu
 @pytest.mark.parametrize("text", [
     "Salir.", "¡Quiero salir!", "Cuty, quiero salir, por favor.",
     "Regresa al menú principal", "Quiero salir de Cuty", "salir Cuty",
+    "C.U.T.Y., quiero salir", "Oye Cuty, quiero salir por favor", "Kuti quiero salir",
 ])
 def test_direct_exit_commands(text):
     assert wants_menu(text)
@@ -184,7 +185,7 @@ def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
         async def prepare(self):
             pass
 
-        async def run(self, speaker, stop):
+        async def run(self, speaker, stop, *, abort=None):
             await stop.wait()
 
     def select(selector, *, input_device, sample_rate=24000):
