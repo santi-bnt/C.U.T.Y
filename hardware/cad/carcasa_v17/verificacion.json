@@ -1,0 +1,99 @@
+{
+ "non_manifold": [],
+ "gimbal": {
+  "pitch+18_roll+0": [],
+  "pitch-18_roll+0": [],
+  "pitch+0_roll+12": [],
+  "pitch+0_roll-12": [],
+  "pitch+0_roll+15": [],
+  "pitch+0_roll-15": [],
+  "pitch+0_roll+18": [
+   [
+    "A4_Hand_R",
+    "B1_Base_Cover",
+    82.28
+   ]
+  ],
+  "pitch+0_roll-18": [
+   [
+    "A3_Hand_L",
+    "B1_Base_Cover",
+    49.73
+   ]
+  ],
+  "pitch+14_roll+10": [],
+  "pitch-14_roll-10": [],
+  "pitch+14_roll-10": [],
+  "pitch-14_roll+10": []
+ },
+ "head_pan": {
+  "pan-90": [],
+  "pan-60": [],
+  "pan-30": [],
+  "pan+30": [],
+  "pan+60": [],
+  "pan+90": []
+ },
+ "arms": {
+  "armL-120": [],
+  "armL-90": [],
+  "armL-60": [],
+  "armL-30": [],
+  "armL+30": [],
+  "armL+60": [],
+  "armL+90": [],
+  "armL+120": [],
+  "armR-120": [],
+  "armR-90": [],
+  "armR-60": [],
+  "armR-30": [],
+  "armR+30": [],
+  "armR+60": [],
+  "armR+90": [],
+  "armR+120": []
+ },
+ "static_mesh": [
+  [
+   "B1_Base_Cover",
+   "B2_Base_Floor",
+   0.58
+  ],
+  [
+   "S1_Body_Front",
+   "S2_Body_Back",
+   5.03
+  ],
+  [
+   "S1_Body_Front",
+   "S3_Tummy_Grille",
+   5.44
+  ],
+  [
+   "H1_Head_Front",
+   "H3_Visor",
+   0.57
+  ]
+ ],
+ "keepouts": {
+  "checked": 18,
+  "hits": [],
+  "note": "ko_battery_plug_J1 vs S1 0.6 mm3 en malla = 0.000 mm3 exacto"
+ },
+ "exact_brep_confirmed_zero": [
+  "S1xS2",
+  "S1xS3",
+  "B1xB2",
+  "H1xH3",
+  "J1 keepout x S1"
+ ],
+ "limits_deg": {
+  "pitch": 18,
+  "roll": 15,
+  "pitch_roll_combined": [
+   14,
+   10
+  ],
+  "head_pan": 90,
+  "arms": 120
+ }
+}

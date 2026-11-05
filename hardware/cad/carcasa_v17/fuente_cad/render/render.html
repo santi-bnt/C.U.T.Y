@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#eef1ee;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const q = new URLSearchParams(location.search);
+const W = +(q.get('w') || 1200), H = +(q.get('h') || 1200);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(q.get('bg') || '#eef1ee');
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c4bc, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(-260, 520, 420); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -400, right: 400, top: 400, bottom: -400, near: 10, far: 2000 });
+key.shadow.bias = -0.0004; key.shadow.radius = 6;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xfff1e0, 0.6); rim.position.set(300, 200, -400); scene.add(rim);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.ShadowMaterial({ opacity: 0.18 }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+
+const xray = q.get('xray');            // comma list of name prefixes rendered translucent
+const hide = (q.get('hide') || '').split(',').filter(Boolean);
+const only = (q.get('only') || '').split(',').filter(Boolean);
+const explode = +(q.get('explode') || 0);
+const loader = new GLTFLoader();
+loader.load(q.get('glb'), (g) => {
+  const root = g.scene;
+  let meta = window.META || [];
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    const nm = o.name || '';
+    if (hide.some(h => nm.startsWith(h))) { o.visible = false; return; }
+    if (only.length && !only.some(h => nm.startsWith(h))) { o.visible = false; return; }
+    o.castShadow = true; o.receiveShadow = true;
+    const m = o.material;
+    m.envMapIntensity = 0.55;
+    if (xray && xray.split(',').some(p => nm.startsWith(p))) {
+      m.transparent = true; m.opacity = 0.18; m.depthWrite = false; o.castShadow = false;
+    }
+  });
+  scene.add(root);
+  const faceName = q.get('face') || 'happy';
+  if (faceName !== 'none' && !hide.some(h => 'H3_'.startsWith(h))) {
+    const tex = new THREE.TextureLoader().load('/render/tex/cara_' + faceName + '.png', () => { renderer.render(scene, window.__cam); window.__done = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+    const fm = new THREE.Mesh(new THREE.PlaneGeometry(74.04, 49.56), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
+    fm.position.set(0, 266.0, 47.52);
+    scene.add(fm);
+    window.__waitFace = true;
+  }
+  const box = new THREE.Box3().setFromObject(root);
+  const c = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  const view = q.get('view') || 'front34';
+  const az = { front34: -35, front: 0, side: -90, back: 180, back34: 145, left34: 35 }[view] ?? +(q.get('az') || -35);
+  const el = +(q.get('el') || (view === 'top' ? 80 : 14));
+  const fov = 28;
+  const cam = new THREE.PerspectiveCamera(fov, W / H, 1, 5000);
+  const dist = (Math.max(size.x, size.y, size.z) * +(q.get('zoom') || 1.0)) / (2 * Math.tan(THREE.MathUtils.degToRad(fov / 2))) * 1.25;
+  const azr = THREE.MathUtils.degToRad(az), elr = THREE.MathUtils.degToRad(el);
+  const tgt = q.get('target') ? new THREE.Vector3(...q.get('target').split(',').map(Number)) : c;
+  cam.position.set(tgt.x + dist * Math.sin(azr) * Math.cos(elr), tgt.y + dist * Math.sin(elr), tgt.z + dist * Math.cos(azr) * Math.cos(elr));
+  cam.lookAt(tgt);
+  window.__cam = cam;
+  renderer.render(scene, cam);
+  if (!window.__waitFace) window.__done = true;
+});
+</script></body></html>

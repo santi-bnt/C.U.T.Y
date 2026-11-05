@@ -1,0 +1,115 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<canvas id="cv"></canvas>
+<script type="importmap">{"imports":{"three":"/render/node_modules/three/build/three.module.js","three/addons/":"/render/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Offline frame renderer for the build guide / video: same model, pivots and explode table as the 3D viewer.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const q = new URLSearchParams(location.search);
+const W = +(q.get('w') || 812), H = +(q.get('h') || 720);
+const g = (x, y, z) => new THREE.Vector3(x, z, -y);
+const D = THREE.MathUtils.degToRad;
+const canvas = document.getElementById('cv');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false); canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+renderer.setClearColor(0x000000, 0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c4bc, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(-260, 620, 420); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -420, right: 420, top: 520, bottom: -420, near: 10, far: 2200 });
+key.shadow.bias = -0.0004; key.shadow.radius = 6; scene.add(key);
+const rim = new THREE.DirectionalLight(0xfff1e0, 0.6); rim.position.set(300, 200, -400); scene.add(rim);
+const groundMat = new THREE.ShadowMaterial({ opacity: 0.2 });
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), groundMat);
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.3; ground.receiveShadow = true; scene.add(ground);
+const camera = new THREE.PerspectiveCamera(30, W / H, 5, 8000);
+
+function pivot(parent, at) { const p = new THREE.Object3D(); p.position.copy(at); scene.add(p); p.updateMatrixWorld(); parent.attach(p); return p; }
+const rollP = pivot(scene, g(0, 0, 83)), pitchP = pivot(rollP, g(0, 0, 89));
+const headP = pivot(pitchP, g(0, 0, 212)), armLP = pivot(pitchP, g(0, 6, 176)), armRP = pivot(pitchP, g(0, 6, 176));
+function groupFor(n) {
+  if (/^(G1_|bolt_pitch)/.test(n)) return rollP;
+  if (/^(A1_|A3_|A5_|servo_arm_L_spline)/.test(n)) return armLP;
+  if (/^(A2_|A4_|A6_|servo_arm_R_spline)/.test(n)) return armRP;
+  if (/^(H\d_|servo_head_case|lcd_|camera_)/.test(n)) return headP;
+  if (/^(K\d_|S\d_|pcb_|respeaker|fuse_|pi5_|buck|reg_|speaker|imu|servo_arm|servo_head_spline)/.test(n)) return pitchP;
+  return scene;
+}
+let CFG = null;
+const parts = [];
+const faceTex = {};
+const face = new THREE.Mesh(new THREE.PlaneGeometry(74.04, 49.56), new THREE.MeshBasicMaterial({ toneMapped: false }));
+const pick = (name, table) => { for (const [p, v] of table) if (name.startsWith(p)) return v; return null; };
+
+window.__setup = async (cfg) => {
+  CFG = cfg;
+  const tl = new THREE.TextureLoader();
+  await Promise.all(cfg.faces.map((f) => new Promise((res) => { const t = tl.load(`${cfg.texBase}/cara_${f}.png`, res, undefined, res); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; faceTex[f] = t; })));
+  face.material.map = faceTex[cfg.faces[0]];
+  const gltf = await new GLTFLoader().loadAsync(cfg.glb);
+  const root = gltf.scene; scene.add(root); root.updateMatrixWorld(true);
+  for (const o of [...root.children].filter((o) => o.name)) {
+    const mats = [];
+    o.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.material.envMapIntensity = 0.55; mats.push(m.material); } });
+    groupFor(o.name).attach(o);
+    const e = pick(o.name, cfg.exp) || [0, 0, 0];
+    parts.push({ name: o.name, obj: o, mats, exp: g(...e), base: o.position.clone(), step: stepOf(o.name) });
+  }
+  face.position.copy(g(0, -47.52, 266)); scene.add(face); face.updateMatrixWorld(); headP.attach(face);
+  parts.push({ name: 'lcd_face', obj: face, mats: [], exp: g(...pick('lcd_', cfg.exp)), base: face.position.clone(), step: stepOf('lcd_') });
+  for (const p of parts) for (const m of p.mats) m.userData.em = m.emissive ? m.emissive.clone() : null;
+  return parts.length;
+};
+function stepOf(n) { const S = CFG.steps; for (let i = 0; i < S.length; i++) if (S[i].parts.some((p) => n.startsWith(p))) return i; return -1; }
+
+function aim(v) {
+  const t = g(...v.focus), r = v.dist, az = D(v.az), el = D(v.el);
+  camera.position.set(t.x + r * Math.sin(az) * Math.cos(el), t.y + r * Math.sin(el), t.z + r * Math.cos(az) * Math.cos(el));
+  camera.lookAt(t); camera.updateMatrixWorld();
+}
+// state: {step, k (fly-in progress 0..1), glow 0..1, view:{focus,dist,az,el}, face, pose:{pitch,roll,pan,aL,aR}, all:bool}
+window.__frame = (s) => {
+  for (const p of parts) {
+    const vis = s.all || p.step < 0 || p.step <= s.step;
+    p.obj.visible = vis;
+    p.obj.position.copy(p.base);
+    if (!s.all && p.step === s.step) p.obj.position.addScaledVector(p.exp, 0.9 * (1 - s.k));
+    for (const m of p.mats) if (m.userData.em) {
+      const gl = (!s.all && p.step === s.step) ? s.glow : 0;
+      m.emissive.setRGB(m.userData.em.r + 0.55 * gl, m.userData.em.g + 0.22 * gl, m.userData.em.b + 0.05 * gl);
+    }
+  }
+  const P = s.pose || {};
+  rollP.rotation.set(0, 0, -D(P.roll || 0)); pitchP.rotation.set(-D(P.pitch || 0), 0, 0);
+  headP.rotation.set(0, D(P.pan || 0), 0); armLP.rotation.set(D(P.aL || 0), 0, 0); armRP.rotation.set(D(P.aR || 0), 0, 0);
+  if (s.face && faceTex[s.face]) face.material.map = faceTex[s.face];
+  aim(s.view);
+  scene.updateMatrixWorld(true);
+  renderer.render(scene, camera);
+  return true;
+};
+// screen anchors (0..1, top-left) of the named parts in their final pose
+window.__anchors = (s, names) => {
+  window.__frame(Object.assign({}, s, { k: 1, glow: 0 }));
+  const out = {};
+  for (const n of names) {
+    const p = parts.find((q) => q.name === n || q.name.startsWith(n));
+    if (!p) continue;
+    const box = new THREE.Box3().setFromObject(p.obj);
+    const c = box.getCenter(new THREE.Vector3()).project(camera);
+    out[n] = [+(0.5 + c.x / 2).toFixed(4), +(0.5 - c.y / 2).toFixed(4)];
+  }
+  return out;
+};
+window.__ready = true;
+</script>
