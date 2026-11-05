@@ -1,8 +1,11 @@
 /** Measured after applying the supplied GLB node transforms (world space). */
 export const modelInfo = {
-  revision: "V16",
-  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=16-original`,
-  triangles: 51158,
-  meshes: 1,
-  boundsMm: [186.06, 310.85, 131.58] as const,
+  revision: "V17",
+  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=17-black-display`,
+  triangles: 116741,
+  meshes: 110,
+  boundsMm: [180, 365, 173.02] as const,
+  millimetersPerUnit: 1,
+  displayRotationX: -Math.PI / 2,
+  screenMesh: "part_100",
 };

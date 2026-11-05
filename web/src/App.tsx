@@ -29,6 +29,7 @@ import {
 import { useLocale } from "./state/Locale";
 import Architecture from "./components/Architecture";
 import FaceDemo from "./simulations/FaceDemo";
+import { FaceSimulationProvider } from "./state/FaceSimulation";
 const RobotViewer = lazy(() => import("./viewer/RobotViewer"));
 const icons = {
   voice: AudioLines,
@@ -38,6 +39,13 @@ const icons = {
 };
 
 export default function App() {
+  return (
+    <FaceSimulationProvider>
+      <Portfolio />
+    </FaceSimulationProvider>
+  );
+}
+function Portfolio() {
   const { locale, setLocale, t } = useLocale();
   const [menu, setMenu] = useState(false);
   const [componentIndex, setComponentIndex] = useState(0);
@@ -258,8 +266,8 @@ export default function App() {
           <p className="caption">
             {t(
               bi(
-                "The original V16 GLB is a single assembly, without a hat, authored materials, rig or animation clips. Component information is shown externally; this viewer does not articulate parts. World-space bounds: X 186.06 × Y 310.85 × Z 131.58 mm. Y is up.",
-                "El GLB V16 original es un ensamblaje único, sin sombrero, materiales definidos, rig ni clips de animación. La información de componentes es externa; este visor no articula piezas. Límites globales: X 186.06 × Y 310.85 × Z 131.58 mm. Y es vertical.",
+                "The V17 GLB contains 110 meshes, with no rig or animation clips. The black finish and integrated LCD face are browser presentation effects; no hardware is connected. Assembly bounds after orienting Z-up to Y-up: X 180 × Y 365 × Z 173.02 mm.",
+                "El GLB V17 contiene 110 mallas, sin rig ni clips de animación. El acabado negro y la cara integrada en el LCD son efectos de presentación local; no hay hardware conectado. Límites tras orientar Z vertical a Y vertical: X 180 × Y 365 × Z 173.02 mm.",
               ),
             )}
           </p>
@@ -502,7 +510,7 @@ export default function App() {
             </div>
             <div>
               <dt>{t(bi("Model geometry", "Geometría"))}</dt>
-              <dd>51,158 {t(bi("triangles", "triángulos"))} · GLB V16</dd>
+              <dd>116,741 {t(bi("triangles", "triángulos"))} · GLB V17</dd>
             </div>
           </dl>
         </section>

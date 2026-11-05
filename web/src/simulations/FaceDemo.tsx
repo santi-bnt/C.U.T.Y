@@ -1,25 +1,16 @@
-﻿import { useEffect, useState } from "react";
 import { Smile, Eye, Sparkles, Circle } from "lucide-react";
 import { bi } from "../data/project";
 import { useLocale } from "../state/Locale";
-import { useMedia } from "../state/useMedia";
+import {
+  useFaceSimulation,
+  type FaceExpression,
+} from "../state/FaceSimulation";
 
 /** Frames come directly from cuty.face.renderer.FaceRenderer, not a redesign. */
 export default function FaceDemo() {
   const { t } = useLocale();
-  const reduced = useMedia("(prefers-reduced-motion: reduce)");
-  const [expression, setExpression] = useState("idle");
-  const [gaze, setGaze] = useState(4);
-  const [talk, setTalk] = useState(false);
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    if (reduced) return;
-    const timer = window.setInterval(() => setTick((value) => value + 1), 140);
-    return () => window.clearInterval(timer);
-  }, [reduced]);
-  const mouth = talk && !reduced ? [0, 1, 3, 2, 1, 0][tick % 6] : 0;
-  const blinking = !reduced && tick % 29 === 28;
-  const frame = (blinking ? 9 : gaze) * 4 + mouth;
+  const { reduced, expression, setExpression, setGaze, talk, setTalk, frame } =
+    useFaceSimulation();
   const expressions = [
     { id: "idle", text: bi("Neutral", "Neutral"), icon: Circle },
     { id: "listening", text: bi("Listening", "Escuchando"), icon: Eye },
@@ -79,7 +70,7 @@ export default function FaceDemo() {
           <button
             key={item.id}
             aria-pressed={expression === item.id}
-            onClick={() => setExpression(item.id)}
+            onClick={() => setExpression(item.id as FaceExpression)}
           >
             <item.icon size={16} />
             {t(item.text)}

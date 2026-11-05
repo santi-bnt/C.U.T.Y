@@ -23,6 +23,7 @@ import { useMedia } from "../state/useMedia";
 import { bi } from "../data/project";
 import type { CameraView } from "./model";
 import { modelInfo } from "../data/model";
+import DisplayControls from "../components/DisplayControls";
 const Scene = lazy(() => import("./Scene"));
 class ModelBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -247,6 +248,7 @@ export default function RobotViewer() {
           </button>
         </div>
       </div>
+      <DisplayControls />
     </div>
   );
 }

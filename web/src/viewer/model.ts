@@ -8,9 +8,9 @@ export function measureModel(scene: Object3D) {
   return { size, center, scale: 3 / size.y };
 }
 export const cameraViews = {
-  front: [6.8, 1.5, 0],
-  side: [0, 1.5, 6.8],
+  front: [0, 1.5, 6.8],
+  side: [6.8, 1.5, 0],
   top: [0.001, 8, 0.001],
-  iso: [5, 3.2, 5],
+  iso: [4, 3.2, 6],
 } as const;
 export type CameraView = keyof typeof cameraViews;

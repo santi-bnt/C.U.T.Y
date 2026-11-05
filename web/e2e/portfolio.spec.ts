@@ -13,7 +13,14 @@ test("real model, camera controls, translation, panels and responsive layout", a
     timeout: 30_000,
   });
   await expect(page.getByRole("alert")).toHaveCount(0);
-  await expect(page.getByText("REAL ASSEMBLY / V16")).toBeVisible();
+  await expect(page.getByText("REAL ASSEMBLY / V17")).toBeVisible();
+  await page
+    .getByRole("combobox", { name: "Display expression", exact: true })
+    .selectOption("happy");
+  await expect(page.locator(".face-screen")).toHaveClass(/happy/);
+  await page
+    .getByRole("combobox", { name: "Display expression", exact: true })
+    .selectOption("idle");
   for (const name of ["Front", "Side", "Top", "Isometric"]) {
     await page.getByRole("button", { name, exact: true }).click();
     await expect(

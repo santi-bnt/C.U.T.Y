@@ -421,6 +421,33 @@ button {
 .view-presets button:hover {
   background: #1c2730;
 }
+.display-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 8px;
+  border: 1px solid #293947;
+  border-radius: 5px;
+  background: #111923;
+}
+.display-controls > span {
+  font:
+    8px "Courier New",
+    monospace;
+  color: #90a9ba;
+  margin-right: auto;
+}
+.display-controls select,
+.display-controls button {
+  border: 1px solid #3b5263;
+  background: #1a2b38;
+  border-radius: 4px;
+  color: #bce5ef;
+  padding: 7px 10px;
+  font-size: 10px;
+  min-height: 32px;
+}
 .viewer-actions {
   display: flex;
   gap: 1px;

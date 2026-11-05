@@ -1,10 +1,12 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, ContactShadows } from "@react-three/drei";
-import { Mesh, MeshStandardMaterial, Vector3, type Material } from "three";
+import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
-import { cameraViews, measureModel, type CameraView } from "./model";
+import { cameraViews, type CameraView } from "./model";
 import { modelInfo } from "../data/model";
+import { prepareRobot } from "./robot";
+import { useFaceTexture } from "./useFaceTexture";
 
 function Robot({
   wireframe,
@@ -14,37 +16,20 @@ function Robot({
   onLoaded: () => void;
 }) {
   const { scene } = useGLTF(modelInfo.url);
-  const { object, measurement, materials } = useMemo(() => {
-    const object = scene.clone(true);
-    const measurement = measureModel(object);
-    const materials = new Map<Material, Material>();
-    const copyMaterial = (original: Material) => {
-      if (!materials.has(original)) {
-        const clone = original.clone();
-        if (clone instanceof MeshStandardMaterial) clone.wireframe = wireframe;
-        materials.set(original, clone);
-      }
-      return materials.get(original)!;
-    };
-    object.traverse((child) => {
-      if (child instanceof Mesh) {
-        child.material = Array.isArray(child.material)
-          ? child.material.map(copyMaterial)
-          : copyMaterial(child.material);
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    return { object, measurement, materials };
-  }, [scene, wireframe]);
+  const faceTexture = useFaceTexture();
+  const { object, measurement, materials, geometries } = useMemo(
+    () => prepareRobot(scene, faceTexture, wireframe),
+    [scene, faceTexture, wireframe],
+  );
   useEffect(() => {
     onLoaded();
   }, [onLoaded]);
   useEffect(
     () => () => {
       materials.forEach((material) => material.dispose());
+      geometries.forEach((geometry) => geometry.dispose());
     },
-    [materials],
+    [materials, geometries],
   );
   return (
     <group position={[0, 1.53, 0]} scale={measurement.scale}>
@@ -137,7 +122,7 @@ export default function Scene({
     <Canvas
       frameloop={active ? "demand" : "never"}
       dpr={[1, 1.5]}
-      camera={{ position: [5, 3.2, 5], fov: 35, near: 0.1, far: 50 }}
+      camera={{ position: [4, 3.2, 6], fov: 35, near: 0.1, far: 50 }}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
     >
       <ambientLight intensity={1.2} />
