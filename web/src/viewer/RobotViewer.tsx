@@ -105,7 +105,12 @@ export default function RobotViewer() {
       <div className="viewer-top">
         <span>
           <span className="status-dot" />
-          {t(bi("REAL ASSEMBLY / V23", "ENSAMBLAJE REAL / V23"))}
+          {t(
+            bi(
+              `REAL ASSEMBLY / ${modelInfo.revision}`,
+              `ENSAMBLAJE REAL / ${modelInfo.revision}`,
+            ),
+          )}
         </span>
         <span>GLB · {modelInfo.triangles.toLocaleString("en-US")} △</span>
       </div>

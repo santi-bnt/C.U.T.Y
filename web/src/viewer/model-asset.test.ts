@@ -4,7 +4,7 @@ import { Box3, Mesh, Vector3 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { modelInfo } from "../data/model";
 
-describe("deployed V23 assembly", () => {
+describe("deployed original V16 assembly", () => {
   it("contains the expected parts and measures transformed world-space geometry", async () => {
     const bytes = readFileSync("public/models/cuty.glb");
     const gltf = await new GLTFLoader().parseAsync(
@@ -33,7 +33,8 @@ describe("deployed V23 assembly", () => {
       .forEach((value, axis) =>
         expect(value).toBeCloseTo(modelInfo.boundsMm[axis], 2),
       );
-    expect(gltf.scene.getObjectByName("Head_Left_V23")).toBeTruthy();
+    expect(gltf.scene.getObjectByName("Head_Left_V23")).toBeUndefined();
+    expect(gltf.scene.getObjectByName("Sombrero_Copa")).toBeUndefined();
     expect(gltf.animations).toHaveLength(0);
   });
 });
