@@ -1,9 +1,10 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, ContactShadows } from "@react-three/drei";
-import { Mesh, MeshStandardMaterial, Vector3 } from "three";
+import { Mesh, MeshStandardMaterial, Vector3, type Material } from "three";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import { cameraViews, measureModel, type CameraView } from "./model";
+import { modelInfo } from "../data/model";
 
 function Robot({
   wireframe,
@@ -12,33 +13,38 @@ function Robot({
   wireframe: boolean;
   onLoaded: () => void;
 }) {
-  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/cuty.glb`);
-  const { object, measurement, material } = useMemo(() => {
+  const { scene } = useGLTF(modelInfo.url);
+  const { object, measurement, materials } = useMemo(() => {
     const object = scene.clone(true);
     const measurement = measureModel(object);
-    const material = new MeshStandardMaterial({
-      color: "#d9e3e0",
-      roughness: 0.36,
-      metalness: 0.25,
-      wireframe,
-    });
+    const materials = new Map<Material, Material>();
+    const copyMaterial = (original: Material) => {
+      if (!materials.has(original)) {
+        const clone = original.clone();
+        if (clone instanceof MeshStandardMaterial) clone.wireframe = wireframe;
+        materials.set(original, clone);
+      }
+      return materials.get(original)!;
+    };
     object.traverse((child) => {
       if (child instanceof Mesh) {
-        child.material = material;
+        child.material = Array.isArray(child.material)
+          ? child.material.map(copyMaterial)
+          : copyMaterial(child.material);
         child.castShadow = true;
         child.receiveShadow = true;
       }
     });
-    return { object, measurement, material };
+    return { object, measurement, materials };
   }, [scene, wireframe]);
   useEffect(() => {
     onLoaded();
   }, [onLoaded]);
   useEffect(
     () => () => {
-      material.dispose();
+      materials.forEach((material) => material.dispose());
     },
-    [material],
+    [materials],
   );
   return (
     <group position={[0, 1.53, 0]} scale={measurement.scale}>

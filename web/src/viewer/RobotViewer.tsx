@@ -22,6 +22,7 @@ import { useLocale } from "../state/Locale";
 import { useMedia } from "../state/useMedia";
 import { bi } from "../data/project";
 import type { CameraView } from "./model";
+import { modelInfo } from "../data/model";
 const Scene = lazy(() => import("./Scene"));
 class ModelBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -104,9 +105,9 @@ export default function RobotViewer() {
       <div className="viewer-top">
         <span>
           <span className="status-dot" />
-          {t(bi("REAL ASSEMBLY / V16", "ENSAMBLAJE REAL / V16"))}
+          {t(bi("REAL ASSEMBLY / V23", "ENSAMBLAJE REAL / V23"))}
         </span>
-        <span>GLB · 51,158 △</span>
+        <span>GLB · {modelInfo.triangles.toLocaleString("en-US")} △</span>
       </div>
       <div
         className="canvas-wrap"

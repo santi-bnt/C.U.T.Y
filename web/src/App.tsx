@@ -258,8 +258,8 @@ export default function App() {
           <p className="caption">
             {t(
               bi(
-                "The real GLB is a single, unrigged assembly. Component information is shown externally; no part selection or articulated motion is implied. Model bounds: X 186.06 × Y 310.85 × Z 131.58 mm. Y is up.",
-                "El GLB real es un ensamblaje único sin articulaciones. La información es externa; no implica selección de piezas ni movimiento articulado. Límites: X 186.06 × Y 310.85 × Z 131.58 mm. Y es vertical.",
+                "The V23 GLB contains nine named meshes with materials, but no rig or animation clips. Component information is shown externally; this viewer does not articulate parts. World-space bounds: X 182.70 × Y 333.75 × Z 131.67 mm. Y is up.",
+                "El GLB V23 contiene nueve mallas con nombres y materiales, sin rig ni clips de animación. La información de componentes es externa; este visor no articula piezas. Límites globales: X 182.70 × Y 333.75 × Z 131.67 mm. Y es vertical.",
               ),
             )}
           </p>
@@ -502,7 +502,7 @@ export default function App() {
             </div>
             <div>
               <dt>{t(bi("Model geometry", "Geometría"))}</dt>
-              <dd>51,158 {t(bi("triangles", "triángulos"))} · GLB</dd>
+              <dd>103,446 {t(bi("triangles", "triángulos"))} · GLB V23</dd>
             </div>
           </dl>
         </section>

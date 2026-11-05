@@ -13,6 +13,7 @@ test("real model, camera controls, translation, panels and responsive layout", a
     timeout: 30_000,
   });
   await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByText("REAL ASSEMBLY / V23")).toBeVisible();
   for (const name of ["Front", "Side", "Top", "Isometric"]) {
     await page.getByRole("button", { name, exact: true }).click();
     await expect(
@@ -81,7 +82,7 @@ test("reduced motion and a missing GLB produce usable UI", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Auto-rotate", exact: true }),
   ).toBeDisabled();
-  await page.route("**/models/cuty.glb", (route) =>
+  await page.route("**/models/cuty.glb*", (route) =>
     route.fulfill({ status: 404, body: "Model missing" }),
   );
   await page.reload();
