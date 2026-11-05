@@ -53,4 +53,6 @@ Los comandos anteriores `sudo python3 cuty_launcher.py` y `bash cuty-install.sh`
 
 [Arquitectura](docs/architecture.md) · [Roadmap](docs/roadmap.md) · [Protocolo](docs/protocol/protocol.md) · [Movimientos e integración](docs/reorganization.md)
 
+[Mapa de conexiones por bloques (HTML)](docs/conexiones.html) · [Señales (SVG)](docs/assets/conexiones-senales.svg) · [Alimentación (SVG)](docs/assets/conexiones-alimentacion.svg)
+
 Las pruebas locales no certifican la pantalla física ni el arranque de su servicio tras reiniciar la Raspberry.

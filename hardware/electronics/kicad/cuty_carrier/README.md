@@ -1,5 +1,7 @@
 # C.U.T.Y — Placa base (carrier) v1.1
 
+[Diagrama por bloques interactivo (HTML)](../../../../docs/conexiones.html) · [Señales (SVG)](../../../../docs/assets/conexiones-senales.svg) · [Alimentación (SVG)](../../../../docs/assets/conexiones-alimentacion.svg)
+
 PCB de 2 capas que reemplaza la protoboard y los cables Dupont. Interconecta
 la Raspberry Pi 5, la STM32F401 Black Pill, la pantalla Display-G de 3.5 in,
 el ReSpeaker 2-Mics Pi HAT V2.0 y los cinco MG996R, y distribuye la energía
