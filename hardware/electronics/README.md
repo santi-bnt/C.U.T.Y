@@ -7,4 +7,4 @@ Plan areas for STM32 control PCB, Raspberry UART connection, servo connectors, I
 
 ## Carrier board v1.1
 
-[`kicad/cuty_carrier`](kicad/cuty_carrier/README.md): 2-layer, 100 × 92 mm carrier for Raspberry Pi 5, Black Pill, Display-G, ReSpeaker and 5 servos. Gerbers ready for PCBWay in `kicad/cuty_carrier/fab/`.
+[`kicad/cuty_carrier`](kicad/cuty_carrier/README.md): 2-layer, 100 × 92 mm carrier for Raspberry Pi 5, Black Pill, Display-G, ReSpeaker and 5 servos. Gerbers ready for PCBWay in `kicad/cuty_carrier/fab/`; turnkey assembly files (BOM with manufacturer part numbers, centroid, assembly drawing and order steps) in [`kicad/cuty_carrier/fab/pcba/`](kicad/cuty_carrier/fab/pcba/LEEME_PCBA.md).

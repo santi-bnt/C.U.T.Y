@@ -10,7 +10,7 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 | --- | --- |
 | Tamaño | 100 × 92 mm, esquinas redondeadas, 4 barrenos M3 |
 | Capas | 2 (F.Cu / B.Cu), FR-4 1.6 mm |
-| Componentes | 100 % de agujero pasante (THT), fáciles de soldar a mano |
+| Componentes | 100 % de agujero pasante (THT): se pide ensamblada a PCBWay (`fab/pcba/`) o se suelda a mano |
 | Pista / espacio mínimo | 0.30 mm / 0.25 mm (señales); 2.5–3.0 mm en potencia |
 | Taladro mínimo | 0.40 mm (vías 0.8/0.4); 2 ranuras de 0.6 mm (patas del XT60) |
 | DRC | 0 errores eléctricos, 0 pads sin conectar (`drc_report.txt`) |
@@ -29,7 +29,11 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
    - **Cobre: 1 oz** basta para uso normal. **Si los 5 servos van a forzar a la vez, pide 2 oz.**
      Las pistas de batería son de 3 mm y el bus de 6 V va en ambas capas.
    - Cantidad: 5 (el mínimo)
-3. No hace falta ensamblado: todo es THT. La lista de compras está en `fab/cuty_carrier_BOM.csv`.
+3. **Ensamblada (recomendado):** sigue [`fab/pcba/LEEME_PCBA.md`](fab/pcba/LEEME_PCBA.md). Ahí están el BOM con
+   números de parte del fabricante, el archivo de centroid, el dibujo de ensamble con la polaridad
+   y el texto para las notas del pedido. PCBWay compra y suelda las 39 piezas; tú solo pones la
+   Black Pill y los fusibles.
+4. **Para soldarla tú:** la lista de compras está en `fab/cuty_carrier_BOM.csv`.
 
 ## Qué hay en la placa
 
@@ -109,7 +113,8 @@ negativo queda hacia el borde de la placa.
 | `cuty_carrier.kicad_pro/.kicad_sch/.kicad_pcb` | Proyecto KiCad 7, abre en KiCad 7, 8 y 9 |
 | `CUTY.kicad_sym`, `CUTY.pretty/` | Símbolo y footprint propios de la Black Pill (tablas de bibliotecas incluidas) |
 | `fab/gerbers/` | Gerbers RS-274X y taladros Excellon (PTH y NPTH separados) |
-| `fab/cuty_carrier_BOM.csv` | Lista de materiales |
+| `fab/cuty_carrier_BOM.csv` | Lista de materiales para soldar a mano |
+| `fab/pcba/` | Pedido ensamblado en PCBWay: BOM y centroid (xlsx/csv), dibujo de ensamble (PDF/SVG), instrucciones |
 | `fab/cuty_carrier_esquematico.pdf` | Esquemático |
 | `fab/preview/` | Render de los Gerbers (como saldrá fabricada) |
 | `drc_report.txt` | Reporte DRC |
@@ -128,6 +133,8 @@ python3 gen_lib.py && python3 gen_sch.py
 /usr/bin/python3 verify_pcb.py          # paridad pad por pad con netlist.py
 /usr/bin/python3 verify_spec.py         # la PCB contra las tablas de info.md
 /usr/bin/python3 verify_gerbers.py      # cortos/abiertos, taladros y mascara en los Gerbers reales
+/usr/bin/python3 gen_pcba.py           # BOM y centroid para PCBWay (fab/pcba/)
+/usr/bin/python3 gen_asm_svg.py && python3 gen_asm_pdf.py   # dibujo de ensamble con polaridad
 ```
 
 `netlist.py` es la única fuente de verdad: si cambias una conexión ahí,

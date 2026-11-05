@@ -1,0 +1,39 @@
+Designator,Mid X (mm),Mid Y (mm),Layer,Rotation,Ref X (mm),Ref Y (mm),Value,Footprint
+C1,17.55,52.05,Top,0.0,15.05,52.05,1000uF 16V,CP_Radial_D10.0mm_P5.00mm
+C2,29.55,52.05,Top,0.0,27.05,52.05,1000uF 16V,CP_Radial_D10.0mm_P5.00mm
+C3,48.05,62.93,Top,90.0,48.05,60.43,100nF,C_Disc_D5.0mm_W2.5mm_P5.00mm
+D1,49.13,23.95,Top,180.0,54.21,23.95,1N5819,D_DO-41_SOD81_P10.16mm_Horizontal
+D2,33.28,2.55,Top,180.0,34.55,2.55,5V,LED_D3.0mm
+D3,25.28,60.25,Top,180.0,26.55,60.25,6V,LED_D3.0mm
+D4,25.28,65.05,Top,180.0,26.55,65.05,BAT,LED_D3.0mm
+F1,49.01,75.85,Top,0.0,44.05,77.55,10A,Fuseholder_Blade_Mini_Keystone_3568
+F2,29.01,75.85,Top,0.0,24.05,77.55,5A,Fuseholder_Blade_Mini_Keystone_3568
+J1,16.6,76.65,Top,90.0,16.6,73.05,XT60 BAT 3S,AMASS_XT60PW-M_1x02_P7.20mm_Horizontal
+JP1,37.82,23.95,Top,90.0,36.55,23.95,5V STM32,PinHeader_1x02_P2.54mm_Vertical
+J2,26.61,86.45,Top,180.0,29.15,86.45,SW PRINCIPAL,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
+J3,51.01,86.45,Top,180.0,53.55,86.45,SW SERVOS,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
+J4,38.81,86.45,Top,180.0,41.35,86.45,BUCK IN,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
+J5,5.55,50.51,Top,270.0,5.55,53.05,BUCK OUT 6V,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
+J6,5.55,62.01,Top,270.0,5.55,64.55,REG RPI,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
+J7,5.11,40.55,Top,270.0,7.65,40.55,SERVO1,PinHeader_1x03_P2.54mm_Vertical
+J8,5.11,33.05,Top,270.0,7.65,33.05,SERVO2,PinHeader_1x03_P2.54mm_Vertical
+J9,5.11,25.55,Top,270.0,7.65,25.55,SERVO3,PinHeader_1x03_P2.54mm_Vertical
+J10,5.11,18.05,Top,270.0,7.65,18.05,SERVO4,PinHeader_1x03_P2.54mm_Vertical
+J11,5.11,10.55,Top,270.0,7.65,10.55,SERVO5,PinHeader_1x03_P2.54mm_Vertical
+J12,68.92,31.28,Top,270.0,93.05,32.55,RPI5 GPIO,IDC-Header_2x20_P2.54mm_Vertical
+J13,77.81,85.58,Top,270.0,93.05,86.85,PANTALLA 3.5,IDC-Header_2x13_P2.54mm_Vertical
+J14,68.92,43.28,Top,270.0,93.05,44.55,RESPEAKER,PinHeader_2x20_P2.54mm_Vertical
+J15,42.55,14.24,Top,0.0,42.55,18.05,I2C IMU,PinHeader_1x04_P2.54mm_Vertical
+R1,15.74,40.55,Top,180.0,19.55,40.55,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R2,15.74,33.05,Top,180.0,19.55,33.05,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R3,15.74,25.55,Top,180.0,19.55,25.55,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R4,15.74,18.05,Top,180.0,19.55,18.05,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R5,15.74,10.55,Top,180.0,19.55,10.55,220,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R6,42.05,64.24,Top,270.0,42.05,68.05,100k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R7,45.05,64.24,Top,90.0,45.05,60.43,22k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R8,25.86,2.55,Top,0.0,22.05,2.55,1k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R9,17.86,60.25,Top,0.0,14.05,60.25,1k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R10,17.86,65.05,Top,0.0,14.05,65.05,4.7k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R11,38.55,11.86,Top,90.0,38.55,8.05,4.7k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+R12,35.55,11.86,Top,90.0,35.55,8.05,4.7k,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal
+U1,73.321,11.044,Top,180.0,79.29,12.25,BlackPill F401CC,WeAct_BlackPill_Socket

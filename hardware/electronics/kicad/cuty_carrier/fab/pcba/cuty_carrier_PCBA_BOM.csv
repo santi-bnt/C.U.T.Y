@@ -1,0 +1,23 @@
+Item #,Designator,Qty,Manufacturer,Mfg Part #,Description / Value,Package / Footprint,Type,Supplier link,Your Instructions / Notes
+1,"C1,C2",2,Nichicon,UHE1C102MPD,"Aluminum electrolytic 1000 uF 16 V, low ESR, D10 x 20 mm, 5.0 mm pitch",CP_Radial_D10.0mm_P5.00mm,THT,https://www.digikey.com/en/products/detail/nichicon/UHE1C102MPD/589267,Polarized: + lead in the square pad (pad 1). Max body height 20 mm.
+2,C3,1,Vishay,K104K15X7RF5TL2,"Ceramic capacitor 100 nF 50 V X7R, radial 5.0 mm pitch",C_Disc_D5.0mm_W2.5mm_P5.00mm,THT,,
+3,D1,1,onsemi,1N5819RLG,"Schottky diode 40 V 1 A, DO-41",D_DO-41_SOD81_P10.16mm_Horizontal,THT,,"Cathode band to the square pad (pad 1), as the silkscreen."
+4,D2,1,Kingbright,WP710A10SGD,LED 3 mm green,LED_D3.0mm,THT,,"Cathode (flat side, short lead) in the square pad (pad 1). Flush with the board."
+5,D3,1,Kingbright,WP710A10QBC/D,LED 3 mm blue,LED_D3.0mm,THT,https://www.digikey.com/en/products/detail/kingbright/WP710A10QBC-D/2769812,"Cathode (flat side, short lead) in the square pad (pad 1). Flush with the board."
+6,D4,1,Kingbright,WP710A10ID,LED 3 mm red,LED_D3.0mm,THT,,"Cathode (flat side, short lead) in the square pad (pad 1). Flush with the board."
+7,"F1,F2",2,Keystone Electronics,3568,"Fuse holder, mini blade (ATM), PCB mount, 4 pins",Fuseholder_Blade_Mini_Keystone_3568,THT,,Holder only. Do NOT insert fuses (owner inserts 10 A in F1 and 5 A in F2).
+8,J1,1,Changzhou Amass,XT60PW-M,"XT60 male, right angle, PCB mount (LCSC C98732)",AMASS_XT60PW-M_1x02_P7.20mm_Horizontal,THT,https://lcsc.com/product-detail/Power-Connectors_Changzhou-Amass-Elec-XT60PW-M_C98732.html,"Male. Housing exactly inside the silkscreen outline: pad 1 (square) = negative, pad 2 = positive (battery +). Do not substitute."
+9,"J2,J3,J4,J5,J6",5,Phoenix Contact,1715721,"Terminal block MKDS 1,5/2-5,08, 2 pos, 5.08 mm","TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",THT,,"Wire entries face the nearest board edge, as the silkscreen outline. Do not substitute pitch."
+10,"J7,J8,J9,J10,J11",5,Sullins,PREC003SAAN-RC,"Pin header male 1x3, 2.54 mm, vertical",PinHeader_1x03_P2.54mm_Vertical,THT,,Can be cut from a breakaway strip.
+11,J15,1,Sullins,PREC004SAAN-RC,"Pin header male 1x4, 2.54 mm, vertical",PinHeader_1x04_P2.54mm_Vertical,THT,,Can be cut from a breakaway strip.
+12,JP1,1,Sullins,PREC002SAAN-RC,"Pin header male 1x2, 2.54 mm, vertical",PinHeader_1x02_P2.54mm_Vertical,THT,,Can be cut from a breakaway strip.
+13,JP1 (shunt),1,Sullins,SPC02SYAN,Jumper shunt 2.54 mm,-,THT,,Fit the shunt on JP1 after soldering.
+14,J12,1,Wurth Elektronik,61204021621,"Box header (shrouded) 2x20, 2.54 mm, vertical",IDC-Header_2x20_P2.54mm_Vertical,THT,,Keyed: key slot and pin 1 (square pad) exactly as the silkscreen.
+15,J13,1,Wurth Elektronik,61202621621,"Box header (shrouded) 2x13, 2.54 mm, vertical",IDC-Header_2x13_P2.54mm_Vertical,THT,,Keyed: key slot and pin 1 (square pad) exactly as the silkscreen.
+16,J14,1,Sullins,PRPC020DAAN-RC,"Pin header male 2x20, 2.54 mm, vertical",PinHeader_2x20_P2.54mm_Vertical,THT,,
+17,U1,2,Sullins,PPTC201LFBN-RC,"Female socket 1x20, 2.54 mm, 8.5 mm tall",WeAct_BlackPill_Socket,THT,,Two 1x20 female sockets in the two 20-pin rows. Leave the 4 SWD holes (marked SWD) empty. Do not install any module.
+18,"R1,R2,R3,R4,R5",5,Yageo,MFR-25FBF52-220R,"Resistor 220 ohm 1% 1/4 W metal film, axial",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,THT,,
+19,R6,1,Yageo,MFR-25FBF52-100K,"Resistor 100 kohm 1% 1/4 W metal film, axial",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,THT,,
+20,R7,1,Yageo,MFR-25FBF52-22K,"Resistor 22 kohm 1% 1/4 W metal film, axial",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,THT,,
+21,"R8,R9",2,Yageo,MFR-25FBF52-1K,"Resistor 1 kohm 1% 1/4 W metal film, axial",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,THT,,
+22,"R10,R11,R12",3,Yageo,MFR-25FBF52-4K7,"Resistor 4.7 kohm 1% 1/4 W metal film, axial",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,THT,,
