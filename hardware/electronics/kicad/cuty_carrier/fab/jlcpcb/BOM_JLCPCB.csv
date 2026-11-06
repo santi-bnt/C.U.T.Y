@@ -1,0 +1,22 @@
+Comment,Designator,Footprint,LCSC Part #
+1000uF 16V 10x20mm low-ESR (Rubycon 16YXF1000MEFC10X20),"C1,C2",CP_Radial_D10.0mm_P5.00mm,C110138
+100nF 50V X7R radial 5mm (Vishay K104K15X7RF5TH5),C3,C_Disc_D5.0mm_W2.5mm_P5.00mm,C2167231
+1N5819 Schottky DO-41 (Vishay 1N5819-E3/54),D1,D_DO-41_SOD81_P10.16mm_Horizontal,C145202
+LED 3mm green (XINGLIGHT XL-304UGD),D2,LED_D3.0mm,C2895477
+LED 3mm blue (XINGLIGHT XL-304UBC),D3,LED_D3.0mm,C2895465
+LED 3mm red (XINGLIGHT XL-304SURD),D4,LED_D3.0mm,C2895471
+Mini blade fuse holder (Keystone 3568),"F1,F2",Fuseholder_Blade_Mini_Keystone_3568,C5249699
+XT60PW-M male right angle (AMASS),J1,AMASS_XT60PW-M_1x02_P7.20mm_Horizontal,C98732
+"Terminal block 2P 5.08mm (Phoenix MKDS 1,5/2-5,08)","J2,J3,J4,J5,J6","TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",C5183929
+Pin header 1x3 2.54mm vertical,"J7,J8,J9,J10,J11",PinHeader_1x03_P2.54mm_Vertical,C49257
+Pin header 1x4 2.54mm vertical,J15,PinHeader_1x04_P2.54mm_Vertical,C492403
+Pin header 1x2 2.54mm vertical,JP1,PinHeader_1x02_P2.54mm_Vertical,C492401
+Box header 2x20 2.54mm vertical (CONNFLY DS1013-40SSiB1-B-0),J12,IDC-Header_2x20_P2.54mm_Vertical,C7430317
+Box header 2x13 2.54mm vertical (CONNFLY DS1013-26SSiB1-B-0),J13,IDC-Header_2x13_P2.54mm_Vertical,C75755
+Pin header 2x20 2.54mm vertical,J14,PinHeader_2x20_P2.54mm_Vertical,C50980
+Female header 1x20 2.54mm 8.5mm (Kinghelm KH-2.54FH-1X20P-H8.5),"U1A,U1B",WeAct_BlackPill_Socket,C2905423
+220R 1% 1/4W axial (UNI-ROYAL MFR0W4F2200A50),"R1,R2,R3,R4,R5",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,C57439
+100k 1% 1/4W axial (UNI-ROYAL),R6,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,C69893
+22k 1% 1/4W axial (UNI-ROYAL MFR0W4F2202A50),R7,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,C58612
+1k 1% 1/4W axial (UNI-ROYAL MFR0W4F1001A50),"R8,R9",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,C57435
+4.7k 1% 1/4W axial (UNI-ROYAL MFR0W4F4701A50),"R10,R11,R12",R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,C57204
