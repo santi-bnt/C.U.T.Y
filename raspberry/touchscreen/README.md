@@ -11,6 +11,22 @@ Utiliza Pillow, evdev, NetworkManager y el framebuffer Linux, sin HDMI.
   Un toque corto la hace parpadear. Mantén presionada cualquier zona durante
   **5 segundos continuos** para regresar; soltar antes cancela la pulsación.
 
+## Apagar y reiniciar desde la pantalla
+
+En el menú principal, toca **Apagar / Reiniciar**, elige la acción y confirma
+con **Sí, apagar** o **Sí, reiniciar**. **Cancelar** vuelve a las opciones y
+**Menú** regresa al inicio. Seleccionar una acción no la ejecuta todavía.
+
+Al confirmar se cierran la voz y la cámara y se solicita a systemd un apagado
+o reinicio normal, sin forzarlo. La pantalla muestra el estado y bloquea toques
+repetidos; si la solicitud falla, conserva un menú utilizable y registra el error.
+El launcher utiliza los permisos root de su servicio existente; no instala
+paquetes ni necesita cambios de sudoers, GPIO o del servicio.
+
+Para apagar desde la cara, mantén la pulsación de cinco segundos para volver
+al menú y utiliza el botón. Estas acciones pertenecen a la pantalla física;
+el portafolio web sigue funcionando como demostración local del robot.
+
 ## Conversación desde el menú
 
 Al tocar **C.U.T.Y**, el menú abre la cara e inicia la voz con

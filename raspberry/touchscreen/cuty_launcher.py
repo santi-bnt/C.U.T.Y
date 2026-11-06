@@ -149,10 +149,13 @@ class Launcher(wifi.Panel):
         self.last_status_check = 0
         self.voice = MenuVoice(Path(__file__).resolve().parents[1], NORM_USER) if not FACE_ERROR else None
         self.voice_error = ''
+        self.power_action = None
+        self.power_error = ''
+        self.power_busy = ''
 
-    def draw_button(self, d, rect, title, action, font=FONT):
+    def draw_button(self, d, rect, title, action, font=FONT, fill=BLUE):
         x1, y1, x2, y2 = rect
-        d.rounded_rectangle(rect, radius=9, fill=BLUE)
+        d.rounded_rectangle(rect, radius=9, fill=fill)
         tw = d.textbbox((0, 0), title, font=font)[2]
         th = d.textbbox((0, 0), title, font=font)[3]
         text(d, (x1 + max(4, (x2-x1-tw)//2),
@@ -166,6 +169,7 @@ class Launcher(wifi.Panel):
     def draw_menu(self, d):
         text(d, (18, 11), 'C.U.T.Y', LARGE)
         text(d, (18, 43), 'Selecciona un modo', SMALL, MUTED)
+        self.draw_button(d, (W-188, 8, W-12, 55), 'Apagar / Reiniciar', ('power_menu',), SMALL)
         options = [
             (70, 'Terminal', 'Comandos y diagnóstico', 'terminal'),
             (151, 'Internet', 'Wi-Fi, IP y conexión', 'internet'),
@@ -177,6 +181,57 @@ class Launcher(wifi.Panel):
             text(d, (30, y+43), description, SMALL, MUTED)
             d.polygon([(W-38,y+24),(W-25,y+35),(W-38,y+46)], fill=GREEN)
             self.hotspots.append(((12, y, W-12, y+70), ('mode', action)))
+
+    def draw_power(self, d):
+        text(d, (18, 11), 'Energía', LARGE)
+        if self.screen == 'busy':
+            text(d, (24, 121), self.power_busy, LARGE, WHITE, W-48)
+            text(d, (24, 167), 'Espera a que el sistema termine.', FONT, MUTED, W-48)
+            return  # no buttons while a system request is pending
+        self.back_button(d)
+        if self.screen == 'confirm':
+            restarting = self.power_action == 'reboot'
+            d.rounded_rectangle((14, 65, W-14, 220), radius=12, fill=CARD)
+            text(d, (28, 85), '¿Reiniciar Raspberry?' if restarting else '¿Apagar Raspberry?', LARGE)
+            text(d, (28, 131), 'Se cerrarán la voz y la cámara.', FONT, MUTED)
+            text(d, (28, 165), 'La Raspberry volverá a arrancar.' if restarting else
+                 'Para volver a usarla tendrás que encenderla.', SMALL, MUTED, W-56)
+            self.draw_button(d, (16, 242, 230, 306), 'Cancelar', ('power_cancel',))
+            self.draw_button(d, (250, 242, W-16, 306), 'Sí, reiniciar' if restarting else
+                             'Sí, apagar', ('power_confirm',), fill='#8f293d')
+            return
+        text(d, (18, 47), 'Selecciona una opción; se pedirá confirmación.', SMALL, MUTED)
+        self.draw_button(d, (18, 82, W-18, 151), 'Apagar Raspberry', ('power_request', 'poweroff'))
+        self.draw_button(d, (18, 171, W-18, 240), 'Reiniciar Raspberry', ('power_request', 'reboot'))
+        if self.power_error:
+            text(d, (20, 263), self.power_error, SMALL, RED, W-40)
+            text(d, (20, 286), 'Revisa el registro del launcher por SSH.', SMALL, MUTED)
+
+    def execute_power(self):
+        """Only a confirmed local touch may queue one normal system shutdown."""
+        requested = self.power_action
+        if (self.mode != 'power' or self.screen != 'confirm' or
+                requested not in ('poweroff', 'reboot')):
+            return
+        self.power_action = None  # consume before doing anything; repeated touches are ignored
+        self.screen = 'busy'
+        self.power_busy = 'Reiniciando Raspberry…' if requested == 'reboot' else 'Apagando Raspberry…'
+        self.render()
+        try:
+            self.leave_face()
+        except (OSError, RuntimeError, subprocess.SubprocessError) as error:
+            print('C.U.T.Y energía: no se pudo cerrar la sesión:', error, flush=True)
+            self.power_error = 'No se pudo cerrar la sesión de C.U.T.Y.'
+            self.screen = 'home'
+            self.render()
+            return
+        result = command(['/usr/bin/systemctl', '--no-block', requested], timeout=8)
+        if result is None or result.returncode != 0:
+            detail = 'Tiempo agotado o systemctl no disponible' if result is None else result.stderr.strip()
+            print('C.U.T.Y energía:', detail, flush=True)
+            self.power_error = 'No se pudo solicitar el reinicio.' if requested == 'reboot' else 'No se pudo solicitar el apagado.'
+            self.screen = 'home'
+            self.render()
 
     def draw_internet(self, d):
         text(d, (14, 9), 'Internet / Wi-Fi', LARGE)
@@ -400,6 +455,8 @@ class Launcher(wifi.Panel):
                 self.draw_internet(d)
         elif self.mode == 'terminal':
             self.draw_terminal(d)
+        elif self.mode == 'power':
+            self.draw_power(d)
         elif self.mode == 'face':
             if not FACE_ERROR:
                 self.next_face_frame = 0.0  # drawn by the animation loop
@@ -408,12 +465,38 @@ class Launcher(wifi.Panel):
         render_frame(im)
 
     def action(self, act):
+        if self.mode == 'power' and self.screen == 'busy':
+            return
         if act == ('menu',):
             if self.mode == 'face':
                 self.leave_face()
             self.mode, self.screen = 'menu', 'home'
+            self.power_action = None
             self.value = ''  # never leave passwords displayed
             self.render()
+            return
+        if act == ('power_menu',) and self.mode == 'menu':
+            self.mode, self.screen = 'power', 'home'
+            self.power_action = None
+            self.power_error = ''
+            self.value = ''
+            self.render()
+            return
+        if self.mode == 'power':
+            if self.screen == 'busy':
+                return
+            if act == ('power_cancel',):
+                self.power_action = None
+                self.screen = 'home'
+                self.render()
+            elif (isinstance(act, tuple) and len(act) == 2 and act[0] == 'power_request'
+                  and self.screen == 'home' and act[1] in ('poweroff', 'reboot')):
+                self.power_action = act[1]
+                self.power_error = ''
+                self.screen = 'confirm'
+                self.render()
+            elif act == ('power_confirm',):
+                self.execute_power()
             return
         if isinstance(act, tuple) and act[0] == 'mode':
             if act[1] == 'face':

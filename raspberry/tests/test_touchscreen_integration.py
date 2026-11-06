@@ -1,6 +1,7 @@
 """Verify relocated screen code without importing Linux hardware dependencies."""
 
 import ast
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -84,3 +85,94 @@ def test_active_voice_does_not_leave_the_face():
     panel = SimpleNamespace(mode="face", voice=SimpleNamespace(process=object(), poll=lambda: None))
     assert not check(panel)
     assert panel.mode == "face"
+
+
+def power_panel(result=None, *, close_error=None):
+    """Real action handlers, with every OS power command replaced by a recorder."""
+    calls = []
+
+    def run(args, timeout):
+        calls.append((args, timeout))
+        return result
+
+    def leave():
+        calls.append("close voice and camera")
+        if close_error:
+            raise close_error
+
+    panel = SimpleNamespace(
+        mode="menu", screen="home", value="hidden password", power_action=None,
+        power_error="", power_busy="", leave_face=leave,
+        render=lambda: calls.append("render"),
+    )
+    execute = load_function("execute_power", method=True,
+                            namespace={"command": run, "subprocess": subprocess})
+    panel.execute_power = lambda: execute(panel)
+    action = load_function("action", method=True)
+    return panel, lambda act: action(panel, act), calls
+
+
+@pytest.mark.parametrize("requested", ["poweroff", "reboot"])
+def test_power_command_requires_confirmation_and_cannot_run_twice(requested):
+    panel, action, calls = power_panel(SimpleNamespace(returncode=0, stderr=""))
+    action(("power_confirm",))
+    action(("power_menu",))
+    assert panel.mode == "power" and panel.screen == "home" and panel.value == ""
+    action(("power_confirm",))
+    action(("power_request", requested))
+    assert panel.screen == "confirm" and panel.power_action == requested
+    assert not any(isinstance(call, tuple) for call in calls)
+    action(("power_confirm",))
+    assert panel.screen == "busy" and panel.power_action is None
+    assert calls.index("close voice and camera") < next(i for i, call in enumerate(calls) if isinstance(call, tuple))
+    assert [call for call in calls if isinstance(call, tuple)] == [
+        (["/usr/bin/systemctl", "--no-block", requested], 8),
+    ]
+    before = list(calls)
+    action(("power_confirm",))
+    action(("menu",))
+    assert calls == before and panel.screen == "busy"
+
+
+@pytest.mark.parametrize("cancel", [("power_cancel",), ("menu",)])
+def test_cancel_or_back_disarms_shutdown(cancel):
+    panel, action, calls = power_panel()
+    action(("power_menu",))
+    action(("power_request", "poweroff"))
+    action(cancel)
+    action(("power_confirm",))
+    assert panel.power_action is None and panel.screen == "home"
+    assert not any(isinstance(call, tuple) for call in calls)
+
+
+def test_power_rejects_unlisted_commands_and_requests_outside_power_menu():
+    panel, action, calls = power_panel()
+    action(("power_request", "reboot"))
+    assert panel.mode == "menu"
+    action(("power_menu",))
+    action(("power_request", "reboot; echo unexpected"))
+    action(("power_request", "poweroff", "extra"))
+    action(("power_confirm",))
+    assert panel.screen == "home" and panel.power_action is None
+    assert not any(isinstance(call, tuple) for call in calls)
+
+
+@pytest.mark.parametrize("result", [None, SimpleNamespace(returncode=1, stderr="Access denied")])
+def test_failed_system_request_keeps_power_menu_usable(result):
+    panel, action, calls = power_panel(result)
+    action(("power_menu",))
+    action(("power_request", "reboot"))
+    action(("power_confirm",))
+    assert panel.screen == "home" and panel.power_error
+    action(("menu",))
+    assert panel.mode == "menu"
+    assert len([call for call in calls if isinstance(call, tuple)]) == 1
+
+
+def test_cleanup_failure_does_not_queue_a_power_command():
+    panel, action, calls = power_panel(close_error=OSError("Camera close failed"))
+    action(("power_menu",))
+    action(("power_request", "poweroff"))
+    action(("power_confirm",))
+    assert panel.screen == "home" and panel.power_error
+    assert not any(isinstance(call, tuple) for call in calls)
