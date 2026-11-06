@@ -81,10 +81,21 @@ export default function RobotViewer({ motion }: { motion: StoryMotion }) {
       resolveShot(motion.progress, compact, reduced, shot);
       if (layer.current) {
         layer.current.style.opacity = String(exploring ? 1 : shot.visible);
+        const revealTop =
+          !exploring && motion.progress < 1
+            ? Math.max(
+                0,
+                document.getElementById("companion")?.getBoundingClientRect()
+                  .top ?? 0,
+              )
+            : 0;
+        layer.current.style.clipPath = `inset(${revealTop}px 0 0 0)`;
         layer.current.dataset.chapter = String(Math.round(motion.progress));
       }
       if (open.current) open.current.hidden = shot.visible < 0.02;
-      setActive(!document.hidden && (exploring || shot.visible > 0.01));
+      setActive(
+        !document.hidden && (!loaded || exploring || shot.visible > 0.01),
+      );
     };
     update();
     const unsubscribe = motion.subscribe(update);
@@ -93,7 +104,7 @@ export default function RobotViewer({ motion }: { motion: StoryMotion }) {
       unsubscribe();
       document.removeEventListener("visibilitychange", update);
     };
-  }, [motion, compact, reduced, exploring]);
+  }, [motion, compact, reduced, exploring, loaded]);
   useEffect(() => {
     if (!exploring) return;
     const overflow = document.body.style.overflow;

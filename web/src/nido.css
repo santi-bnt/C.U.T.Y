@@ -356,3 +356,8 @@
 .wire-edge.confirmed path {
   stroke-dasharray: none;
 }
+.badge.fabrication {
+  color: #c4b5fd;
+  border-color: #8b5cf670;
+  background: #8b5cf61c;
+}

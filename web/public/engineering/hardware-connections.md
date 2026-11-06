@@ -42,6 +42,12 @@ Exactly 11 connected pins, following the user's final table: physical 1, 3, 4, 5
 
 Arducam OV5647 CSI 15-pin → Pi 5 CAM/DISP 22-pin using a compatible 15-to-22-pin cable. CSI supplies power and image signals. No individual ribbon-contact mapping is asserted.
 
+The builder subsequently confirmed camera operation and facial tracking on the robot. These are implemented features; servo-driven head tracking remains separate future motion work.
+
+## PCB production status
+
+The builder confirms the carrier has been sent to fabrication. Delivery, assembly and electrical checks are still subsequent steps; the order is not a claim that a manufactured board has already passed testing.
+
 ## Proposed UART and servo control
 
 Pi physical 8 / BCM14 TXD → STM32 RX pin to confirm. STM32 TX pin to confirm → Pi physical 10 / BCM15 RXD. Shared GND, 3.3 V logic; do not apply 5 V UART signals.

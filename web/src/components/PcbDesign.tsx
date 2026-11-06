@@ -83,16 +83,16 @@ export default function PcbDesign() {
         <strong>
           {t(
             bi(
-              "DESIGN AVAILABLE / NOT ELECTRICALLY VALIDATED",
-              "DISEÑO DISPONIBLE / SIN VALIDACIÓN ELÉCTRICA",
+              "SENT TO FABRICATION / ELECTRICAL CHECKS AFTER DELIVERY",
+              "ENVIADA A FABRICACIÓN / PRUEBAS ELÉCTRICAS AL RECIBIRLA",
             ),
           )}
         </strong>
         <span>
           {t(
             bi(
-              "100 × 92 mm · 2 layers · 1.6 mm · Carrier V1.1. Fabrication and assembly pending.",
-              "100 × 92 mm · 2 capas · 1.6 mm · Carrier V1.1. Fabricación y montaje pendientes.",
+              "100 × 92 mm · 2 layers · 1.6 mm · Carrier V1.1. Fabrication ordered; assembly follows delivery.",
+              "100 × 92 mm · 2 capas · 1.6 mm · Carrier V1.1. Ya enviada a fabricar; montaje después de recibirla.",
             ),
           )}
         </span>

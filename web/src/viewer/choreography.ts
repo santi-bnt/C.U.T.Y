@@ -27,7 +27,7 @@ const desktop: readonly Shot[] = [
     targetY: 1.5,
     x: 0.29,
     y: -0.02,
-    visible: 1,
+    visible: 0,
   },
   {
     azimuth: -0.16,

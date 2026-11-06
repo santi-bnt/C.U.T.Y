@@ -101,6 +101,12 @@ test("persistent product story, original display, manual controls and translatio
     page.getByRole("button", { name: "Dashboard not configured" }),
   ).toBeDisabled();
   await chapter(page, "home", 0);
+  await expect(page.locator(".scene-layer")).toHaveCSS("opacity", "0");
+  await expect(
+    page.getByRole("button", { name: "Explore in 3D", exact: true }),
+  ).toBeHidden();
+  await chapter(page, "companion", 1);
+  await chapter(page, "companion", 1);
   await page
     .getByRole("button", { name: "Explore in 3D", exact: true })
     .click();
@@ -128,7 +134,7 @@ test("persistent product story, original display, manual controls and translatio
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".scene-layer canvas")).toHaveAttribute(
     "data-shot",
-    "0",
+    "1",
   );
   await page.getByRole("button", { name: "Español", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
@@ -279,6 +285,7 @@ test("deep anchors and reduced motion keep the story usable", async ({
       .isVisible()
   )
     await page.getByRole("button", { name: "Skip intro", exact: true }).click();
+  await chapter(page, "companion", 1);
   await page
     .getByRole("button", { name: "Explore in 3D", exact: true })
     .click();
@@ -319,6 +326,7 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   await expect(page.getByText("Loading real GLB…")).toBeHidden({
     timeout: 30000,
   });
+  await chapter(page, "companion", 1);
   await page
     .getByRole("button", { name: "Explore in 3D", exact: true })
     .click();

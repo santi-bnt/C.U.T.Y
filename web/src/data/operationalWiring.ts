@@ -109,7 +109,7 @@ add(
   "Pi CAM/DISP 22-pin",
   "OV5647 15-pin / adapter",
   "signals",
-  "unverified",
+  "confirmed",
   "Power + image via CSI / alimentación e imagen",
 );
 add(
@@ -248,8 +248,8 @@ const detail: Record<string, ReturnType<typeof bi>> = {
     "Cinco MG996R: rojo a 6 V regulados, marrón/negro a GND y naranja/amarillo a PWM STM32. Asignaciones PWM pendientes.",
   ),
   camera: bi(
-    "OV5647 15-pin CSI connects to Pi 5 CAM/DISP 22-pin through a compatible adapter. Power and image travel through CSI; individual ribbon contacts are not enumerated.",
-    "OV5647 CSI de 15 pines a CAM/DISP Pi 5 de 22 pines mediante adaptador compatible. Alimentación e imagen por CSI; no se enumeran contactos internos.",
+    "The builder confirmed camera operation and facial tracking. OV5647 15-pin CSI connects to Pi 5 CAM/DISP 22-pin through a compatible adapter. Power and image travel through CSI; individual contacts are not enumerated.",
+    "El constructor confirmó cámara y seguimiento facial. OV5647 CSI de 15 pines a CAM/DISP Pi 5 de 22 pines con adaptador compatible. Alimentación e imagen por CSI; no se enumeran contactos internos.",
   ),
   battery: bi(
     "LiPo 3S: 11.1 V nominal, 12.6 V full, 2200 mAh, 24.42 Wh and labeled 50C. Protection, fuse and final distribution remain to verify.",
@@ -347,7 +347,7 @@ export const wiringEdges = [
     to: "camera",
     kind: "signals",
     label: "CSI 22 ↔ 15",
-    status: "unverified",
+    status: "confirmed",
   },
   {
     from: "pi",

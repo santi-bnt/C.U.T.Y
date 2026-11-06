@@ -4,11 +4,12 @@ export const bi = (en: string, es: string): Copy => ({ en, es });
 export const repo = "https://github.com/santi-bnt/C.U.T.Y";
 export const source = (path: string) =>
   `${repo}/${path.split("/").at(-1)?.includes(".") ? "blob" : "tree"}/main/${path}`;
-export type Stage = "implemented" | "validation" | "planned";
+export type Stage = "implemented" | "validation" | "planned" | "fabrication";
 export const stageNames: Record<Stage, Copy> = {
   implemented: bi("Implemented", "Implementado"),
   validation: bi("In validation", "En validación"),
   planned: bi("Planned", "Planeado"),
+  fabrication: bi("Sent to fabrication", "Enviada a fabricación"),
 };
 export const components = [
   {
@@ -54,10 +55,10 @@ export const components = [
     id: "camera",
     name: "Arducam OV5647",
     tag: bi("VISION", "VISIÓN"),
-    stage: "validation",
+    stage: "implemented",
     detail: bi(
-      "OV5647 camera startup has been observed on the Pi. Picamera2/OpenCV adapters feed YuNet detection and visual gaze tracking. End-to-end physical tracking validation is pending.",
-      "Se observó el arranque de la cámara OV5647 en la Pi. Picamera2/OpenCV alimentan YuNet y el seguimiento visual. Falta validar físicamente todo el seguimiento.",
+      "The builder confirmed OV5647 camera operation and facial tracking on the robot. Picamera2/OpenCV feed face detection and expressive gaze tracking.",
+      "El constructor confirmó el funcionamiento de la cámara OV5647 y el seguimiento facial en el robot. Picamera2/OpenCV alimentan la detección y el seguimiento expresivo de la mirada.",
     ),
     interface: "CSI · Picamera2 · OpenCV",
     path: "raspberry/src/cuty/vision",
@@ -93,10 +94,10 @@ export const components = [
     id: "pcb",
     name: "Carrier PCB V1.1",
     tag: bi("ELECTRONICS", "ELECTRÓNICA"),
-    stage: "validation",
+    stage: "fabrication",
     detail: bi(
-      "100 × 92 mm, two-layer KiCad carrier. Native schematic, layout, BOM and fabrication exports exist. Manufacturing, assembly and electrical validation are pending.",
-      "Carrier KiCad de dos capas, 100 × 92 mm. Existen esquema, PCB, BOM y archivos de fabricación. La fabricación, el montaje y la validación eléctrica están pendientes.",
+      "100 × 92 mm, two-layer KiCad carrier. The builder confirms the board has been sent to fabrication. Assembly and electrical checks follow delivery.",
+      "Carrier KiCad de dos capas, 100 × 92 mm. El constructor confirma que la placa ya se envió a fabricar. El montaje y las pruebas eléctricas siguen después de recibirla.",
     ),
     interface: "KiCad · 2 layers · THT",
     path: "hardware/electronics/kicad/cuty_carrier",
@@ -135,8 +136,8 @@ export const capabilities = [
       "OpenCV y YuNet, con alternativa Haar, detectan caras. La selección y el suavizado convierten coordenadas de cámara en movimientos de ojos.",
     ),
     evidence: bi(
-      "Software implemented; camera startup observed. Complete physical gaze validation pending. No identity recognition.",
-      "Software implementado; arranque de cámara observado. Validación física del seguimiento pendiente. Sin reconocimiento de identidad.",
+      "Camera operation and facial tracking physically confirmed by the builder. Face detection and gaze tracking, without identity recognition.",
+      "Funcionamiento de cámara y seguimiento facial confirmados físicamente por el constructor. Detección y seguimiento de mirada, sin reconocimiento de identidad.",
     ),
     path: "raspberry/src/cuty/vision",
     icon: "vision",
@@ -178,7 +179,7 @@ export const capabilities = [
 export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
   {
     stage: "implemented",
-    title: bi("Built in code.", "Desarrollado en código."),
+    title: bi("Built and working.", "Desarrollado y funcionando."),
     items: [
       bi(
         "Gemini Live + OpenAI Realtime adapters",
@@ -189,8 +190,8 @@ export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
         "Conversación, VAD local y búsqueda web",
       ),
       bi(
-        "YuNet detection + visual gaze tracking",
-        "Detección YuNet + seguimiento visual",
+        "Camera + facial tracking: builder-confirmed on the robot",
+        "Cámara y seguimiento facial: confirmados en el robot",
       ),
       bi(
         "Animated face, expressions and lip sync",
@@ -207,24 +208,20 @@ export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
     title: bi("On the workbench.", "En el banco de pruebas."),
     items: [
       bi(
-        "ReSpeaker capture / playback: basic tests passed",
-        "Captura / reproducción ReSpeaker: pruebas básicas realizadas",
+        "Long-session audio and lip-sync tuning",
+        "Ajustes de audio y sincronización en sesiones largas",
       ),
       bi(
-        "Gemini voice replies observed on Pi 5",
-        "Respuestas de voz Gemini observadas en Pi 5",
+        "Final backlight mapping and overlay documentation",
+        "Documentación final de retroiluminación y overlay",
       ),
       bi(
-        "Listening sensitivity and stable long sessions",
-        "Sensibilidad y sesiones largas estables",
+        "Battery power distribution and independent Pi regulator",
+        "Distribución de batería y regulador Pi independiente",
       ),
       bi(
-        "Display reliability and camera-to-gaze pipeline",
-        "Estabilidad de pantalla y flujo cámara-mirada",
-      ),
-      bi(
-        "PCB fabrication and electrical checks pending",
-        "Fabricación y pruebas eléctricas de PCB pendientes",
+        "PCB sent to fabrication; assembly and electrical checks after delivery",
+        "PCB enviada a fabricar; montaje y pruebas eléctricas al recibirla",
       ),
     ],
   },
@@ -241,8 +238,8 @@ export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
         "PWM, límites de servo y seguridad",
       ),
       bi(
-        "Physical head tracking, IMU and body PID",
-        "Seguimiento físico, IMU y PID de cuerpo",
+        "Servo-driven head tracking, IMU and body PID",
+        "Seguimiento mecánico con servos, IMU y PID de cuerpo",
       ),
       bi(
         "Live telemetry and connected dashboard",

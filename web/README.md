@@ -26,7 +26,7 @@ Build performs strict TypeScript checking and outputs `dist/`. Browser tests use
 
 ## The experience
 
-A kinetic C.U.T.Y. typographic opening precedes robot reveal, with Skip and reduced-motion bypass. Deep section links bypass the opening. One lazy homepage canvas persists throughout the story. A measured GSAP master timeline drives deterministic desktop/mobile camera poses without page-wide React scroll updates. Explicit exploration takes camera ownership; Escape restores the story.
+A kinetic C.U.T.Y. typographic opening precedes a text-only hero, with Skip and reduced-motion bypass. The robot and exploration controls appear only in the second section, Meet C.U.T.Y.; the transition is clipped to that section so it cannot cover the first. Deep section links bypass the opening. One lazy homepage canvas persists throughout the story. A measured GSAP master timeline drives deterministic desktop/mobile camera poses without page-wide React scroll updates. Explicit exploration takes camera ownership; Escape restores the story.
 
 The updated **V17 Nido November 5 revision** has named parts, smooth CAD normals and authored internal materials. The exterior remains black and the original animated Python face remains mapped onto the actual LCD glass. Explore supports orbit/pinch, presets, zoom/reset, wireframe, autorotation, inside/exploded views and clearly labeled head/arm motion demos. These are visual rigid-part simulations, not motor commands or proof of safe joint limits.
 
@@ -37,6 +37,8 @@ PCB inspection retains native KiCad front/back pad selection, zoom/pan and elect
 Wiring defaults to an interactive 3D interior with selected components and colored functional curves; a 2D overview and searchable tables remain available. Curve endpoints derive from named CAD bounds and represent relationships, not physical harness routes or contact coordinates. Ground topology stays in the table because NT1 has no CAD solid. Technical viewers load near the viewport and pause while hidden; the dormant homepage canvas is retained.
 
 ## Which connections are confirmed
+
+Latest builder update: camera operation and facial tracking are confirmed on the robot, alongside display/audio. Their component states are Implemented. The carrier has been sent to fabrication, displayed as a distinct production status; delivery, assembly and electrical checks remain subsequent steps. Visual tracking is separate from future servo-driven head tracking.
 
 `src/data/operationalWiring.ts` and `public/engineering/hardware-connections.md` record the builder's supplied table. Display and ReSpeaker operation together is confirmed. Display DC is BCM24 / physical18; RESET is BCM25 / physical22; touch IRQ is BCM17 / physical11. The latest explicit ReSpeaker table uses 5 V physical4, 3.3 V physical1, GND physical6, I2C physical3/5, MCLK physical7 / BCM4, I2S physical12/35/38/40 and AUD_RST physical37 / BCM26. These 11 rows supersede the earlier audio hookup list.
 

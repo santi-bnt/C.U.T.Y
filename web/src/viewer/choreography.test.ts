@@ -21,6 +21,10 @@ describe("continuous robot choreography", () => {
       expect(output.visible).toBeLessThanOrEqual(1);
     }
     expect(resolveShot(4, false, false, output).visible).toBe(0);
+    expect(resolveShot(0, false, false, output).visible).toBe(0);
+    expect(resolveShot(0, true, true, output).visible).toBe(0);
+    expect(resolveShot(1, false, false, output).visible).toBe(1);
+    expect(resolveShot(1, true, true, output).visible).toBe(1);
     expect(resolveShot(5, false, false, output).visible).toBe(0);
     expect(resolveShot(6, false, false, output).visible).toBe(1);
   });

@@ -78,8 +78,8 @@ export default function WiringConnections() {
         <strong>
           {t(
             bi(
-              "BUILDER-CONFIRMED DISPLAY & AUDIO / FUTURE CONTROL MARKED SEPARATELY",
-              "PANTALLA Y AUDIO CONFIRMADOS / CONTROL FUTURO IDENTIFICADO APARTE",
+              "DISPLAY / AUDIO / VISION CONFIRMED / FUTURE CONTROL MARKED SEPARATELY",
+              "PANTALLA / AUDIO / VISIÓN CONFIRMADOS / CONTROL FUTURO IDENTIFICADO APARTE",
             ),
           )}
         </strong>

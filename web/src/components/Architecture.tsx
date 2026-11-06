@@ -155,8 +155,8 @@ export default function Architecture() {
         <div className="architecture-note">
           {t(
             bi(
-              "The carrier routes these interfaces; it does not replace firmware. Its fabrication and electrical validation are pending.",
-              "La carrier distribuye estas interfaces; no reemplaza el firmware. Su fabricación y validación eléctrica están pendientes.",
+              "The carrier routes these interfaces; it does not replace firmware. It has been sent to fabrication; assembly and electrical checks follow delivery.",
+              "La carrier distribuye estas interfaces; no reemplaza el firmware. Ya se envió a fabricar; el montaje y las pruebas eléctricas siguen al recibirla.",
             ),
           )}
         </div>
