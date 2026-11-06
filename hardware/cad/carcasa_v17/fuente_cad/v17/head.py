@@ -25,8 +25,17 @@ BASE_Z0 = HEAD_Z0 + WALL
 BASE_T = 3.0
 BASE_SCREWS = [(-40.0, -14.0), (40.0, -14.0), (-40.0, 22.0), (40.0, 22.0)]
 FLANGE_GAP, FLANGE_T = 0.2, 1.6
-TOUCH_FRONT_Y = FRONT_Y + WALL + FLANGE_GAP + FLANGE_T + 0.35  # visor shell + its backing flange
-LENS_FRONT_Y = FRONT_Y + 0.5
+VISOR_IN_Y = FRONT_Y + WALL + FLANGE_GAP + FLANGE_T             # back face of the visor (shell + flange)
+TOUCH_FRONT_Y = VISOR_IN_Y + 0.35                                # visor shell + its backing flange
+LCD_BACK_Y = TOUCH_FRONT_Y + refs.LCD["stack"]                   # display PCB back (measured stack 5.8)
+BAR_Y0 = LCD_BACK_Y + 0.2                                        # front face of the clamp bars (display + camera)
+# camera: its back face lines up with the display back so one bar plate clamps both
+CAM_BOARD_FRONT_Y = BAR_Y0 - refs.CAM["t"]
+LENS_FRONT_Y = CAM_BOARD_FRONT_Y - refs.CAM["lens_h"]             # pokes ~0.9 mm into the visor's inner pocket
+CAM_TOP_Z = CAM_Z + refs.CAM["lens_top"]
+CAM_BOT_Z = CAM_TOP_Z - refs.CAM["h"]
+CAM_BAR_Z = CAM_TOP_Z - 3.0
+CAM_BOSS_X = refs.CAM["w"] / 2 + 3.6
 
 
 def outer():
@@ -51,10 +60,11 @@ def _shell():
 def display_ref():
     L = refs.LCD
     out = []
+    lcd_t = L["stack"] - L["touch_t"] - L["pcb_t"]
     touch = rbox(0, TOUCH_FRONT_Y + L["touch_t"] / 2, DISP_Z, L["touch_w"], L["touch_t"], L["touch_h"], 2.0, "Y")
-    glass = rbox(0, TOUCH_FRONT_Y + L["touch_t"] + 3.5, DISP_Z, L["pcb_w"], 7.0, L["pcb_h"], 1.0, "Y")
-    pcb = cbox(0, TOUCH_FRONT_Y + L["touch_t"] + 7.0 + 0.8, DISP_Z, L["pcb_w"], 1.6, L["pcb_h"])
-    header = cbox(-18.9, TOUCH_FRONT_Y + 14.0 - 1.9, DISP_Z + L["pcb_h"] / 2 - 3.5, 33.0, 3.8, 5.0)
+    glass = rbox(0, TOUCH_FRONT_Y + L["touch_t"] + lcd_t / 2, DISP_Z, L["pcb_w"], lcd_t, L["pcb_h"], 1.0, "Y")
+    pcb = cbox(0, LCD_BACK_Y - L["pcb_t"] / 2, DISP_Z, L["pcb_w"], L["pcb_t"], L["pcb_h"])
+    header = cbox(-18.9, LCD_BACK_Y + L["header_h"] / 2, DISP_Z + L["pcb_h"] / 2 - 3.5, 33.0, L["header_h"], 5.0)
     active = cbox(0, TOUCH_FRONT_Y - 0.01, DISP_Z, L["active_w"], 0.05, L["active_h"])
     out.append(("lcd_touch_panel", touch, (0.04, 0.05, 0.07)))
     out.append(("lcd_module", glass, (0.15, 0.15, 0.17)))
@@ -64,24 +74,49 @@ def display_ref():
 
 
 def display_keepout():
-    return cbox(-18.9, TOUCH_FRONT_Y + 14.0 + 6.0, DISP_Z + refs.LCD["pcb_h"] / 2 - 3.5, 36.0, 12.0, 8.0)
+    """Female 2x13 header on the display back + the male Dupont housings plugged into it (14 mm + bend)."""
+    L = refs.LCD
+    return cbox(-18.9, LCD_BACK_Y + L["header_h"] + 8.0, DISP_Z + L["pcb_h"] / 2 - 3.5, 36.0, 16.0, 8.0)
 
 
 def camera_ref():
     C_ = refs.CAM
-    lens_front = LENS_FRONT_Y
-    board_y0 = lens_front + C_["lens_h"]
-    top = CAM_Z + C_["hole_off"]
-    board = cbox(0, board_y0 + C_["t"] / 2, top - C_["h"] / 2, C_["w"], C_["t"], C_["h"])
-    holder = cbox(0, board_y0 - C_["lens_h"] / 2 + 0.6, CAM_Z, C_["lens"], C_["lens_h"] - 1.2, C_["lens"])
-    lens = cyl(3.6, 1.4, (0, lens_front + 1.4, CAM_Z), (0, -1, 0))
+    board = cbox(0, CAM_BOARD_FRONT_Y + C_["t"] / 2, (CAM_TOP_Z + CAM_BOT_Z) / 2, C_["w"], C_["t"], C_["h"])
+    hold_d = C_["lens_h"] - 1.4
+    holder = cbox(0, CAM_BOARD_FRONT_Y - hold_d / 2, CAM_Z, C_["lens"], hold_d, C_["lens"])
+    lens = cyl(3.6, 1.4, (0, LENS_FRONT_Y + 1.4, CAM_Z), (0, -1, 0))
     return [("camera_board", board, (0.10, 0.36, 0.19)), ("camera_lens", fuse(holder, lens), (0.03, 0.03, 0.04))]
 
 
-def cam_holes():
+def camera_cradle():
+    """Locating features on the visor back: 4 front pads, 2 side guides with feet, 2 bosses for the clamp bar.
+    The board drops in from above; the bar presses its back. Works for any hole pattern."""
     C_ = refs.CAM
-    top = CAM_Z + C_["hole_off"]
-    return [(sx * 10.5, top - 2.0) for sx in (-1, 1)] + [(sx * 10.5, top - 14.5) for sx in (-1, 1)]
+    w2 = C_["w"] / 2
+    y0 = VISOR_IN_Y - 0.6
+    parts = []
+    for sx in (-1, 1):
+        for z in (CAM_TOP_Z - 1.6, CAM_BOT_Z + 1.6):
+            xa, xb = sx * (w2 - 2.8), sx * (w2 - 0.4)
+            parts.append(box(min(xa, xb), max(xa, xb), y0, CAM_BOARD_FRONT_Y, z - 1.2, z + 1.2))
+        xa, xb = sx * (w2 + 0.4), sx * (w2 + 2.0)
+        parts.append(box(min(xa, xb), max(xa, xb), y0, CAM_BOARD_FRONT_Y + 1.0, CAM_BOT_Z - 1.2, CAM_TOP_Z - 6.0))
+        xa, xb = sx * (w2 - 2.8), sx * (w2 + 2.0)
+        parts.append(box(min(xa, xb), max(xa, xb), y0, CAM_BOARD_FRONT_Y + 1.0, CAM_BOT_Z - 1.2, CAM_BOT_Z - 0.3))
+        parts.append(cyl(2.6, CAM_BOARD_FRONT_Y + 0.8 - y0, (sx * CAM_BOSS_X, CAM_BOARD_FRONT_Y + 0.8, CAM_BAR_Z),
+                         (0, -1, 0)))
+    c = fuse(*parts).intersect(inner())
+    for sx in (-1, 1):
+        c = c.cut(cyl(0.8, 6.5, (sx * CAM_BOSS_X, CAM_BOARD_FRONT_Y + 0.9, CAM_BAR_Z), (0, -1, 0)))
+    return c
+
+
+def camera_bar():
+    """Clamp bar across the top of the camera's back, 2 x M2 x 10 into the cradle bosses."""
+    bar = rbox(0, BAR_Y0 + 1.5, CAM_BAR_Z, 2 * CAM_BOSS_X + 6.0, 3.0, 5.6, 2.7, "Y")
+    for sx in (-1, 1):
+        bar = bar.cut(cyl_c(1.2, 10, (sx * CAM_BOSS_X, BAR_Y0 + 1.5, CAM_BAR_Z), (0, 1, 0)))
+    return bar
 
 
 # ------------------------------------------------------------------ shells
@@ -153,8 +188,9 @@ def visor():
     L = refs.LCD
     # active-area window
     v = v.cut(rbox(0, FRONT_Y, DISP_Z, L["active_w"] + 1.6, 20, L["active_h"] + 1.6, 2.5, "Y"))
-    # camera lens hole
+    # camera window: round hole in the front skin + square pocket behind (lens holder may poke in)
     v = v.cut(cyl_c(6.2, 20, (0, FRONT_Y, CAM_Z), (0, 1, 0)))
+    v = v.cut(rbox(0, VISOR_IN_Y - 1.0, CAM_Z, 12.4, 2.8, 12.4, 1.0, "Y"))
     # display pocket walls (locate the touch panel) — short ribs around the module
     rz = L["pcb_h"] / 2 + 1.4
     rx = L["pcb_w"] / 2 + 1.4
@@ -164,17 +200,13 @@ def visor():
         v = v.fuse(rib.cut(outer().cut(inner())).intersect(inner()))
     # bosses for the two display clamp bars (M2 x 10, self-tapping)
     for (x, z) in display_bar_bosses():
-        b = cyl(3.0, 12.0, (x, TOUCH_FRONT_Y + refs.LCD["touch_t"] + 7.0 + 1.6 + 0.2, z), (0, -1, 0))
+        b = cyl(3.0, 12.0, (x, BAR_Y0, z), (0, -1, 0))
         b = b.intersect(inner())
         v = v.fuse(b)
-        v = v.cut(cyl(0.8, 10, (x, TOUCH_FRONT_Y + 12, z), (0, -1, 0)))
-    # camera bosses (M2)
-    lens_front = LENS_FRONT_Y
-    board_y0 = lens_front + refs.CAM["lens_h"]
-    for (x, z) in cam_holes():
-        b = cyl(2.2, 8.0, (x, board_y0, z), (0, -1, 0)).intersect(inner())
-        v = v.fuse(b)
-        v = v.cut(cyl(0.8, 6, (x, board_y0 + 0.5, z), (0, -1, 0)))
+        v = v.cut(cyl(0.8, 8.5, (x, BAR_Y0 + 0.1, z), (0, -1, 0)))
+    # camera cradle (pads, guides, bosses for the clamp bar)
+    v = v.fuse(camera_cradle())
+    v = v.cut(rbox(0, VISOR_IN_Y - 1.0, CAM_Z, 12.4, 2.8, 12.4, 1.0, "Y"))
     return v.clean()
 
 
@@ -186,7 +218,7 @@ def display_bar_bosses():
 
 def display_bars():
     L = refs.LCD
-    y0 = TOUCH_FRONT_Y + L["touch_t"] + 7.0 + 1.6 + 0.2
+    y0 = BAR_Y0
     out = []
     for x in (-39.5, 39.5):
         bar = rbox(x, y0 + 1.5, DISP_Z, 6.0, 3.0, L["pcb_h"] + 8.0 + 6.0, 2.9, "Y")
@@ -194,6 +226,7 @@ def display_bars():
             if abs(bx - x) < 1:
                 bar = bar.cut(cyl_c(1.4, 10, (bx, y0 + 1.5, bz), (0, 1, 0)))
         out.append(bar)
+    out.append(camera_bar())
     return fuse(*out)
 
 

@@ -125,24 +125,26 @@ def _inner_offset_solid(extra):
 
 
 def tummy_grille():
-    """Orange speaker grille: follows the belly curve, holds the Ø40 speaker in its back ring."""
+    """Orange speaker grille: follows the belly curve; a pocket on its back holds the 35 x 25 x 5.5 speaker
+    (landscape), its front face on a thin stop rim. 2-3 dots of hot glue at the pocket corners."""
     cz = refs.SPEAKER_C[2]
+    sp = refs.SPK
     disc = cyl(TUMMY_R - 0.25, 40, (0, -40, cz), (0, -1, 0))
     cap = body.outer_solid().intersect(disc).cut(body.inner_solid())
-    a, b, n = body.profile_at(cz, BODY_WALL)
-    y_in = -b
-    sy = refs.SPEAKER_C[1] - 6.0          # speaker front face
-    tube = cyl(22.6, (sy - y_in) + 1.0, (0, sy, cz), (0, -1, 0)).cut(cyl(20.3, 60, (0, sy + 5, cz), (0, -1, 0)))
-    # inner stop ring: the speaker's front rim seats against it (glue 3 dots behind)
-    tube = tube.fuse(cyl(22.6, 1.2, (0, sy, cz), (0, -1, 0)).cut(cyl(17.5, 10, (0, sy + 2, cz), (0, -1, 0))))
-    tube = tube.intersect(_inner_offset_solid(0.0))
+    yf = refs.SPEAKER_C[1] - sp["t"] / 2                 # speaker front face
+    pw, ph = sp["w"] + 0.6, sp["h"] + 0.6                 # pocket (0.3 mm play per side)
+    fw, fh = pw + 3.2, ph + 3.2                           # frame outline (1.6 mm walls)
+    frame = box(-fw / 2, fw / 2, -80.0, yf + sp["t"] - 1.0, cz - fh / 2, cz + fh / 2)
+    frame = frame.cut(box(-pw / 2, pw / 2, yf, 0.0, cz - ph / 2, cz + ph / 2))                 # pocket
+    frame = frame.cut(box(-pw / 2 + 2.0, pw / 2 - 2.0, -90.0, 0.0, cz - ph / 2 + 2.0, cz + ph / 2 - 2.0))  # sound
+    frame = frame.intersect(_inner_offset_solid(0.0))
     lip_disc = cyl(TUMMY_R + 2.4, 40, (0, -40, cz), (0, -1, 0)).cut(cyl(22.0, 50, (0, -30, cz), (0, -1, 0)))
     lip = _inner_offset_solid(0.2).intersect(lip_disc).cut(_inner_offset_solid(1.8))
     filler = _inner_offset_solid(0.0).intersect(disc).cut(_inner_offset_solid(0.2))
-    g = fuse(cap, filler, tube, lip)
+    g = fuse(cap, filler, frame, lip)
     g = g.cut(box(-60, 60, -41.5, 0, 0, 300))            # keep clear of the deck front edge
     for k, w in zip(range(-2, 3), (22, 32, 36, 32, 22)):
-        g = g.cut(rbox(0, -60, cz + 6.8 * k, w, 40, 3.4, 1.69, "Y"))
+        g = g.cut(rbox(0, -60, cz + 6.8 * k, w, 40, 3.4, 1.69, "Y").intersect(box(-60, 60, -90, yf - 1.2, 0, 300)))
     return g.clean()
 
 

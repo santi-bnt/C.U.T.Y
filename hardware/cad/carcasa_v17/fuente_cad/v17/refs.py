@@ -147,7 +147,7 @@ def carrier_pcb():
         out.append((f"pcb_{ref}", board_box(bb, 0.0, HEIGHTS[key]), colors.get(ref, COL["pcb_dark"])))
     out.append(("pcb_blackpill", board_box((45.99, 70.61, 98.80, 91.39), 8.6, 10.2), COL["pcb_dark"]))
     out.append(("pcb_blackpill_usb", board_box((92.3, 77.4, 99.5, 84.6), 10.2, 13.4), COL["metal"]))
-    out.append(("respeaker_hat", board_box((36.37, 22.27, 101.37, 52.27), 11.0, 12.6), COL["pcb_dark"]))
+    out.append(("respeaker_hat", board_box((36.12, 22.37, 101.62, 52.17), 11.0, 12.6), COL["pcb_dark"]))
     out.append(("respeaker_jack", board_box((40.0, 24.3, 46.0, 29.3), 12.6, 17.6), COL["metal"]))
     for ref, col in (("F1", (0.85, 0.2, 0.18)), ("F2", (0.86, 0.76, 0.55))):
         b = PARTS[ref]["box"]
@@ -201,7 +201,8 @@ def raspberry_pi5():
         p = pi_to_world(hx, hy, -0.8)
         board = board.cut(cyl_c(1.4, 4, (p.x, p.y, p.z)))
     out.append(("pi5_board", board, COL["pi"]))
-    out.append(("pi5_usb_eth", pi_box(64, 2, 87, 54, 0, 16.0), COL["metal"]))
+    out.append(("pi5_usb_eth", pi_box(64, 2, 88.0, 54, 0, 16.4), COL["metal"]))     # measured: 18 mm over the underside
+    out.append(("pi5_sd_card", pi_box(-2.3, 22.5, 12.0, 33.5, -3.0, -1.6), COL["pcb_dark"]))  # 85 + 3.0 + 2.3 = 90.3 measured
     out.append(("pi5_cooler", pi_box(21, 10, 60, 46, 0, 13.0), (0.55, 0.58, 0.62)))
     out.append(("pi5_gpio", pi_box(7.1, 50.0, 57.9, 55.0, 0, 8.6), COL["pcb_dark"]))
     out.append(("pi5_usbc", pi_box(7.6, -1.0, 14.8, 7.0, 0, 3.4), COL["metal"]))
@@ -238,24 +239,27 @@ def power_keepouts():
 
 
 # ------------------------------------------------------------------ speaker, IMU
-SPEAKER_C = (0.0, -52.0, 114.0)            # Ø40 x 16 mm, firing forward through the tummy grille
-SPEAKER_R = 20.0
+# 2 W / 8 ohm compact box speaker, measured 35.4 x 25 x 5.5 mm. Mounted landscape (35.4 along X)
+# in a pocket on the back of the tummy grille; the front face clears the curved belly by >= 0.4 mm.
+SPK = dict(w=35.4, h=25.0, t=5.5)
+SPEAKER_C = (0.0, -61.9 + SPK["t"] / 2, 114.0)   # centre; front face at y = -61.9
 IMU_C = (-38.0, -31.0, DECK_Z1 + 3.6)       # GY-521 flat on the deck, front-left (under the servo plugs)
 
 
 def speaker():
     cx, cy, cz = SPEAKER_C
-    front = cyl(SPEAKER_R, 4.5, (cx, cy - 6.0, cz), (0, 1, 0))
-    magnet = cyl(11.5, 12.0, (cx, cy - 1.5, cz), (0, 1, 0))
-    return [("speaker_40mm", fuse(front, magnet), (0.12, 0.12, 0.13))]
+    b = cbox(cx, cy, cz, SPK["w"], SPK["t"], SPK["h"])
+    b = cq.Workplane().add(b).edges("|Y").fillet(3.0).val()
+    cone = cyl(8.0, 0.6, (cx, cy - SPK["t"] / 2 + 0.3, cz), (0, -1, 0))
+    return [("speaker_2w", b, (0.12, 0.12, 0.13)), ("speaker_2w_cone", cone, COL["metal"])]
 
 
 def imu():
     return [("imu_mpu6050", cbox(IMU_C[0], IMU_C[1], IMU_C[2], 21.0, 16.0, 3.2), (0.10, 0.35, 0.65))]
 
 
-# ------------------------------------------------------------------ battery (3S 2200 mAh, measure)
-BATT = (108.0, 35.0, 25.0)                     # OVONIC 3S 2200 50C: 107 x 35 x 22 (+-3)
+# ------------------------------------------------------------------ battery (3S 2200 mAh 50C, measure)
+BATT = (108.0, 35.0, 25.0)                     # HM2202 3S 2200 50C (the team's): drawer fits up to 109 x 35 x 25
 BATT_C = (0.0, 43.5, 5.0 + 12.5)               # on the drawer tray (top z 4.8)
 
 
@@ -279,6 +283,9 @@ def switches(positions):
 
 
 # ------------------------------------------------------------------ display + camera (head)
-LCD = dict(pcb_w=85.0, pcb_h=56.0, depth=14.0, touch_w=83.79, touch_h=54.86, touch_t=1.6,
-           active_w=74.04, active_h=49.56, holes=(29.0, 24.5))
-CAM = dict(w=25.0, h=24.0, t=1.0, lens=8.5, lens_h=5.5, holes=(21.0, 12.5), hole_off=9.5)
+LCD = dict(pcb_w=85.0, pcb_h=55.3, stack=5.8, touch_w=83.79, touch_h=54.86, touch_t=1.6, pcb_t=1.6,
+           active_w=74.04, active_h=49.56, holes=(29.0, 24.5), header_h=8.5)   # measured 85 x 55.3 x 5.8
+# Arducam OV5647, measured: PCB 24.4 x 23.3 x 2.3, 7.2 deep incl. the 8.5 mm square lens holder.
+# It sits in a cradle (guides + clamp bar), so its hole pattern does not matter; lens_top = lens centre
+# below the top edge (assumed like the Pi camera v1.3; confirm with calipers).
+CAM = dict(w=24.4, h=23.3, t=2.3, lens=8.5, lens_h=4.9, lens_top=9.6, holes=(19.8, 11.3))
