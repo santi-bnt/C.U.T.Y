@@ -27,7 +27,7 @@ Build performs strict TypeScript checking and produces `web/dist/`. Preview serv
 
 ## Real model
 
-`CUTY_V17_Ensamble_completo.glb` is copied unchanged to **web/public/models/cuty.glb**, replacing V16. The loader uses Vite's base URL and a version query for cache invalidation, including subdirectory deployments. Missing/invalid models and WebGL failures display placement instructions and a reload control; the rest of the page remains accessible.
+`hardware/cad/glb/CUTY_V17_Ensamble_completo.glb` is copied unchanged to **web/public/models/cuty.glb**, replacing V16. The loader uses Vite's base URL and a version query for cache invalidation, including subdirectory deployments. Missing/invalid models and WebGL failures display placement instructions and a reload control; the rest of the page remains accessible.
 
 Measured V17 GLB: **110 meshes**, **116,741 triangles**, no authored materials, rig or animation clips. This CAD export uses millimeter coordinates and Z as vertical: source extents X 180 × Y 173.02 × Z 365. The viewer rotates a cloned instance −90° about X, making Y vertical, then uniformly fits it. Displayed assembly bounds are **X 180 × Y 365 × Z 173.02 mm**. Source geometry, part placement and GLB bytes are preserved. Front/side camera views are now +Z/+X in the oriented viewer, with the actual screen facing +Z. Parts are not articulated or individually selectable.
 

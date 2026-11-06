@@ -5,6 +5,23 @@
 > aquel momento. Para el estado actual consulta el [roadmap](roadmap.md),
 > la [arquitectura](architecture.md) y la [carrier v1.1](../hardware/electronics/kicad/cuty_carrier/README.md).
 
+## Limpieza de la raíz — 2026-11-05
+
+Los accesos de compatibilidad `cuty.py`, `cuty_launcher.py`, `cuty_wifi_panel.py`
+y `cuty-install.sh` de la raíz se retiraron. Las fuentes reales ya estaban en
+`raspberry/src/cuty/` y `raspberry/touchscreen/`; el servicio del launcher ya
+apunta a esa carpeta. Para el arranque manual se utiliza
+`sudo python3 raspberry/touchscreen/cuty_launcher.py` desde la raíz; el
+instalador explícito es `bash raspberry/touchscreen/install.sh`.
+
+La preparación Windows usa `raspberry/.venv` y `raspberry/requirements.txt`;
+se retiró el requirements de compatibilidad de la raíz. No se trasladaron
+entornos virtuales, claves, calibraciones ni archivos privados. El archivo
+`pytest.ini` raíz se mantiene como configuración de pruebas del repositorio.
+El GLB fuente pasó a `hardware/cad/glb/`; la copia pública de la web conserva
+su ruta y contenido. Las siguientes secciones documentan la reorganización
+anterior y sus wrappers históricos, no los comandos de ejecución actuales.
+
 ## Origen y alcance
 
 Se ejecutaron `git fetch origin` y `git merge --ff-only origin/main`: la rama local pasó de `39effb9` a `7bfb392`, incorporando también `d7790b5`. No se hizo force push ni se crearon commits adicionales para la reorganización. Los cambios locales previos se conservaron. Esta reorganización aún debe revisarse, añadirse y publicarse mediante Git para llegar a la Raspberry.

@@ -14,13 +14,13 @@ C.U.T.Y/
 │   └── systemd/       Plantilla futura del servicio de voz
 ├── stm32/             Firmware futuro: servos, IMU, PID, UART y seguridad
 ├── hardware/
-│   ├── cad/           SolidWorks y exportaciones STEP/STL
+│   ├── cad/           SolidWorks y exportaciones STEP/STL/GLB
 │   └── electronics/   KiCad, esquemas y datasheets
-├── web/               Dashboard y gemelo digital futuros
+├── web/               Portafolio EN/ES y visor 3D; dashboard conectado futuro
 └── docs/              Arquitectura, planes y protocol/
 ```
 
-Los archivos de arranque de la raíz son wrappers de compatibilidad, no otras copias de la aplicación. Las carpetas ocultas del entorno no son módulos del robot.
+Las entradas de voz, pantalla e instalación están dentro de `raspberry/`. El GLB fuente está en `hardware/cad/glb/` y la copia que usa el visor en `web/public/models/`. La raíz conserva documentación, licencia y configuración del repositorio; ya no contiene lanzadores de compatibilidad. Las carpetas ocultas del entorno no son módulos del robot.
 
 ## Estado
 
@@ -35,21 +35,26 @@ Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM,
 
 ## Voz en Windows
 
-Desde la raíz, con el entorno existente:
+Desde la raíz, entra al proyecto de Raspberry y utiliza su entorno:
 
 ```powershell
+cd raspberry
 .\.venv\Scripts\python.exe -m cuty
 .\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
 ```
 
-Preparación del entorno: `./raspberry/scripts/dev_setup.ps1`.
-Consulta [la guía de voz](raspberry/README.md). Se conserva el `.env` privado de la raíz; también se admite `raspberry/.env`. No subir claves.
+Preparación del entorno desde la raíz del repositorio: `./raspberry/scripts/dev_setup.ps1`.
+Consulta [la guía de voz](raspberry/README.md). Configura `raspberry/.env`; el lector aún admite un `.env` en la raíz para instalaciones anteriores. No subir claves.
 
 ## Pantalla en Raspberry
 
 Consulta [las instrucciones de pantalla](raspberry/touchscreen/README.md). Requiere Linux, framebuffer RGB565, ADS7846, calibración local y dependencias de sistema. Las dependencias Python de pantalla están separadas en `raspberry/touchscreen/requirements.txt`; no instalar evdev en Windows.
 
-Los comandos anteriores `sudo python3 cuty_launcher.py` y `bash cuty-install.sh` siguen funcionando mediante wrappers. El instalador cambia servicios: solo se ejecuta manualmente en la Raspberry, después de probar la pantalla. No se ejecutó durante esta integración.
+Entrada manual: `sudo python3 raspberry/touchscreen/cuty_launcher.py` desde la raíz. Instalación explícita: `bash raspberry/touchscreen/install.sh`, después de probar la pantalla. El servicio actual ya apunta a `raspberry/touchscreen/cuty_launcher.py`; esta limpieza no cambia sus rutas ni la calibración del hardware.
+
+## Web
+
+Consulta [ejecución y despliegue](web/README.md). Desde `web/`, usa `npm ci` y `npm run dev` para abrir el portafolio con el robot negro y su LCD integrado. La web es frontend y funciona sin una Raspberry encendida.
 
 [Arquitectura](docs/architecture.md) · [Roadmap](docs/roadmap.md) · [Protocolo](docs/protocol/protocol.md) · [Movimientos e integración](docs/reorganization.md)
 

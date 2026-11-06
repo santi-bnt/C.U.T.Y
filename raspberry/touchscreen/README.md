@@ -166,7 +166,7 @@ Con acceso SSH o terminal disponible, detén los programas que usan la pantalla:
 
 ```sh
 sudo systemctl stop cuty-launcher.service cuty-wifi-panel.service
-sudo python3 /home/santi/C.U.T.Y/cuty_launcher.py
+sudo python3 /home/santi/C.U.T.Y/raspberry/touchscreen/cuty_launcher.py
 ```
 
 Ctrl+C termina la prueba. Para restaurar el menú instalado:
@@ -181,7 +181,7 @@ El menú ya está habilitado en la Raspberry actual. Para una instalación en
 esta misma ruta, después de probar manualmente:
 
 ```sh
-bash /home/santi/C.U.T.Y/cuty-install.sh
+bash /home/santi/C.U.T.Y/raspberry/touchscreen/install.sh
 ```
 
 No ejecutes simultáneamente el panel antiguo, el espejo ni el menú.

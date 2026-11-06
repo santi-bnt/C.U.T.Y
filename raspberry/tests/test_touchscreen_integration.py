@@ -8,7 +8,6 @@ from types import SimpleNamespace
 import pytest
 
 RASPBERRY = Path(__file__).resolve().parents[1]
-ROOT = RASPBERRY.parent
 
 
 def load_function(name, *, method=False, namespace=None):
@@ -52,15 +51,15 @@ def test_calibrated_touch_mapping_and_bounds_are_preserved():
     assert touch_xy(panel) == (0, 319)
 
 
-def test_service_and_compatibility_launch_paths_exist():
+def test_service_and_canonical_launch_paths_exist():
     service = (RASPBERRY / "touchscreen/cuty-launcher.service").read_text(encoding="utf-8")
     assert "ExecStart=/usr/bin/python3 -u /home/santi/C.U.T.Y/raspberry/touchscreen/cuty_launcher.py" in service
     assert 'cuty_display.py --wait 60' in service
     assert '/dev/fb1' not in service
-    for filename in ("cuty.py", "cuty_launcher.py", "cuty_wifi_panel.py"):
-        compile((ROOT / filename).read_text(encoding="utf-8"), filename, "exec")
-    for filename in ("cuty_launcher.py", "cuty_wifi_panel.py"):
+    for filename in ("cuty_launcher.py", "cuty_wifi_panel.py", "cuty_display.py"):
         compile((RASPBERRY / "touchscreen" / filename).read_text(encoding="utf-8"), filename, "exec")
+    assert (RASPBERRY / "touchscreen/install.sh").is_file()
+    assert (RASPBERRY / "src/cuty/__main__.py").is_file()
 
 
 @pytest.mark.parametrize("code", [0, 1])
