@@ -21,7 +21,7 @@ test("real model, camera controls, translation, panels and responsive layout", a
   await page
     .getByRole("combobox", { name: "Display expression", exact: true })
     .selectOption("idle");
-  for (const name of ["Front", "Side", "Top", "Isometric"]) {
+  for (const name of ["Front", "Side", "Top", "Isometric", "LCD"]) {
     await page.getByRole("button", { name, exact: true }).click();
     await expect(
       page.getByRole("button", { name, exact: true }),
@@ -82,6 +82,72 @@ test("real model, camera controls, translation, panels and responsive layout", a
     fullPage: true,
   });
   expect(errors).toEqual([]);
+});
+
+test("story chapters, manual camera ownership and honest offline state", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  await expect(page.getByText("Loading real GLB…")).toBeHidden({
+    timeout: 30_000,
+  });
+  await expect(page.locator("canvas")).toHaveCount(1);
+  if (info.project.name === "desktop") {
+    const follow = page.getByRole("button", {
+      name: "Scroll camera active · drag to explore",
+      exact: true,
+    });
+    await expect(follow).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Side", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "Resume scroll camera", exact: true }),
+    ).toHaveAttribute("aria-pressed", "false");
+    await page
+      .getByRole("button", { name: "Resume scroll camera", exact: true })
+      .click();
+    await expect(follow).toHaveAttribute("aria-pressed", "true");
+    await page.locator(".story-intro").evaluate((element) => {
+      window.scrollTo({
+        top:
+          element.getBoundingClientRect().top +
+          window.scrollY +
+          element.clientHeight -
+          window.innerHeight -
+          5,
+        behavior: "instant",
+      });
+    });
+    await expect
+      .poll(() =>
+        page
+          .locator(".companion-chapter")
+          .evaluate((element) => Number(getComputedStyle(element).opacity)),
+      )
+      .toBeGreaterThan(0.95);
+    await expect(page.locator(".intro-chapter")).toBeHidden();
+    await page.screenshot({ path: "test-results/desktop-companion.png" });
+  } else {
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    const canvas = await page.locator("canvas").boundingBox();
+    expect(canvas!.y).toBeLessThan(400);
+    await expect(page.locator(".companion-chapter")).toBeVisible();
+  }
+  await page.getByRole("button", { name: "LCD", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "LCD", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#live").scrollIntoViewIfNeeded();
+  await expect(
+    page.getByText("The robot is not connected.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".live-terminal")).toHaveAttribute(
+    "data-connection",
+    "offline",
+  );
+  await expect(
+    page.getByRole("link", { name: "Try the face demo", exact: true }),
+  ).toHaveAttribute("href", "#intelligence");
+  await page.screenshot({ path: `test-results/${info.project.name}-live.png` });
 });
 test("reduced motion and a missing GLB produce usable UI", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

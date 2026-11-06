@@ -6,11 +6,14 @@ import {
   LinearFilter,
   SRGBColorSpace,
 } from "three";
+import { atlasFrame, drawFaceFrame } from "../communication/faceFrames";
 import { useFaceSimulation } from "../state/FaceSimulation";
+import { useFaceFrameSource } from "../state/FaceFrames";
 
 /** The 3D LCD and the face lab display the same original Python-rendered frame. */
 export function useFaceTexture() {
   const { expression, frame } = useFaceSimulation();
+  const source = useFaceFrameSource();
   const atlas = useLoader(
     ImageLoader,
     `${import.meta.env.BASE_URL}face/${expression}.webp`,
@@ -27,24 +30,21 @@ export function useFaceTexture() {
     return { canvas, texture };
   }, []);
   useEffect(() => {
-    canvas
-      .getContext("2d")!
-      .drawImage(
-        atlas,
-        (frame % 5) * 480,
-        Math.floor(frame / 5) * 320,
-        480,
-        320,
-        0,
-        0,
-        480,
-        320,
-      );
+    if (source?.mode === "live") return;
+    drawFaceFrame(canvas.getContext("2d")!, atlasFrame(atlas, frame));
     // Three.js requires an imperative upload flag on this owned texture.
     // eslint-disable-next-line react-hooks/immutability
     texture.needsUpdate = true;
     invalidate();
-  }, [atlas, canvas, frame, texture, invalidate]);
+  }, [atlas, canvas, frame, texture, invalidate, source]);
+  useEffect(() => {
+    if (source?.mode !== "live") return;
+    return source.subscribe((incoming) => {
+      drawFaceFrame(canvas.getContext("2d")!, incoming);
+      texture.needsUpdate = true;
+      invalidate();
+    });
+  }, [source, canvas, texture, invalidate]);
   useEffect(() => () => texture.dispose(), [texture]);
   return texture;
 }

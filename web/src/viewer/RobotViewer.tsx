@@ -24,6 +24,7 @@ import { bi } from "../data/project";
 import type { CameraView } from "./model";
 import { modelInfo } from "../data/model";
 import DisplayControls from "../components/DisplayControls";
+import type { StoryMotion } from "./storyMotion";
 const Scene = lazy(() => import("./Scene"));
 class ModelBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -42,8 +43,9 @@ const viewLabels = {
   side: bi("Side", "Lateral"),
   top: bi("Top", "Superior"),
   iso: bi("Isometric", "Isométrica"),
+  display: bi("LCD", "LCD"),
 };
-export default function RobotViewer() {
+export default function RobotViewer({ motion }: { motion?: StoryMotion }) {
   const { t } = useLocale();
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const [auto, setAuto] = useState(false);
@@ -53,6 +55,11 @@ export default function RobotViewer() {
   const [loaded, setLoaded] = useState(false);
   const [active, setActive] = useState(true);
   const [zoom, setZoom] = useState(0);
+  const [following, setFollowing] = useState(true);
+  const manual = useCallback(() => {
+    motion?.follow(false);
+    setFollowing(false);
+  }, [motion]);
   const frame = useRef<HTMLDivElement>(null);
   const onLoaded = useCallback(() => setLoaded(true), []);
   useEffect(() => {
@@ -72,6 +79,7 @@ export default function RobotViewer() {
     };
   }, []);
   const resetCamera = () => {
+    manual();
     setView("iso");
     setZoom(0);
     setReset((value) => value + 1);
@@ -130,9 +138,14 @@ export default function RobotViewer() {
             event.preventDefault();
             resetCamera();
           }
-          if (event.key === "+" || event.key === "=")
+          if (event.key === "+" || event.key === "=") {
+            manual();
             setZoom((z) => Math.min(3, z + 1));
-          if (event.key === "-") setZoom((z) => Math.max(-3, z - 1));
+          }
+          if (event.key === "-") {
+            manual();
+            setZoom((z) => Math.max(-3, z - 1));
+          }
         }}
       >
         <div className="orbit-ring ring-one" />
@@ -155,6 +168,8 @@ export default function RobotViewer() {
               reduced={reduced}
               active={active}
               onLoaded={onLoaded}
+              motion={motion}
+              onManual={manual}
             />
           </Suspense>
           {!loaded && (
@@ -185,8 +200,9 @@ export default function RobotViewer() {
           {(Object.keys(viewLabels) as CameraView[]).map((key) => (
             <button
               key={key}
-              aria-pressed={view === key}
+              aria-pressed={view === key && (!motion || !following || reduced)}
               onClick={() => {
+                manual();
                 setView(key);
                 setReset((v) => v + 1);
               }}
@@ -200,7 +216,10 @@ export default function RobotViewer() {
             className="icon-button"
             title={t(bi("Zoom in", "Acercar"))}
             aria-label={t(bi("Zoom in", "Acercar"))}
-            onClick={() => setZoom((z) => Math.min(3, z + 1))}
+            onClick={() => {
+              manual();
+              setZoom((z) => Math.min(3, z + 1));
+            }}
             disabled={zoom === 3}
           >
             <ZoomIn size={17} />
@@ -209,7 +228,10 @@ export default function RobotViewer() {
             className="icon-button"
             title={t(bi("Zoom out", "Alejar"))}
             aria-label={t(bi("Zoom out", "Alejar"))}
-            onClick={() => setZoom((z) => Math.max(-3, z - 1))}
+            onClick={() => {
+              manual();
+              setZoom((z) => Math.max(-3, z - 1));
+            }}
             disabled={zoom === -3}
           >
             <ZoomOut size={17} />
@@ -242,12 +264,35 @@ export default function RobotViewer() {
                 "Autorrotación (desactivada con movimiento reducido)",
               ),
             )}
-            onClick={() => setAuto((v) => !v)}
+            onClick={() => {
+              manual();
+              setAuto((v) => !v);
+            }}
           >
             {auto && !reduced ? <Pause size={17} /> : <Play size={17} />}
           </button>
         </div>
       </div>
+      {motion && !reduced && (
+        <button
+          className="story-follow"
+          aria-pressed={following}
+          onClick={() => {
+            motion.follow(!following);
+            setFollowing(!following);
+            setAuto(false);
+          }}
+        >
+          {t(
+            following
+              ? bi(
+                  "Scroll camera active · drag to explore",
+                  "Cámara al desplazar · arrastra para explorar",
+                )
+              : bi("Resume scroll camera", "Reanudar cámara al desplazar"),
+          )}
+        </button>
+      )}
       <DisplayControls />
     </div>
   );

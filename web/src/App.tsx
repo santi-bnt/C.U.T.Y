@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -30,7 +30,8 @@ import { useLocale } from "./state/Locale";
 import Architecture from "./components/Architecture";
 import FaceDemo from "./simulations/FaceDemo";
 import { FaceSimulationProvider } from "./state/FaceSimulation";
-const RobotViewer = lazy(() => import("./viewer/RobotViewer"));
+import StoryIntro from "./components/StoryIntro";
+import LivePreview from "./components/LivePreview";
 const icons = {
   voice: AudioLines,
   vision: ScanFace,
@@ -115,70 +116,7 @@ function Portfolio() {
         </div>
       </header>
       <main id="main">
-        <section className="hero shell">
-          <div className="hero-copy">
-            <div className="eyebrow">
-              <span className="tiny-cross">+</span>
-              {t(
-                bi(
-                  "AN OPEN EXPERIMENT IN COMPANIONSHIP",
-                  "UN EXPERIMENTO ABIERTO DE COMPAÑÍA",
-                ),
-              )}
-            </div>
-            <h1>
-              C.U.T.Y<span className="title-period">.</span>
-            </h1>
-            <p className="hero-subtitle">Cute Utility That Yaps</p>
-            <h2>
-              {t(bi("A little body.", "Un pequeño cuerpo."))}
-              <br />
-              <span>{t(bi("A curious mind.", "Una mente curiosa."))}</span>
-            </h2>
-            <p className="hero-description">
-              {t(
-                bi(
-                  "An expressive desktop companion robot integrating multimodal AI, computer vision and embedded systems. Built to listen, look, and bring a little personality to your desk.",
-                  "Un compañero de escritorio expresivo que integra IA multimodal, visión artificial y sistemas embebidos. Creado para escuchar, mirar y darle personalidad a tu escritorio.",
-                ),
-              )}
-            </p>
-            <div className="hero-buttons">
-              <a className="button primary" href="#explorer">
-                {t(bi("Explore the Robot", "Explorar el robot"))}
-                <ArrowUpRight size={17} />
-              </a>
-              <a className="button secondary" href="#architecture">
-                {t(bi("Technical Architecture", "Arquitectura técnica"))}
-                <ArrowRight size={17} />
-              </a>
-            </div>
-            <a
-              className="hero-source text-link"
-              href={repo}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Github size={16} />
-              {t(bi("View on GitHub", "Ver en GitHub"))}
-              <ArrowUpRight size={14} />
-            </a>
-            <div className="hero-footnote">
-              <span className="status-dot amber" />
-              {t(bi("IN ACTIVE DEVELOPMENT", "EN DESARROLLO ACTIVO"))}
-              <span>AI × ROBOTICS × EMBEDDED</span>
-            </div>
-          </div>
-          <Suspense
-            fallback={
-              <div className="explorer placeholder" role="status">
-                {t(bi("Loading explorer…", "Cargando explorador…"))}
-              </div>
-            }
-          >
-            <RobotViewer />
-          </Suspense>
-        </section>
+        <StoryIntro />
         <div className="discipline-strip">
           <div className="shell">
             <span>
@@ -199,16 +137,18 @@ function Portfolio() {
             </span>
           </div>
         </div>
-        <section className="section shell" id="hardware-explorer">
+        <section className="section shell light-section" id="hardware-explorer">
           <div className="section-heading">
             <div>
               <div className="eyebrow">
-                01 / {t(bi("THE PHYSICAL LAYER", "LA CAPA FÍSICA"))}
+                03 / {t(bi("INSIDE C.U.T.Y.", "DENTRO DE C.U.T.Y."))}
               </div>
               <h2>
-                {t(bi("Small form.", "Formato pequeño."))}
+                {t(bi("Small robot.", "Robot pequeño."))}
                 <br />
-                <span>{t(bi("Many disciplines.", "Muchas disciplinas."))}</span>
+                <span>
+                  {t(bi("Big ideas inside.", "Grandes ideas dentro."))}
+                </span>
               </h2>
             </div>
             <p>
@@ -272,79 +212,11 @@ function Portfolio() {
             )}
           </p>
         </section>
-        <section className="intelligence section" id="intelligence">
-          <div className="shell">
-            <div className="section-heading">
-              <div>
-                <div className="eyebrow">
-                  02 /{" "}
-                  {t(bi("THE PERSONALITY STACK", "LA PERSONALIDAD EN CÓDIGO"))}
-                </div>
-                <h2>
-                  {t(bi("More than", "Más que"))}
-                  <br />
-                  <span>
-                    {t(bi("a talking machine.", "una máquina que habla."))}
-                  </span>
-                </h2>
-              </div>
-              <p>
-                {t(
-                  bi(
-                    "Voice, perception and expression meet in Python. Each layer has a role. Each claim has a source.",
-                    "Voz, percepción y expresión se encuentran en Python. Cada capa tiene una función. Cada afirmación tiene una fuente.",
-                  ),
-                )}
-              </p>
-            </div>
-            <div className="capability-layout">
-              <div className="capability-panel">
-                <div
-                  className="capability-tabs"
-                  aria-label={t(bi("AI capabilities", "Capacidades de IA"))}
-                >
-                  {capabilities.map((c, i) => {
-                    const Icon = icons[c.icon as keyof typeof icons];
-                    return (
-                      <button
-                        key={c.id}
-                        aria-pressed={i === capabilityIndex}
-                        onClick={() => setCapabilityIndex(i)}
-                      >
-                        <Icon size={19} />
-                        <span>{t(c.label)}</span>
-                        <ArrowUpRight size={16} />
-                      </button>
-                    );
-                  })}
-                </div>
-                <article className="capability-content" aria-live="polite">
-                  <h3>{t(capability.title)}</h3>
-                  <p>{t(capability.detail)}</p>
-                  <div className="evidence">
-                    <Check size={15} />
-                    <span>{t(capability.evidence)}</span>
-                  </div>
-                  <a
-                    className="text-link"
-                    href={source(capability.path)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {t(bi("Explore implementation", "Explorar implementación"))}
-                    <ArrowRight size={16} />
-                  </a>
-                </article>
-              </div>
-              <FaceDemo />
-            </div>
-          </div>
-        </section>
         <section className="section shell" id="architecture">
           <div className="section-heading">
             <div>
               <div className="eyebrow">
-                03 /{" "}
+                03.1 /{" "}
                 {t(
                   bi(
                     "FROM PERCEPTION TO EXPRESSION",
@@ -371,78 +243,13 @@ function Portfolio() {
           </div>
           <Architecture />
         </section>
-        <section className="section development" id="development">
-          <div className="shell">
-            <div className="section-heading">
-              <div>
-                <div className="eyebrow">
-                  04 / {t(bi("ENGINEERING, IN THE OPEN", "INGENIERÍA ABIERTA"))}
-                </div>
-                <h2>
-                  {t(bi("A work in progress.", "Un trabajo en progreso."))}
-                  <br />
-                  <span>
-                    {t(
-                      bi("With a clear direction.", "Con una dirección clara."),
-                    )}
-                  </span>
-                </h2>
-              </div>
-              <div>
-                <p>
-                  {t(
-                    bi(
-                      "Software exists. Hardware earns its confidence through testing. These are different milestones.",
-                      "El software existe. El hardware gana confianza mediante pruebas. Son hitos distintos.",
-                    ),
-                  )}
-                </p>
-                <a
-                  className="text-link"
-                  href={source("docs/roadmap.md")}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t(bi("Read the roadmap", "Leer el roadmap"))}
-                  <ArrowUpRight size={15} />
-                </a>
-              </div>
-            </div>
-            <div className="status-grid">
-              {milestones.map((m, i) => (
-                <article key={m.stage} className={`milestone ${m.stage}`}>
-                  <div className="milestone-header">
-                    <span className={`badge ${m.stage}`}>
-                      {t(stageNames[m.stage])}
-                    </span>
-                    <span>0{i + 1}</span>
-                  </div>
-                  <h3>{t(m.title)}</h3>
-                  <ul>
-                    {m.items.map((item) => (
-                      <li key={item.en}>
-                        <span />
-                        {t(item)}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-            <p className="caption">
-              {t(
-                bi(
-                  "Reviewed against the repository and documented physical checks · November 2026. No progress percentages or unmeasured performance claims.",
-                  "Revisado contra el repositorio y las pruebas físicas documentadas · Noviembre 2026. Sin porcentajes de avance ni rendimiento sin medir.",
-                ),
-              )}
-            </p>
-          </div>
-        </section>
-        <section className="section shell specs" id="specifications">
+        <section
+          className="section shell specs light-section"
+          id="specifications"
+        >
           <div>
             <div className="eyebrow">
-              05 / {t(bi("HARDWARE NOTES", "NOTAS DE HARDWARE"))}
+              03.2 / {t(bi("HARDWARE NOTES", "NOTAS DE HARDWARE"))}
             </div>
             <h2>{t(bi("Under the shell.", "Bajo la carcasa."))}</h2>
             <p>
@@ -514,9 +321,150 @@ function Portfolio() {
             </div>
           </dl>
         </section>
+        <section className="intelligence section" id="intelligence">
+          <div className="shell">
+            <div className="section-heading">
+              <div>
+                <div className="eyebrow">
+                  04 /{" "}
+                  {t(
+                    bi(
+                      "EXPRESSIONS & PERSONALITY",
+                      "EXPRESIONES Y PERSONALIDAD",
+                    ),
+                  )}
+                </div>
+                <h2>
+                  {t(bi("A little expression.", "Un poco de expresión."))}
+                  <br />
+                  <span>{t(bi("A lot of character.", "Mucho carácter."))}</span>
+                </h2>
+              </div>
+              <p>
+                {t(
+                  bi(
+                    "Voice, perception and expression meet in Python. Each layer has a role. Each claim has a source.",
+                    "Voz, percepción y expresión se encuentran en Python. Cada capa tiene una función. Cada afirmación tiene una fuente.",
+                  ),
+                )}
+              </p>
+            </div>
+            <div className="capability-layout">
+              <div className="capability-panel">
+                <div
+                  className="capability-tabs"
+                  aria-label={t(bi("AI capabilities", "Capacidades de IA"))}
+                >
+                  {capabilities.map((c, i) => {
+                    const Icon = icons[c.icon as keyof typeof icons];
+                    return (
+                      <button
+                        key={c.id}
+                        aria-pressed={i === capabilityIndex}
+                        onClick={() => setCapabilityIndex(i)}
+                      >
+                        <Icon size={19} />
+                        <span>{t(c.label)}</span>
+                        <ArrowUpRight size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
+                <article className="capability-content" aria-live="polite">
+                  <h3>{t(capability.title)}</h3>
+                  <p>{t(capability.detail)}</p>
+                  <div className="evidence">
+                    <Check size={15} />
+                    <span>{t(capability.evidence)}</span>
+                  </div>
+                  <a
+                    className="text-link"
+                    href={source(capability.path)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t(bi("Explore implementation", "Explorar implementación"))}
+                    <ArrowRight size={16} />
+                  </a>
+                </article>
+              </div>
+              <FaceDemo />
+            </div>
+          </div>
+        </section>
+        <LivePreview />
+        <section className="section development" id="development">
+          <div className="shell">
+            <div className="section-heading">
+              <div>
+                <div className="eyebrow">
+                  06 /{" "}
+                  {t(bi("DEVELOPMENT JOURNEY", "EL CAMINO DEL DESARROLLO"))}
+                </div>
+                <h2>
+                  {t(bi("A work in progress.", "Un trabajo en progreso."))}
+                  <br />
+                  <span>
+                    {t(
+                      bi("With a clear direction.", "Con una dirección clara."),
+                    )}
+                  </span>
+                </h2>
+              </div>
+              <div>
+                <p>
+                  {t(
+                    bi(
+                      "Software exists. Hardware earns its confidence through testing. These are different milestones.",
+                      "El software existe. El hardware gana confianza mediante pruebas. Son hitos distintos.",
+                    ),
+                  )}
+                </p>
+                <a
+                  className="text-link"
+                  href={source("docs/roadmap.md")}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t(bi("Read the roadmap", "Leer el roadmap"))}
+                  <ArrowUpRight size={15} />
+                </a>
+              </div>
+            </div>
+            <div className="status-grid">
+              {milestones.map((m, i) => (
+                <article key={m.stage} className={`milestone ${m.stage}`}>
+                  <div className="milestone-header">
+                    <span className={`badge ${m.stage}`}>
+                      {t(stageNames[m.stage])}
+                    </span>
+                    <span>0{i + 1}</span>
+                  </div>
+                  <h3>{t(m.title)}</h3>
+                  <ul>
+                    {m.items.map((item) => (
+                      <li key={item.en}>
+                        <span />
+                        {t(item)}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+            <p className="caption">
+              {t(
+                bi(
+                  "Reviewed against the repository and documented physical checks · November 2026. No progress percentages or unmeasured performance claims.",
+                  "Revisado contra el repositorio y las pruebas físicas documentadas · Noviembre 2026. Sin porcentajes de avance ni rendimiento sin medir.",
+                ),
+              )}
+            </p>
+          </div>
+        </section>
         <section className="about section shell" id="about">
           <div className="eyebrow">
-            06 / {t(bi("BUILT OUT OF CURIOSITY", "CREADO POR CURIOSIDAD"))}
+            C.U.T.Y / {t(bi("BUILT OUT OF CURIOSITY", "CREADO POR CURIOSIDAD"))}
           </div>
           <h2>
             {t(bi("What if technology", "¿Y si la tecnología"))}

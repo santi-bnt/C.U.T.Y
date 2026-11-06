@@ -12,5 +12,6 @@ export const cameraViews = {
   side: [6.8, 1.5, 0],
   top: [0.001, 8, 0.001],
   iso: [4, 3.2, 6],
+  display: [0, 2.2, 3.5],
 } as const;
 export type CameraView = keyof typeof cameraViews;
