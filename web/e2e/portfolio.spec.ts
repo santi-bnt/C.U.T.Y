@@ -313,7 +313,7 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
 }, info) => {
   await page.goto("/");
   await expect(
-    page.getByRole("region", { name: "C.U.T.Y. introduction" }),
+    page.getByRole("dialog", { name: "C.U.T.Y. introduction" }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Skip intro", exact: true }),
@@ -323,6 +323,39 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   });
   await page.getByRole("button", { name: "Skip intro", exact: true }).click();
   await expect(page.locator(".intro-sequence")).toHaveCount(0);
+  await page.locator(".hero-replay").click();
+  await expect(
+    page.getByRole("dialog", { name: "C.U.T.Y. introduction" }),
+  ).toBeVisible();
+  await page.waitForTimeout(2050);
+  const introBounds = await page.locator(".intro-mask").last().boundingBox();
+  expect(introBounds!.x).toBeGreaterThanOrEqual(0);
+  expect(introBounds!.x + introBounds!.width).toBeLessThanOrEqual(
+    page.viewportSize()!.width,
+  );
+  await page.screenshot({
+    path: `test-results/${info.project.name}-replayed-intro.png`,
+  });
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".intro-sequence")).toHaveCount(0);
+  await expect(page.locator(".hero-replay")).toBeFocused();
+  const ink = await page
+    .locator(".hero-letter-mask")
+    .nth(6)
+    .evaluate((mask) => {
+      const letter = mask.querySelector(".hero-letter")!;
+      const style = getComputedStyle(letter);
+      const ctx = document.createElement("canvas").getContext("2d")!;
+      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      return {
+        right:
+          letter.getBoundingClientRect().left +
+          ctx.measureText("Y").actualBoundingBoxRight,
+        clip: mask.getBoundingClientRect().right,
+      };
+    });
+  expect(ink.right).toBeLessThanOrEqual(ink.clip + 1);
+
   await expect(page.getByText("Loading real GLB…")).toBeHidden({
     timeout: 30000,
   });

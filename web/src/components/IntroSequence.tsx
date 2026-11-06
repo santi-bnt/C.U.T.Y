@@ -2,24 +2,44 @@
 import gsap from "gsap";
 import { useLocale } from "../state/Locale";
 import { bi } from "../data/project";
-export default function IntroSequence() {
+import { useMedia } from "../state/useMedia";
+export default function IntroSequence({
+  replay = false,
+}: {
+  replay?: boolean;
+}) {
+  const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const [visible, setVisible] = useState(
-    () =>
-      !window.location.hash &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => replay || (!window.location.hash && !reduced),
   );
   const root = useRef<HTMLDivElement>(null);
   const { t } = useLocale();
   useEffect(() => {
     if (!visible) return;
     const overflow = document.body.style.overflow;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     document.body.style.overflow = "hidden";
     const focusFrame = requestAnimationFrame(() =>
       root.current
         ?.querySelector<HTMLButtonElement>("button")
         ?.focus({ preventScroll: true }),
     );
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setVisible(false);
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        root.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
+    };
+    window.addEventListener("keydown", key);
     const ctx = gsap.context(() => {
+      if (reduced) return;
       const timeline = gsap.timeline({ onComplete: () => setVisible(false) });
       timeline
         .fromTo(
@@ -47,8 +67,8 @@ export default function IntroSequence() {
         .to(
           ".intro-word",
           {
-            letterSpacing: ".08em",
-            scale: 1.06,
+            letterSpacing: ".015em",
+            scale: 1.035,
             duration: 0.55,
             ease: "power2.inOut",
           },
@@ -66,17 +86,21 @@ export default function IntroSequence() {
     }, root);
     return () => {
       cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", key);
       ctx.revert();
       document.body.style.overflow = overflow;
+      if (previousFocus?.isConnected)
+        previousFocus.focus({ preventScroll: true });
       requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     };
-  }, [visible]);
+  }, [visible, reduced]);
   if (!visible) return null;
   return (
     <div
-      className="intro-sequence"
+      className={`intro-sequence${reduced ? " is-static" : ""}`}
       ref={root}
-      role="region"
+      role="dialog"
+      aria-modal="true"
       aria-label={t(bi("C.U.T.Y. introduction", "Introducción C.U.T.Y."))}
     >
       <div className="intro-top">

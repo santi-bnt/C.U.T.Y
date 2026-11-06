@@ -17,6 +17,8 @@ Validated locally on Windows, 2026-11-06. No production deployment.
 
 Latest steering: hero contains no visible model or exploration controls; the robot first appears in Meet C.U.T.Y. Tests assert hidden/visible states for desktop/mobile/reduced motion, and the transition clips the canvas below the second section's boundary. Camera/tracking status now reflects the builder's physical confirmation. PCB status is Sent to fabrication, without claiming assembly or electrical testing has finished.
 
+Replay/typography follow-up: 20 unit tests, lint and build passed; the three affected desktop/tablet/mobile browser scenarios passed with replay, Escape/focus restoration, intro bounds and a canvas text-metrics check proving the hero Y's ink fits its mask. Additional desktop and 320px captures reviewed the complete Y and static reduced-motion replay with no page errors or horizontal overflow. Replay does not remount the persistent model.
+
 Reviewed the kinetic opening and actual revised black robot on desktop/mobile, plus assembly imagery, original LCD, exploded view, PCB 3D and spatial wiring at desktop/tablet/mobile sizes. Corrected intro/deep-link interaction, Skip accessible name/focus, mobile framing and masking, overlapping wiring labels, an unnecessary nested React root from floating labels, and offscreen lazy-view expectations. Simplified electronics remain visibly mechanical reference geometry. Source render images are explicitly labeled as the earlier Nido reference.
 
 Captures remain ignored under `test-results/` and `node_modules/.cache/cuty-research/`. Useful final views include `desktop-nido-intro-final.png`, `desktop-nido-hero-final.png`, `desktop-nido-wiring-final.png` and their tablet/mobile counterparts.

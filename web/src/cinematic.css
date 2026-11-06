@@ -467,6 +467,9 @@ p {
 .hero-letter-mask {
   display: inline-block;
   overflow: hidden;
+  flex-shrink: 0;
+  padding-right: 0.12em;
+  margin-right: -0.12em;
   padding-bottom: 0.13em;
   margin-bottom: -0.13em;
 }

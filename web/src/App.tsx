@@ -15,6 +15,7 @@ import {
   X,
   ChevronRight,
   Radio,
+  RotateCcw,
 } from "lucide-react";
 import {
   bi,
@@ -172,12 +173,13 @@ function Portfolio() {
   const motion = useMemo(() => createStoryMotion(), []);
   const [componentIndex, setComponentIndex] = useState(0),
     [capabilityIndex, setCapabilityIndex] = useState(0);
+  const [introRun, setIntroRun] = useState(0);
   const component = components[componentIndex],
     capability = capabilities[capabilityIndex];
   const dashboard = dashboardUrl(import.meta.env.VITE_CUTY_DASHBOARD_URL);
   return (
     <div className="homepage">
-      <IntroSequence />
+      <IntroSequence key={introRun} replay={introRun > 0} />
       <a className="skip-link" href="#main">
         {t(bi("Skip to content", "Ir al contenido"))}
       </a>
@@ -234,6 +236,13 @@ function Portfolio() {
               {t(bi("Meet your companion", "Conoce a tu compañero"))}
               <ArrowUpRight size={17} />
             </a>
+            <button
+              className="hero-replay"
+              onClick={() => setIntroRun((run) => run + 1)}
+            >
+              <RotateCcw size={15} />
+              {t(bi("Replay intro", "Repetir animación"))}
+            </button>
           </div>
           <div className="hero-baseline">
             <a href="#companion">
@@ -638,6 +647,12 @@ function Portfolio() {
           )}
         </p>
         <a href="#home">{t(bi("Back to top ↑", "Volver arriba ↑"))}</a>
+        <button
+          className="footer-replay"
+          onClick={() => setIntroRun((run) => run + 1)}
+        >
+          {t(bi("Replay intro", "Repetir animación"))}
+        </button>
       </footer>
     </div>
   );
