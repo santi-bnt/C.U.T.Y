@@ -1,21 +1,20 @@
-import { useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUpRight,
-  AudioLines,
-  Braces,
-  Check,
-  ChevronRight,
-  CircuitBoard,
-  Code2,
-  Cpu,
-  Eye,
   Github,
   Menu,
-  ScanFace,
-  Sparkles,
   X,
+  ChevronRight,
+  Radio,
 } from "lucide-react";
 import {
   bi,
@@ -25,20 +24,142 @@ import {
   repo,
   source,
   stageNames,
+  type Copy,
 } from "./data/project";
 import { useLocale } from "./state/Locale";
+import { FaceSimulationProvider } from "./state/FaceSimulation";
+import { createStoryMotion, type StoryMotion } from "./viewer/storyMotion";
+import { chapterIds } from "./viewer/choreography";
+import Choreography from "./components/Choreography";
 import Architecture from "./components/Architecture";
 import FaceDemo from "./simulations/FaceDemo";
-import { FaceSimulationProvider } from "./state/FaceSimulation";
-import StoryIntro from "./components/StoryIntro";
-import LivePreview from "./components/LivePreview";
-const icons = {
-  voice: AudioLines,
-  vision: ScanFace,
-  face: Sparkles,
-  tools: Braces,
-};
+import IntroSequence from "./components/IntroSequence";
+import AssemblyStory from "./components/AssemblyStory";
+import { modelInfo } from "./data/model";
+import PcbDesign from "./components/PcbDesign";
+import WiringConnections from "./components/WiringConnections";
+const RobotViewer = lazy(() => import("./viewer/RobotViewer"));
 
+function Heading({ first, second }: { first: Copy; second?: Copy }) {
+  const { t } = useLocale();
+  return (
+    <h2>
+      <span className="reveal-line">
+        <span>{t(first)}</span>
+      </span>
+      {second && (
+        <span className="reveal-line">
+          <span className="heading-accent">{t(second)}</span>
+        </span>
+      )}
+    </h2>
+  );
+}
+function Chapter({
+  id,
+  number,
+  label,
+  tone,
+  side,
+  children,
+}: {
+  id: string;
+  number: string;
+  label: Copy;
+  tone: "ink" | "paper" | "lavender";
+  side: "left" | "right";
+  children: ReactNode;
+}) {
+  const { t } = useLocale();
+  return (
+    <section id={id} className={`chapter ${tone} copy-${side}`}>
+      <div className="chapter-index">
+        <span>
+          {number} / {t(label)}
+        </span>
+        <span>C.U.T.Y. / V17</span>
+      </div>
+      <div className="chapter-copy">{children}</div>
+    </section>
+  );
+}
+function Header({ motion }: { motion: StoryMotion }) {
+  const { locale, setLocale, t } = useLocale();
+  const [menu, setMenu] = useState(false);
+  const header = useRef<HTMLElement>(null);
+  const nav = [
+    { id: "home", label: bi("Home", "Inicio") },
+    { id: "companion", label: bi("Meet C.U.T.Y.", "Conoce a C.U.T.Y.") },
+    { id: "hardware-explorer", label: bi("Technology", "Tecnología") },
+    { id: "pcb-design", label: bi("PCB Design", "Diseño PCB") },
+    { id: "wiring", label: bi("Wiring & Connections", "Conexiones") },
+    { id: "development", label: bi("Development", "Desarrollo") },
+    { id: "live", label: bi("C.U.T.Y. Live", "C.U.T.Y. Live") },
+  ];
+  useEffect(
+    () =>
+      motion.subscribe(() => {
+        const chapter = Math.round(motion.progress);
+        if (header.current) {
+          header.current.dataset.tone = [1, 3, 5, 7].includes(chapter)
+            ? "ink"
+            : "paper";
+          header.current
+            .querySelectorAll<HTMLAnchorElement>("nav a")
+            .forEach((link) => {
+              if (link.hash === `#${chapterIds[chapter]}`)
+                link.setAttribute("aria-current", "location");
+              else link.removeAttribute("aria-current");
+            });
+        }
+      }),
+    [motion],
+  );
+  return (
+    <header className="site-header" ref={header} data-tone="paper">
+      <a className="wordmark" href="#home" aria-label="C.U.T.Y home">
+        <span className="brand-icon">
+          <i />
+          <i />
+        </span>
+        C.U.T.Y.
+      </a>
+      <nav
+        className={menu ? "nav open" : "nav"}
+        aria-label={t(bi("Main navigation", "Navegación principal"))}
+      >
+        {nav.map((n) => (
+          <a key={n.id} href={`#${n.id}`} onClick={() => setMenu(false)}>
+            {t(n.label)}
+          </a>
+        ))}
+      </nav>
+      <div className="header-actions">
+        <div className="language">
+          {(["en", "es"] as const).map((l) => (
+            <button
+              key={l}
+              lang={l}
+              aria-label={l === "en" ? "English" : "Español"}
+              aria-pressed={locale === l}
+              onClick={() => setLocale(l)}
+            >
+              {l.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <button
+          className="menu-toggle"
+          aria-label={t(bi("Toggle navigation", "Abrir navegación"))}
+          aria-expanded={menu}
+          onClick={() => setMenu((v) => !v)}
+        >
+          {menu ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+    </header>
+  );
+}
 export default function App() {
   return (
     <FaceSimulationProvider>
@@ -47,466 +168,466 @@ export default function App() {
   );
 }
 function Portfolio() {
-  const { locale, setLocale, t } = useLocale();
-  const [menu, setMenu] = useState(false);
-  const [componentIndex, setComponentIndex] = useState(0);
-  const [capabilityIndex, setCapabilityIndex] = useState(0);
-  const component = components[componentIndex];
-  const capability = capabilities[capabilityIndex];
-  const nav = [
-    { id: "explorer", title: bi("Explorer", "Explorador") },
-    { id: "intelligence", title: bi("Intelligence", "Inteligencia") },
-    { id: "architecture", title: bi("Architecture", "Arquitectura") },
-    { id: "development", title: bi("Build log", "Desarrollo") },
-  ];
+  const { t } = useLocale();
+  const motion = useMemo(() => createStoryMotion(), []);
+  const [componentIndex, setComponentIndex] = useState(0),
+    [capabilityIndex, setCapabilityIndex] = useState(0);
+  const component = components[componentIndex],
+    capability = capabilities[capabilityIndex];
+  const dashboard = dashboardUrl(import.meta.env.VITE_CUTY_DASHBOARD_URL);
   return (
-    <>
+    <div className="homepage">
+      <IntroSequence />
       <a className="skip-link" href="#main">
         {t(bi("Skip to content", "Ir al contenido"))}
       </a>
-      <header className="header">
-        <a href="#" className="wordmark" aria-label="C.U.T.Y home">
-          <span className="brand-icon">
-            <i />
-            <i />
-          </span>
-          C.U.T.Y
-        </a>
-        <nav
-          className={menu ? "nav open" : "nav"}
-          aria-label={t(bi("Main navigation", "Navegación principal"))}
-        >
-          {nav.map((n) => (
-            <a key={n.id} href={`#${n.id}`} onClick={() => setMenu(false)}>
-              {t(n.title)}
-            </a>
-          ))}
-        </nav>
-        <div className="header-actions">
-          <div className="language" aria-label={t(bi("Language", "Idioma"))}>
-            {(["en", "es"] as const).map((l) => (
-              <button
-                key={l}
-                lang={l}
-                aria-label={l === "en" ? "English" : "Español"}
-                aria-pressed={locale === l}
-                onClick={() => setLocale(l)}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
+      <Header motion={motion} />
+      <Choreography motion={motion} />
+      <Suspense
+        fallback={
+          <div className="loading-model" role="status">
+            {t(bi("Preparing C.U.T.Y.…", "Preparando C.U.T.Y.…"))}
           </div>
-          <a
-            href={repo}
-            target="_blank"
-            rel="noreferrer"
-            className="github-icon"
-            aria-label="GitHub"
-          >
-            <Github size={19} />
-          </a>
-          <button
-            className="mobile-toggle icon-button"
-            aria-label={t(bi("Toggle navigation", "Abrir navegación"))}
-            aria-expanded={menu}
-            onClick={() => setMenu((v) => !v)}
-          >
-            {menu ? <X size={21} /> : <Menu size={21} />}
-          </button>
-        </div>
-      </header>
+        }
+      >
+        <RobotViewer motion={motion} />
+      </Suspense>
       <main id="main">
-        <StoryIntro />
-        <div className="discipline-strip">
-          <div className="shell">
+        <section className="product-hero paper" id="home">
+          <span id="explorer" className="anchor-alias" />
+          <div className="hero-overline">
             <span>
-              <Cpu size={17} />
-              {t(bi("Multimodal AI", "IA multimodal"))}
+              {t(
+                bi(
+                  "A PHYSICAL DESKTOP COMPANION",
+                  "UN COMPAÑERO FÍSICO DE ESCRITORIO",
+                ),
+              )}
             </span>
-            <span>
-              <Eye size={17} />
-              {t(bi("Computer vision", "Visión artificial"))}
-            </span>
-            <span>
-              <CircuitBoard size={17} />
-              {t(bi("Embedded systems", "Sistemas embebidos"))}
-            </span>
-            <span>
-              <Code2 size={17} />
-              {t(bi("Open engineering", "Ingeniería abierta"))}
-            </span>
+            <span>AI / VISION / EMBEDDED</span>
           </div>
-        </div>
-        <section className="section shell light-section" id="hardware-explorer">
-          <div className="section-heading">
-            <div>
-              <div className="eyebrow">
-                03 / {t(bi("INSIDE C.U.T.Y.", "DENTRO DE C.U.T.Y."))}
-              </div>
-              <h2>
-                {t(bi("Small robot.", "Robot pequeño."))}
-                <br />
-                <span>
-                  {t(bi("Big ideas inside.", "Grandes ideas dentro."))}
+          <h1 aria-label="C.U.T.Y.">
+            {"C.U.T.Y.".split("").map((letter, i) => (
+              <span className="hero-letter-mask" key={i}>
+                <span className={`hero-letter ${i === 7 ? "accent" : ""}`}>
+                  {letter}
                 </span>
-              </h2>
-            </div>
+              </span>
+            ))}
+          </h1>
+          <div className="hero-copy">
+            <p className="mono">Cute Utility That Yaps</p>
+            <h2>
+              {t(bi("A little body.", "Un pequeño cuerpo."))}
+              <br />
+              <span>{t(bi("A curious mind.", "Una mente curiosa."))}</span>
+            </h2>
             <p>
               {t(
                 bi(
-                  "One assembly. A stack of ideas. Explore the components behind the character.",
-                  "Un ensamblaje. Muchas ideas. Explora los componentes detrás del personaje.",
+                  "Multimodal AI, computer vision and embedded engineering. Made physical.",
+                  "IA multimodal, visión artificial e ingeniería embebida. Con presencia física.",
                 ),
               )}
             </p>
+            <a className="button primary" href="#companion">
+              {t(bi("Meet your companion", "Conoce a tu compañero"))}
+              <ArrowUpRight size={17} />
+            </a>
           </div>
-          <div className="component-browser">
-            <div
-              className="component-list"
-              aria-label={t(bi("Hardware components", "Componentes físicos"))}
-            >
-              {components.map((c, i) => (
-                <button
-                  key={c.id}
-                  onClick={() => setComponentIndex(i)}
-                  aria-pressed={i === componentIndex}
-                >
-                  <span className="component-num">0{i + 1}</span>
-                  <span>{c.name}</span>
-                  <ChevronRight size={16} />
-                </button>
-              ))}
-            </div>
-            <article className="component-detail" aria-live="polite">
-              <div className="detail-top">
-                <span className="eyebrow">{t(component.tag)}</span>
-                <span className={`badge ${component.stage}`}>
-                  {t(stageNames[component.stage])}
-                </span>
-              </div>
-              <div className="component-glyph">
-                <Cpu size={65} strokeWidth={0.8} />
-                <span>0{componentIndex + 1}</span>
-              </div>
-              <h3>{component.name}</h3>
-              <p>{t(component.detail)}</p>
-              <div className="detail-bottom">
-                <code>{component.interface}</code>
-                <a
-                  href={source(component.path)}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`${t(bi("Source for", "Fuente de"))} ${component.name}`}
-                >
-                  <ArrowUpRight size={20} />
-                </a>
-              </div>
-            </article>
+          <div className="hero-baseline">
+            <a href="#companion">
+              <ArrowDown size={15} />
+              {t(
+                bi(
+                  "SCROLL TO MEET C.U.T.Y.",
+                  "DESPLAZA PARA CONOCER A C.U.T.Y.",
+                ),
+              )}
+            </a>
+            <span>
+              {t(
+                bi(
+                  "REAL V17 ASSEMBLY / IN DEVELOPMENT",
+                  "ENSAMBLAJE V17 REAL / EN DESARROLLO",
+                ),
+              )}
+            </span>
           </div>
-          <p className="caption">
+        </section>
+        <Chapter
+          id="companion"
+          number="01"
+          label={bi("MEET C.U.T.Y.", "CONOCE A C.U.T.Y.")}
+          tone="ink"
+          side="right"
+        >
+          <Heading
+            first={bi("A familiar face.", "Una cara familiar.")}
+            second={bi("An unfamiliar idea.", "Una idea distinta.")}
+          />
+          <p className="chapter-lead">
             {t(
               bi(
-                "The V17 GLB contains 110 meshes, with no rig or animation clips. The black finish and integrated LCD face are browser presentation effects; no hardware is connected. Assembly bounds after orienting Z-up to Y-up: X 180 × Y 365 × Z 173.02 mm.",
-                "El GLB V17 contiene 110 mallas, sin rig ni clips de animación. El acabado negro y la cara integrada en el LCD son efectos de presentación local; no hay hardware conectado. Límites tras orientar Z vertical a Y vertical: X 180 × Y 365 × Z 173.02 mm.",
+                "What if an AI had a place at your desk? A voice to talk with. Eyes that look back. A little personality, written in code.",
+                "¿Y si una IA tuviera un lugar en tu escritorio? Una voz para conversar. Ojos que te miran. Un poco de personalidad, escrita en código.",
               ),
             )}
           </p>
-        </section>
-        <section className="section shell" id="architecture">
-          <div className="section-heading">
-            <div>
-              <div className="eyebrow">
-                03.1 /{" "}
-                {t(
-                  bi(
-                    "FROM PERCEPTION TO EXPRESSION",
-                    "DE PERCEPCIÓN A EXPRESIÓN",
-                  ),
-                )}
-              </div>
-              <h2>
-                {t(bi("One robot.", "Un robot."))}
-                <br />
-                <span>
-                  {t(bi("Clear boundaries.", "Responsabilidades claras."))}
-                </span>
-              </h2>
-            </div>
-            <p>
+          <div className="companion-facts">
+            <span>
               {t(
                 bi(
-                  "The Pi thinks and renders. The future STM32 layer will handle deterministic movement. Explore how the pieces connect.",
-                  "La Pi piensa y renderiza. La futura capa STM32 gestionará el movimiento determinista. Explora cómo se conectan.",
+                  "Voice conversation tested on Raspberry Pi",
+                  "Conversación probada en Raspberry Pi",
                 ),
               )}
-            </p>
+            </span>
+            <span>
+              {t(
+                bi(
+                  "Local vision & expression software developed",
+                  "Visión local y expresiones desarrolladas",
+                ),
+              )}
+            </span>
+            <span>
+              {t(
+                bi(
+                  "Physical servo motion remains planned",
+                  "Movimiento físico de servos aún planeado",
+                ),
+              )}
+            </span>
           </div>
-          <Architecture />
-        </section>
-        <section
-          className="section shell specs light-section"
-          id="specifications"
+          <a className="text-link" href="#intelligence">
+            {t(bi("Meet its expressions", "Conoce sus expresiones"))}
+            <ArrowUpRight size={16} />
+          </a>
+        </Chapter>
+        <Chapter
+          id="intelligence"
+          number="02"
+          label={bi("EXPRESSIONS", "EXPRESIONES")}
+          tone="paper"
+          side="left"
         >
-          <div>
-            <div className="eyebrow">
-              03.2 / {t(bi("HARDWARE NOTES", "NOTAS DE HARDWARE"))}
-            </div>
-            <h2>{t(bi("Under the shell.", "Bajo la carcasa."))}</h2>
-            <p>
-              {t(
-                bi(
-                  "A modular hardware stack. A custom carrier to bring it together.",
-                  "Hardware modular. Una carrier propia para unirlo.",
-                ),
-              )}
-            </p>
+          <Heading
+            first={bi("Personality.", "Personalidad.")}
+            second={bi("Pixel by pixel.", "Píxel a píxel.")}
+          />
+          <p className="chapter-lead">
+            {t(
+              bi(
+                "The same face as the physical robot. Change an expression and watch the actual LCD come to life.",
+                "La misma cara del robot físico. Cambia una expresión y observa el LCD real cobrar vida.",
+              ),
+            )}
+          </p>
+          <FaceDemo />
+          <p className="offline-label">
+            <Radio size={13} />
+            {t(
+              bi(
+                "ORIGINAL RENDERER / OFFLINE DEMO",
+                "RENDERIZADOR ORIGINAL / DEMO LOCAL",
+              ),
+            )}
+          </p>
+        </Chapter>
+        <Chapter
+          id="hardware-explorer"
+          number="03"
+          label={bi("INSIDE THE ROBOT", "DENTRO DEL ROBOT")}
+          tone="ink"
+          side="right"
+        >
+          <Heading
+            first={bi("Built on real", "Construido con")}
+            second={bi("engineering.", "ingeniería real.")}
+          />
+          <p className="chapter-lead">
+            {t(
+              bi(
+                "A physical character takes more than a model. Explore the hardware and the boundaries behind it.",
+                "Un personaje físico necesita más que un modelo. Explora el hardware y sus responsabilidades.",
+              ),
+            )}
+          </p>
+          <div className="hardware-selector">
+            {components.map((c, i) => (
+              <button
+                key={c.id}
+                aria-pressed={i === componentIndex}
+                onClick={() => setComponentIndex(i)}
+              >
+                <span>0{i + 1}</span>
+                {c.name}
+                <ChevronRight size={14} />
+              </button>
+            ))}
+          </div>
+          <article className="hardware-evidence" aria-live="polite">
+            <span className={`badge ${component.stage}`}>
+              {t(stageNames[component.stage])}
+            </span>
+            <h3>{component.name}</h3>
+            <p>{t(component.detail)}</p>
             <a
               className="text-link"
-              href={source("hardware/electronics/kicad/cuty_carrier")}
+              href={source(component.path)}
               target="_blank"
               rel="noreferrer"
             >
+              {t(bi("Inspect the source", "Revisar la fuente"))}
+              <ArrowUpRight size={15} />
+            </a>
+          </article>
+        </Chapter>
+        <section className="technical-disclosure ink">
+          <details>
+            <summary>
               {t(
                 bi(
-                  "KiCad files + fabrication exports",
-                  "Archivos KiCad + fabricación",
+                  "Explore the system architecture & specifications",
+                  "Explora la arquitectura y especificaciones",
                 ),
               )}
-              <ArrowUpRight size={16} />
-            </a>
-            <div className="pcb-note">
-              <CircuitBoard size={22} />
-              <p>
-                {t(
-                  bi(
-                    "Carrier V1.1 · Design available. Fabrication, assembly and electrical validation pending.",
-                    "Carrier V1.1 · Diseño disponible. Fabricación, montaje y validación eléctrica pendientes.",
-                  ),
-                )}
-              </p>
-            </div>
-          </div>
-          <dl className="spec-table">
-            <div>
-              <dt>{t(bi("Compute", "Cómputo"))}</dt>
-              <dd>Raspberry Pi 5</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Control target", "Control previsto"))}</dt>
-              <dd>STM32F401CCU6 Black Pill</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Audio", "Audio"))}</dt>
-              <dd>ReSpeaker 2-Mics Pi HAT V2.0</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Display", "Pantalla"))}</dt>
-              <dd>3.5″ · 480 × 320 · SPI</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Camera", "Cámara"))}</dt>
-              <dd>Arducam OV5647 · CSI</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Actuation target", "Actuación prevista"))}</dt>
-              <dd>MG996R · PWM</dd>
-            </div>
-            <div>
-              <dt>Carrier V1.1</dt>
-              <dd>100 × 92 mm · KiCad · 2 {t(bi("layers", "capas"))}</dd>
-            </div>
-            <div>
-              <dt>{t(bi("Model geometry", "Geometría"))}</dt>
-              <dd>116,741 {t(bi("triangles", "triángulos"))} · GLB V17</dd>
-            </div>
-          </dl>
-        </section>
-        <section className="intelligence section" id="intelligence">
-          <div className="shell">
-            <div className="section-heading">
-              <div>
-                <div className="eyebrow">
-                  04 /{" "}
-                  {t(
-                    bi(
-                      "EXPRESSIONS & PERSONALITY",
-                      "EXPRESIONES Y PERSONALIDAD",
-                    ),
-                  )}
-                </div>
-                <h2>
-                  {t(bi("A little expression.", "Un poco de expresión."))}
-                  <br />
-                  <span>{t(bi("A lot of character.", "Mucho carácter."))}</span>
-                </h2>
-              </div>
-              <p>
-                {t(
-                  bi(
-                    "Voice, perception and expression meet in Python. Each layer has a role. Each claim has a source.",
-                    "Voz, percepción y expresión se encuentran en Python. Cada capa tiene una función. Cada afirmación tiene una fuente.",
-                  ),
-                )}
-              </p>
-            </div>
-            <div className="capability-layout">
-              <div className="capability-panel">
-                <div
-                  className="capability-tabs"
-                  aria-label={t(bi("AI capabilities", "Capacidades de IA"))}
-                >
-                  {capabilities.map((c, i) => {
-                    const Icon = icons[c.icon as keyof typeof icons];
-                    return (
-                      <button
-                        key={c.id}
-                        aria-pressed={i === capabilityIndex}
-                        onClick={() => setCapabilityIndex(i)}
-                      >
-                        <Icon size={19} />
-                        <span>{t(c.label)}</span>
-                        <ArrowUpRight size={16} />
-                      </button>
-                    );
-                  })}
-                </div>
-                <article className="capability-content" aria-live="polite">
-                  <h3>{t(capability.title)}</h3>
-                  <p>{t(capability.detail)}</p>
-                  <div className="evidence">
-                    <Check size={15} />
-                    <span>{t(capability.evidence)}</span>
-                  </div>
-                  <a
-                    className="text-link"
-                    href={source(capability.path)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {t(bi("Explore implementation", "Explorar implementación"))}
-                    <ArrowRight size={16} />
-                  </a>
-                </article>
-              </div>
-              <FaceDemo />
-            </div>
-          </div>
-        </section>
-        <LivePreview />
-        <section className="section development" id="development">
-          <div className="shell">
-            <div className="section-heading">
-              <div>
-                <div className="eyebrow">
-                  06 /{" "}
-                  {t(bi("DEVELOPMENT JOURNEY", "EL CAMINO DEL DESARROLLO"))}
-                </div>
-                <h2>
-                  {t(bi("A work in progress.", "Un trabajo en progreso."))}
-                  <br />
-                  <span>
-                    {t(
-                      bi("With a clear direction.", "Con una dirección clara."),
-                    )}
-                  </span>
-                </h2>
-              </div>
-              <div>
+              <span>+</span>
+            </summary>
+            <div id="architecture">
+              <div className="technical-heading">
+                <span className="eyebrow">03.1 / SYSTEM ARCHITECTURE</span>
+                <Heading
+                  first={bi("Different layers.", "Distintas capas.")}
+                  second={bi("One character.", "Un personaje.")}
+                />
                 <p>
                   {t(
                     bi(
-                      "Software exists. Hardware earns its confidence through testing. These are different milestones.",
-                      "El software existe. El hardware gana confianza mediante pruebas. Son hitos distintos.",
+                      "The Pi handles perception and expression. The planned STM32 layer owns deterministic motion. Select a block for evidence.",
+                      "La Pi gestiona percepción y expresión. La futura STM32 gestionará movimiento determinista. Selecciona un bloque para ver su evidencia.",
                     ),
                   )}
                 </p>
+              </div>
+              <Architecture />
+            </div>
+            <div className="capability-audit">
+              <div className="capability-tabs">
+                {capabilities.map((c, i) => (
+                  <button
+                    key={c.id}
+                    aria-pressed={capabilityIndex === i}
+                    onClick={() => setCapabilityIndex(i)}
+                  >
+                    {t(c.label)}
+                    <ArrowUpRight size={15} />
+                  </button>
+                ))}
+              </div>
+              <article aria-live="polite">
+                <h3>{t(capability.title)}</h3>
+                <p>{t(capability.detail)}</p>
+                <p className="evidence">{t(capability.evidence)}</p>
                 <a
                   className="text-link"
-                  href={source("docs/roadmap.md")}
+                  href={source(capability.path)}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {t(bi("Read the roadmap", "Leer el roadmap"))}
-                  <ArrowUpRight size={15} />
+                  {t(
+                    bi("Explore implementation ↗", "Explorar implementación ↗"),
+                  )}
                 </a>
-              </div>
+              </article>
             </div>
-            <div className="status-grid">
-              {milestones.map((m, i) => (
-                <article key={m.stage} className={`milestone ${m.stage}`}>
-                  <div className="milestone-header">
-                    <span className={`badge ${m.stage}`}>
-                      {t(stageNames[m.stage])}
-                    </span>
-                    <span>0{i + 1}</span>
-                  </div>
-                  <h3>{t(m.title)}</h3>
-                  <ul>
-                    {m.items.map((item) => (
-                      <li key={item.en}>
-                        <span />
-                        {t(item)}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
+            <dl id="specifications" className="hardware-specs">
+              {components.map((c) => (
+                <div key={c.id}>
+                  <dt>{c.name}</dt>
+                  <dd>{c.spec}</dd>
+                </div>
               ))}
-            </div>
-            <p className="caption">
+              <div>
+                <dt>
+                  {t(
+                    bi("V17 oriented dimensions", "Dimensiones V17 orientado"),
+                  )}
+                </dt>
+                <dd>
+                  {modelInfo.boundsMm.map((n) => n.toFixed(1)).join(" × ")} mm
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  {t(bi("Assembly geometry", "Geometría del ensamblaje"))}
+                </dt>
+                <dd>
+                  {modelInfo.triangles.toLocaleString("en-US")}{" "}
+                  {t(
+                    bi(
+                      "triangles · named parts · visual motion demos",
+                      "triángulos · piezas con nombre · demos visuales",
+                    ),
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <a className="text-link" href="#pcb-design">
+              {t(
+                bi("Inspect the carrier design ↗", "Inspeccionar la carrier ↗"),
+              )}
+            </a>
+          </details>
+        </section>
+        <AssemblyStory />
+        <PcbDesign />
+        <WiringConnections />
+        <Chapter
+          id="development"
+          number="06"
+          label={bi("DEVELOPMENT", "DESARROLLO")}
+          tone="lavender"
+          side="left"
+        >
+          <Heading
+            first={bi("An open build.", "Un desarrollo abierto.")}
+            second={bi("An honest journey.", "Un camino honesto.")}
+          />
+          <div className="development-timeline">
+            {milestones.map((milestone, i) => (
+              <article key={milestone.stage}>
+                <div>
+                  <span className="mono">0{i + 1}</span>
+                  <span className={`badge ${milestone.stage}`}>
+                    {t(stageNames[milestone.stage])}
+                  </span>
+                </div>
+                <h3>{t(milestone.title)}</h3>
+                <ul>
+                  {milestone.items.map((item) => (
+                    <li key={item.en}>{t(item)}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+          <a
+            className="text-link"
+            href={source("docs/roadmap.md")}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t(bi("Read the development roadmap", "Leer el roadmap"))}
+            <ArrowUpRight size={15} />
+          </a>
+        </Chapter>
+        <Chapter
+          id="live"
+          number="07"
+          label={bi("C.U.T.Y. LIVE", "C.U.T.Y. LIVE")}
+          tone="ink"
+          side="right"
+        >
+          <Heading
+            first={bi("A window into", "Una ventana a")}
+            second={bi("its world.", "su mundo.")}
+          />
+          <p className="chapter-lead">
+            {t(
+              bi(
+                "The product story lives here. Connected robot controls belong in their own protected space.",
+                "La historia del producto vive aquí. Los controles conectados necesitan su propio espacio protegido.",
+              ),
+            )}
+          </p>
+          <div className="live-status" data-connection="offline">
+            <span className="offline-label">
+              <Radio size={14} />
               {t(
                 bi(
-                  "Reviewed against the repository and documented physical checks · November 2026. No progress percentages or unmeasured performance claims.",
-                  "Revisado contra el repositorio y las pruebas físicas documentadas · Noviembre 2026. Sin porcentajes de avance ni rendimiento sin medir.",
+                  "ROBOT CONNECTION / OFFLINE",
+                  "CONEXIÓN AL ROBOT / DESCONECTADA",
+                ),
+              )}
+            </span>
+            <h3>
+              {t(
+                bi(
+                  "The robot is not connected.",
+                  "El robot no está conectado.",
+                ),
+              )}
+            </h3>
+            <p>
+              {t(
+                bi(
+                  "This release makes no camera, microphone or hardware requests. No authenticated dashboard is implemented in this repository.",
+                  "Esta versión no accede a cámara, micrófono ni hardware. El repositorio aún no implementa un dashboard autenticado.",
                 ),
               )}
             </p>
+            {dashboard ? (
+              <a
+                className="button primary"
+                href={dashboard}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t(bi("Open robot dashboard", "Abrir dashboard del robot"))}
+                <ArrowUpRight size={16} />
+              </a>
+            ) : (
+              <button className="button secondary" disabled>
+                {t(bi("Dashboard not configured", "Dashboard sin configurar"))}
+              </button>
+            )}
+            <a className="text-link" href="#intelligence">
+              {t(bi("Try the face demo", "Prueba la cara"))}
+              <ArrowUpRight size={15} />
+            </a>
           </div>
-        </section>
-        <section className="about section shell" id="about">
-          <div className="eyebrow">
-            C.U.T.Y / {t(bi("BUILT OUT OF CURIOSITY", "CREADO POR CURIOSIDAD"))}
-          </div>
+        </Chapter>
+        <section className="project-outro paper" id="about">
+          <p className="eyebrow">
+            {t(bi("BUILT OUT OF CURIOSITY", "CREADO POR CURIOSIDAD"))}
+          </p>
           <h2>
-            {t(bi("What if technology", "¿Y si la tecnología"))}
+            {t(bi("A small robot.", "Un robot pequeño."))}
             <br />
             <span>
-              {t(bi("felt a little more alive?", "se sintiera más viva?"))}
+              {t(bi("A world of possibilities.", "Un mundo de posibilidades."))}
             </span>
           </h2>
-          <div className="about-bottom">
-            <div>
-              <p>
-                {t(
-                  bi(
-                    "C.U.T.Y explores what happens when a conversational AI has a physical presence. A voice becomes a character; a camera becomes eye contact; embedded electronics give that character a place in the real world.",
-                    "C.U.T.Y explora qué pasa cuando una IA conversacional tiene presencia física. Una voz se vuelve personaje; una cámara, contacto visual; la electrónica le da un lugar en el mundo real.",
-                  ),
-                )}
-              </p>
-              <p>
-                {t(
-                  bi(
-                    "The challenge is integration: reliable audio, smooth visual feedback and a clear boundary between high-level behavior and real-time control. Next comes sustained physical validation, carrier fabrication and safe motion firmware.",
-                    "El reto es la integración: audio confiable, respuesta visual fluida y separación entre comportamiento y control en tiempo real. Siguen la validación sostenida, fabricación de carrier y firmware seguro.",
-                  ),
-                )}
-              </p>
-            </div>
+          <p>
+            {t(
+              bi(
+                "C.U.T.Y. explores the meeting point of multimodal AI, computer vision and embedded systems. The challenge is integration: reliable audio, expressive feedback, and a safe path from behavior to physical motion.",
+                "C.U.T.Y. explora el encuentro entre IA multimodal, visión artificial y sistemas embebidos. El reto es integrar audio confiable, expresión y un camino seguro del comportamiento al movimiento físico.",
+              ),
+            )}
+          </p>
+          <div className="outro-links">
             <a
+              className="button primary"
               href={repo}
               target="_blank"
               rel="noreferrer"
-              className="button primary"
             >
+              <Github size={17} />
               {t(bi("Follow the build", "Sigue el desarrollo"))}
-              <Github size={18} />
+            </a>
+            <a className="text-link" href="#architecture">
+              {t(bi("Technical Architecture", "Arquitectura técnica"))}
+              <ArrowUpRight size={15} />
             </a>
           </div>
         </section>
       </main>
-      <footer className="footer shell">
-        <a className="wordmark" href="#">
-          C.U.T.Y<span className="title-period">.</span>
+      <footer className="product-footer paper">
+        <a className="wordmark" href="#home">
+          C.U.T.Y.
         </a>
         <p>
           {t(
@@ -516,11 +637,19 @@ function Portfolio() {
             ),
           )}
         </p>
-        <a href="#main">
-          {t(bi("Back to top", "Volver arriba"))}
-          <ArrowDown size={15} className="up-arrow" />
-        </a>
+        <a href="#home">{t(bi("Back to top ↑", "Volver arriba ↑"))}</a>
       </footer>
-    </>
+    </div>
   );
+}
+export function dashboardUrl(value: string | undefined) {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
 }

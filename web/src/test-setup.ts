@@ -19,3 +19,8 @@ globalThis.IntersectionObserver = class {
   rootMargin = "";
   thresholds = [];
 };
+globalThis.ResizeObserver = class {
+  observe() {}
+  disconnect() {}
+  unobserve() {}
+};

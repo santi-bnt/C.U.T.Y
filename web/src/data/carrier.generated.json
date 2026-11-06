@@ -1,0 +1,2368 @@
+{
+  "revision": "1.1",
+  "sizeMm": [
+    100,
+    92
+  ],
+  "thicknessMm": 1.6,
+  "layers": 2,
+  "pcbModel": null,
+  "source": "hardware/electronics/kicad/cuty_carrier",
+  "pcbSha256": "ab0ef7f3afe13e9cf8cae9ab40d41d220056954cb8ebe72e264439d24dd26454",
+  "netlistSha256": "550d173111d6a000b8faec731a64b881c2dc4134f6841711eed0756dc7b30ff5",
+  "piHeader": {
+    "1": "+3V3",
+    "2": "+5V",
+    "3": "I2C1_SDA",
+    "4": "+5V",
+    "5": "I2C1_SCL",
+    "7": "AUD_MCLK",
+    "8": "PI_TXD",
+    "10": "PI_RXD",
+    "11": "TP_IRQ",
+    "12": "I2S_BCLK",
+    "17": "+3V3",
+    "18": "LCD_DC",
+    "19": "SPI0_MOSI",
+    "21": "SPI0_MISO",
+    "22": "LCD_RST",
+    "23": "SPI0_SCLK",
+    "24": "LCD_CS",
+    "26": "TP_CS",
+    "35": "I2S_LRCLK",
+    "37": "AUD_RST",
+    "38": "I2S_DIN",
+    "40": "I2S_DOUT",
+    "6": "GND",
+    "9": "GND",
+    "14": "GND",
+    "20": "GND",
+    "25": "GND",
+    "30": "GND",
+    "34": "GND",
+    "39": "GND"
+  },
+  "displayUsed": [
+    1,
+    2,
+    4,
+    6,
+    9,
+    11,
+    14,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "respeakerUsed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    12,
+    14,
+    17,
+    20,
+    25,
+    30,
+    34,
+    35,
+    37,
+    38,
+    39,
+    40
+  ],
+  "respeakerMustBeOpen": [
+    11,
+    19,
+    23,
+    32,
+    33
+  ],
+  "components": [
+    {
+      "ref": "C1",
+      "value": "1000uF 16V",
+      "note": "Bulk servos",
+      "group": "servo",
+      "mpn": "Electrolitico 1000 uF 16 V low-ESR D10 P5",
+      "footprint": "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm",
+      "bounds": [
+        13.0,
+        38.0,
+        9.0,
+        4.0
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+6V_SERVO",
+          "x": 15.0,
+          "y": 40.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "PGND",
+          "x": 20.0,
+          "y": 40.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "C2",
+      "value": "1000uF 16V",
+      "note": "Bulk servos",
+      "group": "servo",
+      "mpn": "Electrolitico 1000 uF 16 V low-ESR D10 P5",
+      "footprint": "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm",
+      "bounds": [
+        25.0,
+        38.0,
+        9.0,
+        4.0
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+6V_SERVO",
+          "x": 27.0,
+          "y": 40.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "PGND",
+          "x": 32.0,
+          "y": 40.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "C3",
+      "value": "100nF",
+      "note": "Filtro ADC",
+      "group": "logic",
+      "mpn": "Ceramico 100 nF 50 V",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm",
+      "bounds": [
+        46.2,
+        24.82,
+        3.6,
+        8.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SENSE",
+          "x": 48.0,
+          "y": 31.62,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "GND",
+          "x": 48.0,
+          "y": 26.62,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "D1",
+      "value": "1N5819",
+      "note": "Evita retroalimentar 5 V desde el USB",
+      "group": "logic",
+      "mpn": "1N5819",
+      "footprint": "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal",
+      "bounds": [
+        41.9,
+        66.0,
+        14.36,
+        4.2
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+5V_BP",
+          "x": 54.16,
+          "y": 68.1,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "5V_JP",
+          "x": 44.0,
+          "y": 68.1,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "D2",
+      "value": "5V",
+      "note": "LED 5 V Pi",
+      "group": "logic",
+      "mpn": "LED 3 mm verde",
+      "footprint": "LED_THT:LED_D3.0mm",
+      "bounds": [
+        30.06,
+        87.6,
+        6.34,
+        3.8
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "GND",
+          "x": 34.5,
+          "y": 89.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_5V",
+          "x": 31.96,
+          "y": 89.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "D3",
+      "value": "6V",
+      "note": "LED servos",
+      "group": "power",
+      "mpn": "LED 3 mm azul",
+      "footprint": "LED_THT:LED_D3.0mm",
+      "bounds": [
+        22.06,
+        29.9,
+        6.34,
+        3.8
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PGND",
+          "x": 26.5,
+          "y": 31.8,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_6V",
+          "x": 23.96,
+          "y": 31.8,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "D4",
+      "value": "BAT",
+      "note": "LED bateria",
+      "group": "power",
+      "mpn": "LED 3 mm rojo",
+      "footprint": "LED_THT:LED_D3.0mm",
+      "bounds": [
+        22.06,
+        25.1,
+        6.34,
+        3.8
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PGND",
+          "x": 26.5,
+          "y": 27.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_BAT",
+          "x": 23.96,
+          "y": 27.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "F1",
+      "value": "10A",
+      "note": "Fusible servos (mini blade 10 A)",
+      "group": "power",
+      "mpn": "Keystone 3568 + fusible mini 10 A",
+      "footprint": "Fuse:Fuseholder_Blade_Mini_Keystone_3568",
+      "bounds": [
+        41.61,
+        12.11,
+        14.7,
+        8.18
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 44.0,
+          "y": 14.5,
+          "label": ""
+        },
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 44.0,
+          "y": 17.9,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_SERVO",
+          "x": 53.92,
+          "y": 14.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_SERVO",
+          "x": 53.92,
+          "y": 17.9,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "F2",
+      "value": "5A",
+      "note": "Fusible Raspberry (mini blade 5 A)",
+      "group": "power",
+      "mpn": "Keystone 3568 + fusible mini 5 A",
+      "footprint": "Fuse:Fuseholder_Blade_Mini_Keystone_3568",
+      "bounds": [
+        21.61,
+        12.11,
+        14.7,
+        8.18
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 24.0,
+          "y": 14.5,
+          "label": ""
+        },
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 24.0,
+          "y": 17.9,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_PI",
+          "x": 33.92,
+          "y": 14.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_PI",
+          "x": 33.92,
+          "y": 17.9,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "H1",
+      "value": "M3",
+      "note": "Tornillo M3",
+      "group": "mech",
+      "mpn": "",
+      "footprint": "MountingHole:MountingHole_3.2mm_M3",
+      "bounds": [
+        0.9,
+        0.9,
+        5.2,
+        5.2
+      ],
+      "pins": []
+    },
+    {
+      "ref": "H2",
+      "value": "M3",
+      "note": "Tornillo M3",
+      "group": "mech",
+      "mpn": "",
+      "footprint": "MountingHole:MountingHole_3.2mm_M3",
+      "bounds": [
+        93.9,
+        12.9,
+        5.2,
+        5.2
+      ],
+      "pins": []
+    },
+    {
+      "ref": "H3",
+      "value": "M3",
+      "note": "Tornillo M3",
+      "group": "mech",
+      "mpn": "",
+      "footprint": "MountingHole:MountingHole_3.2mm_M3",
+      "bounds": [
+        0.9,
+        85.9,
+        5.2,
+        5.2
+      ],
+      "pins": []
+    },
+    {
+      "ref": "H4",
+      "value": "M3",
+      "note": "Tornillo M3",
+      "group": "mech",
+      "mpn": "",
+      "footprint": "MountingHole:MountingHole_3.2mm_M3",
+      "bounds": [
+        38.2,
+        86.0,
+        5.2,
+        5.2
+      ],
+      "pins": []
+    },
+    {
+      "ref": "J1",
+      "value": "XT60 BAT 3S",
+      "note": "Bateria LiPo 3S",
+      "group": "power",
+      "mpn": "AMASS XT60PW-M",
+      "footprint": "Connector_AMASS:AMASS_XT60PW-M_1x02_P7.20mm_Horizontal",
+      "bounds": [
+        8.55,
+        6.65,
+        11.05,
+        17.5
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PGND",
+          "x": 16.55,
+          "y": 19.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_RAW",
+          "x": 16.55,
+          "y": 11.8,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J2",
+      "value": "SW PRINCIPAL",
+      "note": "A interruptor general (>=10 A)",
+      "group": "power",
+      "mpn": "Phoenix MKDS 1,5/2-5,08",
+      "footprint": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
+      "bounds": [
+        21.72,
+        3.3,
+        9.68,
+        4.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 29.1,
+          "y": 5.6,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_RAW",
+          "x": 24.02,
+          "y": 5.6,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J3",
+      "value": "SW SERVOS",
+      "note": "A interruptor de servos",
+      "group": "power",
+      "mpn": "Phoenix MKDS 1,5/2-5,08",
+      "footprint": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
+      "bounds": [
+        46.12,
+        3.3,
+        9.68,
+        4.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SERVO",
+          "x": 53.5,
+          "y": 5.6,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_SERVO_SW",
+          "x": 48.42,
+          "y": 5.6,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J4",
+      "value": "BUCK IN",
+      "note": "Entrada del buck de servos",
+      "group": "power",
+      "mpn": "Phoenix MKDS 1,5/2-5,08",
+      "footprint": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
+      "bounds": [
+        33.92,
+        3.3,
+        9.68,
+        4.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SERVO_SW",
+          "x": 41.3,
+          "y": 5.6,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "PGND",
+          "x": 36.22,
+          "y": 5.6,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J5",
+      "value": "BUCK OUT 6V",
+      "note": "Salida del buck ajustado a 6 V",
+      "group": "power",
+      "mpn": "Phoenix MKDS 1,5/2-5,08",
+      "footprint": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
+      "bounds": [
+        3.2,
+        36.7,
+        4.6,
+        9.68
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PGND",
+          "x": 5.5,
+          "y": 39.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.5,
+          "y": 44.08,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J6",
+      "value": "REG RPI",
+      "note": "Entrada del regulador 5.1 V / 5 A (USB-C a Pi 5)",
+      "group": "power",
+      "mpn": "Phoenix MKDS 1,5/2-5,08",
+      "footprint": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
+      "bounds": [
+        3.2,
+        25.2,
+        4.6,
+        9.68
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_PI",
+          "x": 5.5,
+          "y": 27.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "PGND",
+          "x": 5.5,
+          "y": 32.58,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J7",
+      "value": "SERVO1",
+      "note": "MG996R Cabeza (S + -)",
+      "group": "servo",
+      "mpn": "Tira de pines 1x3 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+      "bounds": [
+        0.67,
+        49.65,
+        8.78,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "SERVO1",
+          "x": 7.6,
+          "y": 51.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.06,
+          "y": 51.5,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "PGND",
+          "x": 2.52,
+          "y": 51.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J8",
+      "value": "SERVO2",
+      "note": "MG996R Brazo izq (S + -)",
+      "group": "servo",
+      "mpn": "Tira de pines 1x3 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+      "bounds": [
+        0.67,
+        57.15,
+        8.78,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "SERVO2",
+          "x": 7.6,
+          "y": 59.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.06,
+          "y": 59.0,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "PGND",
+          "x": 2.52,
+          "y": 59.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J9",
+      "value": "SERVO3",
+      "note": "MG996R Brazo der (S + -)",
+      "group": "servo",
+      "mpn": "Tira de pines 1x3 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+      "bounds": [
+        0.67,
+        64.65,
+        8.78,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "SERVO3",
+          "x": 7.6,
+          "y": 66.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.06,
+          "y": 66.5,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "PGND",
+          "x": 2.52,
+          "y": 66.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J10",
+      "value": "SERVO4",
+      "note": "MG996R Base 1 (S + -)",
+      "group": "servo",
+      "mpn": "Tira de pines 1x3 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+      "bounds": [
+        0.67,
+        72.15,
+        8.78,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "SERVO4",
+          "x": 7.6,
+          "y": 74.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.06,
+          "y": 74.0,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "PGND",
+          "x": 2.52,
+          "y": 74.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J11",
+      "value": "SERVO5",
+      "note": "MG996R Base 2 (S + -)",
+      "group": "servo",
+      "mpn": "Tira de pines 1x3 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+      "bounds": [
+        0.67,
+        79.65,
+        8.78,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "SERVO5",
+          "x": 7.6,
+          "y": 81.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+6V_SERVO",
+          "x": 5.06,
+          "y": 81.5,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "PGND",
+          "x": 2.52,
+          "y": 81.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J12",
+      "value": "RPI5 GPIO",
+      "note": "Cable plano 40 vias a la Raspberry Pi 5",
+      "group": "logic",
+      "mpn": "Box header 2x20 2.54 mm",
+      "footprint": "Connector_IDC:IDC-Header_2x20_P2.54mm_Vertical",
+      "bounds": [
+        42.89,
+        57.65,
+        51.96,
+        6.24
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3",
+          "x": 93.0,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+5V",
+          "x": 93.0,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "I2C1_SDA",
+          "x": 90.46,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "4",
+          "net": "+5V",
+          "x": 90.46,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "5",
+          "net": "I2C1_SCL",
+          "x": 87.92,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "6",
+          "net": "GND",
+          "x": 87.92,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "7",
+          "net": "AUD_MCLK",
+          "x": 85.38,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "8",
+          "net": "PI_TXD",
+          "x": 85.38,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "9",
+          "net": "GND",
+          "x": 82.84,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "10",
+          "net": "PI_RXD",
+          "x": 82.84,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "11",
+          "net": "TP_IRQ",
+          "x": 80.3,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "12",
+          "net": "I2S_BCLK",
+          "x": 80.3,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "13",
+          "net": "",
+          "x": 77.76,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "14",
+          "net": "GND",
+          "x": 77.76,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "15",
+          "net": "",
+          "x": 75.22,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "16",
+          "net": "",
+          "x": 75.22,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "17",
+          "net": "+3V3",
+          "x": 72.68,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "18",
+          "net": "LCD_DC",
+          "x": 72.68,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "19",
+          "net": "SPI0_MOSI",
+          "x": 70.14,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "20",
+          "net": "GND",
+          "x": 70.14,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "21",
+          "net": "SPI0_MISO",
+          "x": 67.6,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "22",
+          "net": "LCD_RST",
+          "x": 67.6,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "23",
+          "net": "SPI0_SCLK",
+          "x": 65.06,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "24",
+          "net": "LCD_CS",
+          "x": 65.06,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "25",
+          "net": "GND",
+          "x": 62.52,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "26",
+          "net": "TP_CS",
+          "x": 62.52,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "27",
+          "net": "",
+          "x": 59.98,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "28",
+          "net": "",
+          "x": 59.98,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "29",
+          "net": "",
+          "x": 57.44,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "30",
+          "net": "GND",
+          "x": 57.44,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "31",
+          "net": "",
+          "x": 54.9,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "32",
+          "net": "",
+          "x": 54.9,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "33",
+          "net": "",
+          "x": 52.36,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "34",
+          "net": "GND",
+          "x": 52.36,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "35",
+          "net": "I2S_LRCLK",
+          "x": 49.82,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "36",
+          "net": "",
+          "x": 49.82,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "37",
+          "net": "AUD_RST",
+          "x": 47.28,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "38",
+          "net": "I2S_DIN",
+          "x": 47.28,
+          "y": 62.04,
+          "label": ""
+        },
+        {
+          "pin": "39",
+          "net": "GND",
+          "x": 44.74,
+          "y": 59.5,
+          "label": ""
+        },
+        {
+          "pin": "40",
+          "net": "I2S_DOUT",
+          "x": 44.74,
+          "y": 62.04,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J13",
+      "value": "PANTALLA 3.5",
+      "note": "Display-G 26 pines (waveshare35a), por cable",
+      "group": "logic",
+      "mpn": "Box header 2x13 2.54 mm",
+      "footprint": "Connector_IDC:IDC-Header_2x13_P2.54mm_Vertical",
+      "bounds": [
+        60.67,
+        3.35,
+        34.18,
+        6.24
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3",
+          "x": 93.0,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+5V",
+          "x": 93.0,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "",
+          "x": 90.46,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "4",
+          "net": "+5V",
+          "x": 90.46,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "5",
+          "net": "",
+          "x": 87.92,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "6",
+          "net": "GND",
+          "x": 87.92,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "7",
+          "net": "",
+          "x": 85.38,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "8",
+          "net": "",
+          "x": 85.38,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "9",
+          "net": "GND",
+          "x": 82.84,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "10",
+          "net": "",
+          "x": 82.84,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "11",
+          "net": "TP_IRQ",
+          "x": 80.3,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "12",
+          "net": "",
+          "x": 80.3,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "13",
+          "net": "",
+          "x": 77.76,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "14",
+          "net": "GND",
+          "x": 77.76,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "15",
+          "net": "",
+          "x": 75.22,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "16",
+          "net": "",
+          "x": 75.22,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "17",
+          "net": "+3V3",
+          "x": 72.68,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "18",
+          "net": "LCD_DC",
+          "x": 72.68,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "19",
+          "net": "SPI0_MOSI",
+          "x": 70.14,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "20",
+          "net": "GND",
+          "x": 70.14,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "21",
+          "net": "SPI0_MISO",
+          "x": 67.6,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "22",
+          "net": "LCD_RST",
+          "x": 67.6,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "23",
+          "net": "SPI0_SCLK",
+          "x": 65.06,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "24",
+          "net": "LCD_CS",
+          "x": 65.06,
+          "y": 7.74,
+          "label": ""
+        },
+        {
+          "pin": "25",
+          "net": "GND",
+          "x": 62.52,
+          "y": 5.2,
+          "label": ""
+        },
+        {
+          "pin": "26",
+          "net": "TP_CS",
+          "x": 62.52,
+          "y": 7.74,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J14",
+      "value": "RESPEAKER",
+      "note": "ReSpeaker 2-Mics Pi HAT V2.0",
+      "group": "logic",
+      "mpn": "Tira de pines 2x20 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical",
+      "bounds": [
+        42.89,
+        45.65,
+        51.96,
+        6.24
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3",
+          "x": 93.0,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "+5V",
+          "x": 93.0,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "I2C1_SDA",
+          "x": 90.46,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "4",
+          "net": "+5V",
+          "x": 90.46,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "5",
+          "net": "I2C1_SCL",
+          "x": 87.92,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "6",
+          "net": "GND",
+          "x": 87.92,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "7",
+          "net": "AUD_MCLK",
+          "x": 85.38,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "8",
+          "net": "",
+          "x": 85.38,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "9",
+          "net": "GND",
+          "x": 82.84,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "10",
+          "net": "",
+          "x": 82.84,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "11",
+          "net": "",
+          "x": 80.3,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "12",
+          "net": "I2S_BCLK",
+          "x": 80.3,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "13",
+          "net": "",
+          "x": 77.76,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "14",
+          "net": "GND",
+          "x": 77.76,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "15",
+          "net": "",
+          "x": 75.22,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "16",
+          "net": "",
+          "x": 75.22,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "17",
+          "net": "+3V3",
+          "x": 72.68,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "18",
+          "net": "",
+          "x": 72.68,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "19",
+          "net": "",
+          "x": 70.14,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "20",
+          "net": "GND",
+          "x": 70.14,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "21",
+          "net": "",
+          "x": 67.6,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "22",
+          "net": "",
+          "x": 67.6,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "23",
+          "net": "",
+          "x": 65.06,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "24",
+          "net": "",
+          "x": 65.06,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "25",
+          "net": "GND",
+          "x": 62.52,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "26",
+          "net": "",
+          "x": 62.52,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "27",
+          "net": "",
+          "x": 59.98,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "28",
+          "net": "",
+          "x": 59.98,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "29",
+          "net": "",
+          "x": 57.44,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "30",
+          "net": "GND",
+          "x": 57.44,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "31",
+          "net": "",
+          "x": 54.9,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "32",
+          "net": "",
+          "x": 54.9,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "33",
+          "net": "",
+          "x": 52.36,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "34",
+          "net": "GND",
+          "x": 52.36,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "35",
+          "net": "I2S_LRCLK",
+          "x": 49.82,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "36",
+          "net": "",
+          "x": 49.82,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "37",
+          "net": "AUD_RST",
+          "x": 47.28,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "38",
+          "net": "I2S_DIN",
+          "x": 47.28,
+          "y": 50.04,
+          "label": ""
+        },
+        {
+          "pin": "39",
+          "net": "GND",
+          "x": 44.74,
+          "y": 47.5,
+          "label": ""
+        },
+        {
+          "pin": "40",
+          "net": "I2S_DOUT",
+          "x": 44.74,
+          "y": 50.04,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "J15",
+      "value": "I2C IMU",
+      "note": "IMU futura en I2C2 de la STM32",
+      "group": "logic",
+      "mpn": "Tira de pines 1x4 2.54 mm",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+      "bounds": [
+        40.65,
+        72.15,
+        3.7,
+        11.32
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3_BP",
+          "x": 42.5,
+          "y": 74.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "GND",
+          "x": 42.5,
+          "y": 76.54,
+          "label": ""
+        },
+        {
+          "pin": "3",
+          "net": "I2C2_SCL",
+          "x": 42.5,
+          "y": 79.08,
+          "label": ""
+        },
+        {
+          "pin": "4",
+          "net": "I2C2_SDA",
+          "x": 42.5,
+          "y": 81.62,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "JP1",
+      "value": "5V STM32",
+      "note": "Puente: 5 V de la Pi a la Black Pill",
+      "group": "logic",
+      "mpn": "Tira 1x2 + jumper",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+      "bounds": [
+        34.65,
+        66.25,
+        6.24,
+        3.7
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+5V",
+          "x": 36.5,
+          "y": 68.1,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "5V_JP",
+          "x": 39.04,
+          "y": 68.1,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "NT1",
+      "value": "NetTie",
+      "note": "Union unica tierra logica / potencia",
+      "group": "power",
+      "mpn": "",
+      "footprint": "NetTie:NetTie-2_THT_Pad1.0mm",
+      "bounds": [
+        34.55,
+        22.35,
+        5.9,
+        3.3
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "GND",
+          "x": 38.8,
+          "y": 24.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "PGND",
+          "x": 36.2,
+          "y": 24.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R1",
+      "value": "220",
+      "note": "Serie PWM",
+      "group": "servo",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        10.08,
+        49.7,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PWM1",
+          "x": 19.5,
+          "y": 51.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "SERVO1",
+          "x": 11.88,
+          "y": 51.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R2",
+      "value": "220",
+      "note": "Serie PWM",
+      "group": "servo",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        10.08,
+        57.2,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PWM2",
+          "x": 19.5,
+          "y": 59.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "SERVO2",
+          "x": 11.88,
+          "y": 59.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R3",
+      "value": "220",
+      "note": "Serie PWM",
+      "group": "servo",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        10.08,
+        64.7,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PWM3",
+          "x": 19.5,
+          "y": 66.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "SERVO3",
+          "x": 11.88,
+          "y": 66.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R4",
+      "value": "220",
+      "note": "Serie PWM",
+      "group": "servo",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        10.08,
+        72.2,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PWM4",
+          "x": 19.5,
+          "y": 74.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "SERVO4",
+          "x": 11.88,
+          "y": 74.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R5",
+      "value": "220",
+      "note": "Serie PWM",
+      "group": "servo",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        10.08,
+        79.7,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "PWM5",
+          "x": 19.5,
+          "y": 81.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "SERVO5",
+          "x": 11.88,
+          "y": 81.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R6",
+      "value": "100k",
+      "note": "Divisor bateria",
+      "group": "logic",
+      "mpn": "Resistencia 1/4 W 1%",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        40.2,
+        22.2,
+        3.6,
+        11.22
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 42.0,
+          "y": 24.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "VBAT_SENSE",
+          "x": 42.0,
+          "y": 31.62,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R7",
+      "value": "22k",
+      "note": "Divisor bateria",
+      "group": "logic",
+      "mpn": "Resistencia 1/4 W 1%",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        43.2,
+        22.2,
+        3.6,
+        11.22
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SENSE",
+          "x": 45.0,
+          "y": 31.62,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "GND",
+          "x": 45.0,
+          "y": 24.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R8",
+      "value": "1k",
+      "note": "",
+      "group": "logic",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        20.2,
+        87.7,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+5V",
+          "x": 22.0,
+          "y": 89.5,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_5V",
+          "x": 29.62,
+          "y": 89.5,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R9",
+      "value": "1k",
+      "note": "",
+      "group": "power",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        12.2,
+        30.0,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+6V_SERVO",
+          "x": 14.0,
+          "y": 31.8,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_6V",
+          "x": 21.62,
+          "y": 31.8,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R10",
+      "value": "4.7k",
+      "note": "",
+      "group": "power",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        12.2,
+        25.2,
+        11.22,
+        3.6
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "VBAT_SW",
+          "x": 14.0,
+          "y": 27.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "LED_BAT",
+          "x": 21.62,
+          "y": 27.0,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R11",
+      "value": "4.7k",
+      "note": "Pull-up I2C",
+      "group": "logic",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        36.7,
+        74.58,
+        3.6,
+        11.22
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3_BP",
+          "x": 38.5,
+          "y": 84.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "I2C2_SCL",
+          "x": 38.5,
+          "y": 76.38,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "R12",
+      "value": "4.7k",
+      "note": "Pull-up I2C",
+      "group": "logic",
+      "mpn": "Resistencia 1/4 W",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "bounds": [
+        33.7,
+        74.58,
+        3.6,
+        11.22
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "+3V3_BP",
+          "x": 35.5,
+          "y": 84.0,
+          "label": ""
+        },
+        {
+          "pin": "2",
+          "net": "I2C2_SDA",
+          "x": 35.5,
+          "y": 76.38,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "ref": "U1",
+      "value": "BlackPill F401CC",
+      "note": "WeAct Black Pill STM32F401CCU6",
+      "group": "logic",
+      "mpn": "2x zocalo hembra 1x20 2.54 mm",
+      "footprint": "CUTY:WeAct_BlackPill_Socket",
+      "bounds": [
+        47.291,
+        71.549,
+        51.96,
+        18.915
+      ],
+      "pins": [
+        {
+          "pin": "1",
+          "net": "",
+          "x": 97.401,
+          "y": 73.399,
+          "label": "PB12"
+        },
+        {
+          "pin": "2",
+          "net": "",
+          "x": 94.861,
+          "y": 73.399,
+          "label": "PB13"
+        },
+        {
+          "pin": "3",
+          "net": "",
+          "x": 92.321,
+          "y": 73.399,
+          "label": "PB14"
+        },
+        {
+          "pin": "4",
+          "net": "",
+          "x": 89.781,
+          "y": 73.399,
+          "label": "PB15"
+        },
+        {
+          "pin": "5",
+          "net": "PWM5",
+          "x": 87.241,
+          "y": 73.399,
+          "label": "PA8"
+        },
+        {
+          "pin": "6",
+          "net": "",
+          "x": 84.701,
+          "y": 73.399,
+          "label": "PA9"
+        },
+        {
+          "pin": "7",
+          "net": "",
+          "x": 82.161,
+          "y": 73.399,
+          "label": "PA10"
+        },
+        {
+          "pin": "8",
+          "net": "",
+          "x": 79.621,
+          "y": 73.399,
+          "label": "PA11"
+        },
+        {
+          "pin": "9",
+          "net": "",
+          "x": 77.081,
+          "y": 73.399,
+          "label": "PA12"
+        },
+        {
+          "pin": "10",
+          "net": "",
+          "x": 74.541,
+          "y": 73.399,
+          "label": "PA15"
+        },
+        {
+          "pin": "11",
+          "net": "I2C2_SDA",
+          "x": 72.001,
+          "y": 73.399,
+          "label": "PB3"
+        },
+        {
+          "pin": "12",
+          "net": "",
+          "x": 69.461,
+          "y": 73.399,
+          "label": "PB4"
+        },
+        {
+          "pin": "13",
+          "net": "",
+          "x": 66.921,
+          "y": 73.399,
+          "label": "PB5"
+        },
+        {
+          "pin": "14",
+          "net": "PWM1",
+          "x": 64.381,
+          "y": 73.399,
+          "label": "PB6"
+        },
+        {
+          "pin": "15",
+          "net": "PWM2",
+          "x": 61.841,
+          "y": 73.399,
+          "label": "PB7"
+        },
+        {
+          "pin": "16",
+          "net": "PWM3",
+          "x": 59.301,
+          "y": 73.399,
+          "label": "PB8"
+        },
+        {
+          "pin": "17",
+          "net": "PWM4",
+          "x": 56.761,
+          "y": 73.399,
+          "label": "PB9"
+        },
+        {
+          "pin": "18",
+          "net": "+5V_BP",
+          "x": 54.221,
+          "y": 73.399,
+          "label": "5V"
+        },
+        {
+          "pin": "19",
+          "net": "GND",
+          "x": 51.681,
+          "y": 73.399,
+          "label": "GND"
+        },
+        {
+          "pin": "20",
+          "net": "+3V3_BP",
+          "x": 49.141,
+          "y": 73.399,
+          "label": "3V3"
+        },
+        {
+          "pin": "21",
+          "net": "",
+          "x": 49.141,
+          "y": 88.614,
+          "label": "VBAT"
+        },
+        {
+          "pin": "22",
+          "net": "",
+          "x": 51.681,
+          "y": 88.614,
+          "label": "PC13"
+        },
+        {
+          "pin": "23",
+          "net": "",
+          "x": 54.221,
+          "y": 88.614,
+          "label": "PC14"
+        },
+        {
+          "pin": "24",
+          "net": "",
+          "x": 56.761,
+          "y": 88.614,
+          "label": "PC15"
+        },
+        {
+          "pin": "25",
+          "net": "",
+          "x": 59.301,
+          "y": 88.614,
+          "label": "NRST"
+        },
+        {
+          "pin": "26",
+          "net": "",
+          "x": 61.841,
+          "y": 88.614,
+          "label": "PA0"
+        },
+        {
+          "pin": "27",
+          "net": "VBAT_SENSE",
+          "x": 64.381,
+          "y": 88.614,
+          "label": "PA1"
+        },
+        {
+          "pin": "28",
+          "net": "PI_RXD",
+          "x": 66.921,
+          "y": 88.614,
+          "label": "PA2"
+        },
+        {
+          "pin": "29",
+          "net": "PI_TXD",
+          "x": 69.461,
+          "y": 88.614,
+          "label": "PA3"
+        },
+        {
+          "pin": "30",
+          "net": "",
+          "x": 72.001,
+          "y": 88.614,
+          "label": "PA4"
+        },
+        {
+          "pin": "31",
+          "net": "",
+          "x": 74.541,
+          "y": 88.614,
+          "label": "PA5"
+        },
+        {
+          "pin": "32",
+          "net": "",
+          "x": 77.081,
+          "y": 88.614,
+          "label": "PA6"
+        },
+        {
+          "pin": "33",
+          "net": "",
+          "x": 79.621,
+          "y": 88.614,
+          "label": "PA7"
+        },
+        {
+          "pin": "34",
+          "net": "",
+          "x": 82.161,
+          "y": 88.614,
+          "label": "PB0"
+        },
+        {
+          "pin": "35",
+          "net": "",
+          "x": 84.701,
+          "y": 88.614,
+          "label": "PB1"
+        },
+        {
+          "pin": "36",
+          "net": "",
+          "x": 87.241,
+          "y": 88.614,
+          "label": "PB2"
+        },
+        {
+          "pin": "37",
+          "net": "I2C2_SCL",
+          "x": 89.781,
+          "y": 88.614,
+          "label": "PB10"
+        },
+        {
+          "pin": "38",
+          "net": "+3V3_BP",
+          "x": 92.321,
+          "y": 88.614,
+          "label": "3V3"
+        },
+        {
+          "pin": "39",
+          "net": "GND",
+          "x": 94.861,
+          "y": 88.614,
+          "label": "GND"
+        },
+        {
+          "pin": "40",
+          "net": "+5V_BP",
+          "x": 97.401,
+          "y": 88.614,
+          "label": "5V"
+        }
+      ]
+    }
+  ]
+}

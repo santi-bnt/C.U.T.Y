@@ -1,0 +1,18 @@
+{
+ "fecha": "2026-11-05",
+ "revision": "medidas de piezas compradas (XL4015 54x23x18, JRBLVL 46x32x18, OVONIC 107x35x22)",
+ "piezas_impresas": 30,
+ "cuerpos_revisados": 109,
+ "interferencias_estaticas_mm3_exactas": 0.0,
+ "zonas_libres": "18/18",
+ "posturas": 34,
+ "limites": {
+  "cabeceo_gimbal": "±18°",
+  "balanceo_gimbal": "±15°",
+  "combinado": "±14° / ±10°",
+  "giro_cabeza": "±90°",
+  "brazos": "±120°"
+ },
+ "stl_hermeticos": true,
+ "cama_180": true
+}

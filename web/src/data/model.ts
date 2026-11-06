@@ -1,11 +1,11 @@
-/** Measured after applying the supplied GLB node transforms (world space). */
+﻿import nido from "./nido.generated.json";
 export const modelInfo = {
-  revision: "V17",
-  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=17-black-display`,
-  triangles: 116741,
-  meshes: 110,
-  boundsMm: [180, 365, 173.02] as const,
+  revision: "V17 Nido",
+  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=nido-rev-20261105`,
+  triangles: nido.triangles,
+  meshes: nido.meshes,
+  boundsMm: nido.boundsMm,
   millimetersPerUnit: 1,
-  displayRotationX: -Math.PI / 2,
-  screenMesh: "part_100",
+  displayRotationX: 0,
+  screenMesh: "lcd_touch_panel",
 };

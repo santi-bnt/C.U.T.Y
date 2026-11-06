@@ -12,8 +12,9 @@ import { LocaleProvider } from "./state/Locale";
 import { measureModel } from "./viewer/model";
 import { offlineRobot } from "./communication/robot";
 vi.mock("./viewer/RobotViewer", () => ({
-  default: () => <div id="explorer">3D test boundary</div>,
+  default: () => <div>3D test boundary</div>,
 }));
+vi.mock("./components/Choreography", () => ({ default: () => null }));
 afterEach(cleanup);
 describe("portfolio interactions", () => {
   it("starts in English, switches content and document language to Spanish", async () => {
@@ -70,7 +71,7 @@ describe("portfolio interactions", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Toggle navigation" }));
     expect(document.querySelector(".nav.open")).toBeTruthy();
-    fireEvent.click(screen.getByRole("link", { name: "Build log" }));
+    fireEvent.click(screen.getByRole("link", { name: "Development" }));
     expect(document.querySelector(".nav.open")).toBeNull();
   });
 });

@@ -1,0 +1,358 @@
+﻿/* Nido asset integration: opening, assembly sequence and spatial inspection. */
+.intro-sequence {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #17141f;
+  color: #f5f3fa;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 38px 5vw;
+  overflow: hidden;
+  isolation: isolate;
+}
+.intro-top,
+.intro-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.intro-bottom {
+  align-items: center;
+}
+.intro-bottom button {
+  border: 1px solid #c4b5fd70;
+  border-radius: 30px;
+  padding: 14px 24px;
+  color: #c4b5fd;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.intro-center {
+  width: 100%;
+}
+.intro-word {
+  display: flex;
+  justify-content: center;
+  font-size: clamp(70px, 21vw, 360px);
+  font-weight: 850;
+  letter-spacing: -0.075em;
+  line-height: 1;
+}
+.intro-mask {
+  overflow: hidden;
+  display: inline-block;
+}
+.intro-letter {
+  display: block;
+}
+.intro-letter i {
+  color: #8b5cf6;
+  font-style: normal;
+  font-size: 0.7em;
+}
+.intro-expansion {
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 2%;
+  font-family: monospace;
+  font-size: clamp(10px, 1.2vw, 18px);
+  letter-spacing: 0.2em;
+  color: #c4b5fd;
+}
+.intro-rule {
+  height: 2px;
+  background: #8b5cf6;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.homepage:has(.intro-sequence) .scene-layer {
+  opacity: 0 !important;
+}
+.assembly-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0;
+}
+.assembly-controls button,
+.assembly-playback button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #9e86b65e;
+  border-radius: 24px;
+  padding: 9px 14px;
+  min-height: 38px;
+  font-size: 11px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.assembly-controls button[aria-pressed="true"] {
+  color: #8b5cf6;
+  border-color: #8b5cf6;
+  background: #8b5cf61a;
+}
+.ink .assembly-controls button[aria-pressed="true"] {
+  color: #e0d4ff;
+}
+.assembly-controls button:disabled,
+.assembly-playback button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.simulation-note {
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  color: inherit;
+  opacity: 0.65;
+  max-width: 680px;
+}
+.explore-panel {
+  max-height: 65svh;
+  overflow-y: auto;
+}
+.explore-panel .simulation-note {
+  margin: 8px 0 0;
+}
+.assembly-story {
+  background: #211a2b;
+  position: relative;
+  z-index: 3;
+}
+.assembly-story .technical-heading h2 {
+  max-width: 1000px;
+}
+.assembly-stage {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: 6vw;
+  margin-top: 55px;
+}
+.assembly-image {
+  position: relative;
+  min-width: 0;
+  background: #19151e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.assembly-image > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.127;
+  object-fit: contain;
+}
+.assembly-image > .mono {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 9px;
+  color: #c4b5fd;
+}
+.assembly-caption h3 {
+  font-size: clamp(30px, 3.8vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  margin: 24px 0;
+}
+.assembly-caption > p {
+  color: #bfb1cd;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.assembly-playback {
+  display: flex;
+  gap: 9px;
+  margin: 30px 0;
+}
+.assembly-playback button {
+  min-height: 44px;
+}
+.assembly-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 28px 0 18px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: #8b5cf6 #211a2b;
+}
+.assembly-strip button {
+  flex: 0 0 136px;
+  text-align: left;
+  scroll-snap-align: start;
+  border: 1px solid #c4b5fd25;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #19151e;
+  color: #b4a7bf;
+  cursor: pointer;
+  padding: 0;
+}
+.assembly-strip button[aria-pressed="true"] {
+  border-color: #c4b5fd;
+  color: #f5f3fa;
+}
+.assembly-strip img {
+  width: 136px;
+  height: 120px;
+  object-fit: contain;
+  display: block;
+}
+.assembly-strip span {
+  display: block;
+  padding: 12px;
+  font-size: 10px;
+}
+.cad-evidence {
+  margin-top: 28px;
+  border-top: 1px solid #c4b5fd33;
+  padding: 20px 0;
+}
+.cad-evidence summary {
+  cursor: pointer;
+  font-size: 14px;
+}
+.cad-evidence > p {
+  max-width: 800px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #baacc8;
+}
+.assembly-story .engineering-downloads a {
+  color: #c4b5fd;
+  border-color: #c4b5fd33;
+}
+.engineering-viewport {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  min-height: 320px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, #c4b5fd16, transparent 72%);
+  touch-action: pan-y;
+}
+.engineering-viewport canvas {
+  display: block;
+  touch-action: none;
+}
+.engineering-viewport.wiring {
+  height: 590px;
+}
+.engineering-loading {
+  display: grid;
+  place-items: center;
+  padding: 45px;
+  min-height: 350px;
+  text-align: center;
+  font-size: 13px;
+}
+.spatial-node {
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #21192ee8;
+  border: 1px solid #c4b5fd66;
+  color: #e4d9f5;
+  font-size: 10px;
+  padding: 7px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 15px #0003;
+}
+.spatial-node.selected {
+  background: #8b5cf6;
+  color: white;
+}
+.spatial-parts {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+}
+.spatial-parts button {
+  font-size: 10px !important;
+  min-height: 32px !important;
+  padding: 7px 10px !important;
+  border: 1px solid #c4b5fd40 !important;
+  border-radius: 20px !important;
+  color: #d0c0e0;
+  gap: 7px;
+}
+.spatial-parts button[aria-pressed="true"] {
+  background: #8b5cf644;
+}
+.pcb-reference-3d .simulation-note {
+  padding: 0 12px 14px;
+}
+.wiring-diagram-panel > .simulation-note {
+  padding: 0 14px;
+}
+@media (max-width: 900px) {
+  .intro-sequence {
+    padding: 28px 22px;
+  }
+  .intro-top,
+  .intro-bottom {
+    font-size: 9px;
+  }
+  .intro-bottom > span {
+    max-width: 150px;
+    line-height: 1.8;
+  }
+  .assembly-stage {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 30px;
+  }
+  .assembly-caption h3 {
+    font-size: 38px;
+  }
+  .assembly-caption > p {
+    font-size: 13px;
+  }
+  .assembly-image > .mono {
+    font-size: 8px;
+    left: 12px;
+    bottom: 12px;
+  }
+  .engineering-viewport {
+    height: 400px;
+  }
+  .engineering-viewport.wiring {
+    height: 480px;
+  }
+  .spatial-node {
+    font-size: 8px;
+    max-width: 130px;
+    padding: 6px 8px;
+  }
+  .intro-word {
+    font-size: 22vw;
+  }
+  .explore-panel .assembly-controls {
+    gap: 5px;
+  }
+  .explore-panel .assembly-controls button {
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-sequence {
+    display: none;
+  }
+}
+.wire-edge.confirmed path {
+  stroke-dasharray: none;
+}

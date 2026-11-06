@@ -1,5 +1,7 @@
-import {
+﻿import {
+  Box3,
   Float32BufferAttribute,
+  Group,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -7,57 +9,77 @@ import {
   type Object3D,
   type Texture,
 } from "three";
-import { modelInfo } from "../data/model";
+import nido from "../data/nido.generated.json";
 import { measureModel } from "./model";
-
-/** Map only the measured front glass triangles. The supplied GLB has no UVs. */
+const names = new Set(nido.parts.map((p) => p.name));
+/** Decode quantized attributes before baking transforms; cached loader geometry stays untouched. */
+export function worldGeometry(mesh: Mesh) {
+  const geometry = mesh.geometry.clone();
+  for (const name of ["position", "normal"]) {
+    const a = geometry.getAttribute(name);
+    if (!a) continue;
+    const values = new Float32Array(a.count * 3);
+    for (let i = 0; i < a.count; i++) {
+      values[i * 3] = a.getX(i);
+      values[i * 3 + 1] = a.getY(i);
+      values[i * 3 + 2] = a.getZ(i);
+    }
+    geometry.setAttribute(name, new Float32BufferAttribute(values, 3));
+  }
+  return geometry.applyMatrix4(mesh.matrixWorld);
+}
+export function partName(object: Object3D) {
+  let current: Object3D | null = object;
+  while (current) {
+    if (names.has(current.name)) return current.name;
+    current = current.parent;
+  }
+  return object.name;
+}
+/** Existing LCD glass, front +Z in the supplied Y-up Nido model; no floating face plane. */
 export function displayGeometry(source: BufferGeometry) {
   const geometry = source.clone();
   geometry.computeBoundingBox();
   const box = geometry.boundingBox!;
-  const position = geometry.attributes.position;
+  const p = geometry.attributes.position;
   const index = geometry.index;
-  const count = index?.count ?? position.count;
-  const height = box.max.z - box.min.z;
-  const width = Math.min(box.max.x - box.min.x, height * 1.5);
-  const centerX = (box.max.x + box.min.x) / 2;
-  const uv = new Float32Array(position.count * 2);
-  for (let vertex = 0; vertex < position.count; vertex++) {
-    uv[vertex * 2] = (position.getX(vertex) - centerX) / width + 0.5;
-    uv[vertex * 2 + 1] = (position.getZ(vertex) - box.min.z) / height;
+  const count = index?.count ?? p.count;
+  const height = box.max.y - box.min.y,
+    width = Math.min(box.max.x - box.min.x, height * 1.5),
+    center = (box.max.x + box.min.x) / 2;
+  const uv = new Float32Array(p.count * 2);
+  for (let i = 0; i < p.count; i++) {
+    uv[i * 2] = (p.getX(i) - center) / width + 0.5;
+    uv[i * 2 + 1] = (p.getY(i) - box.min.y) / height;
   }
   geometry.setAttribute("uv", new Float32BufferAttribute(uv, 2));
   geometry.clearGroups();
-  let groupStart = 0;
-  let previousMaterial = -1;
-  for (let triangle = 0; triangle < count; triangle += 3) {
-    const front = [0, 1, 2].every(
-      (offset) =>
-        Math.abs(
-          position.getY(
-            index ? index.getX(triangle + offset) : triangle + offset,
-          ) - box.min.y,
-        ) < 0.001,
-    );
-    const material = front ? 1 : 0;
-    if (material !== previousMaterial) {
-      if (previousMaterial !== -1)
-        geometry.addGroup(groupStart, triangle - groupStart, previousMaterial);
-      groupStart = triangle;
-      previousMaterial = material;
+  let start = 0,
+    previous = -1;
+  for (let t = 0; t < count; t += 3) {
+    const material = [0, 1, 2].every(
+      (o) =>
+        Math.abs(p.getZ(index ? index.getX(t + o) : t + o) - box.max.z) < 0.02,
+    )
+      ? 1
+      : 0;
+    if (material !== previous) {
+      if (previous !== -1) geometry.addGroup(start, t - start, previous);
+      start = t;
+      previous = material;
     }
   }
-  geometry.addGroup(groupStart, count - groupStart, previousMaterial);
+  geometry.addGroup(start, count - start, previous);
   return geometry;
 }
-
 export function prepareRobot(
   source: Object3D,
   faceTexture: Texture,
   wireframe: boolean,
+  inspect = false,
 ) {
-  const object = source.clone(true);
-  object.rotateX(modelInfo.displayRotationX);
+  source.updateMatrixWorld(true);
+  const object = new Group();
   const body = new MeshStandardMaterial({
     color: "#101114",
     roughness: 0.52,
@@ -65,25 +87,36 @@ export function prepareRobot(
     wireframe,
   });
   const screen = new MeshBasicMaterial({ map: faceTexture, toneMapped: false });
+  const materials = [body, screen];
   const geometries: BufferGeometry[] = [];
-  let foundDisplay = false;
-  object.traverse((child) => {
+  source.traverse((child) => {
     if (!(child instanceof Mesh)) return;
-    child.castShadow = true;
-    child.receiveShadow = true;
-    if (child.name === modelInfo.screenMesh) {
-      foundDisplay = true;
-      child.geometry = displayGeometry(child.geometry);
-      geometries.push(child.geometry);
-      child.material = [body, screen];
-    } else child.material = body;
+    const name = partName(child);
+    let geometry = worldGeometry(child);
+    let material: Mesh["material"] = body;
+    if (name === "lcd_touch_panel") {
+      const display = displayGeometry(geometry);
+      geometry.dispose();
+      geometry = display;
+      material = [body, screen];
+    } else if (inspect && !/^[BSAGKH][0-9]_/.test(name)) {
+      const authored = (
+        Array.isArray(child.material) ? child.material[0] : child.material
+      ).clone() as MeshStandardMaterial;
+      authored.wireframe = wireframe;
+      materials.push(authored);
+      material = authored;
+    }
+    const mesh = new Mesh(geometry, material);
+    mesh.name = name;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    object.add(mesh);
+    geometries.push(geometry);
   });
-  if (!foundDisplay)
-    throw new Error("The expected V17 LCD glass mesh is missing");
-  return {
-    object,
-    measurement: measureModel(object),
-    materials: [body, screen],
-    geometries,
-  };
+  if (!object.getObjectByName("lcd_touch_panel"))
+    throw new Error("Nido LCD mesh missing");
+  return { object, measurement: measureModel(object), materials, geometries };
 }
+export const meshBounds = (object: Object3D) =>
+  new Box3().setFromObject(object);

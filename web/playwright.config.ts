@@ -18,6 +18,14 @@ export default defineConfig({
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 1000 } } },
     {
+      name: "tablet",
+      use: {
+        viewport: { width: 820, height: 1180 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
       name: "mobile",
       use: {
         ...devices["iPhone 13"],

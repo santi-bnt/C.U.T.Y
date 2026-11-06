@@ -1,209 +1,270 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
+﻿import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, ContactShadows } from "@react-three/drei";
-import { Group, Vector3 } from "three";
-import type { StoryMotion } from "./storyMotion";
+import {
+  OrbitControls,
+  useGLTF,
+  Environment,
+  Lightformer,
+  ContactShadows,
+} from "@react-three/drei";
+import { Group, PerspectiveCamera, Vector3 } from "three";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import { cameraViews, type CameraView } from "./model";
+import type { StoryMotion } from "./storyMotion";
+import { emptyShot, resolveShot } from "./choreography";
 import { modelInfo } from "../data/model";
 import { prepareRobot } from "./robot";
+import { batchStaticAssembly } from "./batchAssembly";
 import { useFaceTexture } from "./useFaceTexture";
 import { useMedia } from "../state/useMedia";
+import { updateAssembly, type AssemblyView, type PoseDemo } from "./assembly";
 
 function Robot({
   wireframe,
-  onLoaded,
+  assemblyView,
+  pose,
   reduced,
-  active,
 }: {
   wireframe: boolean;
-  onLoaded: () => void;
+  assemblyView: AssemblyView;
+  pose: PoseDemo;
   reduced: boolean;
-  active: boolean;
 }) {
-  const root = useRef<Group>(null);
-  const { invalidate } = useThree();
-  useEffect(() => {
-    if (reduced || !active) return;
-    const timer = window.setInterval(invalidate, 1000 / 30);
-    return () => window.clearInterval(timer);
-  }, [reduced, active, invalidate]);
-  useFrame(({ clock }) => {
-    if (reduced || !active || !root.current) return;
-    root.current.position.y = 1.53 + Math.sin(clock.elapsedTime * 0.8) * 0.018;
-  });
   const { scene } = useGLTF(modelInfo.url);
-  const faceTexture = useFaceTexture();
-  const { object, measurement, materials, geometries } = useMemo(
-    () => prepareRobot(scene, faceTexture, wireframe),
-    [scene, faceTexture, wireframe],
+  const face = useFaceTexture();
+  const root = useRef<Group>(null);
+  const prepared = useMemo(
+    () => prepareRobot(scene, face, wireframe, assemblyView !== "assembled"),
+    [scene, face, wireframe, assemblyView],
   );
+  const batched = useMemo(
+    () => batchStaticAssembly(prepared.object),
+    [prepared],
+  );
+  const invalidate = useThree((state) => state.invalidate);
+  const start = useRef<number | null>(null);
+  useFrame(({ clock }) => {
+    if (start.current === null) start.current = clock.elapsedTime;
+    updateAssembly(
+      prepared.object,
+      assemblyView,
+      reduced ? "none" : pose,
+      clock.elapsedTime - start.current,
+    );
+    if (pose !== "none" && !reduced) invalidate();
+  });
   useEffect(() => {
-    onLoaded();
-  }, [onLoaded]);
+    updateAssembly(prepared.object, assemblyView, "none", 0);
+    invalidate();
+  }, [prepared, assemblyView, pose, invalidate]);
   useEffect(
     () => () => {
-      materials.forEach((material) => material.dispose());
-      geometries.forEach((geometry) => geometry.dispose());
+      prepared.materials.forEach((material) => material.dispose());
+      prepared.geometries.forEach((geometry) => geometry.dispose());
+      batched.geometries.forEach((geometry) => geometry.dispose());
     },
-    [materials, geometries],
+    [prepared, batched],
   );
   return (
-    <group ref={root} position={[0, 1.53, 0]} scale={measurement.scale}>
+    <group
+      ref={root}
+      position={[0, 1.53, 0]}
+      scale={prepared.measurement.scale}
+    >
       <primitive
-        object={object}
-        position={measurement.center.clone().negate()}
+        object={
+          assemblyView === "assembled" && pose === "none"
+            ? batched.object
+            : prepared.object
+        }
+        position={prepared.measurement.center.clone().negate()}
       />
     </group>
   );
 }
-function Rig({
+
+interface SceneProps {
+  assemblyView: AssemblyView;
+  pose: PoseDemo;
+  view: CameraView;
+  reset: number;
+  zoom: number;
+  autoRotate: boolean;
+  wireframe: boolean;
+  reduced: boolean;
+  active: boolean;
+  exploring: boolean;
+  motion: StoryMotion;
+  onLoaded: () => void;
+}
+function Director({
   view,
   reset,
   zoom,
   autoRotate,
   reduced,
+  exploring,
   motion,
-  onManual,
-}: {
-  view: CameraView;
-  reset: number;
-  zoom: number;
-  autoRotate: boolean;
-  reduced: boolean;
-  motion?: StoryMotion;
-  onManual: () => void;
-}) {
+  compact,
+  assemblyView,
+}: SceneProps & { compact: boolean }) {
   const controls = useRef<OrbitControlsType>(null);
   const destination = useRef<Vector3 | null>(null);
-  const viewTarget = useMemo(() => new Vector3(), []);
-  const storyGoal = useMemo(() => new Vector3(), []);
-  const { camera, invalidate } = useThree();
-  useEffect(() => motion?.subscribe(invalidate), [motion, invalidate]);
+  const goal = useMemo(() => new Vector3(), []);
+  const target = useMemo(() => new Vector3(), []);
+  const shot = useMemo(() => emptyShot(), []);
+  const { camera, invalidate, size, gl } = useThree();
+  useEffect(() => motion.subscribe(invalidate), [motion, invalidate]);
   useEffect(() => {
-    const target = viewTarget.set(0, view === "display" ? 2.2 : 1.5, 0);
+    if (!exploring) return;
+    target.set(0, view === "display" ? 2.36 : 1.5, 0);
     destination.current = new Vector3(...cameraViews[view])
       .sub(target)
-      .multiplyScalar(Math.pow(0.85, zoom))
-      .clampLength(view === "display" ? 2.5 : 4, 10.8)
+      .multiplyScalar(
+        Math.pow(0.85, zoom) * (assemblyView === "exploded" ? 1.25 : 1.05),
+      )
+      .clampLength(view === "display" ? 2.2 : 3.6, 12)
       .add(target);
-    if (reduced) {
-      camera.position.copy(destination.current);
-      controls.current?.target.copy(target);
-      controls.current?.update();
-      destination.current = null;
-    }
+    if (compact && view !== "display")
+      destination.current.sub(target).multiplyScalar(1.3).add(target);
     invalidate();
-  }, [view, reset, zoom, reduced, camera, invalidate, viewTarget]);
+  }, [view, reset, zoom, exploring, target, compact, invalidate, assemblyView]);
   useFrame((_, delta) => {
-    if (motion?.following && !reduced && controls.current) {
-      const p = motion.progress;
-      // Whole-assembly orbit only; no invented joints or component anchors.
-      const angle = 0.22 + p * 1.18;
-      const distance = 6.2 - Math.sin(p * Math.PI) * 0.4;
-      const goal = storyGoal.set(
-        Math.sin(angle) * distance,
-        2.3 + p * 0.5,
-        Math.cos(angle) * distance,
+    if (!(camera instanceof PerspectiveCamera)) return;
+    const damping = reduced ? 1 : 1 - Math.exp(-Math.min(delta, 0.05) * 8);
+    if (!exploring) {
+      resolveShot(motion.progress, compact, reduced, shot);
+      const azimuth =
+        shot.azimuth + (reduced || compact ? 0 : motion.pointer.x * 0.025);
+      const elevation =
+        shot.elevation + (reduced || compact ? 0 : motion.pointer.y * 0.009);
+      goal.set(
+        Math.sin(azimuth) * Math.cos(elevation) * shot.distance,
+        shot.targetY + Math.sin(elevation) * shot.distance,
+        Math.cos(azimuth) * Math.cos(elevation) * shot.distance,
       );
-      camera.position.lerp(goal, 1 - Math.exp(-delta * 5));
-      controls.current.target.set(0, 1.5, 0);
-      controls.current.autoRotate = false;
-      controls.current.update();
-      destination.current = null;
-      if (camera.position.distanceTo(goal) > 0.003) invalidate();
+      camera.position.lerp(goal, damping);
+      target.set(0, shot.targetY, 0);
+      camera.lookAt(target);
+      camera.setViewOffset(
+        size.width,
+        size.height,
+        (-shot.x * size.width) / 2,
+        (shot.y * size.height) / 2,
+        size.width,
+        size.height,
+      );
+      gl.domElement.setAttribute(
+        "data-shot",
+        String(Math.round(motion.progress)),
+      );
+      gl.domElement.setAttribute(
+        "data-camera",
+        camera.position
+          .toArray()
+          .map((n) => n.toFixed(3))
+          .join(","),
+      );
+      if (camera.position.distanceTo(goal) > 0.002) invalidate();
       return;
     }
-    if (controls.current)
+    camera.setViewOffset(
+      size.width,
+      size.height,
+      0,
+      size.height * (compact ? 0.12 : 0.08),
+      size.width,
+      size.height,
+    );
+    if (controls.current) {
       controls.current.autoRotate = autoRotate && !destination.current;
-    if (!destination.current) return;
-    camera.position.lerp(destination.current, 1 - Math.exp(-delta * 7));
-    controls.current?.target.lerp(viewTarget, 1 - Math.exp(-delta * 7));
-    controls.current?.update();
-    if (camera.position.distanceTo(destination.current) < 0.005)
-      destination.current = null;
-    invalidate();
-  });
+      if (destination.current) {
+        camera.position.lerp(destination.current, damping);
+        controls.current.target.lerp(target, damping);
+        controls.current.update();
+        if (camera.position.distanceTo(destination.current) < 0.002)
+          destination.current = null;
+        invalidate();
+      }
+    }
+  }, -1);
   return (
     <OrbitControls
       ref={controls}
-      target={[0, 1.5, 0]}
-      autoRotate={autoRotate}
-      autoRotateSpeed={0.6}
+      enabled={exploring}
       enablePan={false}
-      minDistance={2.5}
-      maxDistance={11}
-      maxPolarAngle={Math.PI * 0.92}
       enableDamping={!reduced}
+      target={[0, 1.5, 0]}
+      minDistance={2.2}
+      maxDistance={12}
+      maxPolarAngle={Math.PI * 0.92}
+      autoRotate={autoRotate && exploring}
+      autoRotateSpeed={0.5}
       onStart={() => {
-        onManual();
         destination.current = null;
       }}
     />
   );
 }
-export default function Scene({
-  view,
-  reset,
-  zoom,
-  autoRotate,
-  wireframe,
-  reduced,
-  active,
-  onLoaded,
-  motion,
-  onManual,
-}: {
-  view: CameraView;
-  reset: number;
-  zoom: number;
-  autoRotate: boolean;
-  wireframe: boolean;
-  reduced: boolean;
-  active: boolean;
-  onLoaded: () => void;
-  motion?: StoryMotion;
-  onManual: () => void;
-}) {
+function Loaded({ onLoaded }: { onLoaded: () => void }) {
+  useEffect(onLoaded, [onLoaded]);
+  return null;
+}
+export default function Scene(props: SceneProps) {
   const compact = useMedia("(max-width: 900px)");
   return (
     <Canvas
-      frameloop={active ? "demand" : "never"}
-      dpr={[1, 1.5]}
-      camera={{ position: [4, 3.2, 6], fov: 35, near: 0.1, far: 50 }}
-      gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+      frameloop={props.active ? "demand" : "never"}
+      dpr={compact ? 1 : [1, 1.5]}
+      camera={{ position: [1, 1.9, 5.8], fov: 35, near: 0.1, far: 60 }}
+      gl={{ antialias: !compact, alpha: true, powerPreference: "low-power" }}
     >
-      <ambientLight intensity={1.2} />
-      <directionalLight position={[4, 7, 5]} intensity={3.5} color="#f5faff" />
-      <directionalLight position={[-4, 3, -4]} intensity={5} color="#c4b5fd" />
-      <directionalLight position={[2, 1, -5]} intensity={1.5} color="#b5a2ff" />
+      <ambientLight intensity={0.65} />
+      <directionalLight position={[3, 7, 5]} intensity={2.8} color="#fff7f1" />
+      <directionalLight position={[-5, 2, 3]} intensity={1.1} color="#f5f3fa" />
+      <directionalLight position={[4, 4, -4]} intensity={2.2} color="#b89af4" />
+      <Environment resolution={128} frames={1}>
+        <Lightformer
+          position={[-4, 4, 3]}
+          rotation-y={Math.PI / 4}
+          scale={[4, 7, 1]}
+          intensity={2.4}
+          color="#ffffff"
+        />
+        <Lightformer
+          position={[5, 2, 1]}
+          rotation-y={-Math.PI / 3}
+          scale={[3, 6, 1]}
+          intensity={1.7}
+          color="#d7c8ef"
+        />
+        <Lightformer
+          position={[0, 6, -2]}
+          rotation-x={Math.PI / 2}
+          scale={[7, 4, 1]}
+          intensity={2.2}
+        />
+      </Environment>
       <Suspense fallback={null}>
         <Robot
-          wireframe={wireframe}
-          onLoaded={onLoaded}
-          reduced={reduced || compact}
-          active={active}
+          wireframe={props.wireframe}
+          assemblyView={props.assemblyView}
+          pose={props.pose}
+          reduced={props.reduced}
         />
+        <Loaded onLoaded={props.onLoaded} />
         <ContactShadows
-          position={[0, 0, 0]}
-          scale={10}
-          opacity={0.5}
-          blur={2.8}
-          far={5}
-          resolution={256}
+          position={[0, 0.01, 0]}
+          scale={7}
+          opacity={0.3}
+          blur={3.5}
+          far={4}
+          resolution={compact ? 128 : 256}
           frames={1}
-          color="#050a12"
+          color="#17141f"
         />
       </Suspense>
-      <Rig
-        view={view}
-        reset={reset}
-        zoom={zoom}
-        autoRotate={autoRotate && active}
-        reduced={reduced}
-        motion={motion}
-        onManual={onManual}
-      />
+      <Director {...props} compact={compact} />
     </Canvas>
   );
 }

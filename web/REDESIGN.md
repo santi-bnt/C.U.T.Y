@@ -1,67 +1,36 @@
-# Cinematic C.U.T.Y. redesign
+﻿# Continuous product experience — change map
 
-## Audit before implementation — 2026-11-05
+The current implementation follows [EXPERIENCE_PLAN.md](EXPERIENCE_PLAN.md), written after repository/reference inspection and before implementation. It replaces the earlier intro-only camera transition with a single persistent scene across the homepage. [README.md](README.md) documents execution, deployment, source assets, file responsibilities and electrical limitations.
 
-The repository is divided into Raspberry/Python voice, vision, face and touchscreen code; future STM32 firmware; CAD and KiCad hardware; documentation; and this independent web application. The redesign changes only `web/`.
+## Modified
 
-| Area | Existing implementation | Treatment |
-| --- | --- | --- |
-| Frontend | React 19, TypeScript, Vite, CSS, R3F/Drei/Three, Lucide | Reused; one GSAP dependency added |
-| Navigation | Single page with hash anchors, EN/ES context, mobile menu | Existing destinations preserved |
-| Authentication / database | No auth SDK, database client or implemented integration | No new integration |
-| API / dashboard | No backend endpoints; dashboard and digital-twin directories contain planning notes | Honest offline Live chapter |
-| Deployment | Relative Vite base; static Vercel/Netlify/Pages instructions, no checked-in deployment service configuration | Build/output settings retained |
-| Identity | Two-eye mark, black V17 body, original green-eye/pink-mouth display; dark/cyan interface | Mark/model/face retained; surrounding UI moves to purple/lavender |
-| Assets | Actual V17 GLB, four original face atlases, favicon; no authored robot rig/clips | Asset bytes unchanged |
-| Working interactions | Camera presets, orbit, zoom, wireframe, autorotation, face simulation, hardware/capability/architecture selection | Preserved and extended |
+- `src/App.tsx`, `src/cinematic.css`: narrative composition, seven-section navigation, typographic hierarchy, technical disclosures and responsive layouts.
+- `src/viewer/RobotViewer.tsx`, `Scene.tsx`, `robot.ts`, `storyMotion.ts`: persistent scene, camera ownership, original LCD, local studio lighting, material normals, rendering limits and animation channel.
+- `src/App.test.tsx`, `src/test-setup.ts`, `src/viewer/model-asset.test.ts`: preserved interactions, DOM observers and actual V17 geometry/source integrity checks.
+- `e2e/portfolio.spec.ts`, `playwright.config.ts`: desktop/tablet/mobile browser interactions, screenshots and fallback validation.
+- `README.md`, `REDESIGN.md`, `VERIFICATION.md`: current documentation.
 
-Claims remain grounded in `src/data/project.ts` and its repository evidence links. Gemini/OpenAI adapters, local voice activity detection, web search, OpenCV/YuNet tracking, face rendering and touchscreen behavior exist in Python. Basic Pi voice/audio checks are documented; sustained reliability and full physical tracking need validation. STM32 UART/PWM/safety are future work. Carrier V1.1 is a 100 × 92 mm two-layer KiCad design awaiting fabrication and electrical validation. The website does not turn these plans into completed features.
+## Added
 
-## Reference study
+- `src/components/Choreography.tsx`: measured GSAP master timeline and editorial reveals.
+- `src/viewer/choreography.ts`, `choreography.test.ts`: pure responsive camera resolver and tests.
+- `src/viewer/batchAssembly.ts`: owned static presentation batching; original V17 GLB untouched.
+- `src/components/PcbDesign.tsx`, `WiringConnections.tsx`, `Engineering.test.tsx`: source-backed PCB and wiring interaction.
+- `src/data/carrier.generated.json`, `engineering.ts`, `engineering.test.ts`, `boardFunctions.ts`: native component/pad export, typed bilingual connection data and integrity tests.
+- `scripts/export-engineering.py`: deterministic source export and pin/net parity verification.
+- `public/engineering/`: actual source downloads and board previews; see generated asset manifest for hashes.
+- `EXPERIENCE_PLAN.md`: audit, references, visual specification and validation gates.
 
-[Lando Norris’s website](https://landonorris.com/) was inspected in desktop and mobile viewports, including its loaded hero and scrolled content. Observed principles: a dominant interactive subject, oversize editorial type, sparse navigation, strong background/scale changes, and mobile controls that explicitly invite interaction. The reference uses Mona Sans, serif display typography, a lime/olive palette, portrait imagery and racing-specific content.
+## Removed
 
-C.U.T.Y. uses its own robot, local system sans/Georgia typography, two-eye branding and purple palette. No reference assets, fonts, shaders or implementation code were copied. Screenshots used for study remain ignored local QA artifacts.
+`src/components/StoryIntro.tsx` and `LivePreview.tsx`: superseded by the master choreography and homepage Live section. Existing face/architecture components and future communication contracts remain intact.
 
-## Narrative and design system
+No firmware, Raspberry configuration, GPIO assignment, robot service, authentication, database, dependency manifest or Vercel/domain configuration changed. No copied reference-project code/assets. No production deployment.
 
-1. **Meet C.U.T.Y.** — giant wordmark and real, black V17 assembly, original face on the actual LCD mesh.
-2. **Meet Your Companion** — desktop sticky transition changes copy and camera angle; voice, vision and planned motion have distinct wording.
-3. **Inside C.U.T.Y.** — light hardware browser, interactive architecture and specifications with source links.
-4. **Expressions & Personality** — existing capability selectors and shared original face demo.
-5. **C.U.T.Y. Live** — explicitly disconnected display link, demo navigation and renderer source link. No fabricated telemetry.
-6. **Development Journey** — implemented, in-validation and planned milestones; project motivation and repository links.
+## Nido integration additions
 
-Tokens in `src/cinematic.css`: purple `#8B5CF6`, deep `#17141F`, paper `#F5F3FA`, lavender `#C4B5FD`. Green eyes remain part of the original face/mark identity. Serif italics provide a softer counterpoint to large sans headings. Engineering selectors retain their existing reusable markup and behavior, styled through the presentation layer.
+The later user-supplied archives enabled the previously missing mechanical PCB view. See NIDO_INTEGRATION.md for source differences and README.md for current execution/asset specifications. Earlier no-PCB-model and anonymous-V17 observations describe the pre-import audit, not the current application.
 
-## Motion and interaction ownership
+Added: `IntroSequence.tsx`, `AssemblyStory.tsx`, `EngineeringViewport.tsx`, `EngineeringScene.tsx`, `viewer/assembly.ts`, `data/operationalWiring.ts` and its tests, `nido.generated.json`, `nido.css`, `scripts/import-nido.py`, `scripts/export-nido.mjs`, `public/assembly/`, `public/models/carrier-assembly.glb`, and `public/engineering/hardware-connections.md`.
 
-`StoryIntro` owns a scoped GSAP matchMedia/timeline with cleanup. ScrollTrigger updates an imperative `StoryMotion` channel; it does not rerender the React tree every scroll frame. The R3F camera reads this channel and interpolates toward its destination. Native scrolling is preserved; there is no smooth-scroll hijack.
-
-Orbit, zoom, presets and autorotation give the user manual camera ownership. A labeled control resumes scroll framing. The LCD preset uses the verified front-facing display location, not invented component hotspots. No individual arms or joints are animated.
-
-Above 900 CSS pixels, the first two chapters share a sticky canvas. On narrower devices the robot comes before the longer copy, with all chapters in document flow. Reduced motion removes the sticky storytelling, idle movement and autorotation; both narrative chapters remain readable. The existing explicit camera controls still work. The page uses one lazy canvas, DPR capped at 1.5, low-power WebGL preference, offscreen/tab visibility pausing and small shadow maps. Mobile idle movement is disabled. The desktop idle invalidation timer is capped at 30 Hz; user-driven camera transitions can render more frequently. This is a rendering policy, not a measured device FPS claim.
-
-## Future face stream boundary
-
-`communication/faceFrames.ts` defines `FaceFrame` (decoded pixels and crop rectangle), `FaceFrameSource` (mode and subscription), atlas cropping and a shared 480 × 320 canvas sink. `state/FaceFrames.tsx` can inject a source around the app. `viewer/useFaceTexture.ts` subscribes to a supplied live source with cleanup, or draws the original offline atlas frames when none is provided.
-
-A later transport adapter must own WebSocket connection/reconnection, decoding, frame pacing and ImageBitmap disposal. It can feed this interface without coupling display pixels to a database or to `RobotTransport` telemetry. No such transport, endpoint, remote control or live connection is implemented here. The face lab remains a local simulation; integrating it with future live frames is a separate UI decision. The current Live panel always describes the actual offline release.
-
-## Scope and verification
-
-File inventory (paths relative to `web/`):
-
-| Change | Files |
-| --- | --- |
-| Added presentation | `src/components/StoryIntro.tsx`, `src/components/LivePreview.tsx`, `src/cinematic.css` |
-| Added boundaries | `src/viewer/storyMotion.ts`, `src/communication/faceFrames.ts`, `src/state/FaceFrames.tsx` |
-| Added test/docs | `src/communication/faceFrames.test.ts`, `REDESIGN.md` |
-| Updated composition/style entry | `src/App.tsx`, `src/main.tsx`, `index.html` |
-| Updated existing viewer | `src/viewer/RobotViewer.tsx`, `src/viewer/Scene.tsx`, `src/viewer/model.ts`, `src/viewer/useFaceTexture.ts` |
-| Updated dependencies/checks | `package.json`, `package-lock.json`, `eslint.config.js`, `e2e/portfolio.spec.ts` |
-| Updated documentation | `README.md`, `VERIFICATION.md` |
-
-Unchanged: model/face asset bytes, technical evidence data, Python application, firmware, GPIO, touchscreen services and all existing anchor destinations. English remains the initial language. Static deployment still uses root `web`, build `npm run build`, output `dist`, without API keys.
-
-See [VERIFICATION.md](VERIFICATION.md) for executed checks and platform limitations, and [README.md](README.md) for local execution and deployment.
+Updated: `public/models/cuty.glb`, `data/model.ts`, `viewer/robot.ts`, `Scene.tsx`, `RobotViewer.tsx`, PCB/wiring UI, `main.tsx`, App composition and geometry/browser tests. The source GLB in hardware is unchanged. No production deployment.
