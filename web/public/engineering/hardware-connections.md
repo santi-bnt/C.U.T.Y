@@ -24,19 +24,19 @@ DC and RESET use the modified working assignments. Backlight and final overlay r
 
 | Function  | BCM | Physical pin |
 | --------- | --- | ------------ |
-| 5 V       | —   | 2            |
-| 3.3 V     | —   | 17           |
-| GND       | —   | 39           |
+| 3.3 V     | —   | 1            |
 | I2C SDA   | 2   | 3            |
+| 5 V       | —   | 4            |
 | I2C SCL   | 3   | 5            |
+| GND       | —   | 6            |
 | MCLK      | 4   | 7            |
 | I2S BCLK  | 18  | 12           |
 | I2S LRCLK | 19  | 35           |
+| AUD_RST   | 26  | 37           |
 | I2S DIN   | 20  | 38           |
 | I2S DOUT  | 21  | 40           |
-| AUD_RST   | 26  | 37           |
 
-This is the user's latest explicit ReSpeaker table, superseding the earlier alternative power/ground pins. MCLK is physical 7 / BCM4 and AUD_RST is physical 37 / BCM26. BCM10/11 belong to display SPI: do not use ReSpeaker RGB LEDs. BCM17 belongs to display Touch IRQ: do not use the ReSpeaker button. BCM18 is I2S BCLK: do not use it for backlight. Preserve the working GPIO and overlay configuration.
+Exactly 11 connected pins, following the user's final table: physical 1, 3, 4, 5, 6, 7, 12, 35, 37, 38 and 40. This supersedes the earlier physical 2/17/39 power/ground selection. MCLK is physical 7 / BCM4 and AUD_RST is physical 37 / BCM26. BCM10/11 belong to display SPI: do not use ReSpeaker RGB LEDs. BCM17 belongs to display Touch IRQ: do not use the ReSpeaker button. BCM18 is I2S BCLK: do not use it for backlight. Preserve the working GPIO and overlay configuration.
 
 ## Camera
 

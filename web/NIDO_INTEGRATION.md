@@ -1,4 +1,4 @@
-﻿# Nido asset integration plan — 2026-11-06
+# Nido asset integration plan — 2026-11-06
 
 User authorized use of all three provided ZIP archives, followed by requests for a pre-reveal C.U.T.Y. typographic intro and 3D wiring simulation.
 
@@ -32,6 +32,6 @@ The recovered earlier GLB/HTML provided naming and interaction references, while
 
 A 45-solid PCB mechanical subset is exported from the revised CAD. Its components are simplified source solids, not an electrically validated KiCad 3D export. Four fuse pad coordinates differ from current native PCB coordinates by 3.4 mm Y. Native PCB tables remain authoritative for the CAD view.
 
-The user later supplied an explicit operational hookup table. It supersedes inference about which connections are tested: Waveshare and ReSpeaker are builder-confirmed, while STM32 UART/PWM pin assignments, power distribution and final PCB remain pending. `operationalWiring.ts` drives the wiring simulation/tables; `engineering.ts` retains distinct native CAD proposals. A subsequent explicit ReSpeaker table adds MCLK physical7 / BCM4 and AUD_RST physical37 / BCM26, and fixes power/ground to physical2/17/39. The current operational data follows that latest 11-row table.
+The user later supplied an explicit operational hookup table. It supersedes inference about which connections are tested: Waveshare and ReSpeaker are builder-confirmed, while STM32 UART/PWM pin assignments, power distribution and final PCB remain pending. `operationalWiring.ts` drives the wiring simulation/tables; `engineering.ts` retains distinct native CAD proposals. A subsequent explicit ReSpeaker table adds MCLK physical7 / BCM4 and AUD_RST physical37 / BCM26, and fixes power/ground to physical1/4/6. The current operational data follows that latest 11-row table.
 
 Intro uses a roughly three-second DOM typographic sequence with Skip, reduced-motion bypass and deep-link bypass. Manual exploration adds inside/exploded views and rigid-part motion simulations. 3D wiring uses actual CAD interior solids and schematic curves; no physical cable routes or pin coordinates are asserted. Separate technical viewers are lazy and demand-rendered. No backend, motor commands or production deployment.

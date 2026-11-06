@@ -1,4 +1,4 @@
-﻿# C.U.T.Y. — cinematic engineering portfolio
+# C.U.T.Y. — cinematic engineering portfolio
 
 Frontend-only React / TypeScript / Vite app using React Three Fiber, Drei, Three.js and GSAP. No backend, authentication, database, AI requests or live robot connection is added. Robot source, GPIO, overlays, services and domain configuration are untouched.
 
@@ -38,7 +38,7 @@ Wiring defaults to an interactive 3D interior with selected components and color
 
 ## Which connections are confirmed
 
-`src/data/operationalWiring.ts` and `public/engineering/hardware-connections.md` record the builder's supplied table. Display and ReSpeaker operation together is confirmed. Display DC is BCM24 / physical18; RESET is BCM25 / physical22; touch IRQ is BCM17 / physical11. The latest explicit ReSpeaker table uses 5 V physical2, 3.3 V physical17, GND physical39, I2C physical3/5, MCLK physical7 / BCM4, I2S physical12/35/38/40 and AUD_RST physical37 / BCM26. These 11 rows supersede the earlier audio hookup list.
+`src/data/operationalWiring.ts` and `public/engineering/hardware-connections.md` record the builder's supplied table. Display and ReSpeaker operation together is confirmed. Display DC is BCM24 / physical18; RESET is BCM25 / physical22; touch IRQ is BCM17 / physical11. The latest explicit ReSpeaker table uses 5 V physical4, 3.3 V physical1, GND physical6, I2C physical3/5, MCLK physical7 / BCM4, I2S physical12/35/38/40 and AUD_RST physical37 / BCM26. These 11 rows supersede the earlier audio hookup list.
 
 UART is proposed at Pi physical8/10; final STM32 RX/TX and all five PWM pins remain unassigned. Backlight/overlay, exact buck current rating, protection/fuses/distribution, battery-to-Pi regulator and final PCB connectors remain pending. These are independent of the confirmed audio/display test. Preserve the working GPIO configuration.
 

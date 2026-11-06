@@ -16,17 +16,17 @@ describe("user-confirmed wiring and revised assets", () => {
     expect(audio).toHaveLength(11);
     expect(audio.every((r) => r.status === "confirmed")).toBe(true);
     expect(audio.map(({ pin, net, gpio }) => [pin, net, gpio])).toEqual([
-      ["Pi 2", "5 V", "—"],
-      ["Pi 17", "3.3 V", "—"],
-      ["Pi 39", "GND", "—"],
+      ["Pi 1", "3.3 V", "—"],
       ["Pi 3", "I2C SDA", "BCM 2"],
+      ["Pi 4", "5 V", "—"],
       ["Pi 5", "I2C SCL", "BCM 3"],
+      ["Pi 6", "GND", "—"],
       ["Pi 7", "MCLK", "BCM 4"],
       ["Pi 12", "I2S BCLK", "BCM 18"],
       ["Pi 35", "I2S LRCLK", "BCM 19"],
+      ["Pi 37", "AUD_RST", "BCM 26"],
       ["Pi 38", "I2S DIN", "BCM 20"],
       ["Pi 40", "I2S DOUT", "BCM 21"],
-      ["Pi 37", "AUD_RST", "BCM 26"],
     ]);
     expect(
       connectionRows

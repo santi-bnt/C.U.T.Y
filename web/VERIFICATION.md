@@ -1,4 +1,4 @@
-﻿# Verification — cinematic story and revised Nido integration
+# Verification — cinematic story and revised Nido integration
 
 Validated locally on Windows, 2026-11-06. No production deployment.
 
@@ -8,7 +8,7 @@ Validated locally on Windows, 2026-11-06. No production deployment.
 - Strict TypeScript and Vite production build passed. The shared lazy Three.js chunk remains approximately 996 kB minified / 272 kB gzip, with Vite's large-chunk advisory. Technical Scene code is split separately; no FPS or Lighthouse score is claimed.
 - Vitest: **20 passed across 7 files**. Actual compressed GLB decoding, normalized bounds, triangle count, integrated LCD/source immutability, static batching, named arm/head motion and reset, exploded/interior state, deterministic choreography, source hashes, actual asset presence and builder-confirmed pin assignments are tested.
 - Playwright: **12 passed**, covering desktop 1440×1000, touch tablet 820×1180 and mobile 390×844. Covers intro skip/focus, original face controls, presets, zoom/reset/wireframe/autorotation, named-part demos, persistent homepage canvas/model cache, EN/ES/menu/deep links, reduced motion, missing-model fallback, actual PCB front/back/selection/3D loading, 3D/2D wiring, confirmed audio table, search/filter and source downloads.
-- Assembly step navigation and imagery, downloadable STL ZIP and original engineering downloads checked. Twenty-two supplied confirmed display/audio rows are separate from proposed UART/PWM. The latest ReSpeaker table includes physical7/37 and fixed power/ground physical2/17/39; unit tests assert all 11 rows exactly and browser tests check their displayed values.
+- Assembly step navigation and imagery, downloadable STL ZIP and original engineering downloads checked. Twenty-two supplied confirmed display/audio rows are separate from proposed UART/PWM. The latest ReSpeaker table includes physical7/37 and fixed power/ground physical1/4/6; unit tests assert all 11 rows exactly and browser tests check their displayed values.
 - Source KiCad/netlist parity tests remain intact. The existing Python regression run earlier in this task passed **169 tests with 2 skipped**; subsequent changes were only in web.
 - Production preview on port 5180, before the final hookup-table amendment: Spanish 3D wiring loaded with the then-current nine confirmed ReSpeaker rows, the 1,637,704-byte model, no page/console errors and no external network requests. The final 11-row table is covered by the updated unit/browser suite.
 - No normal-flow page/console errors in final screenshot review. Checked desktop/tablet/mobile and narrow 320×740 for horizontal overflow: none observed. Headless Chromium/Edge software WebGL is not a physical mobile GPU benchmark or Safari certification.

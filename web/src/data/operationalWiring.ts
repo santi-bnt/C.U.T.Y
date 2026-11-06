@@ -73,17 +73,17 @@ for (const [name, pin, kind] of [
     pin,
   );
 for (const [name, pin, kind, label] of [
-  ["5 V", 2, "power", "2"],
-  ["3.3 V", 17, "power", "17"],
-  ["GND", 39, "ground", "39"],
+  ["3.3 V", 1, "power", "1"],
   ["I2C SDA", 3, "I2C", "3"],
+  ["5 V", 4, "power", "4"],
   ["I2C SCL", 5, "I2C", "5"],
+  ["GND", 6, "ground", "6"],
   ["MCLK", 7, "I2S", "7"],
   ["I2S BCLK", 12, "I2S", "12"],
   ["I2S LRCLK", 35, "I2S", "35"],
+  ["AUD_RST", 37, "GPIO", "37"],
   ["I2S DIN", 38, "I2S", "38"],
   ["I2S DOUT", 40, "I2S", "40"],
-  ["AUD_RST", 37, "GPIO", "37"],
 ] as const)
   add(
     "audio-" + name,

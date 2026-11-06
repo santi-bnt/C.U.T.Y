@@ -371,7 +371,9 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   await expect(page.locator(".connection-table tbody")).toContainText(
     "AUD_RST",
   );
-  await expect(page.locator(".connection-table tbody")).toContainText("Pi 39");
+  await expect(page.locator(".connection-table tbody")).toContainText("Pi 1");
+  await expect(page.locator(".connection-table tbody")).toContainText("Pi 4");
+  await expect(page.locator(".connection-table tbody")).toContainText("Pi 6");
   await page.getByRole("button", { name: "2D overview", exact: true }).click();
   await expect(page.locator(".wiring-diagram")).toHaveCount(1);
   await page
