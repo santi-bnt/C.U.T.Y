@@ -4,22 +4,25 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
+**Revisión 5 nov 2026:** ajustada a las piezas que sí se compraron y a la tornillería de los dos kits de Amazon. Cambiaron K5 (rack), B1, B2 y B3 (batería OVONIC hasta 109 mm), G2/G3 (manivelas con piso para el tornillo), B4 y K1 (ejes del gimbal con tornillo M4 autorroscante, sin tuerca), K1 y H3 (Pi y pantalla con M2) y H5 (servo de cabeza con M3). La guía paso a paso con fotos 3D está en la guía de armado de C.U.T.Y.
+
 ## Qué hay en esta carpeta
 
 | Carpeta / archivo | Para qué sirve |
 |---|---|
 | `STL_imprimir/` | 30 STL listos para Bambu Studio, ya orientados para la cama. |
+| `STEP_ensamble/CUTY_V17_Ensamble_completo.step` | Ensamble completo con colores, incluye placa, Pi 5, servos, batería, pantalla y cámara. Ábrelo en Fusion (Archivo › Abrir): entra como componentes. |
+| `STEP_partes/` | Cada pieza en su posición final, para editarla en Fusion. |
+| `CUTY_V17.glb` | Modelo 3D para visores web, presentaciones o Blender. |
 | `renders/` | Frente, espalda, lado y rayos X. |
+| `texturas/` | La cara real de `cuty.face` (feliz, tranquilo, escuchando, sorpresa) para renders. |
 | `fuente_cad/` | El generador en CadQuery. Cambia una medida y reconstruye todo. |
 | `partes.json`, `verificacion.json` | Medidas de impresión, volúmenes y resultados de la revisión de choques. |
 
-Los STEP (por pieza y el ensamble con colores para Fusion, ~130 MB) y el modelo `CUTY_V17.glb` no se suben al repo:
-se generan con `python3 export.py` y `python3 build.py` dentro de `fuente_cad/v17/` (salen en `fuente_cad/out/`).
-
 ## Arquitectura
 
-- **Nido (base fija, Ø172 mm):** piso con bayoneta, cubierta tipo cojín con un plato cóncavo, cajón de batería trasero que corre en rieles, dos interruptores redondos y dos servos MG996R acostados que mueven el gimbal con manivelas y varillas.
-- **Gimbal:** junta universal (cruceta de 14 mm con dos pernos M4). El fondo del cuerpo es una esfera concéntrica al gimbal, así el robot "rueda" dentro del plato con 3.5 mm de holgura constante.
+- **Nido (base fija, Ø172 mm):** piso con bayoneta, cubierta tipo cojín con un plato cóncavo, cajón de batería trasero que corre en rieles, dos interruptores redondos y dos servos MG996R acostados que mueven el gimbal con manivelas y dos varillas con rótulas.
+- **Gimbal:** junta universal (cruceta de 14 mm con dos tornillos M4 × 30 como ejes). El fondo del cuerpo es una esfera concéntrica al gimbal, así el robot "rueda" dentro del plato con 3.5 mm de holgura constante.
 - **Núcleo:** plataforma, columna, hombros, rack de potencia y cubo del cuello. Toda la electrónica se atornilla aquí antes de poner la carcasa.
 - **Carcasa:** panza y espalda se deslizan horizontalmente y muerden la plataforma con clips. Los brazos pasan por la costura y las amarran.
 - **Cabeza:** casco en dos mitades, visor negro con pantalla y cámara, servo de giro adentro. Orejas y antena atraviesan la costura y la cierran.
@@ -30,17 +33,17 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 
 | Código | Pieza | Color | Medida en cama (mm) | Cómo imprimir |
 |---|---|---|---|---|
-| B1 | Cubierta del nido | Durazno | 175 × 173 × 67 | Sobre su base · soportes árbol solo por dentro · **sin brim** |
+| B1 | Cubierta del nido | Durazno | 175 × 173 × 66 | Sobre su base · soportes árbol solo por dentro · **sin brim** |
 | B2 | Piso del nido | Gris | 165 × 167 × 26 | Plano · sin soportes |
-| B3 | Cajón de batería | Durazno | 117 × 63 × 31 | Sobre el fondo · sin soportes |
+| B3 | Cajón de batería | Durazno | 119 × 63 × 30 | Sobre el fondo · sin soportes |
 | B4 | Poste del gimbal | Gris | 40 × 40 × 88 | De pie, brida abajo |
 | G1 | Cruceta | Gris oscuro | 14 × 14 × 14 | 100 % relleno |
-| G2, G3 | Manivelas | Gris oscuro | 22 × 12 × 5 | Planas · 100 % relleno |
+| G2, G3 | Manivelas | Gris oscuro | 22 × 12 × 6 | Planas · 100 % relleno |
 | K1 | Plataforma del núcleo | Gris | 124 × 118 × 47 | Boca abajo · soportes bajo la placa (5 mm) |
 | K2 | Columna | Gris | 110 × 96 × 10 | Acostada |
 | K3 | Hombros | Gris | 114 × 32 × 66 | Viga abajo |
-| K4 | Cubo del cuello | Gris oscuro | 32 × 32 × 15 | Brida abajo · 100 % relleno |
-| K5 | Rack de potencia | Gris | 40 × 55 × 34 | De lado · soportes mínimos |
+| K4 | Cubo del cuello | Gris oscuro | 32 × 32 × 14 | Brida abajo · 100 % relleno |
+| K5 | Rack de potencia | Gris | 38 × 55 × 44 | De lado · soportes mínimos |
 | S1 | Panza | Crema | 148 × 162 × 76 | Sobre la costura · soportes solo en los clips |
 | S2 | Espalda | Crema | 148 × 162 × 67 | Sobre la costura · soportes solo en los clips |
 | S3 | Rejilla de la panza | Naranja | 55 × 55 × 14 | Anillo abajo |
@@ -48,8 +51,8 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 | A1, A2 | Brazos | Crema | 104 × 30 × 22 | Cara exterior abajo · 4 perímetros |
 | A3, A4 | Manos | Naranja | 16 × 34 × 14 | Cara exterior abajo |
 | A5, A6 | Tapas de brazo | Naranja | 14 × 14 × 4 | Cara abajo |
-| H1 | Casco frontal | Crema | 160 × 135 × 59 | Sobre la costura · soportes árbol mínimos |
-| H2 | Casco trasero | Crema | 160 × 135 × 56 | Sobre la costura (el nombre queda arriba) |
+| H1 | Casco frontal | Crema | 160 × 134 × 59 | Sobre la costura · soportes árbol mínimos |
+| H2 | Casco trasero | Crema | 160 × 134 × 56 | Sobre la costura (el nombre queda arriba) |
 | H3 | Visor | Negro | 121 × 93 × 15 | Cara abajo en PEI texturizado · soportes en las orillas |
 | H4 | Barras de la pantalla | Gris | 85 × 70 × 3 | Planas |
 | H5 | Base de la cabeza | Gris | 96 × 48 × 10 | Plana |
@@ -62,40 +65,56 @@ Filamento aproximado (PLA, 15 % de relleno): crema ≈ 380 g, gris ≈ 200 g, du
 
 ## Tornillería
 
-| Cant. | Qué |
-|---|---|
-| 25 | M3 × 10 autorroscante (servos, poste, rack, base de la cabeza) |
-| 10 | M3 × 8 autorroscante (placa C.U.T.Y, cubo del cuello) |
-| 4 | M3 × 12 (columna a plataforma y a hombros) |
-| 3 | M3 × 10 al spline: cabeza y brazos (los traen los servos) |
-| 1 | M3 × 20 del cubo del cuello al servo de la cabeza |
-| 2 | M4 × 30 + tuerca nyloc + 4 rondanas (ejes del gimbal) |
-| 10 | M2.5 × 6–10 autorroscante (Pi 5, IMU, servo de cabeza) |
-| 4 | M2.5 × 8 (barras de la pantalla) |
-| 4 | M2 × 5 autorroscante (cámara) |
-| 4 + 2 | Rótulas M3 de bola + varilla M3, 49 mm entre centros |
-| 4 | Pies de silicón Ø10 × 1 mm |
-| 1 | Velcro de 20 mm × 25 cm |
+Todo sale de dos kits: **Taiss** (autorroscantes de cabeza redonda M2, M3 y M4) y el **kit M3 allen** (tornillos de máquina con tuercas). Los autorroscantes van en plástico; los allen van en el eje metálico de los servos.
 
-Comprados: 5 × MG996R, LiPo 3S 2200 mAh (máx. 106 × 35 × 25 mm), 2 balancines redondos Ø20 mm 12 V/20 A, cable XT60 con salida a 90° para J1, buck 6 V tipo XL4015, regulador 5.1 V/5 A con USB-C, cable USB-C a 90° para la Pi 5, bocina Ø40 mm 8 Ω, cable de cámara Pi 5 (22 pines) de 30–50 cm, cable IDC de 40 vías hembra-hembra, MPU-6050.
+| Cant. | Tornillo | Kit | Dónde |
+|---|---|---|---|
+| 33 | M3 × 10 autorroscante | Taiss | 16 en los 4 servos del cuerpo y del nido · 3 poste al piso · 4 rack a la columna · 4 base de la cabeza · 4 servo de cabeza · 2 rótulas a las manivelas |
+| 7 | M3 × 8 autorroscante | Taiss | 4 placa C.U.T.Y a la columna · 3 cubo del cuello a la viga |
+| 6 | M3 × 12 autorroscante | Taiss | 2 columna a plataforma · 2 hombros a columna · 2 rótulas a las patas |
+| 2 | M4 × 30 autorroscante | Taiss | Ejes del gimbal (sin tuerca: se enroscan en la mejilla del fondo) |
+| 4 | M2 × 8 autorroscante | Taiss | Raspberry Pi 5 |
+| 4 | M2 × 10 autorroscante | Taiss | Barras de la pantalla |
+| 4 | M2 × 6 autorroscante | Taiss | Cámara |
+| 2 | M3 × 8 allen | Kit M3 | Manivelas a los servos del nido |
+| 2 | M3 × 12 allen | Kit M3 | Brazos a sus servos |
+| 1 | M3 × 20 allen | Kit M3 | Desde abajo de la viga al servo de la cabeza |
+
+Varillas del gimbal: 4 rótulas M3 Hobbypark y 2 tramos de varilla roscada M3 de unos 25 mm (córtala con segueta). Enrosca una rótula en cada punta hasta que los centros de los ojos queden a **49 mm**. Además: 4 topes de silicón bajo el piso.
+
+## Piezas compradas para las que está diseñada
+
+| Pieza | Medida que usa el modelo |
+|---|---|
+| Batería OVONIC 3S 2200 mAh 50C, XT60 | hasta 109 × 35 × 25 mm (la real: 107 × 35 × 22) |
+| Buck XL4015 5 A (sin voltímetro) | 54 × 23 × 18 mm, de pie, bornes arriba |
+| Convertidor JRBLVL 12→5 V 5 A, USB-C en cable | 46 × 32 × 18 mm, de pie, cables hacia abajo |
+| 2 balancines redondos 12 V/20 A | agujero Ø20 mm |
+| Cable de cámara Pi 5, 22→15 pines, 50 cm | pasa por la ranura trasera de la viga |
+| Cable plano IDC de 40 vías hembra-hembra, 20 cm | J12 → Pi 5, por el lado derecho de la columna |
+| Extensión XT60 macho-hembra, 30 cm | batería → J1, por el hueco del plato |
+| Cable de silicón 16 AWG | J2/J3 → interruptores (35 cm por cable) y J4/J5 ↔ buck (15 cm por cable) |
+| 5 × MG996R, Raspberry Pi 5, Display-G 3.5", ReSpeaker 2-Mics HAT V2.0, cámara OV5647, bocina Ø40 mm | ya los tienes |
+
+La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de la viga). La MPU-6050 es opcional: si no la pones, su lugar en la plataforma queda vacío.
 
 ## Armado en 15 pasos
 
-1. **Piso del nido.** Pega los pies. Desliza los dos servos del gimbal acostados contra sus muros (eje hacia el centro) y atorníllalos (8 × M3 × 10). Centra cada servo a 90° y pon su manivela apuntando al centro, con su rótula de bola.
+1. **Piso del nido.** Pega los 4 topes. Desliza los dos servos del gimbal acostados contra sus muros (eje hacia el centro) y atorníllalos (8 × M3 × 10). Centra cada servo a 90° y pon su manivela apuntando al centro con un M3 × 8 allen.
 2. **Poste del gimbal.** Brida en el anillo del piso, 3 × M3 × 10 desde abajo. La ranura del tubo mira al frente.
-3. **Varillas.** Ajusta las dos a 49 mm entre centros y presiona la rótula inferior en cada manivela.
+3. **Varillas.** Arma las dos varillas a 49 mm entre centros. Atornilla la rótula de abajo a cada manivela (M3 × 10).
 4. **Interruptores y cubierta.** Interruptores a presión en la cubierta (principal a la izquierda, servos a la derecha). Baja la cubierta sobre el piso, alinea las 3 pestañas y gira 14° hasta el clic.
-5. **Cruceta.** Dentro de la horquilla del poste, perno M4 × 30 de adelante hacia atrás. Aprieta la nyloc hasta que gire sin juego.
-6. **Plataforma.** Sobre la cruceta, segundo perno M4 de lado a lado. Presiona las rótulas superiores en las patas y atornilla la IMU.
+5. **Cruceta.** Dentro de la horquilla del poste, M4 × 30 de adelante hacia atrás: pasa libre por la mejilla delantera y la cruceta y se enrosca en la trasera. Aprieta hasta que la cruceta gire sin juego.
+6. **Plataforma.** Sobre la cruceta, el segundo M4 × 30 de izquierda a derecha. Atornilla las rótulas de arriba a las patas (M3 × 12).
 7. **Columna y placa C.U.T.Y.** Columna en la ranura de la plataforma (2 × M3 × 12 desde abajo). Placa en los 4 postes del frente (M3 × 8).
-8. **Raspberry Pi 5.** En los postes detrás de la columna (4 × M2.5 × 6). Conecta el IDC de 40 vías a la placa.
-9. **Rack de potencia.** Buck contra la columna, regulador en su repisa, rack a la columna con sus 4 orejas (M3 × 10 desde el frente de la columna).
+8. **Raspberry Pi 5.** En los postes detrás de la columna (4 × M2 × 8). Conecta el cable plano de 40 vías a J12 y a la Pi.
+9. **Rack de potencia.** XL4015 contra la columna (bornes arriba), convertidor de 5 V de pie en su repisa con sus cables hacia abajo por la ranura, rack a la columna con sus 4 orejas (M3 × 10 desde el frente de la columna). El USB-C del convertidor va a la Pi.
 10. **Hombros y cuello.** Servos de brazo desde adentro (8 × M3 × 10), hombros arriba de la columna (2 × M3 × 12), cubo del cuello sobre la viga (3 × M3 × 8).
-11. **Visor.** Pantalla de cara contra el visor dentro de sus costillas, dos barras (4 × M2.5 × 8). Cámara arriba (4 × M2 × 5).
-12. **Cabeza.** Servo de cabeza en su base. Visor dentro del casco frontal, cierra con el trasero, presiona orejas y antena. 4 × M3 × 10 desde abajo. Monta la cabeza en el cubo y fija con M3 × 20 desde abajo de la viga.
+11. **Visor.** Pantalla de cara contra el visor dentro de sus costillas, dos barras (4 × M2 × 10). Cámara arriba (4 × M2 × 6).
+12. **Cabeza.** Servo de cabeza en su base (4 × M3 × 10). Visor dentro del casco frontal, cierra con el trasero, presiona orejas y antena. 4 × M3 × 10 desde abajo. Monta la cabeza en el cubo y fija con M3 × 20 allen desde abajo de la viga. Deja una vuelta de cable de cámara y de Dupont para que la cabeza gire ±90°.
 13. **Panza y espalda.** Bocina en la rejilla con 3 puntos de silicón, rejilla en la panza. Desliza panza y espalda hasta que los clips muerdan la plataforma. Tapón USB.
-14. **Brazos.** Cada brazo por su agujero hasta el spline (M3 × 10), tapas y manos a presión. Los brazos cierran el cuerpo.
-15. **Batería.** Velcro, XT60, desliza el cajón hasta el clic. Enciende el principal y luego el de servos.
+14. **Brazos.** Cada brazo por su agujero hasta el spline (M3 × 12 allen), tapas y manos a presión. Los brazos cierran el cuerpo.
+15. **Batería.** Extensión XT60, desliza el cajón hasta el clic. Enciende el principal y luego el de servos.
 
 ## Límites de movimiento (ponlos en el firmware)
 
@@ -107,27 +126,25 @@ Comprados: 5 × MG996R, LiPo 3S 2200 mAh (máx. 106 × 35 × 25 mm), 2 balancine
 | Giro de cabeza | ±90° |
 | Brazos | ±120° |
 
-## Verificación
+## Verificación (5 nov 2026, con las medidas de lo comprado)
 
 - 30 piezas, cada una un sólido válido; STL herméticos.
-- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 175 × 173 × 67).
-- 109 cuerpos (30 impresos y 79 comprados) revisados por pares con todo armado: 0 interferencias. Los contactos de superficies coincidentes se confirmaron en 0.000 mm³ con booleanas exactas.
-- 18 zonas para cables y conectores (XT60, enchufes de servos, IDC, USB-C a 90°, bornes del buck, ventilador de la Pi) libres de plástico.
+- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 175 × 173 × 66).
+- 111 cuerpos (30 impresos y 81 comprados, incluidos los ejes M4 y los tornillos de las manivelas) revisados por pares con todo armado: 0 interferencias. Los contactos de superficies coincidentes se confirmaron en 0.000 mm³ con booleanas exactas.
+- 18 zonas para cables y conectores (XT60, enchufes de servos, IDC, cables del convertidor, bornes del buck, ventilador de la Pi) libres de plástico.
 - 34 posturas revisadas: gimbal, cabeza y brazos sin choques dentro de los límites de arriba.
+- Largos de cable revisados en el modelo: extensión XT60 (≈20 cm de recorrido), cable plano de 40 vías (≈12 cm), cámara (≈30–35 cm con la vuelta del cuello), cables de servo (≤22 cm, los MG996R traen 30 cm), interruptores (≈26 cm de recorrido, se cortan de 35 cm).
 
 ## Antes de imprimir todo
 
-El modelo usa medidas típicas: MG996R 40.7 × 19.7 × 37 mm, pantalla 3.5" de 85 × 56 mm, cámara OV5647 de 25 × 24 mm y batería de 106 × 35 × 25 mm. Mide las tuyas; si alguna cambia, ajusta `fuente_cad/v17/refs.py` y corre:
+Mide lo que ya tienes: MG996R 40.7 × 19.7 × 37 mm, pantalla 3.5" de 85 × 56 mm, cámara OV5647 de 25 × 24 mm y bocina Ø40 × 16 mm. Si alguna cambia, ajusta `fuente_cad/v17/refs.py` y corre:
 
 ```
 cd fuente_cad/v17
-pip install cadquery==2.8.0 trimesh manifold3d openpyxl
+pip install cadquery==2.8.0 trimesh manifold3d
 python3 build.py --rebuild     # reconstruye todas las piezas
 python3 meshcheck.py           # revisa choques en reposo y en movimiento
 python3 export.py              # STEP, STL orientados y ensamble para Fusion
 ```
 
 Diseñado por APL en Guadalajara.
-
-Para los renders (`fuente_cad/render/`): `npm i three@0.160.0` dentro de `render/`, sirve `fuente_cad/` con
-`python3 -m http.server 8765` y corre `python3 shots.py out/cuty_v17.glb out/r front34 back34`.

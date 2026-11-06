@@ -219,10 +219,10 @@ def pi_keepouts():
 
 
 # ------------------------------------------------------------------ power modules (standing behind the arm servos)
-BUCK = (26.5, 15.0, 51.5)                  # XL4015 5 A class (51x26x14) or Pololu D24V90F6, standing
-REG = (26.5, 13.0, 46.0)                   # 5.1 V / 5 A USB-C PD buck module, standing
-BUCK_C = (0.0, -1.5, 157.0)                # against the back of the spine, between the arm servos
-REG_C = (0.0, 15.5, 154.0)                 # on the power rack, behind the buck
+BUCK = (23.5, 19.0, 54.5)                  # XL4015 5 A as bought (54 x 23 x 18 incl. heatsink), standing
+REG = (32.5, 18.5, 46.5)                   # JRBLVL 25 W potted 12->5 V 5 A, USB-C on a lead (46 x 32 x 18), standing
+BUCK_C = (0.0, 0.5, 155.5)                 # against the back of the spine, between the arm servos
+REG_C = (0.0, 22.25, 154.0)                # on the power rack, behind the buck
 
 
 def power_modules():
@@ -234,7 +234,7 @@ def power_keepouts():
     rx, ry, rz = REG_C
     return [("ko_buck_terms", cbox(bx, by, bz + BUCK[2] / 2 + 5, BUCK[0], BUCK[1], 10)),
             ("ko_reg_terms", cbox(rx, ry, rz + REG[2] / 2 + 5, REG[0], REG[1], 10)),
-            ("ko_reg_usbc", cbox(rx, ry, rz - REG[2] / 2 - 6, 14, 10, 12))]
+            ("ko_reg_usbc", cbox(rx, ry, rz - REG[2] / 2 - 6, REG[0] - 6, REG[1] - 4, 12))]
 
 
 # ------------------------------------------------------------------ speaker, IMU
@@ -255,7 +255,7 @@ def imu():
 
 
 # ------------------------------------------------------------------ battery (3S 2200 mAh, measure)
-BATT = (106.0, 35.0, 25.0)
+BATT = (108.0, 35.0, 25.0)                     # OVONIC 3S 2200 50C: 107 x 35 x 22 (+-3)
 BATT_C = (0.0, 43.5, 5.0 + 12.5)               # on the drawer tray (top z 4.8)
 
 

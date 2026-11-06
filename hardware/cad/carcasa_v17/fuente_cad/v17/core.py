@@ -54,7 +54,8 @@ def deck():
     for sx in (-1, 1):
         ch = box(min(sx * 7.5, sx * 11.5), max(sx * 7.5, sx * 11.5), -5.0, 5.0, base.PITCH_BOLT_Z - 8.0, DECK_Z0 + 0.5)
         d = d.fuse(ch)
-    d = d.cut(cyl_c(2.15, 40, (0, 0, base.PITCH_BOLT_Z), (1, 0, 0)))
+    d = d.cut(cyl(2.15, 20, (-20, 0, base.PITCH_BOLT_Z), (1, 0, 0)))  # M4 x 30 self-tapping: free in the left cheek
+    d = d.cut(cyl(1.7, 20, (0, 0, base.PITCH_BOLT_Z), (1, 0, 0)))     # ... and threads into the right cheek
     # legs carrying the upper ball studs of the push-rods
     for key, p in leg_points().items():
         leg = box(p.x - 4.5, p.x + 4.5, p.y - 11.5, p.y - 3.5, LEG_BOTTOM_Z, DECK_Z0 + 0.5)
@@ -65,16 +66,16 @@ def deck():
     for x in (-30.0, 30.0):
         d = d.cut(cyl(1.7, 10, (x, (SPINE_Y0 + SPINE_Y1) / 2, DECK_Z0 - 1)))
         d = d.cut(cyl(3.1, 2.0, (x, (SPINE_Y0 + SPINE_Y1) / 2, DECK_Z0 - 0.01)))
-    # Raspberry Pi 5 standoffs (M2.5, self-tapping)
+    # Raspberry Pi 5 standoffs (M2 x 8, self-tapping)
     for hx, hy in refs.PI_HOLES:
         p = refs.pi_to_world(hx, hy, -1.6)
         d = d.fuse(cyl(3.0, refs.PI_STANDOFF, (p.x, p.y, DECK_Z1)))
-        d = d.cut(cyl(1.05, refs.PI_STANDOFF + 4, (p.x, p.y, DECK_Z1 - 2)))
-    # IMU pad (2 x M2.5 standoffs)
+        d = d.cut(cyl(0.8, refs.PI_STANDOFF + 4, (p.x, p.y, DECK_Z1 - 2)))
+    # IMU pad (2 x M2 standoffs)
     ix, iy, iz = refs.IMU_C
     for dx in (-7.75, 7.75):
         d = d.fuse(cyl(2.4, 2.0, (ix + dx, iy + 5.5, DECK_Z1)))
-        d = d.cut(cyl(1.05, 6.0, (ix + dx, iy + 5.5, DECK_Z1 - 2)))
+        d = d.cut(cyl(0.8, 6.0, (ix + dx, iy + 5.5, DECK_Z1 - 2)))
     return d.clean()
 
 
@@ -187,8 +188,9 @@ def power_rack():
     bw, bd, bh = refs.BUCK
     rw, rd, rh = refs.REG
     frame = box(-bw / 2 - 2.5, bw / 2 + 2.5, by + bd / 2, ry - rd / 2, rz - rh / 2 - 2, bz + bh / 2 + 1)
-    side_l = box(-bw / 2 - 2.5, -bw / 2 - 0.5, SPINE_Y1, ry + rd / 2, rz - rh / 2 - 2, rz - rh / 2 + 8)
-    side_r = box(bw / 2 + 0.5, bw / 2 + 2.5, SPINE_Y1, ry + rd / 2, rz - rh / 2 - 2, rz - rh / 2 + 8)
+    sw = max(bw, rw)
+    side_l = box(-sw / 2 - 2.5, -sw / 2 - 0.5, SPINE_Y1, ry + rd / 2, rz - rh / 2 - 2, rz - rh / 2 + 8)
+    side_r = box(sw / 2 + 0.5, sw / 2 + 2.5, SPINE_Y1, ry + rd / 2, rz - rh / 2 - 2, rz - rh / 2 + 8)
     shelf = box(-rw / 2 - 2.5, rw / 2 + 2.5, ry - rd / 2, ry + rd / 2, rz - rh / 2 - 2, rz - rh / 2)
     lip = box(-rw / 2 - 2.5, rw / 2 + 2.5, ry + rd / 2, ry + rd / 2 + 2, rz - rh / 2 - 2, rz - rh / 2 + 6)
     # side ears (wires leave the buck terminals upwards, the Pi's IDC plug sits below)
@@ -197,8 +199,8 @@ def power_rack():
     r = fuse(frame, side_l, side_r, shelf, lip, ears)
     for x, z in RACK_EARS:
         r = r.cut(cyl(1.25, 40, (x, SPINE_Y1 - 1, z), (0, 1, 0)))
-    # the regulator's USB-C plug leaves downwards through the shelf
-    r = r.cut(box(-7.5, 7.5, ry - rd / 2 + 0.5, ry + rd / 2 + 3, rz - rh / 2 - 12, rz - rh / 2 + 0.5))
+    # the regulator's USB-C lead and input wires leave downwards through the shelf
+    r = r.cut(box(-rw / 2 + 3, rw / 2 - 3, ry - rd / 2 + 2.0, ry + rd / 2 + 3, rz - rh / 2 - 12, rz - rh / 2 + 0.5))
     for z in (rz - 12, rz + 12):
         r = r.cut(cbox(-bw / 2 - 1.5, (by + bd / 2 + ry - rd / 2) / 2, z, 2.0, 20, 4))
         r = r.cut(cbox(bw / 2 + 1.5, (by + bd / 2 + ry - rd / 2) / 2, z, 2.0, 20, 4))

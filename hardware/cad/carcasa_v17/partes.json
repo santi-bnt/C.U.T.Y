@@ -4,11 +4,11 @@
    "part": "B1_Base_Cover",
    "group": "base",
    "print_dims_mm": [
-    175.2,
-    173.4,
+    175.1,
+    173.3,
     66.5
    ],
-   "volume_cm3": 155.4
+   "volume_cm3": 155.1
   },
   {
    "part": "B2_Base_Floor",
@@ -24,11 +24,11 @@
    "part": "B3_Battery_Drawer",
    "group": "base",
    "print_dims_mm": [
-    117.3,
+    119.3,
     62.6,
     30.5
    ],
-   "volume_cm3": 30.3
+   "volume_cm3": 30.7
   },
   {
    "part": "B4_Gimbal_Post",
@@ -56,9 +56,9 @@
    "print_dims_mm": [
     22.0,
     12.0,
-    5.0
+    6.5
    ],
-   "volume_cm3": 0.8
+   "volume_cm3": 1.0
   },
   {
    "part": "G3_Crank_R",
@@ -66,9 +66,9 @@
    "print_dims_mm": [
     22.0,
     12.0,
-    5.0
+    6.5
    ],
-   "volume_cm3": 0.8
+   "volume_cm3": 1.0
   },
   {
    "part": "K1_Core_Deck",
@@ -78,7 +78,7 @@
     118.4,
     47.0
    ],
-   "volume_cm3": 38.4
+   "volume_cm3": 38.5
   },
   {
    "part": "K2_Core_Spine",
@@ -114,11 +114,11 @@
    "part": "K5_Power_Rack",
    "group": "core",
    "print_dims_mm": [
-    39.5,
-    54.8,
-    34.0
+    37.5,
+    55.0,
+    43.5
    ],
-   "volume_cm3": 6.6
+   "volume_cm3": 7.2
   },
   {
    "part": "S1_Body_Front",
@@ -268,7 +268,7 @@
     48.0,
     9.6
    ],
-   "volume_cm3": 11.8
+   "volume_cm3": 11.7
   },
   {
    "part": "H6_Ear_L",
@@ -380,6 +380,8 @@
   "pushrod_L",
   "pushrod_R",
   "bolt_roll_M4",
-  "bolt_pitch_M4"
+  "bolt_pitch_M4",
+  "screw_crank_L",
+  "screw_crank_R"
  ]
 }

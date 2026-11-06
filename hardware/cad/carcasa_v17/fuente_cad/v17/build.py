@@ -105,8 +105,13 @@ def purchased():
         l1 = cyl(3.6, 14, (p.x, p.y, p.z + 2))
         l2 = cyl(3.6, 14, (top.x, top.y, top.z - 16))
         items.append((f"pushrod_{key}", fuse(rod, b1, b2, l1, l2), (0.80, 0.80, 0.82), "gimbal"))
-    items.append(("bolt_roll_M4", cyl_c(2.0, 30, (0, 0, base.ROLL_BOLT_Z), (0, 1, 0)), (0.75, 0.75, 0.78), "gimbal"))
-    items.append(("bolt_pitch_M4", cyl_c(2.0, 30, (0, 0, base.PITCH_BOLT_Z), (1, 0, 0)), (0.75, 0.75, 0.78), "gimbal"))
+    # M4 x 30 self-tapping pivots: head outside the front / left cheek, threads in the far cheek
+    roll = fuse(cyl(3.8, 2.8, (0, -14.3, base.ROLL_BOLT_Z), (0, 1, 0)), cyl(1.65, 30, (0, -11.5, base.ROLL_BOLT_Z), (0, 1, 0)))
+    pitch = fuse(cyl(3.8, 2.8, (-14.3, 0, base.PITCH_BOLT_Z), (1, 0, 0)), cyl(1.65, 30, (-11.5, 0, base.PITCH_BOLT_Z), (1, 0, 0)))
+    items.append(("bolt_roll_M4", roll, (0.75, 0.75, 0.78), "gimbal"))
+    items.append(("bolt_pitch_M4", pitch, (0.75, 0.75, 0.78), "gimbal"))
+    for nm in ("servo_gimbal_L", "servo_gimbal_R"):
+        items.append((f"screw_crank_{nm[-1]}", base.crank_screw(nm), (0.2, 0.2, 0.22), "base"))
     return items
 
 

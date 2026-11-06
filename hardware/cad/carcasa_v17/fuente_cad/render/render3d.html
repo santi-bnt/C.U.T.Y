@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
 <canvas id="cv"></canvas>
-<script type="importmap">{"imports":{"three":"/render/node_modules/three/build/three.module.js","three/addons/":"/render/node_modules/three/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"/cad/render/node_modules/three/build/three.module.js","three/addons/":"/cad/render/node_modules/three/examples/jsm/"}}</script>
 <script type="module">
 // Offline frame renderer for the build guide / video: same model, pivots and explode table as the 3D viewer.
 import * as THREE from 'three';
@@ -63,7 +63,7 @@ window.__setup = async (cfg) => {
     o.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.material.envMapIntensity = 0.55; mats.push(m.material); } });
     groupFor(o.name).attach(o);
     const e = pick(o.name, cfg.exp) || [0, 0, 0];
-    parts.push({ name: o.name, obj: o, mats, exp: g(...e), base: o.position.clone(), step: stepOf(o.name) });
+    parts.push({ name: o.name, obj: o, mats, exp: g(...e), base: o.position.clone(), step: stepOf(o.name), hidden: (cfg.hide || []).some((h) => o.name.startsWith(h)) });
   }
   face.position.copy(g(0, -47.52, 266)); scene.add(face); face.updateMatrixWorld(); headP.attach(face);
   parts.push({ name: 'lcd_face', obj: face, mats: [], exp: g(...pick('lcd_', cfg.exp)), base: face.position.clone(), step: stepOf('lcd_') });
@@ -80,7 +80,7 @@ function aim(v) {
 // state: {step, k (fly-in progress 0..1), glow 0..1, view:{focus,dist,az,el}, face, pose:{pitch,roll,pan,aL,aR}, all:bool}
 window.__frame = (s) => {
   for (const p of parts) {
-    const vis = s.all || p.step < 0 || p.step <= s.step;
+    const vis = !p.hidden && (s.all || p.step < 0 || p.step <= s.step);
     p.obj.visible = vis;
     p.obj.position.copy(p.base);
     if (!s.all && p.step === s.step) p.obj.position.addScaledVector(p.exp, 0.9 * (1 - s.k));

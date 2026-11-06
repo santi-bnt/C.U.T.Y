@@ -17,8 +17,8 @@ LUG_ANGLES = (270.0, 32.0, 148.0)            # bayonet lugs (deg from +X)
 LUG_TURN = 14.0
 SWITCH_ANGLES = (90.0 + 76.0, 90.0 - 76.0)    # left (main), right (servos); 90 = back
 SWITCH_Z = 22.0
-DRAWER_HALF_W = 58.0                         # outer edge of the drawer flanges (run under the rail lips)
-DRAWER_WALL_W = 55.6                         # outer face of the drawer side walls
+DRAWER_HALF_W = 59.0                         # outer edge of the drawer flanges (run under the rail lips)
+DRAWER_WALL_W = 56.6                         # outer face of the drawer side walls
 DRAWER_Z = (FLOOR_T, 34.0)
 ROLL_BOLT_Z = CZ - 3.0
 PITCH_BOLT_Z = CZ + 3.0
@@ -184,7 +184,8 @@ def post():
                   box(-5.0, 5.0, -11.5, -7.5, ROLL_BOLT_Z - 12, ROLL_BOLT_Z + 8))
     p = fuse(flange, tube, neck, cheeks)
     p = cq.Workplane().add(p).val()
-    p = p.cut(cyl_c(2.15, 40, (0, 0, ROLL_BOLT_Z), (0, 1, 0)))
+    p = p.cut(cyl(2.15, 20, (0, -20, ROLL_BOLT_Z), (0, 1, 0)))     # M4 x 30 self-tapping: free in the front cheek
+    p = p.cut(cyl(1.7, 20, (0, 0, ROLL_BOLT_Z), (0, 1, 0)))        # ... and threads into the back cheek
     p = p.cut(cyl(POST_R - 3.0, 200, (0, 0, -1)).cut(box(-50, 50, -50, 50, ROLL_BOLT_Z - 13, 200)))
     for k in range(3):
         a = math.radians(90 + 120 * k)
@@ -203,22 +204,30 @@ def cross():
 
 
 CRANK_R = 12.0
+CRANK_HUB_H = 6.5                  # 3.3 mm spline socket + 3.2 mm floor under the M3 x 8 screw head
 
 
 def crank(name):
     """Printed crank on the gimbal servo spline: 25T socket + M3 screw, ball stud at r=12."""
     s = refs.SERVO
-    hub = cyl(6.0, 5.0, (0, 0, s["boss_h"] + 0.1))
+    hub = cyl(6.0, CRANK_HUB_H, (0, 0, s["boss_h"] + 0.1))
     arm = box(0, CRANK_R + 4.0, -4.0, 4.0, s["boss_h"] + 0.1, s["boss_h"] + 5.1)
     tip = cyl(4.0, 5.0, (CRANK_R, 0, s["boss_h"] + 0.1))
     c = fuse(hub, arm, tip)
     c = c.cut(spline_socket(3.3, (0, 0, s["boss_h"] + 0.1)))
     c = c.cut(cyl(1.7, 10, (0, 0, 0)))
-    c = c.cut(cyl(3.0, 2.0, (0, 0, s["boss_h"] + 3.2)))       # screw head counterbore
     c = c.cut(cyl(1.25, 10, (CRANK_R, 0, 0)))                   # M3 ball stud thread (self-tap)
     o, xd, zd = refs.SERVO_FRAMES[name]
     # crank arm points towards the robot centre (the case extends the same way)
     return place(c, o, xd, zd)
+
+
+def crank_screw(name):
+    """M3 x 8 machine screw head on top of the crank hub (for clearance checks)."""
+    s = refs.SERVO
+    h = cyl(2.75, 3.0, (0, 0, s["boss_h"] + 0.1 + CRANK_HUB_H))
+    o, xd, zd = refs.SERVO_FRAMES[name]
+    return place(h, o, xd, zd)
 
 
 def crank_tip(name):

@@ -162,12 +162,12 @@ def visor():
                            (rx, DISP_Z, 2.0, 30), (-rx, DISP_Z, 2.0, 30)):
         rib = cbox(x, TOUCH_FRONT_Y + 2.6, z, dx, 6.8, dz)
         v = v.fuse(rib.cut(outer().cut(inner())).intersect(inner()))
-    # bosses for the two display clamp bars (M2.5, self-tapping)
+    # bosses for the two display clamp bars (M2 x 10, self-tapping)
     for (x, z) in display_bar_bosses():
         b = cyl(3.0, 12.0, (x, TOUCH_FRONT_Y + refs.LCD["touch_t"] + 7.0 + 1.6 + 0.2, z), (0, -1, 0))
         b = b.intersect(inner())
         v = v.fuse(b)
-        v = v.cut(cyl(1.05, 10, (x, TOUCH_FRONT_Y + 12, z), (0, -1, 0)))
+        v = v.cut(cyl(0.8, 10, (x, TOUCH_FRONT_Y + 12, z), (0, -1, 0)))
     # camera bosses (M2)
     lens_front = LENS_FRONT_Y
     board_y0 = lens_front + refs.CAM["lens_h"]
@@ -215,7 +215,7 @@ def head_base():
         pil = box(xs - 3.0, xs + 3.0, -s["W"] / 2, s["W"] / 2, BASE_Z0 + BASE_T, zt)
         plate = plate.fuse(pil)
     for (px, py, pz) in pillars:
-        plate = plate.cut(cyl(1.05, 10, (px, py, pz - 8)))
+        plate = plate.cut(cyl(1.25, 10, (px, py, pz - 8)))      # head servo tabs, M3 x 10 self-tapping
     for x, y in BASE_SCREWS:
         plate = plate.fuse(cyl(3.6, 7.0, (x, y, BASE_Z0)))
         plate = plate.cut(cyl(1.25, 12, (x, y, BASE_Z0 - 1)))
