@@ -114,6 +114,8 @@ SILK = [
     ("RPI 5 GPIO - cable plano 40 vias", 76.0, 66.9, 1.0, 0),
     ("C.U.T.Y carrier v1.1", 74.0, 25.0, 1.6, 0),
     ("Tec de Monterrey GDL - 2026", 74.0, 28.0, 1.0, 0),
+    ("Designed by APL in Guadalajara", 74.0, 31.0, 1.0, 0),
+    ("Made in China", 74.0, 33.4, 1.0, 0),
     ("Divisor VBAT -> PA1", 48.0, 35.6, 1.0, 0),
 ]
 for i, (y, name) in enumerate(zip(SERVO_Y, SERVO_NAMES)):

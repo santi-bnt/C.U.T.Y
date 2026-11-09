@@ -1,0 +1,33 @@
+{
+ "fecha": "2026-11-06",
+ "revision": "medidas reales del equipo: pantalla 5.8 mm, cámara en cuna con barrita, bocina rectangular 35.4 x 25 x 5.5 en la rejilla, Pi 5 de 90.3 x 56 x 18, ReSpeaker 65.5 x 29.8; batería 3S 2200 del equipo",
+ "piezas_impresas": 30,
+ "cuerpos_revisados": 113,
+ "interferencias_estaticas_mm3_exactas": 0.0,
+ "zonas_libres": "18/18",
+ "posturas": 34,
+ "limites": {
+  "cabeceo_gimbal": "±18°",
+  "balanceo_gimbal": "±15°",
+  "combinado": "±14° / ±10°",
+  "giro_cabeza": "±90°",
+  "brazos": "±120°"
+ },
+ "largos_de_cable_mm": {
+  "bateria_a_J1": "≈200 (batería ≈100 + extensión 300)",
+  "J12_a_Pi": "≈120 (cable 200)",
+  "camara": "≈300-350 (cable 500)",
+  "servos": "≤220 (MG996R 300)",
+  "interruptores": "≈300"
+ },
+ "stl_hermeticos": true,
+ "cama_180": true,
+ "medidas_reales_mm": {
+  "pantalla_display_g": "85 x 55.3 x 5.8",
+  "raspberry_pi_5": "90.3 x 56 x 18",
+  "respeaker_2mics": "65.5 x 29.8 x 11.5",
+  "camara_ov5647": "PCB 24.4 x 23.3 x 2.3, 7.2 de fondo, lente 8.5 x 8.5",
+  "bocina_2w": "35.4 x 25 x 5.5",
+  "pendiente": "batería (largo x ancho x alto) y centro del lente de la cámara (el modelo supone 13.7 mm desde el borde de abajo)"
+ }
+}

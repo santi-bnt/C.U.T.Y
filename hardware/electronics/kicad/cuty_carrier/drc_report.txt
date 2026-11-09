@@ -1,179 +1,7 @@
 ** Drc report for /home/claude/c.u.t.y/hardware/electronics/kicad/cuty_carrier/cuty_carrier.kicad_pcb **
-** Created on 2026-11-03 05:46:13 **
+** Created on 2026-11-04 17:50:28 **
 
 ** Found 50 DRC violations **
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(117.8000 mm, 80.0000 mm): Reference 'R9'
-    @(114.5400 mm, 80.4300 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
-    @(100.8400 mm, 86.4000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
-    @(101.4000 mm, 86.4000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
-    @(102.9000 mm, 86.4000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.4000 mm, 86.4000 mm): Line on F.Silkscreen
-    @(101.2000 mm, 89.0000 mm): PCB Text '-' on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(100.8400 mm, 86.4000 mm): Line on F.Silkscreen
-    @(101.2000 mm, 89.0000 mm): PCB Text '-' on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(134.0000 mm, 130.2000 mm): Reference 'R12'
-    @(134.1300 mm, 133.4600 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(125.8000 mm, 137.6000 mm): Reference 'R8'
-    @(122.5400 mm, 138.1300 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(142.6000 mm, 133.7000 mm): PCB Text 'I2C IMU' on F.Silkscreen
-    @(139.5400 mm, 133.4600 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(142.6000 mm, 133.7000 mm): PCB Text 'I2C IMU' on F.Silkscreen
-    @(139.8700 mm, 133.4600 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(140.4000 mm, 127.8000 mm): Reference 'J15'
-    @(139.8700 mm, 133.4600 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(140.4000 mm, 127.8000 mm): Reference 'J15'
-    @(139.8700 mm, 126.9200 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(136.8700 mm, 133.4600 mm): Line on F.Silkscreen
-    @(137.0000 mm, 130.2000 mm): Reference 'R11'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(137.0000 mm, 130.2000 mm): Reference 'R11'
-    @(137.1300 mm, 133.4600 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(138.7600 mm, 51.2000 mm): PCB Text 'BUCK IN' on F.Silkscreen
-    @(143.9000 mm, 51.5000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(138.7600 mm, 51.2000 mm): PCB Text 'BUCK IN' on F.Silkscreen
-    @(143.9000 mm, 50.9400 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(150.9600 mm, 51.2000 mm): PCB Text 'SW SERVOS' on F.Silkscreen
-    @(156.1000 mm, 50.9400 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(138.7600 mm, 53.0000 mm): Reference 'J4'
-    @(143.9000 mm, 53.0000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(150.9600 mm, 51.2000 mm): PCB Text 'SW SERVOS' on F.Silkscreen
-    @(156.1000 mm, 51.5000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(150.9600 mm, 53.0000 mm): Reference 'J3'
-    @(156.1000 mm, 53.0000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(149.0000 mm, 66.2000 mm): Reference 'F1'
-    @(148.2100 mm, 66.2000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(140.2000 mm, 77.8000 mm): Reference 'R6'
-    @(140.6300 mm, 74.5400 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(149.3700 mm, 81.7400 mm): Line on F.Silkscreen
-    @(149.8000 mm, 79.1000 mm): Reference 'C3'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(146.4000 mm, 77.8000 mm): Reference 'R7'
-    @(146.6300 mm, 81.7400 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(149.1000 mm, 120.0000 mm): Reference 'D1'
-    @(146.3600 mm, 119.5700 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
-    @(189.7810 mm, 135.6138 mm): Footprint Text 'PB10' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
-    @(151.6810 mm, 135.6138 mm): Footprint Text 'PC13' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
-    @(156.7610 mm, 135.6138 mm): Footprint Text 'PC15' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
-    @(154.2210 mm, 135.6138 mm): Footprint Text 'PC14' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
-    @(197.4010 mm, 126.3992 mm): Footprint Text 'PB12' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
-    @(189.7810 mm, 126.3992 mm): Footprint Text 'PB15' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
-    @(194.8610 mm, 126.3992 mm): Footprint Text 'PB13' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
-    @(192.3210 mm, 126.3992 mm): Footprint Text 'PB14' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(197.4010 mm, 135.6138 mm): Footprint Text '5V' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(194.8610 mm, 135.6138 mm): Footprint Text 'GND' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(192.3210 mm, 135.6138 mm): Footprint Text '3V3' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(197.4010 mm, 126.3992 mm): Footprint Text 'PB12' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(194.8610 mm, 126.3992 mm): Footprint Text 'PB13' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
-    @(192.3210 mm, 126.3992 mm): Footprint Text 'PB14' of U1
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.2000 mm, 82.5800 mm): PCB Text '-' on F.Silkscreen
-    @(101.4000 mm, 74.9000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.2000 mm, 82.5800 mm): PCB Text '-' on F.Silkscreen
-    @(100.8400 mm, 74.9000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.2000 mm, 77.5000 mm): PCB Text '+' on F.Silkscreen
-    @(101.4000 mm, 74.9000 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.2000 mm, 77.5000 mm): PCB Text '+' on F.Silkscreen
-    @(100.8400 mm, 74.9000 mm): Line on F.Silkscreen
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
     @(126.5600 mm, 51.2000 mm): PCB Text 'SW PRINCIPAL' on F.Silkscreen
@@ -188,20 +16,192 @@
     @(131.7000 mm, 50.9400 mm): Line on F.Silkscreen
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
-    @(117.8000 mm, 75.2000 mm): Reference 'R10'
-    @(114.5400 mm, 75.6300 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
     @(126.5600 mm, 53.0000 mm): Reference 'J2'
     @(131.7000 mm, 53.0000 mm): Line on F.Silkscreen
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
-    @(126.5600 mm, 51.2000 mm): PCB Text 'SW PRINCIPAL' on F.Silkscreen
-    @(131.7000 mm, 60.8610 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
     @(129.0000 mm, 66.2000 mm): Reference 'F2'
     @(128.2100 mm, 66.2000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(131.7000 mm, 60.8610 mm): Line on F.Silkscreen
+    @(126.5600 mm, 51.2000 mm): PCB Text 'SW PRINCIPAL' on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(117.8000 mm, 80.0000 mm): Reference 'R9'
+    @(114.5400 mm, 80.4300 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 77.5000 mm): PCB Text '+' on F.Silkscreen
+    @(101.4000 mm, 74.9000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 77.5000 mm): PCB Text '+' on F.Silkscreen
+    @(100.8400 mm, 74.9000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 82.5800 mm): PCB Text '-' on F.Silkscreen
+    @(101.4000 mm, 74.9000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 82.5800 mm): PCB Text '-' on F.Silkscreen
+    @(100.8400 mm, 74.9000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(114.5400 mm, 75.6300 mm): Line on F.Silkscreen
+    @(117.8000 mm, 75.2000 mm): Reference 'R10'
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
+    @(100.8400 mm, 86.4000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
+    @(101.4000 mm, 86.4000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.5000 mm, 94.0800 mm): PCB Text '+6V' on F.Silkscreen
+    @(102.9000 mm, 86.4000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 89.0000 mm): PCB Text '-' on F.Silkscreen
+    @(101.4000 mm, 86.4000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(101.2000 mm, 89.0000 mm): PCB Text '-' on F.Silkscreen
+    @(100.8400 mm, 86.4000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(146.4000 mm, 77.8000 mm): Reference 'R7'
+    @(146.6300 mm, 81.7400 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(149.8000 mm, 79.1000 mm): Reference 'C3'
+    @(149.3700 mm, 81.7400 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(140.2000 mm, 77.8000 mm): Reference 'R6'
+    @(140.6300 mm, 74.5400 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(125.8000 mm, 137.6000 mm): Reference 'R8'
+    @(122.5400 mm, 138.1300 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(134.0000 mm, 130.2000 mm): Reference 'R12'
+    @(134.1300 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(142.6000 mm, 133.7000 mm): PCB Text 'I2C IMU' on F.Silkscreen
+    @(139.5400 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(142.6000 mm, 133.7000 mm): PCB Text 'I2C IMU' on F.Silkscreen
+    @(139.8700 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(137.0000 mm, 130.2000 mm): Reference 'R11'
+    @(136.8700 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(137.0000 mm, 130.2000 mm): Reference 'R11'
+    @(137.1300 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(139.8700 mm, 126.9200 mm): Line on F.Silkscreen
+    @(140.4000 mm, 127.8000 mm): Reference 'J15'
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(140.4000 mm, 127.8000 mm): Reference 'J15'
+    @(139.8700 mm, 133.4600 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(197.4010 mm, 126.3992 mm): Footprint Text 'PB12' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(197.4010 mm, 126.3992 mm): Footprint Text 'PB12' of U1
+    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(194.8610 mm, 126.3992 mm): Footprint Text 'PB13' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(194.8610 mm, 126.3992 mm): Footprint Text 'PB13' of U1
+    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(192.3210 mm, 126.3992 mm): Footprint Text 'PB14' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(192.3210 mm, 126.3992 mm): Footprint Text 'PB14' of U1
+    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(189.7810 mm, 126.3992 mm): Footprint Text 'PB15' of U1
+    @(198.7310 mm, 124.7292 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(194.8610 mm, 135.6138 mm): Footprint Text 'GND' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(192.3210 mm, 135.6138 mm): Footprint Text '3V3' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(189.7810 mm, 135.6138 mm): Footprint Text 'PB10' of U1
+    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
+    @(154.2210 mm, 135.6138 mm): Footprint Text 'PC14' of U1
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
+    @(156.7610 mm, 135.6138 mm): Footprint Text 'PC15' of U1
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(198.7310 mm, 139.9438 mm): Rect on F.Silkscreen
+    @(151.6810 mm, 135.6138 mm): Footprint Text 'PC13' of U1
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(197.4010 mm, 135.6138 mm): Footprint Text '5V' of U1
+    @(198.3980 mm, 135.4952 mm): Rect on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(149.1000 mm, 120.0000 mm): Reference 'D1'
+    @(146.3600 mm, 119.5700 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(138.7600 mm, 51.2000 mm): PCB Text 'BUCK IN' on F.Silkscreen
+    @(143.9000 mm, 51.5000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(138.7600 mm, 51.2000 mm): PCB Text 'BUCK IN' on F.Silkscreen
+    @(143.9000 mm, 50.9400 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(138.7600 mm, 53.0000 mm): Reference 'J4'
+    @(143.9000 mm, 53.0000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(150.9600 mm, 51.2000 mm): PCB Text 'SW SERVOS' on F.Silkscreen
+    @(156.1000 mm, 50.9400 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(150.9600 mm, 51.2000 mm): PCB Text 'SW SERVOS' on F.Silkscreen
+    @(156.1000 mm, 51.5000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(150.9600 mm, 53.0000 mm): Reference 'J3'
+    @(156.1000 mm, 53.0000 mm): Line on F.Silkscreen
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(149.0000 mm, 66.2000 mm): Reference 'F1'
+    @(148.2100 mm, 66.2000 mm): Line on F.Silkscreen
 
 ** Found 0 unconnected pads **
 
