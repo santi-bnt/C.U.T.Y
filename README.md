@@ -1,4 +1,4 @@
-# C.U.T.Y — Cute Utility That Yaps
+# C.U.T.Y — Companion Unit That Yaps
 
 Compañero de escritorio expresivo. La voz desarrollada en Windows y el menú/cara subidos desde la Raspberry conviven en este repositorio.
 

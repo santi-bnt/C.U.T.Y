@@ -1,4 +1,4 @@
-# C.U.T.Y — Cute Utility That Yaps
+# C.U.T.Y — Companion Unit That Yaps
 
 Menú táctil ligero para Raspberry Pi 5 y pantalla SPI de 480 × 320.
 Utiliza Pillow, evdev, NetworkManager y el framebuffer Linux, sin HDMI.

@@ -218,7 +218,7 @@ function Portfolio() {
             ))}
           </h1>
           <div className="hero-copy">
-            <p className="mono">Cute Utility That Yaps</p>
+            <p className="mono">Companion Unit That Yaps</p>
             <h2>
               {t(bi("A little body.", "Un pequeño cuerpo."))}
               <br />
