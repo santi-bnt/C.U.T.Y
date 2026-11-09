@@ -56,9 +56,9 @@
    "print_dims_mm": [
     22.0,
     12.0,
-    5.0
+    6.5
    ],
-   "volume_cm3": 0.8
+   "volume_cm3": 1.0
   },
   {
    "part": "G3_Crank_R",
@@ -66,9 +66,9 @@
    "print_dims_mm": [
     22.0,
     12.0,
-    5.0
+    6.5
    ],
-   "volume_cm3": 0.8
+   "volume_cm3": 1.0
   },
   {
    "part": "K1_Core_Deck",
@@ -78,7 +78,7 @@
     118.4,
     47.0
    ],
-   "volume_cm3": 38.4
+   "volume_cm3": 38.5
   },
   {
    "part": "K2_Core_Spine",
@@ -144,11 +144,11 @@
    "part": "S3_Tummy_Grille",
    "group": "shell",
    "print_dims_mm": [
-    55.4,
-    55.4,
+    55.3,
+    55.3,
     13.6
    ],
-   "volume_cm3": 7.6
+   "volume_cm3": 7.4
   },
   {
    "part": "S4_USB_Plug",
@@ -246,7 +246,7 @@
    "print_dims_mm": [
     121.2,
     93.2,
-    15.0
+    10.8
    ],
    "volume_cm3": 27.8
   },
@@ -255,10 +255,10 @@
    "group": "head",
    "print_dims_mm": [
     85.0,
-    70.0,
+    87.1,
     3.0
    ],
-   "volume_cm3": 2.4
+   "volume_cm3": 3.0
   },
   {
    "part": "H5_Head_Base",
@@ -268,7 +268,7 @@
     48.0,
     9.6
    ],
-   "volume_cm3": 11.8
+   "volume_cm3": 11.7
   },
   {
    "part": "H6_Ear_L",
@@ -349,13 +349,15 @@
   "fuse_F2",
   "pi5_board",
   "pi5_usb_eth",
+  "pi5_sd_card",
   "pi5_cooler",
   "pi5_gpio",
   "pi5_usbc",
   "pi5_hdmi",
   "buck_6v",
   "reg_5v1_usbc",
-  "speaker_40mm",
+  "speaker_2w",
+  "speaker_2w_cone",
   "imu_mpu6050",
   "battery_3s_2200",
   "battery_lead",
@@ -380,6 +382,8 @@
   "pushrod_L",
   "pushrod_R",
   "bolt_roll_M4",
-  "bolt_pitch_M4"
+  "bolt_pitch_M4",
+  "screw_crank_L",
+  "screw_crank_R"
  ]
 }

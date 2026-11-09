@@ -96,8 +96,17 @@ def main():
         ("fab/cuty_carrier_capa_superior.pdf", "carrier-top.pdf"),
         ("fab/preview/cuty_carrier_top.png", "carrier-front.png"),
         ("fab/preview/cuty_carrier_bottom.png", "carrier-back.png"),
+        ("fab/jlcpcb/BOM_JLCPCB.csv", "jlcpcb-bom.csv"),
+        ("fab/jlcpcb/CPL_JLCPCB.csv", "jlcpcb-cpl.csv"),
+        ("fab/jlcpcb/LEEME_JLCPCB.md", "jlcpcb-order-notes.md"),
+        ("fab/pcba/cuty_carrier_PCBA_BOM.xlsx", "pcba-bom.xlsx"),
+        ("fab/pcba/cuty_carrier_PCBA_CPL.xlsx", "pcba-cpl.xlsx"),
+        ("fab/pcba/cuty_carrier_PCBA_ensamble.pdf", "pcba-assembly.pdf"),
+        ("fab/pcba/LEEME_PCBA.md", "pcba-readme.md"),
+        ("README.md", "carrier-readme.md"),
     ]:
         shutil.copyfile(SOURCE / src, OUT / dest)
+    shutil.copyfile(ROOT / "docs/bom.md", OUT / "project-bom.md")
     with zipfile.ZipFile(OUT / "carrier-gerbers.zip", "w", zipfile.ZIP_DEFLATED) as bundle:
         for path in sorted((SOURCE / "fab/gerbers").iterdir()):
             if path.is_file():

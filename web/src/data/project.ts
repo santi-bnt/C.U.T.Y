@@ -9,7 +9,7 @@ export const stageNames: Record<Stage, Copy> = {
   implemented: bi("Implemented", "Implementado"),
   validation: bi("In validation", "En validación"),
   planned: bi("Planned", "Planeado"),
-  fabrication: bi("Sent to fabrication", "Enviada a fabricación"),
+  fabrication: bi("THT assembly ordered", "Ensamble THT solicitado"),
 };
 export const components = [
   {
@@ -96,8 +96,8 @@ export const components = [
     tag: bi("ELECTRONICS", "ELECTRÓNICA"),
     stage: "fabrication",
     detail: bi(
-      "100 × 92 mm, two-layer KiCad carrier. The builder confirms the board has been sent to fabrication. Assembly and electrical checks follow delivery.",
-      "Carrier KiCad de dos capas, 100 × 92 mm. El constructor confirma que la placa ya se envió a fabricar. El montaje y las pruebas eléctricas siguen después de recibirla.",
+      "100 × 92 mm, two-layer KiCad carrier. The documented order is a JLCPCB THT assembly: 37 components were soldered there; fuse holders, fuses and the JP1 shunt are fitted by hand. Receipt, integration and electrical checks remain pending.",
+      "Carrier KiCad de dos capas, 100 × 92 mm. El pedido documentado es un ensamble THT de JLCPCB: ahí soldaron 37 componentes; los portafusibles, fusibles y el puente JP1 se montan a mano. Faltan recepción, integración y pruebas eléctricas.",
     ),
     interface: "KiCad · 2 layers · THT",
     path: "hardware/electronics/kicad/cuty_carrier",
@@ -220,8 +220,8 @@ export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
         "Distribución de batería y regulador Pi independiente",
       ),
       bi(
-        "PCB sent to fabrication; assembly and electrical checks after delivery",
-        "PCB enviada a fabricar; montaje y pruebas eléctricas al recibirla",
+        "JLCPCB THT order: hand-fit fuse holders, fuses and JP1 shunt; then inspect and test",
+        "Pedido THT en JLCPCB: montar a mano portafusibles, fusibles y puente JP1; después inspeccionar y probar",
       ),
     ],
   },

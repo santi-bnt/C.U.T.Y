@@ -26,6 +26,16 @@ Measure original/repacked GLB bounds, names and triangles; verify PCB reference 
 
 ## Implemented outcome
 
+### Current print CAD update · 2026-11-06
+
+The repository now includes `hardware/cad/carcasa_v17/`, a separate, newer printable enclosure revision based on team-measured component envelopes. The static website export includes four supplied CAD renders, the 30 current oriented STL files, matching CadQuery source, part dimensions and the author's `verificacion.json`. The existing interactive GLB remains the November 5 assembly model; it is not relabeled as the November 6 print revision.
+
+The November 6 source README reports measurements for the Pi 5, Display-G, ReSpeaker, OV5647 camera and speaker. It also notes the battery's exact size and the camera lens-center measurement remain pending. The accompanying model report lists 30 watertight parts, 0 exact static interferences, 18 cable-clearance zones and 34 poses. These remain author-supplied CAD results; no physical print or assembly validation is inferred.
+
+### Carrier assembly order documentation
+
+The merged hardware README records a THT assembly order at JLCPCB, with 37 supplier-soldered components. F1/F2 fuse holders and fuses, and the JP1 shunt, are hand-fitted. JLCPCB BOM/CPL/notes are linked from the PCB section. PCBWay's PCBA package remains available but is labeled as an alternative to the documented order. Receipt and electrical validation are not asserted by this website update.
+
 Revised GLB is the new website source; native geometry remains outside the robot source tree. gltfpack 1.3.0 produced 1,637,704 bytes from 11,407,376 bytes, retained names/materials and emitted 318,018 triangles (five degenerate triangles removed, no simplification ratio requested). Original geometry has 109 meshes; measured web bounds are about 180.00 × 365.00 × 173.27 mm.
 
 The recovered earlier GLB/HTML provided naming and interaction references, while the latest revised native GLB supplies rendered geometry. The old assembly artifact supplies 18 images; the earlier model artifact supplies poster/static face references. Thirty revised STL files and original source documents are downloadable. The source archives themselves remain in Downloads.

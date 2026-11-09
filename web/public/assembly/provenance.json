@@ -97,5 +97,238 @@
     "CAD verification is an author-supplied report, not rerun or physical validation.",
     "Fuse pad coordinates differ from current repository KiCad by 3.4 mm in Y.",
     "No authored skeletal rig or animation clips; visual pivots are runtime simulations."
-  ]
+  ],
+  "currentPrintableCad": {
+    "revision": "V17 Nido · 2026-11-06",
+    "source": "hardware/cad/carcasa_v17",
+    "stlParts": 30,
+    "printArchive": "nido-print-stl.zip",
+    "sourceArchive": "current-cad-source.zip",
+    "report": "author-cad-verification.json",
+    "files": [
+      {
+        "path": "fuente_cad/render/render.html",
+        "sha256": "8d170c64166cff8cb01233604db2e3c9f0465e50eb07a500aa8b8bf6fd17cb99"
+      },
+      {
+        "path": "fuente_cad/render/render3d.html",
+        "sha256": "c472f2928604857e5029c177df5065b36e2b253f60312bfdb86c3c8cea029b39"
+      },
+      {
+        "path": "fuente_cad/render/shots.py",
+        "sha256": "282b241e9f5e41861557de99bc05f1b5a5c7c45a2508848361e57baa7157d32b"
+      },
+      {
+        "path": "fuente_cad/v17/arms.py",
+        "sha256": "cf2ef389e04d059e8723d671f27e2d0991e3c2b70e35f37d1d2fb577f3af52aa"
+      },
+      {
+        "path": "fuente_cad/v17/base.py",
+        "sha256": "332e6e26afad9854a87170df64468fef8566bcaab2deac0284f33073a93829d6"
+      },
+      {
+        "path": "fuente_cad/v17/body.py",
+        "sha256": "0e7457becfb103775cf9f9cab0ce5d8ae10df9c6059d2de814d65bac2c762bf4"
+      },
+      {
+        "path": "fuente_cad/v17/build.py",
+        "sha256": "2fdcacaec759219f4ecc4826382285ab2f659b6ba16ede696b79078219e5e766"
+      },
+      {
+        "path": "fuente_cad/v17/common.py",
+        "sha256": "a6c064148cbac7aceb9d41253b9c1b8fb23b178de3e3dc1611185700b8e52643"
+      },
+      {
+        "path": "fuente_cad/v17/core.py",
+        "sha256": "984bec1a4342dcd2f7d0d8e313616116b0b3af4ca9486df95caa72f9cc84aa7b"
+      },
+      {
+        "path": "fuente_cad/v17/export.py",
+        "sha256": "b8e2b617469cf2e0d7aaba5d7346aa413c810fdc53a4b89fe969c0e0ff3c6c5f"
+      },
+      {
+        "path": "fuente_cad/v17/fitcheck.py",
+        "sha256": "a2eb1c7dc571c6181d05ef5cf99649447532e8219bb6d2ff305a36d3197b0bd4"
+      },
+      {
+        "path": "fuente_cad/v17/head.py",
+        "sha256": "7339537335e0d2f992ba64387f9d83cee9696bb68f0611f546e43debed4dc3d6"
+      },
+      {
+        "path": "fuente_cad/v17/kocheck.py",
+        "sha256": "d02298e09f9bc1567ea0389839c16e36a01ee650aca6339cf5ebf3bf25becc84"
+      },
+      {
+        "path": "fuente_cad/v17/meshcheck.py",
+        "sha256": "b751c2bb21fdf33cb60bea1e64cf8dd7dc0987f55b059e94cf454bedddf3a55f"
+      },
+      {
+        "path": "fuente_cad/v17/meshio.py",
+        "sha256": "9d69121bcdeabfa93fa03bc8f69c5bdc588baf991c5d5b62176a2e8cd0df9e72"
+      },
+      {
+        "path": "fuente_cad/v17/refs.py",
+        "sha256": "f7315350ca1daedf823bd97d527c6a554a68f3472b6a8f594276c26c14fe28c1"
+      },
+      {
+        "path": "fuente_cad/v17/shells.py",
+        "sha256": "fbdceb5550427ec2b0e024cfd9ece6c0eb7026af491d3e19d05e2595de3b62d9"
+      },
+      {
+        "path": "fuente_cad/v17/verify.py",
+        "sha256": "927585ea7d66393ce6491f24ac962278e9c9ac5ea6fd70cd5647bab83585cf23"
+      },
+      {
+        "path": "LEEME.md",
+        "sha256": "8c3b414623155fc26d8bd052762fb0a08bc598d3784c5b6193e7579ad30061e6"
+      },
+      {
+        "path": "partes.json",
+        "sha256": "9f0684b52938e6f4cff2952122da648fbc3a0206d7f2d01e619eaa3b5c8c2d0d"
+      },
+      {
+        "path": "renders/espalda_34.png",
+        "sha256": "34f825b5ced4881c721617fbe683ff10e713a9a837201d5c0893c76dbbbf4b65"
+      },
+      {
+        "path": "renders/frente_34.png",
+        "sha256": "6987e1dba7ee80322ec382895b9b435c2c842e08a7c57c886d829a01a83ed76c"
+      },
+      {
+        "path": "renders/lado.png",
+        "sha256": "a31cafef4f6dd73db36cd9aff01076f8f1be5c224d70ee40ff922026cfe9d2f5"
+      },
+      {
+        "path": "renders/rayos_x.png",
+        "sha256": "e419d659799c2524512bc38e392b60ab8b3fba28045dff383c0cc0de54b5cf04"
+      },
+      {
+        "path": "STL_imprimir/A1_Arm_L.stl",
+        "sha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587"
+      },
+      {
+        "path": "STL_imprimir/A2_Arm_R.stl",
+        "sha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb"
+      },
+      {
+        "path": "STL_imprimir/A3_Hand_L.stl",
+        "sha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86"
+      },
+      {
+        "path": "STL_imprimir/A4_Hand_R.stl",
+        "sha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40"
+      },
+      {
+        "path": "STL_imprimir/A5_Arm_Cap_L.stl",
+        "sha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5"
+      },
+      {
+        "path": "STL_imprimir/A6_Arm_Cap_R.stl",
+        "sha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e"
+      },
+      {
+        "path": "STL_imprimir/B1_Base_Cover.stl",
+        "sha256": "81f820b2bbe11bce6d7730c75a9af6e5c70bbb090409e0a6f1129a19df99bf01"
+      },
+      {
+        "path": "STL_imprimir/B2_Base_Floor.stl",
+        "sha256": "8ee1796375d758a22affd29aa13335a74ddb7bd8ee977170793d8d6ce2649f99"
+      },
+      {
+        "path": "STL_imprimir/B3_Battery_Drawer.stl",
+        "sha256": "bb8093cdf4b6926056ff6322fa56f4885096dcf99a684d668d1a78c7a8a4dadc"
+      },
+      {
+        "path": "STL_imprimir/B4_Gimbal_Post.stl",
+        "sha256": "667ede2c45a406def8c6a106e5a352ebf6fe95ca77abbbcd65bf440be77baaeb"
+      },
+      {
+        "path": "STL_imprimir/G1_Ujoint_Cross.stl",
+        "sha256": "202a57e20d90a53197c5ae8f5825a6ad24703719c0ff7418e4a2e5a9d175f97b"
+      },
+      {
+        "path": "STL_imprimir/G2_Crank_L.stl",
+        "sha256": "a7fd05a74f8e218f534d33aea8a631b2aea0ae6700d36c063ab35c21701f4096"
+      },
+      {
+        "path": "STL_imprimir/G3_Crank_R.stl",
+        "sha256": "78d825306990c5e33abedc6f40783b0603f0e76f09f4119f8d79e3971036dfcb"
+      },
+      {
+        "path": "STL_imprimir/H1_Head_Front.stl",
+        "sha256": "b9187e4276647d1b15f4cca573e6cd8805867c83ac7c08d1b131b0b8c3db03d1"
+      },
+      {
+        "path": "STL_imprimir/H2_Head_Back.stl",
+        "sha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e"
+      },
+      {
+        "path": "STL_imprimir/H3_Visor.stl",
+        "sha256": "c37b256e0127917ddc6c2bec42b2ab20a79d1d388873f69be1e4c8b3aeca7f05"
+      },
+      {
+        "path": "STL_imprimir/H4_Display_Bars.stl",
+        "sha256": "896c6c6c340c25e1d3b3d47a6b821e7b8a5e3b10b243e75c7b393a97f7bf0a2e"
+      },
+      {
+        "path": "STL_imprimir/H5_Head_Base.stl",
+        "sha256": "222ac356dd57ce6ac8baedd29c785997347d001b5f36c3ea5dad760c9e1dd52d"
+      },
+      {
+        "path": "STL_imprimir/H6_Ear_L.stl",
+        "sha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0"
+      },
+      {
+        "path": "STL_imprimir/H7_Ear_R.stl",
+        "sha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8"
+      },
+      {
+        "path": "STL_imprimir/H8_Antenna.stl",
+        "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66"
+      },
+      {
+        "path": "STL_imprimir/K1_Core_Deck.stl",
+        "sha256": "5a0b3440eb8f657f39b612fc00bf9472e67090968c1ddac0eaccf55b768a6090"
+      },
+      {
+        "path": "STL_imprimir/K2_Core_Spine.stl",
+        "sha256": "75aef7f0db0915305728de2c9ef3f39760d4240a2a967448a8d146648833c1bc"
+      },
+      {
+        "path": "STL_imprimir/K3_Core_Shoulders.stl",
+        "sha256": "90982432556818e9d043a1c761ec40ecd58673c6f6a856223f23c6862963f434"
+      },
+      {
+        "path": "STL_imprimir/K4_Neck_Hub.stl",
+        "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b"
+      },
+      {
+        "path": "STL_imprimir/K5_Power_Rack.stl",
+        "sha256": "8b3b09a93c9cac36cb39961374fc0c1f8ed857c39d6fd7889bf862c6381c462b"
+      },
+      {
+        "path": "STL_imprimir/S1_Body_Front.stl",
+        "sha256": "f3376cc026f145998d07ed80ae9e9a25e459074de91e82c69da5f70b60164493"
+      },
+      {
+        "path": "STL_imprimir/S2_Body_Back.stl",
+        "sha256": "30ad204904acba7b2245827c530f4f2e2126ff2b5b4e199c18a4a9d9318f8bf2"
+      },
+      {
+        "path": "STL_imprimir/S3_Tummy_Grille.stl",
+        "sha256": "fe6771b0c2ad33f0b4d7b27395c3f45140ef7d35cd0cc09356c4e01aabab61af"
+      },
+      {
+        "path": "STL_imprimir/S4_USB_Plug.stl",
+        "sha256": "b665ed22503f81731355cd52797024fd2698a09199f3d031044248d75f86da50"
+      },
+      {
+        "path": "verificacion.json",
+        "sha256": "2312f8c6ec328d48053d11c5dcfdfeedd1bf3c29cad5cfa15f85391f150893cd"
+      }
+    ],
+    "reportScope": "Author-supplied CAD/model checks; not independently rerun or physical validation."
+  },
+  "webGlbRevision": "V17 Nido · 2026-11-05",
+  "webGlbPrintCadNote": "The interactive model predates the November 6 printable enclosure revision; the latter is shown using supplied renders and downloadable print/source files."
 }

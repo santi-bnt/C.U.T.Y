@@ -12,7 +12,7 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 | --- | --- |
 | Tamaño | 100 × 92 mm, esquinas redondeadas, 4 barrenos M3 |
 | Capas | 2 (F.Cu / B.Cu), FR-4 1.6 mm |
-| Componentes | 100 % de agujero pasante (THT): se pide ensamblada a PCBWay (`fab/pcba/`) o se suelda a mano |
+| Componentes | 100 % de agujero pasante (THT): pedido documentado con ensamble JLCPCB (`fab/jlcpcb/`); paquete PCBA de PCBWay conservado como alternativa (`fab/pcba/`) |
 | Pista / espacio mínimo | 0.30 mm / 0.25 mm (señales); 2.5–3.0 mm en potencia |
 | Taladro mínimo | 0.40 mm (vías 0.8/0.4); 2 ranuras de 0.6 mm (patas del XT60) |
 | DRC guardado | 0 entradas de severidad error, 0 pads sin conectar y 50 advertencias de serigrafía (`drc_report.txt`) |
@@ -20,12 +20,14 @@ zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 
 ![Vista superior](fab/preview/cuty_carrier_top.png)
 
-Los archivos de diseño y fabricación están disponibles; la fabricación,
-el montaje y la validación eléctrica de la carrier siguen pendientes.
-Los resultados DRC y Gerber anteriores son los conservados en esta rama;
-integrarlos en `main` no equivale a repetir las verificaciones con KiCad.
+El pedido documentado en [`fab/jlcpcb/`](fab/jlcpcb/LEEME_JLCPCB.md) registra
+37 componentes THT soldados por JLCPCB. Los portafusibles F1/F2, sus fusibles
+y el puente JP1 se colocan a mano. La recepción, integración y validación
+eléctrica deben verificarse por separado. Los resultados DRC y Gerber son los
+reportes guardados en el proyecto; integrar estos archivos no equivale a
+repetir las verificaciones con KiCad.
 
-## Pedido en PCBWay
+## Alternativa de ensamble: PCBWay
 
 1. Comprime el contenido de **`fab/gerbers/`** como `CUTY_carrier_PCBWay_gerbers.zip`
    y súbelo en *PCB Instant Quote → Quick-order PCB*. El ZIP no está versionado;

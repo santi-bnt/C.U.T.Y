@@ -46,7 +46,7 @@ The builder subsequently confirmed camera operation and facial tracking on the r
 
 ## PCB production status
 
-The builder confirms the carrier has been sent to fabrication. Delivery, assembly and electrical checks are still subsequent steps; the order is not a claim that a manufactured board has already passed testing.
+The repository records an assembled THT order placed with JLCPCB: 37 components were soldered by the supplier. F1/F2 fuse holders and fuses, plus the JP1 shunt, are fitted by hand. Receipt, integration and electrical checks remain pending; this order record is not evidence that the board has passed testing.
 
 ## Proposed UART and servo control
 

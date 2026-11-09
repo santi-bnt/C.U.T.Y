@@ -132,12 +132,20 @@ const steps = [
   ],
 ] as const;
 const asset = (name: string) => `${import.meta.env.BASE_URL}assembly/${name}`;
+const currentRevision = [
+  ["front", "Front", "Frente", "latest-front.png"],
+  ["back", "Back", "Espalda", "latest-back.png"],
+  ["side", "Side", "Lateral", "latest-side.png"],
+  ["xray", "X-ray", "Rayos X", "latest-xray.png"],
+] as const;
 export default function AssemblyStory() {
   const { locale, t } = useLocale();
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const [step, setStep] = useState(0),
     [playing, setPlaying] = useState(false);
+  const [revisionView, setRevisionView] = useState<(typeof currentRevision)[number][0]>("front");
   const current = steps[step];
+  const selectedRevision = currentRevision.find(([id]) => id === revisionView)!;
   useEffect(() => {
     if (!playing || reduced) return;
     const timer = window.setInterval(
@@ -150,24 +158,69 @@ export default function AssemblyStory() {
     <section id="assembly" className="assembly-story technical-section ink">
       <div className="technical-heading">
         <span className="eyebrow">
-          V17 / NIDO — {t(bi("THE ASSEMBLY", "EL ENSAMBLE"))}
+          V17 / NIDO · 06 NOV 2026 — {t(bi("CURRENT PRINT CAD", "CAD DE IMPRESIÓN ACTUAL"))}
         </span>
         <h2>
           {t(
             bi(
-              "Personality, piece by piece.",
-              "Personalidad, pieza por pieza.",
+              "A fit refined around real parts.",
+              "Un ajuste afinado con piezas reales.",
             ),
           )}
         </h2>
         <p>
           {t(
             bi(
-              "Explore the supplied assembly imagery, then inspect the revised geometry in 3D.",
-              "Explora las imágenes de ensamble y después inspecciona la geometría revisada en 3D.",
+              "The latest printable V17 Nido revision incorporates measured electronics, camera and speaker dimensions. Browse the author-provided design views and download the current print files.",
+              "La última revisión imprimible del Nido V17 incorpora medidas de la electrónica, la cámara y la bocina. Explora las vistas del diseño y descarga los archivos actuales de impresión.",
             ),
           )}
         </p>
+      </div>
+      <div className="latest-cad">
+        <figure className="latest-cad-image">
+          <img
+            src={asset(selectedRevision[3])}
+            alt={t(bi(`V17 Nido CAD view: ${selectedRevision[1]}`, `Vista CAD del Nido V17: ${selectedRevision[2]}`))}
+            width="1100"
+            height="1100"
+            loading="lazy"
+          />
+          <figcaption className="mono">
+            {t(bi("AUTHOR CAD RENDER · 06 NOV 2026", "RENDER CAD DEL AUTOR · 06 NOV 2026"))}
+          </figcaption>
+        </figure>
+        <div className="latest-cad-copy">
+          <span className="eyebrow">{t(bi("MEASURED FIT UPDATE", "AJUSTE CON MEDIDAS"))}</span>
+          <h3>{t(bi("Camera cradle. Speaker pocket. A revised visor.", "Cuna para cámara. Espacio para bocina. Visor revisado."))}</h3>
+          <p>
+            {t(
+              bi(
+                "The November 6 print CAD adds a camera cradle and retaining bar, sizes the display bars to the measured 5.8 mm panel, and shapes the grille around the 35.4 × 25 × 5.5 mm speaker. The battery drawer is designed for the team's HM2202 pack envelope; its exact dimensions still need measurement.",
+                "El CAD de impresión del 6 de noviembre añade una cuna y barra para la cámara, ajusta las barras a la pantalla medida de 5.8 mm y forma la rejilla alrededor de la bocina de 35.4 × 25 × 5.5 mm. El cajón está diseñado para la batería HM2202 del equipo; aún falta medir sus dimensiones exactas.",
+              ),
+            )}
+          </p>
+          <div className="latest-cad-views" aria-label={t(bi("CAD views", "Vistas CAD"))}>
+            {currentRevision.map(([id, en, es]) => (
+              <button
+                key={id}
+                aria-pressed={revisionView === id}
+                onClick={() => setRevisionView(id)}
+              >
+                {t(bi(en, es))}
+              </button>
+            ))}
+          </div>
+          <p className="simulation-note">
+            {t(
+              bi(
+                "The supplied CAD report lists 30 watertight printable parts, 0 reported static interferences and 34 checked poses. Those are author-reported model checks, not physical print, assembly or electrical validation. The website's interactive GLB remains the November 5 revision; the November 6 print geometry is presented here through its supplied renders and files.",
+                "El reporte CAD suministrado enumera 30 piezas imprimibles herméticas, 0 interferencias estáticas reportadas y 34 posturas revisadas. Son comprobaciones del modelo reportadas por el autor, no validación física de impresión, ensamble o electricidad. El GLB interactivo de la web sigue en la revisión del 5 de noviembre; la geometría de impresión del 6 de noviembre se muestra aquí con sus renders y archivos.",
+              ),
+            )}
+          </p>
+        </div>
       </div>
       <div className="assembly-stage">
         <div className="assembly-image">
@@ -180,7 +233,7 @@ export default function AssemblyStory() {
           />
           <span className="mono">
             {String(step + 1).padStart(2, "0")} / 18 —{" "}
-            {t(bi("RENDERED ASSEMBLY REFERENCE", "REFERENCIA RENDERIZADA"))}
+            {t(bi("EARLIER ASSEMBLY REFERENCE", "REFERENCIA DE ENSAMBLE ANTERIOR"))}
           </span>
         </div>
         <div className="assembly-caption">
@@ -222,8 +275,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-                "Images depict the earlier Nido reference. The interactive 3D uses the supplied November 5 revision. Purchased components are simplified CAD envelopes.",
-                "Las imágenes muestran la referencia Nido anterior. El 3D usa la revisión del 5 de noviembre. Los componentes comprados son envolventes CAD simplificadas.",
+              "This 18-step image sequence depicts an earlier Nido reference. The current November 6 print CAD is shown above; the interactive GLB uses the November 5 assembly. Purchased components in that GLB are simplified CAD envelopes.",
+              "Esta secuencia de 18 pasos muestra una referencia Nido anterior. Arriba está el CAD de impresión actual del 6 de noviembre; el GLB interactivo usa el ensamble del 5 de noviembre. Los componentes comprados en ese GLB son envolventes CAD simplificadas.",
               ),
             )}
           </p>
@@ -275,15 +328,16 @@ export default function AssemblyStory() {
         <p>
           {t(
             bi(
-              "30 STL parts, a source README and an author-supplied CAD check report. Physical fit, wiring and motor safety require their own checks; the supplied collision report has not been rerun here.",
-              "30 STL, el README original y un reporte CAD del autor. Ajuste físico, cableado y seguridad de motores requieren sus propias comprobaciones; aquí no se volvió a ejecutar la revisión de colisiones.",
+                "The November 6 print package includes 30 oriented STL parts, the matching CadQuery source, part dimensions and the author's verification report. The report has not been independently rerun here; physical fit, wiring and motor safety still need their own checks.",
+                "El paquete de impresión del 6 de noviembre incluye 30 STL orientados, la fuente CadQuery correspondiente, dimensiones y el reporte de verificación del autor. Aquí no se volvió a ejecutar de forma independiente; ajuste físico, cableado y seguridad de motores aún requieren sus propias comprobaciones.",
             ),
           )}
         </p>
         <div className="engineering-downloads">
           {[
-            ["nido-print-stl.zip", "30 STL"],
-            ["source-readme.md", "README"],
+            ["nido-print-stl.zip", "30 STL · 06 Nov"],
+            ["source-readme.md", "README · 06 Nov"],
+            ["current-cad-source.zip", "CadQuery source / Fuente CadQuery"],
             ["print-parts.json", "Dimensions / Medidas"],
             ["author-cad-verification.json", "CAD report / Reporte CAD"],
             ["provenance.json", "Provenance / Procedencia"],

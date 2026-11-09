@@ -83,16 +83,16 @@ export default function PcbDesign() {
         <strong>
           {t(
             bi(
-              "SENT TO FABRICATION / ELECTRICAL CHECKS AFTER DELIVERY",
-              "ENVIADA A FABRICACIÓN / PRUEBAS ELÉCTRICAS AL RECIBIRLA",
+              "JLCPCB THT ORDER / HAND-FIT PARTS + ELECTRICAL CHECKS PENDING",
+              "PEDIDO THT EN JLCPCB / FALTAN PIEZAS A MANO Y PRUEBAS ELÉCTRICAS",
             ),
           )}
         </strong>
         <span>
           {t(
             bi(
-              "100 × 92 mm · 2 layers · 1.6 mm · Carrier V1.1. Fabrication ordered; assembly follows delivery.",
-              "100 × 92 mm · 2 capas · 1.6 mm · Carrier V1.1. Ya enviada a fabricar; montaje después de recibirla.",
+              "Carrier V1.1 · 100 × 92 mm · 2 layers · 1.6 mm. JLCPCB soldered 37 THT parts; F1/F2 fuse holders and fuses, plus the JP1 shunt, are hand-fitted. Receipt and electrical validation remain pending.",
+              "Carrier V1.1 · 100 × 92 mm · 2 capas · 1.6 mm. JLCPCB soldó 37 piezas THT; faltan a mano los portafusibles y fusibles F1/F2, además del puente JP1. Falta recibirla y validarla eléctricamente.",
             ),
           )}
         </span>
@@ -170,8 +170,8 @@ export default function PcbDesign() {
               <p className="simulation-note">
                 {t(
                   bi(
-                    "Recovered from the revised Nido CAD. Components are simplified mechanical envelopes. Native KiCad remains the electrical source; fuse positions differ between these references. Mounting holes and NT1 have no selectable 3D part.",
-                    "Recuperado del CAD Nido revisado. Los componentes son envolventes mecánicas simplificadas. KiCad sigue como fuente eléctrica; difieren las posiciones de fusibles. Los agujeros y NT1 no tienen pieza 3D seleccionable.",
+                    "This mechanical view comes from the November 5 Nido model. The printable enclosure was revised on November 6; its current renders and print files are linked below. Components are simplified envelopes. Native KiCad remains the electrical source; fuse positions differ between these references. Mounting holes and NT1 have no selectable 3D part.",
+                    "Esta vista mecánica viene del modelo Nido del 5 de noviembre. La carcasa imprimible se revisó el 6 de noviembre; abajo están sus renders y archivos actuales. Los componentes son envolventes simplificadas. KiCad sigue como fuente eléctrica; las posiciones de fusibles difieren entre referencias. Los agujeros y NT1 no tienen pieza 3D seleccionable.",
                   ),
                 )}
               </p>
@@ -429,6 +429,8 @@ export default function PcbDesign() {
           ["carrier-schematic.pdf", bi("Schematic PDF", "Esquema PDF")],
           ["carrier-bom.csv", bi("Bill of materials", "Lista de materiales")],
           ["carrier-gerbers.zip", bi("Gerbers + drills", "Gerbers + taladros")],
+          ["project-bom.md", bi("Project hardware BOM", "BOM general del proyecto")],
+          ["carrier-readme.md", bi("Carrier documentation", "Documentación carrier")],
         ].map(([file, label]) => (
           <a
             key={file as string}
@@ -440,6 +442,39 @@ export default function PcbDesign() {
           </a>
         ))}
       </div>
+      <details className="pcb-order-files">
+        <summary>
+          {t(bi("Assembly order files & alternatives", "Archivos del pedido y alternativa PCBA"))}
+        </summary>
+        <p>
+          {t(
+            bi(
+              "The README records JLCPCB as the ordered supplier. PCBWay files are retained as an alternative package, not as the order that was placed.",
+              "El README registra a JLCPCB como proveedor del pedido. Los archivos de PCBWay se conservan como alternativa, no como el pedido realizado.",
+            ),
+          )}
+        </p>
+        <div className="engineering-downloads">
+          {[
+            ["jlcpcb-bom.csv", bi("JLCPCB BOM", "BOM de JLCPCB")],
+            ["jlcpcb-cpl.csv", bi("JLCPCB placement (CPL)", "Posiciones JLCPCB (CPL)")],
+            ["jlcpcb-order-notes.md", bi("JLCPCB order notes", "Notas del pedido JLCPCB")],
+            ["pcba-assembly.pdf", bi("PCBWay assembly drawing", "Plano de ensamble PCBWay")],
+            ["pcba-bom.xlsx", bi("PCBWay PCBA BOM", "BOM PCBA PCBWay")],
+            ["pcba-cpl.xlsx", bi("PCBWay PCBA placement", "Posiciones PCBA PCBWay")],
+            ["pcba-readme.md", bi("PCBWay alternative instructions", "Instrucciones alternativa PCBWay")],
+          ].map(([file, label]) => (
+            <a
+              key={file as string}
+              href={engineeringAsset(file as string)}
+              download
+            >
+              <Download size={15} />
+              {t(label as { en: string; es: string })}
+            </a>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }

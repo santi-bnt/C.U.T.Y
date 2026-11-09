@@ -92,7 +92,11 @@ export default function RobotViewer({ motion }: { motion: StoryMotion }) {
         layer.current.style.clipPath = `inset(${revealTop}px 0 0 0)`;
         layer.current.dataset.chapter = String(Math.round(motion.progress));
       }
-      if (open.current) open.current.hidden = shot.visible < 0.02;
+      // Keep the floating explorer entry point beside the robot story only.
+      // In later technical sections it would cover controls such as the CAD
+      // gallery's view picker on narrow screens.
+      if (open.current)
+        open.current.hidden = shot.visible < 0.02 || motion.progress > 3.08;
       setActive(
         !document.hidden && (!loaded || exploring || shot.visible > 0.01),
       );

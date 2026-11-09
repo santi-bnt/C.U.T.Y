@@ -32,7 +32,9 @@ Replay intro buttons in the hero and footer reopen the opening without reloading
 
 The updated **V17 Nido November 5 revision** has named parts, smooth CAD normals and authored internal materials. The exterior remains black and the original animated Python face remains mapped onto the actual LCD glass. Explore supports orbit/pinch, presets, zoom/reset, wireframe, autorotation, inside/exploded views and clearly labeled head/arm motion demos. These are visual rigid-part simulations, not motor commands or proof of safe joint limits.
 
-An 18-image assembly walkthrough uses the user-supplied rendered stages with step selection, previous/next and optional playback. Images depict an earlier Nido reference; the interactive mesh is the revised CAD. Thirty printable STL files and the source README, part dimensions, author CAD report and provenance manifest are downloadable on demand. The original document contains paths to renders/textures absent from its ZIP; web imagery comes from the supplied artifact exports. CAD report claims were not rerun or physically validated here.
+The assembly section now leads with the **November 6, 2026 printable Nido revision**, using the current author-provided front, back, side and X-ray renders. Its fit updates include the camera cradle and retaining bar, measured 5.8 mm display bars, a speaker pocket sized 35.4 × 25 × 5.5 mm and a battery drawer designed around the team's HM2202 pack envelope. Exact battery dimensions and camera lens-center position remain to be measured. The section downloads the matching 30 oriented STL parts, CadQuery source, dimensions and author report. Reported 0 static interferences and 34 poses are clearly attributed to the author and are not physical validation.
+
+The interactive robot GLB and 18-step assembly images remain from earlier revisions: the GLB is dated November 5 and the image sequence is an earlier assembly reference. The page labels these separately from the November 6 print CAD instead of implying they are the same revision.
 
 PCB inspection retains native KiCad front/back pad selection, zoom/pan and electrical details. Its additional 3D mode uses **45 actual solids extracted from revised Nido CAD**. Purchased electronics are simplified mechanical envelopes, not a validated KiCad 3D component library. Orbit, front/back/isometric views, camera focus, hover and selection work. Holes/NT1 have no separately selectable solid, and four F1/F2 pad coordinates differ between the artifact and current KiCad by 3.4 mm in Y. Native electrical data is not replaced by this model.
 
@@ -40,7 +42,7 @@ Wiring defaults to an interactive 3D interior with selected components and color
 
 ## Which connections are confirmed
 
-Latest builder update: camera operation and facial tracking are confirmed on the robot, alongside display/audio. Their component states are Implemented. The carrier has been sent to fabrication, displayed as a distinct production status; delivery, assembly and electrical checks remain subsequent steps. Visual tracking is separate from future servo-driven head tracking.
+Latest builder update: camera operation and facial tracking are confirmed on the robot, alongside display/audio. Their component states are Implemented. The hardware README records an assembled THT order with JLCPCB: 37 components soldered by the supplier; F1/F2 holders and fuses, plus the JP1 shunt, are fitted by hand. The page links the order's BOM, placement file and instructions, and separately labels the PCBWay PCBA package as an alternative. Receipt, integration and electrical checks are not presented as validated. Visual gaze tracking is separate from future servo-driven head tracking.
 
 `src/data/operationalWiring.ts` and `public/engineering/hardware-connections.md` record the builder's supplied table. Display and ReSpeaker operation together is confirmed. Display DC is BCM24 / physical18; RESET is BCM25 / physical22; touch IRQ is BCM17 / physical11. The latest explicit ReSpeaker table uses 5 V physical4, 3.3 V physical1, GND physical6, I2C physical3/5, MCLK physical7 / BCM4, I2S physical12/35/38/40 and AUD_RST physical37 / BCM26. These 11 rows supersede the earlier audio hookup list.
 
@@ -72,7 +74,7 @@ node scripts/export-nido.mjs
 
 The importer accepts `--downloads PATH`, defaulting to the current user's Downloads, and expects the three supplied ZIP names documented in `public/assembly/provenance.json`. It reads ZIP contents without executing artifact JavaScript or CAD Python. Only web assets are written. The source CAD generation/check scripts are reference material, not automatically executed.
 
-Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe web/scripts/export-engineering.py`. This compares native pad nets to `scripts/netlist.py` before generating source downloads; it does not define the confirmed operational wiring. Original face export: `raspberry/.venv/Scripts/python.exe web/scripts/export-face.py`.
+Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe web/scripts/export-engineering.py`. This compares native pad nets to `scripts/netlist.py` before generating source downloads and includes the current JLCPCB order files and PCBWay alternative; it does not define the confirmed operational wiring. Current printable Nido export: `raspberry/.venv/Scripts/python.exe web/scripts/export-current-nido.py`. Original face export: `raspberry/.venv/Scripts/python.exe web/scripts/export-face.py`.
 
 ## Main files and future integration
 
@@ -81,7 +83,7 @@ Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe w
 - `viewer/Scene.tsx`, `RobotViewer.tsx`, `robot.ts`, `assembly.ts`: original face integration, named geometry, exclusive exploration and visual demos.
 - `components/PcbDesign.tsx`, `WiringConnections.tsx`, `EngineeringViewport.tsx`, `viewer/EngineeringScene.tsx`: native layout and spatial inspection.
 - `data/operationalWiring.ts`, `engineering.ts`, `nido.generated.json`: confirmed hookup table, separate native electrical design and measured geometry.
-- `scripts/import-nido.py`, `export-nido.mjs`: source import/provenance and CAD subset extraction.
+- `scripts/import-nido.py`, `export-nido.mjs`, `export-current-nido.py`: source model import, CAD subset extraction and current November 6 print package export.
 - Existing `communication/robot.ts`, `faceFrames.ts` and `state/FaceFrames.tsx`: future transport/decoded-frame boundaries, independent of database state. No socket or credentials.
 
 Live is offline by default. Optional public HTTPS `VITE_CUTY_DASHBOARD_URL` links to a separately deployed dashboard; its authentication stays there. No dashboard/auth/database existed to migrate.

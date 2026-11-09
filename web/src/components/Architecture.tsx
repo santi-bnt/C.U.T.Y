@@ -155,8 +155,8 @@ export default function Architecture() {
         <div className="architecture-note">
           {t(
             bi(
-              "The carrier routes these interfaces; it does not replace firmware. It has been sent to fabrication; assembly and electrical checks follow delivery.",
-              "La carrier distribuye estas interfaces; no reemplaza el firmware. Ya se envió a fabricar; el montaje y las pruebas eléctricas siguen al recibirla.",
+              "The carrier routes these interfaces; it does not replace firmware. The documented JLCPCB order includes 37 THT parts; fuse holders, fuses and the JP1 shunt are hand-fitted. Electrical checks follow receipt and assembly.",
+              "La carrier distribuye estas interfaces; no reemplaza el firmware. El pedido documentado a JLCPCB incluye 37 piezas THT; los portafusibles, fusibles y el puente JP1 se montan a mano. Las pruebas eléctricas siguen a la recepción y al montaje.",
             ),
           )}
         </div>

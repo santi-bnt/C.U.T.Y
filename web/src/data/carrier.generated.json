@@ -8,7 +8,7 @@
   "layers": 2,
   "pcbModel": null,
   "source": "hardware/electronics/kicad/cuty_carrier",
-  "pcbSha256": "ab0ef7f3afe13e9cf8cae9ab40d41d220056954cb8ebe72e264439d24dd26454",
+  "pcbSha256": "c34d382ed3efa45daca3e73cf1253e5825b4e09b0eef3469420685ff0f73c840",
   "netlistSha256": "550d173111d6a000b8faec731a64b881c2dc4134f6841711eed0756dc7b30ff5",
   "piHeader": {
     "1": "+3V3",

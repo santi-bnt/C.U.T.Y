@@ -1,5 +1,13 @@
 # Verification — cinematic story and revised Nido integration
 
+## Latest documentation update — 2026-11-09
+
+- Updated the web page from the current Nov 6 printable Nido CAD README and KiCad carrier README/order files. The interactive robot GLB remains the Nov 5 assembly; the page keeps that distinction explicit.
+- Carrier status now reflects the documented JLCPCB THT assembly order: 37 supplier-soldered components, with F1/F2 fuse hardware and JP1 shunt to be fitted by hand. Receipt, integration, and electrical validation are not claimed complete. PCBWay files are labeled as an alternative package.
+- The page now provides the current Nido STL set, CadQuery source, four CAD renders, dimensions, author-supplied verification report, JLCPCB/PCBWay order documents, and the project BOM/readme downloads.
+- `npm.cmd run lint` and `npm.cmd run build` passed on Nov 9. Vite reports the existing ~996 kB minified robot scene chunk (~272 kB gzip). No test suite was run for this documentation/assets update.
+- Manual production-preview review covered 1440×1000 desktop and 390×844 mobile: CAD views switched correctly; no page errors, failed requests, or horizontal overflow. The floating 3D explorer button was restricted to the robot story so it does not cover the CAD view controls in technical sections.
+
 Validated locally on Windows, 2026-11-06. No production deployment.
 
 ## Checks
@@ -15,7 +23,7 @@ Validated locally on Windows, 2026-11-06. No production deployment.
 
 ## Visual review and fixes
 
-Latest steering: hero contains no visible model or exploration controls; the robot first appears in Meet C.U.T.Y. Tests assert hidden/visible states for desktop/mobile/reduced motion, and the transition clips the canvas below the second section's boundary. Camera/tracking status now reflects the builder's physical confirmation. PCB status is Sent to fabrication, without claiming assembly or electrical testing has finished.
+Latest steering at that validation: hero contains no visible model or exploration controls; the robot first appears in Meet C.U.T.Y. Tests assert hidden/visible states for desktop/mobile/reduced motion, and the transition clips the canvas below the second section's boundary. Camera/tracking status now reflects the builder's physical confirmation. PCB status then was Sent to fabrication; the current status is updated above from the newer README and order documents.
 
 Replay/typography follow-up: 20 unit tests, lint and build passed; the three affected desktop/tablet/mobile browser scenarios passed with replay, Escape/focus restoration, intro bounds and a canvas text-metrics check proving the hero Y's ink fits its mask. Additional desktop and 320px captures reviewed the complete Y and static reduced-motion replay with no page errors or horizontal overflow. Replay does not remount the persistent model.
 
