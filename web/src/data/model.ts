@@ -1,7 +1,7 @@
 ﻿import nido from "./nido.generated.json";
 export const modelInfo = {
-  revision: "V17 Nido",
-  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=nido-rev-20261105`,
+  revision: nido.revision,
+  url: `${import.meta.env.BASE_URL}models/cuty.glb?v=nido-rev-20261106`,
   triangles: nido.triangles,
   meshes: nido.meshes,
   boundsMm: nido.boundsMm,

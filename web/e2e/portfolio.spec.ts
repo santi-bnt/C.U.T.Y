@@ -178,7 +178,10 @@ test("actual PCB inspection, electrical search, filters and source downloads", a
   await page.getByLabel("Select component", { exact: true }).selectOption("U1");
   await expect(page.locator(".pcb-details h3")).toHaveText("BlackPill F401CC");
   await expect(page.locator(".pcb-details")).toContainText("29 / PA3");
-  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page
+    .locator("#pcb-design")
+    .getByRole("button", { name: "Back", exact: true })
+    .click();
   await expect(board.locator("image")).toHaveAttribute(
     "href",
     /carrier-back\.png$/,

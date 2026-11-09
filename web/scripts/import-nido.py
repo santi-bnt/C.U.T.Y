@@ -1,6 +1,8 @@
 """Import user-provided Nido references. Reads ZIP data only; never executes artifact scripts."""
 import argparse,hashlib,json,pathlib,re,shutil,zipfile
 parser=argparse.ArgumentParser();parser.add_argument('--downloads',type=pathlib.Path,default=pathlib.Path.home()/'Downloads');parser.add_argument('--prepare',action='store_true');args=parser.parse_args()
+if not args.prepare:
+ raise SystemExit('Reference-only importer: use --prepare to extract reference assets. It no longer writes the website GLB; rebuild the current model with build-current-nido-model.py and export-current-nido-model.mjs.')
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 CACHE=ROOT/'node_modules/.cache'
 OUT=ROOT/'public/assembly';OUT.mkdir(parents=True,exist_ok=True)
@@ -27,10 +29,7 @@ with zipfile.ZipFile(files[2])as z:
    if e.filename.startswith(prefix+'STL_imprimir/')and e.filename.endswith('.stl'):
     info=zipfile.ZipInfo('STL_imprimir/'+pathlib.Path(e.filename).name,date_time=(2026,11,5,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;output.writestr(info,z.read(e))
 if args.prepare:
- print('Prepared native model and supplied reference assets; run gltfpack before final import.');raise SystemExit(0)
-optimized=CACHE/'cuty-nido-revision/nido-web.glb'
-shutil.copyfile(optimized,ROOT/'public/models/cuty.glb')
-manifest['webGlbSha256']=sha(optimized.read_bytes());manifest['webGlbBytes']=optimized.stat().st_size
+ print('Prepared source-package GLB and reference assets only. The November 6 CadQuery build is the website model source.');raise SystemExit(0)
 # Native metadata is retained without claiming physical validation.
 manifest['limitations']=['Purchased electronics are simplified mechanical solids.','CAD verification is an author-supplied report, not rerun or physical validation.','Fuse pad coordinates differ from current repository KiCad by 3.4 mm in Y.','No authored skeletal rig or animation clips; visual pivots are runtime simulations.']
 (OUT/'provenance.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False),encoding='utf8')

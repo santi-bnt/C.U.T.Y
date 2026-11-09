@@ -56,7 +56,8 @@ describe("user-confirmed wiring and revised assets", () => {
           .update(readFileSync("public/assembly/" + image.name))
           .digest("hex"),
       ).toBe(image.sha256);
-    expect(nido.meshes).toBe(109);
+    expect(nido.revision).toContain("2026-11-06");
+    expect(nido.meshes).toBe(113);
     expect(nido.pcb.meshes).toBe(45);
     expect(nido.pcb.simplified).toBe(true);
     expect(

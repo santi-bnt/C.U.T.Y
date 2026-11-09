@@ -30,11 +30,11 @@ A kinetic C.U.T.Y. typographic opening precedes a text-only hero, with Skip and 
 
 Replay intro buttons in the hero and footer reopen the opening without reloading the page or remounting the model. Escape/Skip closes it and restores keyboard focus. With reduced motion, an explicitly requested replay shows static branding until closed. Letter masks include space for glyph overhang so the Y is not clipped; mobile animation tracking stays inside the viewport.
 
-The updated **V17 Nido November 5 revision** has named parts, smooth CAD normals and authored internal materials. The exterior remains black and the original animated Python face remains mapped onto the actual LCD glass. Explore supports orbit/pinch, presets, zoom/reset, wireframe, autorotation, inside/exploded views and clearly labeled head/arm motion demos. These are visual rigid-part simulations, not motor commands or proof of safe joint limits.
+The interactive **V17 Nido November 6 revision** is rebuilt from the current CadQuery source and includes 113 named parts. Its measured camera cradle, three display/camera bars and current LCD component are in the actual GLB. The exterior remains black and the original animated Python face is mapped onto the LCD glass. Explore supports orbit/pinch, presets, zoom/reset, wireframe, autorotation, inside/exploded views and clearly labeled head/arm motion demos. These are visual rigid-part simulations, not motor commands or proof of safe joint limits.
 
 The assembly section now leads with the **November 6, 2026 printable Nido revision**, using the current author-provided front, back, side and X-ray renders. Its fit updates include the camera cradle and retaining bar, measured 5.8 mm display bars, a speaker pocket sized 35.4 × 25 × 5.5 mm and a battery drawer designed around the team's HM2202 pack envelope. Exact battery dimensions and camera lens-center position remain to be measured. The section downloads the matching 30 oriented STL parts, CadQuery source, dimensions and author report. Reported 0 static interferences and 34 poses are clearly attributed to the author and are not physical validation.
 
-The interactive robot GLB and 18-step assembly images remain from earlier revisions: the GLB is dated November 5 and the image sequence is an earlier assembly reference. The page labels these separately from the November 6 print CAD instead of implying they are the same revision.
+The interactive robot GLB now shares the November 6 enclosure geometry. The 18-step assembly image sequence remains an earlier assembly reference and is labeled accordingly.
 
 PCB inspection retains native KiCad front/back pad selection, zoom/pan and electrical details. Its additional 3D mode uses **45 actual solids extracted from revised Nido CAD**. Purchased electronics are simplified mechanical envelopes, not a validated KiCad 3D component library. Orbit, front/back/isometric views, camera focus, hover and selection work. Holes/NT1 have no separately selectable solid, and four F1/F2 pad coordinates differ between the artifact and current KiCad by 3.4 mm in Y. Native electrical data is not replaced by this model.
 
@@ -52,27 +52,30 @@ UART is proposed at Pi physical8/10; final STM32 RX/TX and all five PWM pins rem
 
 ## Assets and performance
 
-`public/models/cuty.glb` is now generated from the revised user-provided native GLB, replacing the older anonymous V17. Native: 11,407,376 bytes, 109 named meshes, 318,023 triangles. Web: **1,637,704 bytes, 318,018 triangles**, with meshopt compression and quantization. No simplification ratio was requested; gltfpack removed five degenerate triangles. Measured web bounds are approximately 180.00 × 365.00 × 173.27 mm. Position/normal quantization is presentation optimization, not manufacturing geometry. Names and materials are retained. There are no authored animation clips or skin.
+`public/models/cuty.glb` is rebuilt from the current November 6 CadQuery source. The web GLB is **1,093,424 bytes, 113 named meshes and 192,642 triangles**, with 0.25 mm CAD tessellation and gltfpack quantization/compression; no mesh simplification is requested. Measured web bounds are approximately 180.00 × 365.00 × 173.41 mm. The updated H3 visor depth is 10.72 mm and H4 display/camera bars span 87.05 mm. These are model dimensions, not manufacturing tolerances. Names and the integrated LCD mesh are retained. There are no authored animation clips or skin.
 
-`public/models/carrier-assembly.glb` is the 146,700-byte mechanical subset. Geometry, asset hashes and provenance are tested. The original robot GLB remains in `hardware/cad/` unchanged. Recovered face PNGs/poster remain in `public/assembly/` as references; runtime face animation continues using the original four WebP atlases under `public/face/`.
+`public/models/carrier-assembly.glb` is the 45-mesh mechanical subset extracted from the current CAD assembly. The source-package GLB remains unchanged in `hardware/cad/`; the website model is generated separately from the current source code and its `parts.json` reference data. Recovered face PNGs/poster remain in `public/assembly/` as references; runtime face animation continues using the original four WebP atlases under `public/face/`.
 
 The existing Three/Drei meshopt decoder is bundled locally; no CDN decoder, remote font, HDR or AI service is required. DPR is capped, technical canvases are lazy, hidden views pause, static homepage geometry is batched, and no postprocessing is added. There are no FPS/Lighthouse claims. Vite retains a large shared 3D-chunk advisory.
 
 ## Regenerate assets
 
-No new runtime dependency was installed. gltfpack is an isolated build tool cached within `web/node_modules/.cache`.
+No new runtime dependency was installed. CadQuery/trimesh and gltfpack are build-only tools cached within `web/node_modules/.cache`.
 
-From repository root, using an existing Python environment:
+From repository root, using a Python environment with `cadquery` and `trimesh` installed:
 
 ```powershell
-raspberry/.venv/Scripts/python.exe web/scripts/import-nido.py --prepare
+py -3 -m venv web/node_modules/.cache/cadquery-builder/venv
+web/node_modules/.cache/cadquery-builder/venv/Scripts/python.exe -m pip install cadquery trimesh
+web/node_modules/.cache/cadquery-builder/venv/Scripts/python.exe web/scripts/build-current-nido-model.py
 cd web
-npm.cmd exec --yes --cache ./node_modules/.cache/npm-tools --package=gltfpack@1.3.0 -- gltfpack -i node_modules/.cache/cuty-nido-revision/CUTY_V17_Nido/CUTY_V17.glb -o node_modules/.cache/cuty-nido-revision/nido-web.glb -kn -km -vp 16 -vn 12 -cc
-../raspberry/.venv/Scripts/python.exe scripts/import-nido.py
-node scripts/export-nido.mjs
+npm.cmd exec --yes --cache ./node_modules/.cache/npm-tools --package=gltfpack@1.3.0 -- gltfpack -i node_modules/.cache/cadquery-builder/out/cuty_v17_web.glb -o node_modules/.cache/cadquery-builder/cuty-v17-web-optimized.glb -kn -km -vp 16 -vn 12 -cc
+node scripts/export-current-nido-model.mjs
 ```
 
-The importer accepts `--downloads PATH`, defaulting to the current user's Downloads, and expects the three supplied ZIP names documented in `public/assembly/provenance.json`. It reads ZIP contents without executing artifact JavaScript or CAD Python. Only web assets are written. The source CAD generation/check scripts are reference material, not automatically executed.
+The build helper works on a temporary copy under `node_modules/.cache`, adds the checked-in `scripts/data/cadquery/parts.json` input, and forces a fresh CAD rebuild. Windows uses Arial for engraved lettering when the source's Linux Inter fonts are unavailable; this does not change mechanical dimensions. The model exporter validates H3, H4 and LCD mesh presence before replacing the public GLBs and metadata.
+
+`import-nido.py --prepare` only extracts the source-package GLB and historical reference assets; it cannot replace the current website GLB. Do not use the legacy `export-nido.mjs` for current assets. Rebuild the site model only with the current CadQuery build and validated exporter above. The source CAD generation/check scripts are not automatically executed.
 
 Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe web/scripts/export-engineering.py`. This compares native pad nets to `scripts/netlist.py` before generating source downloads and includes the current JLCPCB order files and PCBWay alternative; it does not define the confirmed operational wiring. Current printable Nido export: `raspberry/.venv/Scripts/python.exe web/scripts/export-current-nido.py`. Original face export: `raspberry/.venv/Scripts/python.exe web/scripts/export-face.py`.
 
@@ -83,7 +86,7 @@ Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe w
 - `viewer/Scene.tsx`, `RobotViewer.tsx`, `robot.ts`, `assembly.ts`: original face integration, named geometry, exclusive exploration and visual demos.
 - `components/PcbDesign.tsx`, `WiringConnections.tsx`, `EngineeringViewport.tsx`, `viewer/EngineeringScene.tsx`: native layout and spatial inspection.
 - `data/operationalWiring.ts`, `engineering.ts`, `nido.generated.json`: confirmed hookup table, separate native electrical design and measured geometry.
-- `scripts/import-nido.py`, `export-nido.mjs`, `export-current-nido.py`: source model import, CAD subset extraction and current November 6 print package export.
+- `scripts/import-nido.py`, `build-current-nido-model.py`, `export-current-nido-model.mjs`, `export-current-nido.py`: archive references, current CadQuery build, validated GLB export and print-package export.
 - Existing `communication/robot.ts`, `faceFrames.ts` and `state/FaceFrames.tsx`: future transport/decoded-frame boundaries, independent of database state. No socket or credentials.
 
 Live is offline by default. Optional public HTTPS `VITE_CUTY_DASHBOARD_URL` links to a separately deployed dashboard; its authentication stays there. No dashboard/auth/database existed to migrate.

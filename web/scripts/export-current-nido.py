@@ -11,6 +11,7 @@ WEB = Path(__file__).resolve().parents[1]
 ROOT = WEB.parent
 SOURCE = ROOT / "hardware/cad/carcasa_v17"
 OUT = WEB / "public/assembly"
+CAD_PARTS = WEB / "scripts/data/cadquery/parts.json"
 
 
 def digest(path: Path) -> str:
@@ -44,6 +45,7 @@ def main() -> None:
         (SOURCE / name, name)
         for name in ("LEEME.md", "partes.json", "verificacion.json")
     ] + [(path, path.relative_to(SOURCE).as_posix()) for path in code]
+    source_files.append((CAD_PARTS, "fuente_cad/v17/parts.json"))
     archive_files(OUT / "current-cad-source.zip", source_files)
 
     renders = {
@@ -61,6 +63,7 @@ def main() -> None:
         SOURCE / "verificacion.json",
         *stls,
         *code,
+        CAD_PARTS,
         *(SOURCE / "renders" / name for name in renders.values()),
     ]
     manifest_path = OUT / "provenance.json"
@@ -73,15 +76,20 @@ def main() -> None:
         "sourceArchive": "current-cad-source.zip",
         "report": "author-cad-verification.json",
         "files": [
-            {"path": path.relative_to(SOURCE).as_posix(), "sha256": digest(path)}
+            {
+                "path": (
+                    "web/scripts/data/cadquery/parts.json"
+                    if path == CAD_PARTS
+                    else path.relative_to(SOURCE).as_posix()
+                ),
+                "sha256": digest(path),
+            }
             for path in sorted(record_files)
         ],
         "reportScope": "Author-supplied CAD/model checks; not independently rerun or physical validation.",
     }
-    manifest["webGlbRevision"] = "V17 Nido · 2026-11-05"
-    manifest["webGlbPrintCadNote"] = "The interactive model predates the November 6 printable enclosure revision; the latter is shown using supplied renders and downloadable print/source files."
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Exported current Nido CAD: {len(stls)} STL parts, {len(code)} source files, {len(renders)} renders")
+    print(f"Exported current Nido CAD: {len(stls)} STL parts, {len(code)} CAD code files plus component data, {len(renders)} renders")
 
 
 if __name__ == "__main__":

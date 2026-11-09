@@ -170,8 +170,8 @@ export default function PcbDesign() {
               <p className="simulation-note">
                 {t(
                   bi(
-                    "This mechanical view comes from the November 5 Nido model. The printable enclosure was revised on November 6; its current renders and print files are linked below. Components are simplified envelopes. Native KiCad remains the electrical source; fuse positions differ between these references. Mounting holes and NT1 have no selectable 3D part.",
-                    "Esta vista mecánica viene del modelo Nido del 5 de noviembre. La carcasa imprimible se revisó el 6 de noviembre; abajo están sus renders y archivos actuales. Los componentes son envolventes simplificadas. KiCad sigue como fuente eléctrica; las posiciones de fusibles difieren entre referencias. Los agujeros y NT1 no tienen pieza 3D seleccionable.",
+                    "This mechanical view is extracted from the November 6 Nido assembly. Components are simplified envelopes. Native KiCad remains the electrical source; fuse positions differ between these references. Mounting holes and NT1 have no selectable 3D part.",
+                    "Esta vista mecánica se extrajo del ensamble Nido del 6 de noviembre. Los componentes son envolventes simplificadas. KiCad nativo sigue siendo la fuente eléctrica; las posiciones de fusibles difieren entre estas referencias. Los agujeros de montaje y NT1 no tienen una pieza 3D seleccionable.",
                   ),
                 )}
               </p>

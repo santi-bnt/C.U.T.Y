@@ -8,7 +8,7 @@ vi.mock("./EngineeringViewport", () => ({
 }));
 afterEach(cleanup);
 describe("source-backed engineering interfaces", () => {
-  it("selects a native footprint, exposes pin nets, flips actual previews and labels the missing 3D asset", () => {
+  it("selects a native footprint, exposes pin nets, flips actual previews and describes the current 3D reference", () => {
     render(
       <LocaleProvider>
         <PcbDesign />
@@ -26,9 +26,7 @@ describe("source-backed engineering interfaces", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "3D mechanical reference" }),
     );
-    expect(
-      screen.getByText(/Recovered from the revised Nido CAD/),
-    ).toBeTruthy();
+    expect(screen.getByText(/extracted from the November 6 Nido assembly/)).toBeTruthy();
     expect(
       screen
         .getByRole("link", { name: "Gerbers + drills" })

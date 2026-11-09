@@ -1,8 +1,15 @@
-# Verification — cinematic story and revised Nido integration
+# Verification — cinematic story and current Nido integration
+
+## Current-model replacement — 2026-11-09
+
+- Rebuilt `public/models/cuty.glb` and the PCB mechanical subset from the November 6 CadQuery source in `hardware/cad/carcasa_v17/fuente_cad/v17`, using the matching `parts.json` reference data supplied in the ZIP.
+- Geometry checks: 113 named meshes, 192,642 triangles, 1,093,424-byte optimized GLB, bounds 180.00 × 365.00 × 173.41 mm, H3 depth 10.72 mm, H4 span 87.05 mm, and `lcd_touch_panel` retained for the existing facial texture pipeline.
+- This replaces the previous 1,637,704-byte GLB that had old H3/H4 dimensions. The intro still delays showing the robot until the second section; the assembly photographs remain an earlier reference.
+- The website-model rebuild and metadata/export validation completed. Full web tests, lint, production build, browser visual review, and push are still pending in this update.
 
 ## Latest documentation update — 2026-11-09
 
-- Updated the web page from the current Nov 6 printable Nido CAD README and KiCad carrier README/order files. The interactive robot GLB remains the Nov 5 assembly; the page keeps that distinction explicit.
+- Rebuilt the interactive robot GLB from the November 6 printable Nido CadQuery source. The page now identifies the interactive model as the current printable enclosure revision; the 18-step photo sequence remains an earlier assembly reference.
 - Carrier status now reflects the documented JLCPCB THT assembly order: 37 supplier-soldered components, with F1/F2 fuse hardware and JP1 shunt to be fitted by hand. Receipt, integration, and electrical validation are not claimed complete. PCBWay files are labeled as an alternative package.
 - The page now provides the current Nido STL set, CadQuery source, four CAD renders, dimensions, author-supplied verification report, JLCPCB/PCBWay order documents, and the project BOM/readme downloads.
 - `npm.cmd run lint` and `npm.cmd run build` passed on Nov 9. Vite reports the existing ~996 kB minified robot scene chunk (~272 kB gzip). No test suite was run for this documentation/assets update.
@@ -33,7 +40,7 @@ Captures remain ignored under `test-results/` and `node_modules/.cache/cuty-rese
 
 ## Asset evidence
 
-The revised native GLB has 109 named meshes, 318,023 triangles and 11,407,376 bytes. gltfpack 1.3.0 retained names/materials, quantized/compressed without requesting simplification, and removed five degenerate triangles. Web GLB: 1,637,704 bytes / 318,018 triangles, with local bundled meshopt decoding. Bounds approximately 180.00 × 365.00 × 173.27 mm. Geometry is presentation data, not manufacturing tolerance evidence.
+The November 6 web GLB was rebuilt from the current CadQuery source with 0.25 mm linear and 0.17 rad angular tessellation, then optimized with gltfpack 1.3.0. It contains 113 named meshes and 192,642 triangles in 1,093,424 bytes; bounds are approximately 180.00 × 365.00 × 173.41 mm. H3 visor depth is 10.72 mm and H4 display/camera bars span 87.05 mm. The integrated LCD mesh name is preserved for the existing face-texture pipeline. Geometry is presentation data, not manufacturing tolerance evidence.
 
 The 146,700-byte PCB GLB contains 45 actual mechanical CAD solids. The CAD source explicitly models purchased electronics as simplified envelopes. It does not replace native electrical layout/net metadata; four fuse pad coordinates differ by 3.4 mm Y. Holes and NT1 have no separately selectable solid. Source archive hashes, output hash and all 18 rendered image hashes are preserved in `public/assembly/provenance.json` and tested.
 

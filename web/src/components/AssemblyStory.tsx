@@ -215,8 +215,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-                "The supplied CAD report lists 30 watertight printable parts, 0 reported static interferences and 34 checked poses. Those are author-reported model checks, not physical print, assembly or electrical validation. The website's interactive GLB remains the November 5 revision; the November 6 print geometry is presented here through its supplied renders and files.",
-                "El reporte CAD suministrado enumera 30 piezas imprimibles herméticas, 0 interferencias estáticas reportadas y 34 posturas revisadas. Son comprobaciones del modelo reportadas por el autor, no validación física de impresión, ensamble o electricidad. El GLB interactivo de la web sigue en la revisión del 5 de noviembre; la geometría de impresión del 6 de noviembre se muestra aquí con sus renders y archivos.",
+                "The supplied CAD report lists 30 watertight printable parts, 0 reported static interferences and 34 checked poses. Those are author-reported model checks, not physical print, assembly or electrical validation. The interactive GLB is rebuilt from this November 6 CAD revision, including the camera cradle and measured display/camera bars.",
+                "El reporte CAD suministrado enumera 30 piezas imprimibles herméticas, 0 interferencias estáticas reportadas y 34 posturas revisadas. Son comprobaciones del modelo reportadas por el autor, no validación física de impresión, ensamble o electricidad. El GLB interactivo se reconstruyó desde esta revisión CAD del 6 de noviembre e incluye la cuna de cámara y las barras medidas para pantalla y cámara.",
               ),
             )}
           </p>
@@ -275,8 +275,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-              "This 18-step image sequence depicts an earlier Nido reference. The current November 6 print CAD is shown above; the interactive GLB uses the November 5 assembly. Purchased components in that GLB are simplified CAD envelopes.",
-              "Esta secuencia de 18 pasos muestra una referencia Nido anterior. Arriba está el CAD de impresión actual del 6 de noviembre; el GLB interactivo usa el ensamble del 5 de noviembre. Los componentes comprados en ese GLB son envolventes CAD simplificadas.",
+              "This 18-step image sequence depicts an earlier Nido assembly reference. The interactive GLB and current November 6 printable CAD share the updated enclosure geometry; purchased electronics remain simplified CAD envelopes.",
+              "Esta secuencia de 18 pasos muestra una referencia anterior de armado Nido. El GLB interactivo y la CAD imprimible actual del 6 de noviembre comparten la geometría nueva de la carcasa; los componentes electrónicos comprados siguen como envolventes CAD simplificadas.",
               ),
             )}
           </p>
