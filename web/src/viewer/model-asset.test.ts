@@ -5,6 +5,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  Color,
   Texture,
 } from "three";
 import { batchStaticAssembly } from "./batchAssembly";
@@ -12,7 +13,7 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { updateAssembly } from "./assembly";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { modelInfo } from "../data/model";
-import { prepareRobot } from "./robot";
+import { photoPaletteByMaterial, prepareRobot } from "./robot";
 
 describe("deployed V17 assembly with integrated display", () => {
   it("batches the static body without changing any triangle or oriented bounds", async () => {
@@ -84,6 +85,7 @@ describe("deployed V17 assembly with integrated display", () => {
       .multiplyScalar(modelInfo.millimetersPerUnit);
     let triangles = 0;
     let meshes = 0;
+    let photoMatchedMaterials = 0;
     const authoredColors = new Set<string>();
     object.traverse((object) => {
       if (object instanceof Mesh) {
@@ -104,9 +106,15 @@ describe("deployed V17 assembly with integrated display", () => {
         const displayedMaterial = Array.isArray(object.material)
           ? object.material[0]
           : object.material;
+        const expectedColor = photoPaletteByMaterial[sourceMaterial.name];
+        if (expectedColor) photoMatchedMaterials++;
         expect(
           (displayedMaterial as MeshStandardMaterial).color.getHexString(),
-        ).toBe((sourceMaterial as MeshStandardMaterial).color.getHexString());
+        ).toBe(
+          expectedColor
+            ? new Color(expectedColor).getHexString()
+            : (sourceMaterial as MeshStandardMaterial).color.getHexString(),
+        );
         authoredColors.add(
           (displayedMaterial as MeshStandardMaterial).color.getHexString(),
         );
@@ -115,6 +123,7 @@ describe("deployed V17 assembly with integrated display", () => {
     // GLTFLoader converts authored sRGB factors into Three.js working space;
     // assert a varied preserved palette rather than comparing encoded hex.
     expect(authoredColors.size).toBeGreaterThan(3);
+    expect(photoMatchedMaterials).toBeGreaterThan(0);
     expect(meshes).toBe(modelInfo.meshes);
     expect(triangles).toBe(modelInfo.triangles);
     size

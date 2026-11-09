@@ -14,7 +14,6 @@ import type { StoryMotion } from "./storyMotion";
 import { emptyShot, resolveShot } from "./choreography";
 import { modelInfo } from "../data/model";
 import { prepareRobot } from "./robot";
-import { batchStaticAssembly } from "./batchAssembly";
 import { useFaceTexture } from "./useFaceTexture";
 import { useMedia } from "../state/useMedia";
 import { updateAssembly, type AssemblyView, type PoseDemo } from "./assembly";
@@ -38,10 +37,6 @@ function Robot({
     () => prepareRobot(scene, face, wireframe),
     [scene, face, wireframe],
   );
-  const batched = useMemo(
-    () => batchStaticAssembly(prepared.object),
-    [prepared],
-  );
   const invalidate = useThree((state) => state.invalidate);
   const start = useRef<number | null>(null);
   useFrame(({ clock }) => {
@@ -62,9 +57,8 @@ function Robot({
     () => () => {
       prepared.materials.forEach((material) => material.dispose());
       prepared.geometries.forEach((geometry) => geometry.dispose());
-      batched.geometries.forEach((geometry) => geometry.dispose());
     },
-    [prepared, batched],
+    [prepared],
   );
   return (
     <group
@@ -73,11 +67,7 @@ function Robot({
       scale={prepared.measurement.scale}
     >
       <primitive
-        object={
-          assemblyView === "assembled" && pose === "none"
-            ? batched.object
-            : prepared.object
-        }
+        object={prepared.object}
         position={prepared.measurement.center.clone().negate()}
       />
     </group>

@@ -11,8 +11,41 @@
   type Texture,
 } from "three";
 import nido from "../data/nido.generated.json";
+import { themeColor } from "../theme";
 import { measureModel } from "./model";
 const names = new Set(nido.parts.map((p) => p.name));
+const photoWhite = themeColor("--robot-case", "#f4f2ee");
+const photoBase = themeColor("--robot-base", "#dfc09a");
+const photoGray = themeColor("--robot-gray", "#888a88");
+const photoOrange = themeColor("--orange", "#ff6a00");
+export const photoPaletteByMaterial: Record<string, string> = {
+  S1_Body_Front: photoWhite,
+  S2_Body_Back: photoWhite,
+  A1_Arm_L: photoWhite,
+  A2_Arm_R: photoWhite,
+  H1_Head_Front: photoWhite,
+  H2_Head_Back: photoWhite,
+  B1_Base_Cover: photoBase,
+  B3_Battery_Drawer: photoBase,
+  B2_Base_Floor: photoGray,
+  B4_Gimbal_Post: photoGray,
+  K1_Core_Deck: photoGray,
+  K2_Core_Spine: photoGray,
+  K3_Core_Shoulders: photoGray,
+  K5_Power_Rack: photoGray,
+  H4_Display_Bars: photoGray,
+  H5_Head_Base: photoGray,
+  H3_Visor: themeColor("--dark", "#171717"),
+  S3_Tummy_Grille: photoOrange,
+  S4_USB_Plug: photoOrange,
+  A3_Hand_L: photoOrange,
+  A4_Hand_R: photoOrange,
+  A5_Arm_Cap_L: photoOrange,
+  A6_Arm_Cap_R: photoOrange,
+  H6_Ear_L: photoOrange,
+  H7_Ear_R: photoOrange,
+  H8_Antenna: photoOrange,
+};
 /** Decode quantized attributes before baking transforms; cached loader geometry stays untouched. */
 export function worldGeometry(mesh: Mesh) {
   const geometry = mesh.geometry.clone();
@@ -92,6 +125,10 @@ export function prepareRobot(
       : [child.material];
     const clonedMaterials = sourceMaterials.map((sourceMaterial) => {
       const material = sourceMaterial.clone();
+      const photoColor =
+        photoPaletteByMaterial[sourceMaterial.name] ?? photoPaletteByMaterial[name];
+      if (photoColor && material instanceof MeshStandardMaterial)
+        material.color.set(photoColor);
       if (material instanceof MeshStandardMaterial)
         material.wireframe = wireframe;
       materials.push(material);

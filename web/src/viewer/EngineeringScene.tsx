@@ -37,7 +37,7 @@ function Content(props: EngineeringProps) {
     () => ({
       power: themeColor("--orange", "#ff6a00"),
       ground: themeColor("--muted", "#676767"),
-      signal: themeColor("--surface", "#f3f3f0"),
+      signal: themeColor("--signal", "#16816d"),
       accent: themeColor("--orange", "#ff6a00"),
       accentStrong: themeColor("--orange-strong", "#b94700"),
     }),
@@ -102,7 +102,7 @@ function Content(props: EngineeringProps) {
           material.emissive.set(
             selected ? colors.accent : colors.accentStrong,
           );
-        material.emissiveIntensity = selected ? 0.65 : hover ? 0.35 : 0;
+          material.emissiveIntensity = selected ? 0.12 : hover ? 0.05 : 0;
       }
     });
     invalidate();

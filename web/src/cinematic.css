@@ -9,6 +9,12 @@
   --orange-soft: #fff0e6;
   --orange-wash: rgb(255 106 0 / 12%);
   --orange-line: rgb(255 106 0 / 32%);
+  --signal: #16816d;
+  --ground: #737b83;
+  --robot-case: #f4f2ee;
+  --robot-base: #dfc09a;
+  --robot-gray: #888a88;
+  --eye-green: #56b96c;
   --muted: #676767;
   --line: rgb(23 23 23 / 16%);
   --shadow: rgb(23 23 23 / 12%);
@@ -358,6 +364,10 @@ p {
   letter-spacing: -0.08em;
   gap: 9px;
   white-space: nowrap;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: 24px;
+  padding: 4px 11px 4px 4px;
 }
 .brand-icon {
   border: 1px solid var(--orange-line);
@@ -372,7 +382,7 @@ p {
 .brand-icon i {
   width: 4px;
   height: 8px;
-  background: #65b97a;
+  background: var(--eye-green);
   border-radius: 4px;
 }
 .nav {
@@ -928,6 +938,18 @@ summary::-webkit-details-marker {
   gap: 12px;
   margin: 0 0 18px;
 }
+.wiring-diagram-panel .engineering-toolbar .segmented button,
+.wiring-diagram-panel .assembly-controls button {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--paper);
+}
+.wiring-diagram-panel .engineering-toolbar .segmented button[aria-pressed="true"],
+.wiring-diagram-panel .assembly-controls button[aria-pressed="true"] {
+  color: var(--orange-strong);
+  border-color: var(--orange-line);
+  background: var(--orange-soft);
+}
 .segmented {
   display: flex;
   gap: 3px;
@@ -980,8 +1002,17 @@ summary::-webkit-details-marker {
 .pcb-hotspot.selected rect,
 .pcb-hotspot.hovered rect,
 .pcb-hotspot:focus rect {
-  fill: var(--orange-on-dark);
-  stroke: var(--orange-on-dark);
+  fill: rgb(255 106 0 / 4%);
+  stroke: var(--orange-strong);
+  stroke-width: 1.1;
+}
+.pcb-hotspot.hovered:not(.selected) rect {
+  fill: rgb(255 106 0 / 3%);
+  stroke: var(--orange);
+  stroke-width: 1.25;
+}
+.pcb-hotspot:focus rect {
+  stroke-dasharray: 3 2;
 }
 .pcb-hotspot:focus {
   outline: none;
@@ -1174,8 +1205,8 @@ summary::-webkit-details-marker {
 }
 .wiring-diagram-panel {
   min-width: 0;
-  border: 1px solid var(--orange-line);
-  background: var(--dark);
+  border: 1px solid var(--line);
+  background: var(--surface);
   border-radius: 15px;
   padding: 22px 15px;
 }
@@ -1194,6 +1225,9 @@ summary::-webkit-details-marker {
   min-height: 24px;
   white-space: nowrap;
 }
+.wiring-diagram-panel .simulation-note {
+  color: var(--ink);
+}
 .wiring-diagram {
   width: 100%;
   height: auto;
@@ -1201,28 +1235,28 @@ summary::-webkit-details-marker {
   overflow: visible;
 }
 .wire-edge {
-  color: var(--orange-on-dark);
+  color: var(--signal);
 }
 .wire-edge path {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
-  stroke-dasharray: 5 4;
-  opacity: 0.8;
+  stroke-width: 2.5;
+  stroke-dasharray: 7 4;
+  opacity: 0.9;
 }
 .wire-edge.power {
-  color: #eba65c;
+  color: var(--orange-strong);
 }
 .wire-edge.ground {
-  color: #9eabb2;
+  color: var(--ground);
 }
 .wire-edge text {
   font: 12px "Courier New",
     monospace;
-  fill: currentColor;
+  fill: var(--ink);
   paint-order: stroke;
-  stroke: var(--orange-strong);
-  stroke-width: 6px;
+  stroke: var(--surface);
+  stroke-width: 5px;
   stroke-linejoin: round;
 }
 .wire-edge.dimmed {
@@ -1235,22 +1269,22 @@ summary::-webkit-details-marker {
   cursor: pointer;
 }
 .wire-node rect {
-  fill: var(--orange-strong);
-  stroke: var(--orange-strong);
+  fill: var(--paper);
+  stroke: #45494d;
   stroke-width: 1.2;
 }
 .wire-node.selected rect,
 .wire-node:hover rect,
 .wire-node:focus-visible rect {
-  fill: var(--orange-strong);
-  stroke: var(--orange-on-dark);
-  stroke-width: 2;
+  fill: var(--orange-soft);
+  stroke: var(--orange-strong);
+  stroke-width: 2.4;
 }
 .wire-node:focus {
   outline: none;
 }
 .wire-node text {
-  fill: var(--orange-soft);
+  fill: var(--ink);
   font-size: 15px;
   font-weight: 600;
   pointer-events: none;
@@ -1258,7 +1292,7 @@ summary::-webkit-details-marker {
 .wire-node .node-ref {
   font: 10px "Courier New",
     monospace;
-  fill: var(--orange-on-dark);
+  fill: var(--muted);
 }
 .wire-node.dimmed {
   opacity: 0.38;
@@ -1268,7 +1302,7 @@ summary::-webkit-details-marker {
   flex-wrap: wrap;
   gap: 15px;
   padding: 18px 8px 0;
-  color: var(--orange-on-dark);
+  color: var(--ink);
   font-size: 9px;
 }
 .wire-legend > span {
@@ -1278,13 +1312,13 @@ summary::-webkit-details-marker {
 }
 .wire-legend i {
   width: 16px;
-  border-top: 2px dashed var(--orange-line);
+  border-top: 2px dashed var(--signal);
 }
 .wire-legend .power {
-  border-color: #eba65c;
+  border-color: var(--orange-strong);
 }
 .wire-legend .ground {
-  border-color: #9eabb2;
+  border-color: var(--ground);
 }
 .wire-mobile-nodes {
   display: none;
@@ -1752,21 +1786,22 @@ summary::-webkit-details-marker {
     padding: 14px 4px;
   }
   .wire-mobile-nodes button {
-    border: 1px solid var(--orange-line);
+    border: 1px solid var(--line);
     border-radius: 8px;
     min-height: 58px;
     padding: 12px;
     text-align: left;
     font-size: 11px;
-    color: var(--orange-on-dark);
+    color: var(--ink);
+    background: var(--paper);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 7px;
   }
   .wire-mobile-nodes button[aria-pressed="true"] {
-    border-color: var(--orange-on-dark);
-    background: var(--orange-wash);
+    border-color: var(--orange-strong);
+    background: var(--orange-soft);
   }
   .wiring-detail {
     margin-top: 0;
