@@ -385,6 +385,9 @@ p {
   background: var(--eye-green);
   border-radius: 4px;
 }
+.site-header .brand-icon i {
+  background: var(--orange);
+}
 .nav {
   display: flex;
   gap: 19px;
@@ -476,8 +479,11 @@ p {
   letter-spacing: -0.09em;
   line-height: 0.9;
   white-space: nowrap;
-  color: var(--orange-strong);
+  color: #171717;
   z-index: 0;
+}
+.product-hero h1 .accent {
+  color: #171717;
 }
 .hero-letter-mask {
   display: inline-block;
