@@ -20,6 +20,7 @@ import { wiringEdges, wiringNodes } from "../data/operationalWiring";
 import { modelInfo } from "../data/model";
 import { partName } from "./robot";
 import { useMedia } from "../state/useMedia";
+import { themeColor } from "../theme";
 const nodePatterns: Record<string, RegExp> = {
   pi: /^pi5_/,
   stm: /^pcb_(blackpill|U1)/,
@@ -31,8 +32,17 @@ const nodePatterns: Record<string, RegExp> = {
   buck: /^buck_6v/,
   regulator: /^reg_5v1_usbc/,
 };
-const colors = { power: "#f9aa5a", ground: "#a0acb8", signal: "#c4b5fd" };
 function Content(props: EngineeringProps) {
+  const colors = useMemo(
+    () => ({
+      power: themeColor("--orange", "#ff6a00"),
+      ground: themeColor("--muted", "#676767"),
+      signal: themeColor("--surface", "#f3f3f0"),
+      accent: themeColor("--orange", "#ff6a00"),
+      accentStrong: themeColor("--orange-strong", "#b94700"),
+    }),
+    [],
+  );
   const { scene } = useGLTF(
     props.mode === "pcb"
       ? `${import.meta.env.BASE_URL}models/carrier-assembly.glb`
@@ -89,12 +99,14 @@ function Content(props: EngineeringProps) {
       if (material.emissive) {
         material.emissive.copy(material.userData.baseEmissive);
         if (selected || hover)
-          material.emissive.set(selected ? "#8b5cf6" : "#5d4689");
+          material.emissive.set(
+            selected ? colors.accent : colors.accentStrong,
+          );
         material.emissiveIntensity = selected ? 0.65 : hover ? 0.35 : 0;
       }
     });
     invalidate();
-  }, [object, props.selected, props.hover, props.mode, invalidate]);
+  }, [object, props.selected, props.hover, props.mode, invalidate, colors]);
   useEffect(() => {
     let center = new Vector3(0, props.mode === "pcb" ? 0 : 180, 0);
     if (props.mode === "pcb" && props.selected) {
@@ -236,7 +248,7 @@ function Content(props: EngineeringProps) {
                 args={[props.selected === n.id ? 4.5 : 2.8, 12, 8]}
               />
               <meshBasicMaterial
-                color={props.selected === n.id ? "#ffffff" : "#c4b5fd"}
+                color={props.selected === n.id ? "#ffffff" : colors.accent}
               />
             </mesh>
           ))}
@@ -257,6 +269,7 @@ export default function EngineeringScene(
   props: EngineeringProps & { active: boolean },
 ) {
   const compact = useMedia("(max-width:900px)");
+  const orangeLight = themeColor("--orange-on-dark", "#ff9b5c");
   return (
     <Canvas
       frameloop={props.active ? "demand" : "never"}
@@ -273,8 +286,8 @@ export default function EngineeringScene(
       <directionalLight position={[140, 350, 500]} intensity={3} />
       <directionalLight
         position={[-250, 120, -200]}
-        intensity={2}
-        color="#bfa9e8"
+        intensity={1.3}
+        color={orangeLight}
       />
       <Content {...props} />
     </Canvas>

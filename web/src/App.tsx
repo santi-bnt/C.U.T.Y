@@ -67,7 +67,7 @@ function Chapter({
   id: string;
   number: string;
   label: Copy;
-  tone: "ink" | "paper" | "lavender";
+  tone: "ink" | "paper" | "surface";
   side: "left" | "right";
   children: ReactNode;
 }) {
@@ -497,7 +497,7 @@ function Portfolio() {
           id="development"
           number="06"
           label={bi("DEVELOPMENT", "DESARROLLO")}
-          tone="lavender"
+          tone="surface"
           side="left"
         >
           <Heading

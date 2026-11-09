@@ -1,17 +1,17 @@
 :root {
   font-family: Inter, Arial, Helvetica, sans-serif;
-  color: #e9edf0;
-  background: #090c10;
+  color: #171717;
+  background: #ffffff;
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.6;
   font-size: 15px;
   font-optical-sizing: auto;
-  color-scheme: dark;
-  --muted: #93a0ac;
-  --line: #252d36;
-  --cyan: #a2e8f4;
-  --blue: #a4bcff;
+  color-scheme: light;
+  --muted: #676767;
+  --line: rgb(23 23 23 / 16%);
+  --cyan: #ff6a00;
+  --blue: #b94700;
 }
 * {
   box-sizing: border-box;

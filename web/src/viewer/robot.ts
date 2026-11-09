@@ -4,6 +4,7 @@
   Group,
   Mesh,
   MeshBasicMaterial,
+  Material,
   MeshStandardMaterial,
   type BufferGeometry,
   type Object3D,
@@ -76,36 +77,34 @@ export function prepareRobot(
   source: Object3D,
   faceTexture: Texture,
   wireframe: boolean,
-  inspect = false,
 ) {
   source.updateMatrixWorld(true);
   const object = new Group();
-  const body = new MeshStandardMaterial({
-    color: "#101114",
-    roughness: 0.52,
-    metalness: 0.25,
-    wireframe,
-  });
   const screen = new MeshBasicMaterial({ map: faceTexture, toneMapped: false });
-  const materials = [body, screen];
+  const materials: Material[] = [screen];
   const geometries: BufferGeometry[] = [];
   source.traverse((child) => {
     if (!(child instanceof Mesh)) return;
     const name = partName(child);
     let geometry = worldGeometry(child);
-    let material: Mesh["material"] = body;
+    const sourceMaterials = Array.isArray(child.material)
+      ? child.material
+      : [child.material];
+    const clonedMaterials = sourceMaterials.map((sourceMaterial) => {
+      const material = sourceMaterial.clone();
+      if (material instanceof MeshStandardMaterial)
+        material.wireframe = wireframe;
+      materials.push(material);
+      return material;
+    });
+    let material: Mesh["material"] = Array.isArray(child.material)
+      ? clonedMaterials
+      : clonedMaterials[0];
     if (name === "lcd_touch_panel") {
       const display = displayGeometry(geometry);
       geometry.dispose();
       geometry = display;
-      material = [body, screen];
-    } else if (inspect && !/^[BSAGKH][0-9]_/.test(name)) {
-      const authored = (
-        Array.isArray(child.material) ? child.material[0] : child.material
-      ).clone() as MeshStandardMaterial;
-      authored.wireframe = wireframe;
-      materials.push(authored);
-      material = authored;
+      material = [clonedMaterials[0], screen];
     }
     const mesh = new Mesh(geometry, material);
     mesh.name = name;

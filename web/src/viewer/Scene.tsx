@@ -18,6 +18,7 @@ import { batchStaticAssembly } from "./batchAssembly";
 import { useFaceTexture } from "./useFaceTexture";
 import { useMedia } from "../state/useMedia";
 import { updateAssembly, type AssemblyView, type PoseDemo } from "./assembly";
+import { themeColor } from "../theme";
 
 function Robot({
   wireframe,
@@ -34,8 +35,8 @@ function Robot({
   const face = useFaceTexture();
   const root = useRef<Group>(null);
   const prepared = useMemo(
-    () => prepareRobot(scene, face, wireframe, assemblyView !== "assembled"),
-    [scene, face, wireframe, assemblyView],
+    () => prepareRobot(scene, face, wireframe),
+    [scene, face, wireframe],
   );
   const batched = useMemo(
     () => batchStaticAssembly(prepared.object),
@@ -212,6 +213,9 @@ function Loaded({ onLoaded }: { onLoaded: () => void }) {
 }
 export default function Scene(props: SceneProps) {
   const compact = useMedia("(max-width: 900px)");
+  const highlight = themeColor("--orange-on-dark", "#ff9b5c");
+  const warmWhite = themeColor("--orange-soft", "#fff0e6");
+  const ink = themeColor("--ink", "#171717");
   return (
     <Canvas
       frameloop={props.active ? "demand" : "never"}
@@ -220,9 +224,9 @@ export default function Scene(props: SceneProps) {
       gl={{ antialias: !compact, alpha: true, powerPreference: "low-power" }}
     >
       <ambientLight intensity={0.65} />
-      <directionalLight position={[3, 7, 5]} intensity={2.8} color="#fff7f1" />
-      <directionalLight position={[-5, 2, 3]} intensity={1.1} color="#f5f3fa" />
-      <directionalLight position={[4, 4, -4]} intensity={2.2} color="#b89af4" />
+      <directionalLight position={[3, 7, 5]} intensity={2.8} color="#fffaf6" />
+      <directionalLight position={[-5, 2, 3]} intensity={1.1} color="#ffffff" />
+      <directionalLight position={[4, 4, -4]} intensity={1.2} color={highlight} />
       <Environment resolution={128} frames={1}>
         <Lightformer
           position={[-4, 4, 3]}
@@ -236,7 +240,7 @@ export default function Scene(props: SceneProps) {
           rotation-y={-Math.PI / 3}
           scale={[3, 6, 1]}
           intensity={1.7}
-          color="#d7c8ef"
+          color={warmWhite}
         />
         <Lightformer
           position={[0, 6, -2]}
@@ -261,7 +265,7 @@ export default function Scene(props: SceneProps) {
           far={4}
           resolution={compact ? 128 : 256}
           frames={1}
-          color="#17141f"
+          color={ink}
         />
       </Suspense>
       <Director {...props} compact={compact} />

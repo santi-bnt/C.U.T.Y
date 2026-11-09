@@ -119,7 +119,7 @@ export default function IntroSequence({
           ))}
         </div>
         <div className="intro-expansion">
-          {["CUTE", "UTILITY", "THAT", "YAPS"].map((w) => (
+          {["COMPANION", "UNIT", "THAT", "YAPS"].map((w) => (
             <span key={w}>{w}</span>
           ))}
         </div>

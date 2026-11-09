@@ -1,11 +1,19 @@
 :root {
-  --ink: #17141f;
-  --paper: #f5f3fa;
-  --purple: #8b5cf6;
-  --lavender: #c4b5fd;
-  --muted: #71677d;
-  --line: #17141f26;
-  --cyan: #8b5cf6;
+  --ink: #171717;
+  --paper: #ffffff;
+  --surface: #f3f3f0;
+  --dark: #171717;
+  --orange: #ff6a00;
+  --orange-strong: #b94700;
+  --orange-on-dark: #ff9b5c;
+  --orange-soft: #fff0e6;
+  --orange-wash: rgb(255 106 0 / 12%);
+  --orange-line: rgb(255 106 0 / 32%);
+  --muted: #676767;
+  --line: rgb(23 23 23 / 16%);
+  --shadow: rgb(23 23 23 / 12%);
+  --accent: var(--orange);
+  --cyan: var(--orange);
   --gutter: clamp(24px, 5vw, 88px);
   color: var(--ink);
   background: var(--paper);
@@ -37,33 +45,33 @@ a:focus-visible,
 select:focus-visible,
 input:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid var(--purple);
+  outline: 3px solid var(--orange);
   outline-offset: 4px;
 }
 ::selection {
-  background: var(--purple);
-  color: white;
+  background: var(--orange);
+  color: var(--ink);
 }
 .homepage {
   isolation: isolate;
 }
 .paper {
-  --muted: #71677d;
-  --line: #17141f26;
+  --muted: #676767;
+  --line: rgb(23 23 23 / 16%);
   color: var(--ink);
   background: var(--paper);
 }
 .ink {
-  --muted: #b6aac4;
-  --line: #ffffff29;
+  --muted: #b8b8b8;
+  --line: rgb(255 255 255 / 18%);
   color: var(--paper);
   background: var(--ink);
 }
-.lavender {
-  --muted: #514462;
-  --line: #17141f33;
+.surface {
+  --muted: #626262;
+  --line: rgb(23 23 23 / 20%);
   color: var(--ink);
-  background: var(--lavender);
+  background: var(--surface);
 }
 h2,
 h3 {
@@ -72,16 +80,15 @@ h3 {
 }
 .mono,
 .eyebrow {
-  font:
-    10px/1.5 "Courier New",
+  font: 10px/1.5 "Courier New",
     monospace;
   letter-spacing: 0.1em;
 }
 .eyebrow {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .ink .eyebrow {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .button {
   border-radius: 40px;
@@ -91,12 +98,12 @@ h3 {
   gap: 14px;
 }
 .primary {
-  color: #fff;
-  background: var(--purple);
+  color: var(--ink);
+  background: var(--orange);
   border-color: transparent;
 }
 .primary:hover {
-  background: #7044d4;
+  background: #e65f00;
   transform: translateY(-2px);
 }
 .secondary {
@@ -105,8 +112,8 @@ h3 {
   border-color: currentColor;
 }
 .secondary:hover {
-  color: var(--purple);
-  background: #8b5cf611;
+  color: var(--orange-strong);
+  background: var(--orange-wash);
 }
 .text-link {
   font-size: 12px;
@@ -114,7 +121,7 @@ h3 {
   min-height: 40px;
 }
 .text-link:hover {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 p {
   color: var(--muted);
@@ -130,13 +137,13 @@ p {
   display: block;
 }
 .heading-accent {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .ink .heading-accent {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
-.lavender .heading-accent {
-  color: #63409b;
+.surface .heading-accent {
+  color: var(--orange-strong);
 }
 /* One scene, independently stacked from public document content. */
 .persistent-viewer {
@@ -185,13 +192,13 @@ p {
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  border: 1px solid #c4b5fd66;
+  border: 1px solid var(--orange-line);
   font-size: 11px;
-  box-shadow: 0 5px 20px #17141f18;
+  box-shadow: 0 5px 20px var(--shadow);
   min-height: 44px;
 }
 .explore-launch:hover {
-  background: var(--purple);
+  background: var(--orange-strong);
 }
 .exploration-ui {
   position: fixed;
@@ -208,11 +215,11 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid #c4b5fd66;
+  border: 1px solid var(--orange-line);
   border-radius: 28px;
   padding: 12px 18px;
   color: var(--paper);
-  background: #17141fcc;
+  background: var(--orange-wash);
   font-size: 12px;
 }
 .explore-panel {
@@ -223,8 +230,8 @@ p {
   transform: translateX(-50%);
   width: min(760px, calc(100% - 40px));
   padding: 16px 24px;
-  background: #211a2fee;
-  border: 1px solid #c4b5fd44;
+  background: var(--orange-wash);
+  border: 1px solid var(--orange-line);
   border-radius: 18px;
 }
 .explore-panel .viewer-top {
@@ -232,7 +239,7 @@ p {
   left: auto;
   right: auto;
   font-size: 9px;
-  color: #d3c6e5;
+  color: var(--orange-on-dark);
   display: flex;
   justify-content: space-between;
   padding-bottom: 12px;
@@ -240,18 +247,18 @@ p {
 }
 .explore-panel .viewer-toolbar {
   padding: 10px 0;
-  border-color: #c4b5fd33;
+  border-color: var(--orange-line);
 }
 .view-presets button {
   font-size: 11px;
-  color: #d2c5e3;
+  color: var(--orange-on-dark);
   min-height: 42px;
   padding: 8px 13px;
   border-radius: 20px;
 }
 .view-presets button[aria-pressed="true"] {
   color: white;
-  background: #8b5cf655;
+  background: var(--orange-wash);
 }
 .viewer-actions {
   gap: 3px;
@@ -263,26 +270,26 @@ p {
 }
 .icon-button:hover,
 .icon-button[aria-pressed="true"] {
-  background: #8b5cf633;
-  color: var(--lavender);
-  border-color: #8b5cf666;
+  background: var(--orange-wash);
+  color: var(--orange-on-dark);
+  border-color: var(--orange-line);
 }
 .display-controls {
   padding: 10px 0 0;
   gap: 12px;
   background: none;
   border: 0;
-  border-top: 1px solid #c4b5fd22;
+  border-top: 1px solid var(--orange-line);
   border-radius: 0;
 }
 .display-controls > span {
-  color: #d3c6e5;
+  color: var(--orange-on-dark);
 }
 .display-controls select,
 .display-controls button {
-  background: #332744;
-  color: #f5f3fa;
-  border: 1px solid #8d76a7;
+  background: var(--dark);
+  color: var(--paper);
+  border: 1px solid var(--orange-line);
   border-radius: 25px;
   min-height: 38px;
   font-size: 11px;
@@ -291,14 +298,14 @@ p {
   inset: 150px var(--gutter) auto auto;
   width: min(340px, calc(100% - 48px));
   height: auto;
-  background: #eee8f7f5;
-  border: 1px solid #bba6d4;
+  background: var(--surface);
+  border: 1px solid var(--orange-line);
   border-radius: 20px;
   color: var(--ink);
   pointer-events: auto;
 }
 .viewer-message p {
-  color: #5c4c70;
+  color: var(--orange-strong);
 }
 .viewer-message h3 {
   font-size: 24px;
@@ -318,7 +325,7 @@ p {
   gap: 9px;
   align-items: center;
   font-size: 11px;
-  color: #8055be;
+  color: var(--orange-strong);
   z-index: 9;
 }
 /* Navigation stays public; no robot commands are mounted here. */
@@ -335,15 +342,14 @@ p {
   justify-content: space-between;
   gap: 24px;
   color: var(--ink);
-  background: #f5f3faf2;
-  border-bottom: 1px solid #17141f14;
-  transition:
-    color 0.25s,
+  background: rgb(255 255 255 / 95%);
+  border-bottom: 1px solid var(--orange-line);
+  transition: color 0.25s,
     background 0.25s;
 }
 .site-header[data-tone="ink"] {
   color: var(--paper);
-  background: #17141ff2;
+  background: rgb(23 23 23 / 95%);
   border-bottom-color: #ffffff15;
 }
 .wordmark {
@@ -354,7 +360,7 @@ p {
   white-space: nowrap;
 }
 .brand-icon {
-  border: 1px solid #8b5cf688;
+  border: 1px solid var(--orange-line);
   width: 28px;
   height: 25px;
   border-radius: 8px;
@@ -381,11 +387,11 @@ p {
 }
 .nav a:hover,
 .nav a[aria-current] {
-  color: var(--purple);
-  border-bottom-color: var(--purple);
+  color: var(--orange-strong);
+  border-bottom-color: var(--orange-strong);
 }
 .site-header[data-tone="ink"] .nav a[aria-current] {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .header-actions {
   display: flex;
@@ -406,15 +412,15 @@ p {
   padding: 7px;
 }
 .language button[aria-pressed="true"] {
-  background: #8b5cf61c;
-  color: var(--purple);
+  background: var(--orange-wash);
+  color: var(--orange-strong);
 }
 .site-header[data-tone="ink"] .language button[aria-pressed="true"] {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .menu-toggle {
   display: none;
-  border: 1px solid #8b5cf655;
+  border: 1px solid var(--orange-line);
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -442,11 +448,10 @@ p {
   right: var(--gutter);
   display: flex;
   justify-content: space-between;
-  font:
-    10px "Courier New",
+  font: 10px "Courier New",
     monospace;
   letter-spacing: 0.08em;
-  color: #6e617c;
+  color: var(--orange-strong);
   z-index: 3;
 }
 .product-hero h1 {
@@ -461,7 +466,7 @@ p {
   letter-spacing: -0.09em;
   line-height: 0.9;
   white-space: nowrap;
-  color: #21192c;
+  color: var(--orange-strong);
   z-index: 0;
 }
 .hero-letter-mask {
@@ -477,7 +482,7 @@ p {
   display: inline-block;
 }
 .accent {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .hero-copy {
   position: absolute;
@@ -488,7 +493,7 @@ p {
 }
 .hero-copy .mono {
   font-size: 10px;
-  color: #746281;
+  color: var(--orange-strong);
   margin-bottom: 14px;
 }
 .hero-copy h2 {
@@ -498,7 +503,7 @@ p {
   letter-spacing: -0.065em;
 }
 .hero-copy h2 span {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .hero-copy > p:not(.mono) {
   font-size: 13px;
@@ -514,11 +519,10 @@ p {
   z-index: 3;
   display: flex;
   justify-content: space-between;
-  font:
-    9px "Courier New",
+  font: 9px "Courier New",
     monospace;
   letter-spacing: 0.09em;
-  color: #776987;
+  color: var(--orange-strong);
 }
 .hero-baseline > a {
   display: flex;
@@ -543,8 +547,7 @@ p {
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  font:
-    10px "Courier New",
+  font: 10px "Courier New",
     monospace;
   letter-spacing: 0.1em;
   z-index: 3;
@@ -584,15 +587,14 @@ p {
 }
 .companion-facts span::before {
   content: "↗";
-  color: var(--lavender);
+  color: var(--orange-on-dark);
   margin-right: 12px;
 }
 .offline-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font:
-    9px/1.6 "Courier New",
+  font: 9px/1.6 "Courier New",
     monospace;
   letter-spacing: 0.07em;
   color: var(--muted);
@@ -609,9 +611,9 @@ p {
   height: 100px;
   border-radius: 12px;
   box-shadow: none;
-  border: 1px solid #b8abc8;
+  border: 1px solid var(--orange-line);
   margin: 0 0 16px;
-  background: #0c1120;
+  background: var(--dark);
 }
 .face-demo .face-original {
   width: 100%;
@@ -624,20 +626,20 @@ p {
 .face-controls button {
   min-height: 44px;
   padding: 9px 12px;
-  border: 1px solid #c3b3d6;
+  border: 1px solid var(--orange-line);
   border-radius: 25px;
   font-size: 11px;
-  color: #645370;
+  color: var(--orange-strong);
 }
 .face-controls button:hover,
 .face-controls button[aria-pressed="true"] {
-  color: #6031b2;
-  background: #e8dff7;
-  border-color: #8b5cf6;
+  color: var(--orange-strong);
+  background: var(--orange-soft);
+  border-color: var(--orange-line);
 }
 .face-demo .caption {
   font-size: 10px;
-  color: #7c6b8b;
+  color: var(--orange-strong);
   max-width: 365px;
   line-height: 1.8;
   margin-top: 18px;
@@ -655,21 +657,20 @@ p {
   border-bottom: 1px solid var(--line);
   font-size: 12px;
   text-align: left;
-  color: #c8bad8;
+  color: var(--orange-on-dark);
 }
 .hardware-selector button > span {
-  font:
-    9px "Courier New",
+  font: 9px "Courier New",
     monospace;
-  color: #9783ad;
+  color: var(--orange-on-dark);
 }
 .hardware-selector button svg {
   margin-left: auto;
 }
 .hardware-selector button[aria-pressed="true"] {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
   padding-left: 12px;
-  background: #c4b5fd0d;
+  background: var(--orange-wash);
 }
 .hardware-evidence {
   max-width: 440px;
@@ -723,7 +724,7 @@ p {
 .development-timeline li::before {
   content: "—";
   margin-right: 9px;
-  color: #8967b5;
+  color: var(--orange-strong);
 }
 .live-status {
   max-width: 420px;
@@ -777,7 +778,7 @@ summary::-webkit-details-marker {
 }
 .technical-disclosure summary > span {
   font-size: 24px;
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .technical-disclosure details[open] summary {
   margin-bottom: 50px;
@@ -795,17 +796,17 @@ summary::-webkit-details-marker {
 }
 .architecture-layout {
   margin: 45px 0 60px;
-  border-color: #b59acc55;
+  border-color: var(--orange-line);
 }
 .architecture-board {
-  background-color: #201a2b;
-  background-image: radial-gradient(#b99ad62a 1px, transparent 1px);
+  background-color: var(--dark);
+  background-image: radial-gradient(var(--orange-on-dark) 1px, transparent 1px);
 }
 .architecture-detail {
-  background: #292134;
+  background: var(--dark);
 }
 .architecture-detail p {
-  color: #b9a6ca;
+  color: var(--orange-on-dark);
 }
 .architecture-detail code,
 .architecture-note,
@@ -813,32 +814,32 @@ summary::-webkit-details-marker {
 .bus,
 .diagram-legend,
 .uart-link {
-  color: #b9a6ca;
+  color: var(--orange-on-dark);
 }
 .peripheral button {
-  background: #2c2339;
-  border-color: #665475;
-  color: #d6c2e9;
+  background: var(--dark);
+  border-color: var(--orange-line);
+  color: var(--orange-on-dark);
 }
 .pi-node {
-  color: #e0cdf9;
-  background: #3b2858;
-  border-color: #8e6fba;
+  color: var(--orange-on-dark);
+  background: var(--dark);
+  border-color: var(--orange-line);
 }
 .stm-node {
-  color: #c5b4d2;
-  background: #292132;
-  border-color: #82708f;
+  color: var(--orange-on-dark);
+  background: var(--dark);
+  border-color: var(--orange-line);
 }
 .architecture-detail .eyebrow {
-  color: #c3a7df;
+  color: var(--orange-on-dark);
 }
 .architecture-detail .text-link {
-  color: #deccf2;
+  color: var(--orange-on-dark);
 }
 .architecture-detail .badge {
-  color: #c9b4de;
-  border-color: #806b93;
+  color: var(--orange-on-dark);
+  border-color: var(--orange-line);
 }
 .capability-audit {
   display: grid;
@@ -847,13 +848,13 @@ summary::-webkit-details-marker {
   margin: 60px 0;
 }
 .capability-tabs button {
-  color: #bdacca;
+  color: var(--orange-on-dark);
   font-size: 13px;
   border-color: #ffffff22;
 }
 .capability-tabs button[aria-pressed="true"] {
-  background: #c4b5fd12;
-  color: #dfcaff;
+  background: var(--orange-wash);
+  color: var(--orange-on-dark);
 }
 .capability-audit h3 {
   font-size: 32px;
@@ -865,7 +866,7 @@ summary::-webkit-details-marker {
   margin-bottom: 20px;
 }
 .capability-audit .evidence {
-  color: #c5addc;
+  color: var(--orange-on-dark);
   font-size: 11px;
 }
 .hardware-specs {
@@ -880,11 +881,11 @@ summary::-webkit-details-marker {
   font-size: 12px;
 }
 .hardware-specs dt {
-  color: #9b86b0;
+  color: var(--orange-on-dark);
 }
 .hardware-specs dd {
   margin: 6px 0;
-  color: #d8c9e7;
+  color: var(--orange-on-dark);
 }
 .technical-section {
   position: relative;
@@ -900,14 +901,13 @@ summary::-webkit-details-marker {
   gap: 8px;
 }
 .engineering-notice strong {
-  font:
-    10px/1.5 "Courier New",
+  font: 10px/1.5 "Courier New",
     monospace;
   letter-spacing: 0.04em;
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .ink .engineering-notice strong {
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .engineering-notice span {
   color: var(--muted);
@@ -941,8 +941,8 @@ summary::-webkit-details-marker {
   color: var(--muted);
 }
 .segmented button[aria-pressed="true"] {
-  color: #6739b0;
-  background: #e7ddf5;
+  color: var(--orange-strong);
+  background: var(--orange-soft);
 }
 .engineering-toolbar > .mono {
   color: var(--muted);
@@ -955,7 +955,7 @@ summary::-webkit-details-marker {
   display: block;
   width: 100%;
   aspect-ratio: 100/92;
-  background: #e6dfed;
+  background: var(--surface);
   border-radius: 16px;
   overflow: hidden;
   touch-action: pan-y;
@@ -974,15 +974,14 @@ summary::-webkit-details-marker {
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   cursor: pointer;
-  transition:
-    fill 0.15s,
+  transition: fill 0.15s,
     stroke 0.15s;
 }
 .pcb-hotspot.selected rect,
 .pcb-hotspot.hovered rect,
 .pcb-hotspot:focus rect {
-  fill: #c4b5fd45;
-  stroke: #e9d6ff;
+  fill: var(--orange-on-dark);
+  stroke: var(--orange-on-dark);
 }
 .pcb-hotspot:focus {
   outline: none;
@@ -992,7 +991,7 @@ summary::-webkit-details-marker {
   gap: 3px;
 }
 .pcb-actions .icon-button {
-  color: #6c5284;
+  color: var(--orange-strong);
 }
 .pcb-details {
   padding: 30px 0 20px;
@@ -1006,7 +1005,7 @@ summary::-webkit-details-marker {
   font-size: 58px;
   font-weight: 400;
   letter-spacing: -0.07em;
-  color: var(--purple);
+  color: var(--orange-strong);
   line-height: 1;
 }
 .pcb-component-title h3 {
@@ -1030,7 +1029,7 @@ summary::-webkit-details-marker {
   overflow-wrap: anywhere;
 }
 .pcb-details .text-link {
-  color: #784cad;
+  color: var(--orange-strong);
 }
 .pcb-part-picker {
   display: grid;
@@ -1038,15 +1037,14 @@ summary::-webkit-details-marker {
   margin: 23px 0;
 }
 .pcb-part-picker label {
-  font:
-    10px "Courier New",
+  font: 10px "Courier New",
     monospace;
   color: var(--muted);
 }
 .pcb-part-picker select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #cbbbdc;
+  border: 1px solid var(--orange-line);
   border-radius: 6px;
   background: var(--paper);
   color: var(--ink);
@@ -1083,7 +1081,7 @@ summary::-webkit-details-marker {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #7653b0;
+  background: var(--orange);
   margin-right: 7px;
 }
 .net-dot.power {
@@ -1094,8 +1092,8 @@ summary::-webkit-details-marker {
 }
 .pcb-model-missing {
   min-height: 510px;
-  background: #eae4f2;
-  border: 1px dashed #a28bb9;
+  background: var(--surface);
+  border: 1px dashed var(--orange-line);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -1106,7 +1104,7 @@ summary::-webkit-details-marker {
   text-align: center;
 }
 .pcb-model-missing svg {
-  color: #8b5cf6;
+  color: var(--orange-strong);
 }
 .pcb-model-missing h3 {
   font-size: 30px;
@@ -1118,7 +1116,7 @@ summary::-webkit-details-marker {
 }
 .pcb-model-missing code {
   font-size: 11px;
-  color: #806b93;
+  color: var(--orange-strong);
 }
 .engineering-downloads {
   display: flex;
@@ -1137,11 +1135,11 @@ summary::-webkit-details-marker {
   border-radius: 25px;
   min-height: 44px;
   font-size: 11px;
-  color: #6f4b9a;
+  color: var(--orange-strong);
 }
 .engineering-downloads a:hover {
-  background: #e8dff6;
-  border-color: var(--purple);
+  background: var(--orange-soft);
+  border-color: var(--orange-strong);
 }
 .caption {
   font-size: 10px;
@@ -1157,16 +1155,16 @@ summary::-webkit-details-marker {
 }
 .wire-filters button {
   padding: 9px 15px;
-  border: 1px solid #b79bce55;
+  border: 1px solid var(--orange-line);
   border-radius: 24px;
   font-size: 11px;
   min-height: 42px;
-  color: #c3afd5;
+  color: var(--orange-on-dark);
 }
 .wire-filters button[aria-pressed="true"] {
-  background: var(--lavender);
+  background: var(--orange-on-dark);
   color: var(--ink);
-  border-color: var(--lavender);
+  border-color: var(--orange-on-dark);
 }
 .wiring-workspace {
   display: grid;
@@ -1176,8 +1174,8 @@ summary::-webkit-details-marker {
 }
 .wiring-diagram-panel {
   min-width: 0;
-  border: 1px solid #b79bce44;
-  background: #1e1828;
+  border: 1px solid var(--orange-line);
+  background: var(--dark);
   border-radius: 15px;
   padding: 22px 15px;
 }
@@ -1188,11 +1186,11 @@ summary::-webkit-details-marker {
 }
 .wiring-diagram-panel .mono {
   font-size: 8px;
-  color: #b8a3cc;
+  color: var(--orange-on-dark);
 }
 .wiring-diagram-panel .text-link {
   font-size: 9px;
-  color: var(--lavender);
+  color: var(--orange-on-dark);
   min-height: 24px;
   white-space: nowrap;
 }
@@ -1203,7 +1201,7 @@ summary::-webkit-details-marker {
   overflow: visible;
 }
 .wire-edge {
-  color: #b99bdf;
+  color: var(--orange-on-dark);
 }
 .wire-edge path {
   fill: none;
@@ -1219,12 +1217,11 @@ summary::-webkit-details-marker {
   color: #9eabb2;
 }
 .wire-edge text {
-  font:
-    12px "Courier New",
+  font: 12px "Courier New",
     monospace;
   fill: currentColor;
   paint-order: stroke;
-  stroke: #1e1828;
+  stroke: var(--orange-strong);
   stroke-width: 6px;
   stroke-linejoin: round;
 }
@@ -1238,31 +1235,30 @@ summary::-webkit-details-marker {
   cursor: pointer;
 }
 .wire-node rect {
-  fill: #2a2137;
-  stroke: #78628f;
+  fill: var(--orange-strong);
+  stroke: var(--orange-strong);
   stroke-width: 1.2;
 }
 .wire-node.selected rect,
 .wire-node:hover rect,
 .wire-node:focus-visible rect {
-  fill: #3e295a;
-  stroke: #d2b7f7;
+  fill: var(--orange-strong);
+  stroke: var(--orange-on-dark);
   stroke-width: 2;
 }
 .wire-node:focus {
   outline: none;
 }
 .wire-node text {
-  fill: #e0d3ed;
+  fill: var(--orange-soft);
   font-size: 15px;
   font-weight: 600;
   pointer-events: none;
 }
 .wire-node .node-ref {
-  font:
-    10px "Courier New",
+  font: 10px "Courier New",
     monospace;
-  fill: #a18bad;
+  fill: var(--orange-on-dark);
 }
 .wire-node.dimmed {
   opacity: 0.38;
@@ -1272,7 +1268,7 @@ summary::-webkit-details-marker {
   flex-wrap: wrap;
   gap: 15px;
   padding: 18px 8px 0;
-  color: #c3afd5;
+  color: var(--orange-on-dark);
   font-size: 9px;
 }
 .wire-legend > span {
@@ -1282,7 +1278,7 @@ summary::-webkit-details-marker {
 }
 .wire-legend i {
   width: 16px;
-  border-top: 2px dashed #ba9ce0;
+  border-top: 2px dashed var(--orange-line);
 }
 .wire-legend .power {
   border-color: #eba65c;
@@ -1308,7 +1304,7 @@ summary::-webkit-details-marker {
 }
 .voltage-note {
   display: block;
-  color: #d3bbeb;
+  color: var(--orange-on-dark);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.8;
@@ -1320,14 +1316,14 @@ summary::-webkit-details-marker {
 }
 .wiring-detail .pin-scroll th {
   background: var(--ink);
-  color: #baa5cc;
+  color: var(--orange-on-dark);
 }
 .wiring-detail .pin-scroll td {
-  color: #d4c0e4;
+  color: var(--orange-on-dark);
 }
 .wiring-detail > .text-link {
   margin-top: 16px;
-  color: var(--lavender);
+  color: var(--orange-on-dark);
 }
 .connection-table-heading {
   display: flex;
@@ -1343,10 +1339,10 @@ summary::-webkit-details-marker {
   display: flex;
   gap: 10px;
   align-items: center;
-  border: 1px solid #b79bce66;
+  border: 1px solid var(--orange-line);
   padding: 11px 15px;
   border-radius: 25px;
-  color: #c3afd5;
+  color: var(--orange-on-dark);
   width: min(360px, 100%);
 }
 .wire-search input {
@@ -1358,10 +1354,10 @@ summary::-webkit-details-marker {
   width: 100%;
 }
 .wire-search input::placeholder {
-  color: #9d87b0;
+  color: var(--orange-on-dark);
 }
 .wire-search:focus-within {
-  outline: 2px solid var(--purple);
+  outline: 2px solid var(--orange-strong);
 }
 .connection-table-scroll {
   max-height: 560px;
@@ -1380,8 +1376,8 @@ summary::-webkit-details-marker {
 }
 .connection-table th {
   padding: 15px 12px;
-  color: #b49bc8;
-  background: #241c30;
+  color: var(--orange-on-dark);
+  background: var(--dark);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -1389,18 +1385,18 @@ summary::-webkit-details-marker {
 }
 .connection-table td {
   padding: 16px 12px;
-  color: #cdb9df;
+  color: var(--orange-on-dark);
   border-bottom: 1px solid #ffffff15;
   vertical-align: top;
 }
 .connection-table strong {
   font-weight: 400;
-  color: #e9ddf2;
+  color: var(--orange-on-dark);
   display: block;
 }
 .connection-table small {
   display: block;
-  color: #a68ebc;
+  color: var(--orange-on-dark);
   margin-top: 7px;
   max-width: 310px;
   font-size: 10px;
@@ -1410,7 +1406,7 @@ summary::-webkit-details-marker {
   font-size: 9px;
   max-width: 120px;
   margin-bottom: 7px;
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
 }
 .connection-status.unverified {
   color: #e9b97f;
@@ -1430,7 +1426,7 @@ summary::-webkit-details-marker {
   padding: 20px 0;
 }
 .engineering-conflicts summary {
-  color: #d6bcf0;
+  color: var(--orange-on-dark);
   font-size: 14px;
   padding: 10px 0;
 }
@@ -1447,11 +1443,11 @@ summary::-webkit-details-marker {
 }
 .engineering-conflicts li {
   font-size: 12px;
-  color: #b6a1c9;
+  color: var(--orange-on-dark);
   line-height: 1.9;
 }
 .engineering-conflicts .text-link {
-  color: #d6bcf0;
+  color: var(--orange-on-dark);
 }
 .project-outro {
   position: relative;
@@ -1466,7 +1462,7 @@ summary::-webkit-details-marker {
   margin: 25px 0 32px;
 }
 .project-outro h2 span {
-  color: var(--purple);
+  color: var(--orange-strong);
 }
 .project-outro > p:not(.eyebrow) {
   max-width: 520px;
@@ -1527,8 +1523,8 @@ summary::-webkit-details-marker {
     left: var(--gutter);
     padding: 22px;
     background: var(--paper);
-    border: 1px solid #d7c9e8;
-    box-shadow: 0 15px 35px #17141f22;
+    border: 1px solid var(--orange-line);
+    box-shadow: 0 15px 35px var(--shadow);
     flex-direction: column;
     gap: 0;
     border-radius: 16px;
@@ -1756,21 +1752,21 @@ summary::-webkit-details-marker {
     padding: 14px 4px;
   }
   .wire-mobile-nodes button {
-    border: 1px solid #8d719f88;
+    border: 1px solid var(--orange-line);
     border-radius: 8px;
     min-height: 58px;
     padding: 12px;
     text-align: left;
     font-size: 11px;
-    color: #dac6e7;
+    color: var(--orange-on-dark);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 7px;
   }
   .wire-mobile-nodes button[aria-pressed="true"] {
-    border-color: var(--lavender);
-    background: #8b5cf62a;
+    border-color: var(--orange-on-dark);
+    background: var(--orange-wash);
   }
   .wiring-detail {
     margin-top: 0;

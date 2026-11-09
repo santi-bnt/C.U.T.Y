@@ -84,6 +84,7 @@ describe("deployed V17 assembly with integrated display", () => {
       .multiplyScalar(modelInfo.millimetersPerUnit);
     let triangles = 0;
     let meshes = 0;
+    const authoredColors = new Set<string>();
     object.traverse((object) => {
       if (object instanceof Mesh) {
         meshes++;
@@ -91,13 +92,29 @@ describe("deployed V17 assembly with integrated display", () => {
           (object.geometry.index?.count ??
             object.geometry.attributes.position.count) / 3;
         expect(object.material).toBeTruthy();
-        if (object.name !== modelInfo.screenMesh) {
-          expect(
-            (object.material as MeshStandardMaterial).color.getHexString(),
-          ).toBe("101114");
-        }
+        const sourceNode = gltf.scene.getObjectByName(object.name);
+        const sourceMesh = (sourceNode?.getObjectByProperty(
+          "isMesh",
+          true,
+        ) ?? sourceNode) as Mesh | undefined;
+        expect(sourceMesh).toBeTruthy();
+        const sourceMaterial = Array.isArray(sourceMesh!.material)
+          ? sourceMesh!.material[0]
+          : sourceMesh!.material;
+        const displayedMaterial = Array.isArray(object.material)
+          ? object.material[0]
+          : object.material;
+        expect(
+          (displayedMaterial as MeshStandardMaterial).color.getHexString(),
+        ).toBe((sourceMaterial as MeshStandardMaterial).color.getHexString());
+        authoredColors.add(
+          (displayedMaterial as MeshStandardMaterial).color.getHexString(),
+        );
       }
     });
+    // GLTFLoader converts authored sRGB factors into Three.js working space;
+    // assert a varied preserved palette rather than comparing encoded hex.
+    expect(authoredColors.size).toBeGreaterThan(3);
     expect(meshes).toBe(modelInfo.meshes);
     expect(triangles).toBe(modelInfo.triangles);
     size

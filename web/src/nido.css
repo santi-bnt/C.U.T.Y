@@ -3,8 +3,8 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: #17141f;
-  color: #f5f3fa;
+  background: var(--dark);
+  color: var(--paper);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -27,10 +27,10 @@
 .intro-bottom button {
   white-space: nowrap;
   flex-shrink: 0;
-  border: 1px solid #c4b5fd70;
+  border: 1px solid var(--orange-line);
   border-radius: 30px;
   padding: 14px 24px;
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
   background: transparent;
   font: inherit;
   cursor: pointer;
@@ -57,7 +57,7 @@
   display: block;
 }
 .intro-letter i {
-  color: #8b5cf6;
+  color: var(--orange-strong);
   font-style: normal;
   font-size: 0.7em;
 }
@@ -68,11 +68,11 @@
   font-family: monospace;
   font-size: clamp(10px, 1.2vw, 18px);
   letter-spacing: 0.2em;
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
 }
 .intro-rule {
   height: 2px;
-  background: #8b5cf6;
+  background: var(--orange);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -91,7 +91,7 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  border: 1px solid #9e86b65e;
+  border: 1px solid var(--orange-line);
   border-radius: 24px;
   padding: 9px 14px;
   min-height: 38px;
@@ -101,12 +101,12 @@
   cursor: pointer;
 }
 .assembly-controls button[aria-pressed="true"] {
-  color: #8b5cf6;
-  border-color: #8b5cf6;
-  background: #8b5cf61a;
+  color: var(--orange-strong);
+  border-color: var(--orange-line);
+  background: var(--orange-wash);
 }
 .ink .assembly-controls button[aria-pressed="true"] {
-  color: #e0d4ff;
+  color: var(--orange-on-dark);
 }
 .assembly-controls button:disabled,
 .assembly-playback button:disabled {
@@ -128,7 +128,7 @@
   margin: 8px 0 0;
 }
 .assembly-story {
-  background: #211a2b;
+  background: var(--dark);
   position: relative;
   z-index: 3;
 }
@@ -147,7 +147,7 @@
   min-width: 0;
   overflow: hidden;
   border-radius: 8px;
-  background: radial-gradient(ellipse at center, #a291bd35, #17141f 75%);
+  background: radial-gradient(ellipse at center, var(--orange-wash), var(--dark) 75%);
 }
 .latest-cad-image img {
   display: block;
@@ -158,12 +158,12 @@
 }
 .latest-cad-image figcaption {
   padding: 12px 16px 15px;
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
   font-size: 9px;
   letter-spacing: 0.1em;
 }
 .latest-cad-copy .eyebrow {
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
 }
 .latest-cad-copy h3 {
   margin: 16px 0;
@@ -172,7 +172,7 @@
   letter-spacing: -0.045em;
 }
 .latest-cad-copy > p:not(.simulation-note) {
-  color: #d0c5dc;
+  color: var(--orange-on-dark);
   font-size: 14px;
   line-height: 1.8;
 }
@@ -183,28 +183,28 @@
   margin: 18px 0;
 }
 .latest-cad-views button {
-  border: 1px solid #c4b5fd50;
+  border: 1px solid var(--orange-line);
   border-radius: 24px;
   padding: 8px 13px;
   background: transparent;
-  color: #d9c9f3;
+  color: var(--orange-on-dark);
   font: inherit;
   font-size: 11px;
   cursor: pointer;
 }
 .latest-cad-views button[aria-pressed="true"] {
-  color: #17141f;
-  border-color: #c4b5fd;
-  background: #c4b5fd;
+  color: var(--orange-strong);
+  border-color: var(--orange-line);
+  background: var(--surface);
 }
 .latest-cad-views button:focus-visible {
-  outline: 2px solid #f5f3fa;
+  outline: 2px solid var(--paper);
   outline-offset: 3px;
 }
 .pcb-order-files {
   margin-top: 28px;
   padding: 20px 0;
-  border-top: 1px solid #765a9338;
+  border-top: 1px solid var(--orange-line);
 }
 .pcb-order-files summary {
   cursor: pointer;
@@ -226,7 +226,7 @@
 .assembly-image {
   position: relative;
   min-width: 0;
-  background: #19151e;
+  background: var(--dark);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -242,7 +242,7 @@
   bottom: 20px;
   left: 20px;
   font-size: 9px;
-  color: #c4b5fd;
+  color: var(--orange-on-dark);
 }
 .assembly-caption h3 {
   font-size: clamp(30px, 3.8vw, 60px);
@@ -251,7 +251,7 @@
   margin: 24px 0;
 }
 .assembly-caption > p {
-  color: #bfb1cd;
+  color: var(--orange-on-dark);
   font-size: 15px;
   line-height: 1.8;
 }
@@ -269,23 +269,23 @@
   overflow-x: auto;
   padding: 28px 0 18px;
   scroll-snap-type: x mandatory;
-  scrollbar-color: #8b5cf6 #211a2b;
+  scrollbar-color: var(--orange) var(--dark);
 }
 .assembly-strip button {
   flex: 0 0 136px;
   text-align: left;
   scroll-snap-align: start;
-  border: 1px solid #c4b5fd25;
+  border: 1px solid var(--orange-line);
   border-radius: 6px;
   overflow: hidden;
-  background: #19151e;
-  color: #b4a7bf;
+  background: var(--dark);
+  color: #b8b8b8;
   cursor: pointer;
   padding: 0;
 }
 .assembly-strip button[aria-pressed="true"] {
-  border-color: #c4b5fd;
-  color: #f5f3fa;
+  border-color: var(--orange-line);
+  color: var(--paper);
 }
 .assembly-strip img {
   width: 136px;
@@ -300,7 +300,7 @@
 }
 .cad-evidence {
   margin-top: 28px;
-  border-top: 1px solid #c4b5fd33;
+  border-top: 1px solid var(--orange-line);
   padding: 20px 0;
 }
 .cad-evidence summary {
@@ -311,11 +311,11 @@
   max-width: 800px;
   font-size: 13px;
   line-height: 1.9;
-  color: #baacc8;
+  color: var(--orange-on-dark);
 }
 .assembly-story .engineering-downloads a {
-  color: #c4b5fd;
-  border-color: #c4b5fd33;
+  color: var(--orange-on-dark);
+  border-color: var(--orange-line);
 }
 .engineering-viewport {
   position: relative;
@@ -324,7 +324,7 @@
   min-height: 320px;
   overflow: hidden;
   border-radius: 8px;
-  background: radial-gradient(ellipse at center, #c4b5fd16, transparent 72%);
+  background: radial-gradient(ellipse at center, var(--orange-wash), transparent 72%);
   touch-action: pan-y;
 }
 .engineering-viewport canvas {
@@ -347,9 +347,9 @@
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #21192ee8;
-  border: 1px solid #c4b5fd66;
-  color: #e4d9f5;
+  background: var(--orange-wash);
+  border: 1px solid var(--orange-line);
+  color: var(--orange-on-dark);
   font-size: 10px;
   padding: 7px 10px;
   border-radius: 20px;
@@ -357,8 +357,8 @@
   box-shadow: 0 2px 15px #0003;
 }
 .spatial-node.selected {
-  background: #8b5cf6;
-  color: white;
+  background: var(--orange);
+  color: var(--ink);
 }
 .spatial-parts {
   display: flex !important;
@@ -370,13 +370,13 @@
   font-size: 10px !important;
   min-height: 32px !important;
   padding: 7px 10px !important;
-  border: 1px solid #c4b5fd40 !important;
+  border: 1px solid var(--orange-line) !important;
   border-radius: 20px !important;
-  color: #d0c0e0;
+  color: var(--orange-on-dark);
   gap: 7px;
 }
 .spatial-parts button[aria-pressed="true"] {
-  background: #8b5cf644;
+  background: var(--orange-wash);
 }
 .pcb-reference-3d .simulation-note {
   padding: 0 12px 14px;
@@ -454,9 +454,9 @@
   stroke-dasharray: none;
 }
 .badge.fabrication {
-  color: #c4b5fd;
-  border-color: #8b5cf670;
-  background: #8b5cf61c;
+  color: var(--orange-on-dark);
+  border-color: var(--orange-line);
+  background: var(--orange-wash);
 }
 .hero-replay,
 .footer-replay {
@@ -466,7 +466,7 @@
   gap: 8px;
   background: transparent;
   border: 0;
-  color: #79658f;
+  color: var(--orange-strong);
   font-size: 11px;
   cursor: pointer;
   min-height: 40px;
@@ -479,11 +479,11 @@
 }
 .hero-replay:hover,
 .footer-replay:hover {
-  color: #8b5cf6;
+  color: var(--orange-strong);
 }
 .hero-replay:focus-visible,
 .footer-replay:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--orange-line);
   outline-offset: 5px;
   border-radius: 3px;
 }
