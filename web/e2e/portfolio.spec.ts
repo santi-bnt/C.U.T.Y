@@ -1,4 +1,10 @@
-﻿import { expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+
+async function selectConnectionCategory(page: import("@playwright/test").Page, id: string, label: RegExp | string) {
+  const select = page.locator(".connections-mobile-selector select");
+  if (await select.isVisible()) await select.selectOption(id);
+  else await page.locator(".component-selector").getByRole("button", { name: label }).click();
+}
 
 async function chapter(
   page: import("@playwright/test").Page,
@@ -227,16 +233,29 @@ test("actual PCB inspection, electrical search, filters and source downloads", a
     expect((await response.body()).length).toBeGreaterThan(100);
   }
   await chapter(page, "wiring", 5);
+  await selectConnectionCategory(page, "all", "All connections");
+  await expect(page.locator(".connections-table tbody tr")).toHaveCount(39);
+  await selectConnectionCategory(page, "display", /Waveshare 3.5/);
+  await page.locator(".connection-row-details summary").first().click();
+  await expect(page.locator(".connection-details-content a").first()).toHaveAttribute(
+    "href",
+    /wiring-evidence\.html/,
+  );
+  await page.locator(".connection-row-details summary").first().click();
+  const csvDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export CSV" }).click();
+  expect((await csvDownload).suggestedFilename()).toContain("cuty-connections");
+  await selectConnectionCategory(page, "all", "All connections");
   await page
     .locator(".wire-filters")
     .getByRole("button", { name: "UART", exact: true })
     .click();
-  await expect(page.locator(".connection-table tbody tr")).toHaveCount(2);
+  await expect(page.locator(".connections-table tbody tr")).toHaveCount(2);
   await page
     .getByRole("searchbox", { name: "Search connections" })
     .fill("BCM 14");
-  await expect(page.locator(".connection-table tbody tr")).toHaveCount(1);
-  await expect(page.locator(".connection-table tbody")).toContainText(
+  await expect(page.locator(".connections-table tbody tr")).toHaveCount(1);
+  await expect(page.locator(".connections-table tbody")).toContainText(
     "STM32 RX",
   );
   await page.getByRole("searchbox", { name: "Search connections" }).fill("");
@@ -251,7 +270,12 @@ test("actual PCB inspection, electrical search, filters and source downloads", a
   await expect(page.locator(".wiring-detail")).toContainText(
     "current remain unverified",
   );
-  await expect(page.locator(".connection-table tbody")).toContainText("6.0 V");
+  await selectConnectionCategory(page, "power", "Power & battery");
+  await expect(page.locator(".connections-table tbody")).toContainText("6.0 V");
+  await page.locator(".connections-explorer").scrollIntoViewIfNeeded();
+  await page.locator(".connections-explorer").screenshot({
+    path: `test-results/${info.project.name}-connections-explorer.png`,
+  });
   await page.locator("#wiring").evaluate((el) =>
     window.scrollTo({
       top: el.getBoundingClientRect().top + scrollY,
@@ -408,16 +432,17 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   await expect(page.locator(".wiring-detail")).toContainText(
     "Confirmed I2C/I2S",
   );
-  await expect(page.locator(".connection-table tbody .confirmed")).toHaveCount(
+  await selectConnectionCategory(page, "audio", /ReSpeaker 2-Mics HAT/);
+  await expect(page.locator(".connections-table tbody .confirmed")).toHaveCount(
     11,
   );
-  await expect(page.locator(".connection-table tbody")).toContainText("MCLK");
-  await expect(page.locator(".connection-table tbody")).toContainText(
+  await expect(page.locator(".connections-table tbody")).toContainText("MCLK");
+  await expect(page.locator(".connections-table tbody")).toContainText(
     "AUD_RST",
   );
-  await expect(page.locator(".connection-table tbody")).toContainText("Pi 1");
-  await expect(page.locator(".connection-table tbody")).toContainText("Pi 4");
-  await expect(page.locator(".connection-table tbody")).toContainText("Pi 6");
+  await expect(page.locator(".connections-table tbody")).toContainText("Pi 1");
+  await expect(page.locator(".connections-table tbody")).toContainText("Pi 4");
+  await expect(page.locator(".connections-table tbody")).toContainText("Pi 6");
   await page.getByRole("button", { name: "2D overview", exact: true }).click();
   await expect(page.locator(".wiring-diagram")).toHaveCount(1);
   await page

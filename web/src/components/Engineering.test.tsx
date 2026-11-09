@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { LocaleProvider } from "../state/Locale";
 import PcbDesign from "./PcbDesign";
 import WiringConnections from "./WiringConnections";
+import { connectionRows } from "../data/operationalWiring";
 vi.mock("./EngineeringViewport", () => ({
   default: () => <div>3D boundary</div>,
 }));
@@ -34,23 +35,25 @@ describe("source-backed engineering interfaces", () => {
     ).toContain("carrier-gerbers.zip");
   });
   it("searches real connection rows and shows the selected subsystem's unresolved power requirements", () => {
+    expect(connectionRows).toHaveLength(39);
     render(
       <LocaleProvider>
         <WiringConnections />
       </LocaleProvider>,
     );
+    fireEvent.click(screen.getByRole("button", { name: /^All connections/ }));
     fireEvent.click(screen.getByRole("button", { name: /^UART$/ }));
     expect(
-      document.querySelectorAll(".connection-table tbody tr"),
+      document.querySelectorAll(".connections-table tbody tr"),
     ).toHaveLength(2);
     fireEvent.change(screen.getByLabelText("Search connections"), {
       target: { value: "BCM 14" },
     });
     expect(
-      document.querySelectorAll(".connection-table tbody tr"),
+      document.querySelectorAll(".connections-table tbody tr"),
     ).toHaveLength(1);
     expect(
-      document.querySelector(".connection-table tbody")?.textContent,
+      document.querySelector(".connections-table tbody")?.textContent,
     ).toContain("STM32 RX");
     fireEvent.click(
       screen.getByRole("button", {
@@ -60,9 +63,13 @@ describe("source-backed engineering interfaces", () => {
     expect(document.querySelector(".wiring-detail")?.textContent).toContain(
       "current remain unverified",
     );
+    fireEvent.click(screen.getByRole("button", { name: "Power" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Power & battery/ }));
+    fireEvent.change(screen.getByLabelText("Search connections"), {
+      target: { value: "" },
+    });
     expect(
-      document.querySelectorAll(".connection-table tbody tr"),
-    ).toHaveLength(0);
-    expect(screen.getByText(/No matching connections/)).toBeTruthy();
+      document.querySelector(".connections-table tbody")?.textContent,
+    ).toContain("6.0 V");
   });
 });

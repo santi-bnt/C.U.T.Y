@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f3f0" />
+    <meta name="description" content="C.U.T.Y. hardware connections grouped by subsystem, with confirmed and pending wiring clearly distinguished." />
+    <title>C.U.T.Y. — Wiring evidence</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #171717;
+        --muted: #626262;
+        --paper: #fff;
+        --surface: #f3f3f0;
+        --line: #d9d8d4;
+        --orange: #b94700;
+        --orange-soft: #fff0e6;
+        --signal: #137463;
+        --pending: #735c36;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--surface); color: var(--ink); font: 16px/1.55 Inter, "Segoe UI", Arial, sans-serif; }
+      header, main, footer { width: min(1100px, calc(100% - 36px)); margin-inline: auto; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--line); }
+      .brand { color: var(--ink); font-size: 22px; font-weight: 850; letter-spacing: -.07em; text-decoration: none; }
+      .brand b { color: var(--signal); }
+      .head-actions { display: flex; align-items: center; gap: 18px; }
+      .head-actions a, .source-link { color: var(--orange); font-size: 13px; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+      .language { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 99px; background: var(--paper); }
+      .language button { border: 0; background: transparent; color: var(--muted); padding: 6px 9px; border-radius: 99px; cursor: pointer; font-weight: 700; }
+      .language button[aria-pressed="true"] { background: var(--orange-soft); color: var(--orange); }
+      main { padding: clamp(36px, 7vw, 84px) 0 64px; }
+      .eyebrow { color: var(--orange); font: 700 11px/1.3 "Courier New", monospace; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { max-width: 850px; margin: 12px 0 14px; font-size: clamp(40px, 7vw, 76px); line-height: .98; letter-spacing: -.075em; }
+      .intro { max-width: 680px; color: var(--muted); font-size: 17px; }
+      .notice { display: flex; gap: 14px; align-items: flex-start; margin: 32px 0 42px; padding: 18px 20px; border: 1px solid #e8c7af; border-radius: 12px; background: var(--orange-soft); }
+      .notice strong { display: block; color: var(--orange); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+      .notice p { margin: 4px 0 0; font-size: 14px; }
+      h2 { margin: 48px 0 18px; font-size: clamp(24px, 3vw, 36px); letter-spacing: -.05em; }
+      .flow-list { display: grid; gap: 12px; }
+      .flow-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(185px, .82fr) minmax(180px, 1fr); align-items: stretch; gap: 12px; }
+      .block { min-height: 112px; display: flex; flex-direction: column; justify-content: center; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+      .block .tag { margin-bottom: 7px; color: var(--muted); font: 700 10px/1.3 "Courier New", monospace; letter-spacing: .09em; text-transform: uppercase; }
+      .block strong { font-size: 18px; letter-spacing: -.035em; }
+      .block small { margin-top: 5px; color: var(--muted); font-size: 12px; }
+      .block.core { border-color: #2c2c2c; background: var(--ink); color: var(--paper); }
+      .block.core .tag, .block.core small { color: #c9c9c9; }
+      .block.accent { border-color: #e7b594; background: #fffaf6; }
+      .link-block { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; text-align: center; }
+      .link-block .link-title { color: var(--signal); font: 700 12px/1.3 "Courier New", monospace; }
+      .link-block .link-line { position: relative; height: 2px; margin-inline: 10px; background: var(--signal); }
+      .link-block .link-line::before, .link-block .link-line::after { position: absolute; top: 50%; width: 9px; height: 9px; border: 2px solid var(--signal); border-radius: 50%; background: var(--surface); content: ""; transform: translateY(-50%); }
+      .link-block .link-line::before { left: -2px; }
+      .link-block .link-line::after { right: -2px; }
+      .link-block small { color: var(--muted); font-size: 11px; }
+      .proposed .link-title { color: var(--pending); }
+      .proposed .link-line { height: 0; border-top: 2px dashed var(--pending); background: transparent; }
+      .proposed .link-line::before, .proposed .link-line::after { border-color: var(--pending); }
+      .unverified .link-title { color: var(--orange); }
+      .unverified .link-line { height: 0; border-top: 2px dotted var(--orange); background: transparent; }
+      .unverified .link-line::before, .unverified .link-line::after { border-color: var(--orange); }
+      .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+      .detail { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+      .detail h3 { margin: 0; padding: 16px 18px; border-bottom: 1px solid var(--line); font-size: 16px; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 9px 12px; border-bottom: 1px solid #ecebe8; text-align: left; vertical-align: top; }
+      th { color: var(--muted); font: 700 10px/1.3 "Courier New", monospace; text-transform: uppercase; }
+      tr:last-child td { border-bottom: 0; }
+      .safety { margin: 24px 0; padding: 22px; border-radius: 12px; background: var(--ink); color: var(--paper); }
+      .safety h2 { margin: 0 0 10px; font-size: 24px; }
+      .safety ul { margin: 0; padding-left: 20px; color: #e3e3e3; }
+      .safety li + li { margin-top: 7px; }
+      .source-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 30px; }
+      footer { padding: 20px 0 34px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+      [hidden] { display: none !important; }
+      @media (max-width: 700px) {
+        header, main, footer { width: min(100% - 24px, 560px); }
+        header { align-items: flex-start; gap: 10px; }
+        .head-actions { flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
+        .flow-row { grid-template-columns: 1fr; gap: 0; }
+        .block { min-height: 88px; }
+        .link-block { min-height: 68px; }
+        .link-block .link-line { width: 2px; height: 20px; margin: 0 auto; }
+        .link-block .link-line::before, .link-block .link-line::after { left: 50%; transform: translate(-50%, -50%); }
+        .link-block .link-line::before { top: 0; }
+        .link-block .link-line::after { top: 100%; right: auto; }
+        .details-grid { grid-template-columns: 1fr; }
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .flow-row { animation: reveal .45s both; }
+        .flow-row:nth-child(2) { animation-delay: .05s; }
+        .flow-row:nth-child(3) { animation-delay: .1s; }
+        @keyframes reveal { from { opacity: .55; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="../index.html#wiring" aria-label="C.U.T.Y. home">C.U.T.Y<span><b>••</b></span></a>
+      <div class="head-actions">
+        <a href="../index.html#wiring" id="back-link"><span class="lang-en">Back to C.U.T.Y.</span><span class="lang-es" hidden>Volver a C.U.T.Y.</span></a>
+        <div class="language" aria-label="Language selector">
+          <button type="button" data-language="en" aria-pressed="true">EN</button>
+          <button type="button" data-language="es" aria-pressed="false">ES</button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <p class="eyebrow"><span class="lang-en">Hardware evidence / by subsystem</span><span class="lang-es" hidden>Evidencia de hardware / por subsistema</span></p>
+      <h1><span class="lang-en">Connections, by block.</span><span class="lang-es" hidden>Conexiones por bloques.</span></h1>
+      <p class="intro"><span class="lang-en">Functional relationships between C.U.T.Y. subsystems. Confirmed hookups use solid links; proposed and unverified paths are marked separately. Lines describe logical connections, not physical cable routing.</span><span class="lang-es" hidden>Relaciones funcionales entre subsistemas de C.U.T.Y. Las conexiones confirmadas usan líneas sólidas; las propuestas y sin verificar se distinguen. Las líneas representan relaciones lógicas, no el recorrido físico de los cables.</span></p>
+      <div class="notice"><div aria-hidden="true">●</div><div><strong><span class="lang-en">Confirmed by builder</span><span class="lang-es" hidden>Confirmado por el constructor</span></strong><p><span class="lang-en">The Waveshare display and ReSpeaker operate together on the Raspberry Pi 5 with the pin assignments below.</span><span class="lang-es" hidden>La pantalla Waveshare y el ReSpeaker funcionan juntos en la Raspberry Pi 5 con las asignaciones de pines indicadas.</span></p></div></div>
+
+      <h2><span class="lang-en">Working peripherals</span><span class="lang-es" hidden>Periféricos funcionando</span></h2>
+      <div class="flow-list">
+        <div class="flow-row">
+          <div class="block core"><span class="tag">Compute / Cómputo</span><strong>Raspberry Pi 5</strong><small>3.3 V logic · 5 V supply</small></div>
+          <div class="link-block"><span class="link-title">SPI + touch / confirmado</span><span class="link-line"></span><small>BCM10/11 · DC24 · RESET25 · IRQ17</small></div>
+          <div class="block accent"><span class="tag">Interface / Interfaz</span><strong>Waveshare 3.5″ (G)</strong><small>11 documented connections · Pi physical pins 1, 4, 6, 11, 18–26</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="block core"><span class="tag">Compute / Cómputo</span><strong>Raspberry Pi 5</strong><small>I²C · I²S · shared HAT power</small></div>
+          <div class="link-block"><span class="link-title">I²C + I²S / confirmado</span><span class="link-line"></span><small>11 connected physical pins</small></div>
+          <div class="block accent"><span class="tag">Audio / Audio</span><strong>ReSpeaker 2-Mics Pi HAT V2.0</strong><small>TLV320AIC3x audio codec</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="block core"><span class="tag">Compute / Cómputo</span><strong>Raspberry Pi 5</strong><small>CAM/DISP connector · 22 pins</small></div>
+          <div class="link-block"><span class="link-title">CSI ribbon / cámara confirmada</span><span class="link-line"></span><small>Compatible 15-to-22-pin adapter</small></div>
+          <div class="block accent"><span class="tag">Vision / Visión</span><strong>Arducam OV5647</strong><small>15-pin CSI · no individual contacts asserted</small></div>
+        </div>
+      </div>
+
+      <h2><span class="lang-en">Planned control and power</span><span class="lang-es" hidden>Control y alimentación planeados</span></h2>
+      <div class="flow-list">
+        <div class="flow-row">
+          <div class="block core"><span class="tag">Host / Anfitrión</span><strong>Raspberry Pi 5</strong><small>Physical 8 TXD / 10 RXD · BCM14/15</small></div>
+          <div class="link-block proposed"><span class="link-title">UART 3.3 V / proposed · pins TBD</span><span class="link-line"></span><small>TX/RX cross-over · shared GND</small></div>
+          <div class="block"><span class="tag">Motion controller / Control</span><strong>STM32F401 Black Pill</strong><small>UART pins not assigned in firmware</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="block"><span class="tag">Controller / Control</span><strong>STM32F401</strong><small>Final PWM pins TBD</small></div>
+          <div class="link-block proposed"><span class="link-title">5 × PWM / proposed</span><span class="link-line"></span><small>Signal 3.3 V · assignment pending</small></div>
+          <div class="block accent"><span class="tag">Actuators / Actuadores</span><strong>5 × MG996R servo</strong><small>Servo rail: regulated 6 V target</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="block"><span class="tag">Battery / Batería</span><strong>LiPo 3S · 11.1 V nominal</strong><small>12.6 V full · 2200 mAh</small></div>
+          <div class="link-block proposed"><span class="link-title">Buck converter / proposed</span><span class="link-line"></span><small>Set and measure about 6.0 V before servos</small></div>
+          <div class="block accent"><span class="tag">Servo power / Potencia servo</span><strong>MG996R supply</strong><small>Converter model and current capacity TBD</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="block"><span class="tag">Battery branch / Rama de batería</span><strong>LiPo 3S</strong><small>Raw battery voltage</small></div>
+          <div class="link-block unverified"><span class="link-title">Pi regulator / unverified</span><span class="link-line"></span><small>Independent 5.1 V USB-C supply path TBD</small></div>
+          <div class="block core"><span class="tag">Computer / Computadora</span><strong>Raspberry Pi 5</strong><small>Never connect raw LiPo or 6 V servo rail</small></div>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <section class="detail"><h3><span class="lang-en">Display pin mapping</span><span class="lang-es" hidden>Mapa de pines de pantalla</span></h3><table><thead><tr><th>Function</th><th>BCM</th><th>Pi physical</th></tr></thead><tbody>
+          <tr><td>3.3 V</td><td>—</td><td>1</td></tr><tr><td>5 V</td><td>—</td><td>4</td></tr><tr><td>GND</td><td>—</td><td>6</td></tr><tr><td>Touch IRQ</td><td>17</td><td>11</td></tr><tr><td>LCD DC / RS</td><td>24</td><td>18</td></tr><tr><td>SPI MOSI / MISO</td><td>10 / 9</td><td>19 / 21</td></tr><tr><td>LCD RESET</td><td>25</td><td>22</td></tr><tr><td>SPI SCLK</td><td>11</td><td>23</td></tr><tr><td>LCD CS / Touch CS</td><td>8 / 7</td><td>24 / 26</td></tr>
+        </tbody></table></section>
+        <section class="detail"><h3><span class="lang-en">ReSpeaker pin mapping · 11 pins</span><span class="lang-es" hidden>Mapa de pines ReSpeaker · 11 pines</span></h3><table><thead><tr><th>Function</th><th>BCM</th><th>Pi physical</th></tr></thead><tbody>
+          <tr><td>3.3 V</td><td>—</td><td>1</td></tr><tr><td>I²C SDA / SCL</td><td>2 / 3</td><td>3 / 5</td></tr><tr><td>5 V / GND</td><td>—</td><td>4 / 6</td></tr><tr><td>MCLK</td><td>4</td><td>7</td></tr><tr><td>I²S BCLK</td><td>18</td><td>12</td></tr><tr><td>I²S LRCLK</td><td>19</td><td>35</td></tr><tr><td>AUD_RST</td><td>26</td><td>37</td></tr><tr><td>I²S DIN / DOUT</td><td>20 / 21</td><td>38 / 40</td></tr>
+        </tbody></table></section>
+      </div>
+
+      <section class="safety"><h2><span class="lang-en">Power and signal safety</span><span class="lang-es" hidden>Seguridad de potencia y señales</span></h2><ul>
+        <li><span class="lang-en">Measure the buck output near 6.0 V before connecting servos; confirm it can supply simultaneous servo current.</span><span class="lang-es" hidden>Mide cerca de 6.0 V a la salida del buck antes de conectar servos; confirma que soporte la corriente simultánea.</span></li>
+        <li><span class="lang-en">Share GND between Pi, STM32 and servo supply. Never join positive outputs of different-voltage regulators.</span><span class="lang-es" hidden>Comparte GND entre Pi, STM32 y la alimentación servo. No unas salidas positivas de reguladores de distinto voltaje.</span></li>
+        <li><span class="lang-en">Do not connect raw LiPo to the Pi or send 5 V logic into UART. Pi battery power needs a separate validated 5.1 V regulator.</span><span class="lang-es" hidden>No conectes la LiPo directa a la Pi ni señales de 5 V al UART. La Pi requiere un regulador independiente validado de 5.1 V.</span></li>
+      </ul></section>
+
+      <div class="source-row">
+        <a class="source-link" href="hardware-connections.md"><span class="lang-en">Open original connection tables ↗</span><span class="lang-es" hidden>Abrir tablas originales de conexiones ↗</span></a>
+        <a class="source-link" href="../index.html#wiring"><span class="lang-en">Return to the wiring section ↗</span><span class="lang-es" hidden>Volver a la sección de conexiones ↗</span></a>
+      </div>
+    </main>
+    <footer><span class="lang-en">Confirmed display, audio and camera links are visually solid. Dashed paths remain proposed; dotted paths are unverified.</span><span class="lang-es" hidden>Las conexiones confirmadas de pantalla, audio y cámara usan líneas sólidas. Las discontinuas son propuestas y las punteadas no están verificadas.</span></footer>
+    <script>
+      const groups = [...document.querySelectorAll(".lang-en, .lang-es")];
+      const buttons = [...document.querySelectorAll("[data-language]")];
+      const setLanguage = (lang) => {
+        document.documentElement.lang = lang;
+        groups.forEach((el) => { el.hidden = !el.classList.contains(`lang-${lang}`); });
+        buttons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.language === lang)));
+        document.title = lang === "es" ? "C.U.T.Y. — Evidencia de conexiones" : "C.U.T.Y. — Wiring evidence";
+      };
+      const params = new URLSearchParams(location.search);
+      const initial = params.get("lang") === "es" ? "es" : "en";
+      setLanguage(initial);
+      buttons.forEach((button) => button.addEventListener("click", () => {
+        setLanguage(button.dataset.language);
+        params.set("lang", button.dataset.language);
+        history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+      }));
+    </script>
+  </body>
+</html>

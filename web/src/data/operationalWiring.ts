@@ -6,7 +6,7 @@ import {
   type WireFilter,
   type WiringStatus,
 } from "./engineering";
-export const wiringEvidence = `${import.meta.env.BASE_URL}engineering/hardware-connections.md`;
+export const wiringEvidence = `${import.meta.env.BASE_URL}engineering/wiring-evidence.html`;
 export const connectionRows: ConnectionRow[] = [];
 function add(
   id: string,

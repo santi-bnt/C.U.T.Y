@@ -1,16 +1,15 @@
-import { useMemo, useState } from "react";
-import { ArrowUpRight, Search } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import {
   carrier,
   filters,
   filterNames,
-  matchesFilter,
-  wiringStates,
   type WireFilter,
 } from "../data/engineering";
 import { bi, source } from "../data/project";
 import { useLocale } from "../state/Locale";
 import EngineeringViewport from "./EngineeringViewport";
+import ConnectionsExplorer from "./ConnectionsExplorer";
 import {
   connectionRows,
   wiringEdges,
@@ -19,24 +18,11 @@ import {
 } from "../data/operationalWiring";
 
 export default function WiringConnections() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [selected, setSelected] = useState<string | null>(null);
   const [spatial, setSpatial] = useState(true);
-  const [filter, setFilter] = useState<WireFilter>("all"),
-    [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<WireFilter>("all");
   const node = wiringNodes.find((n) => n.id === selected);
-  const rows = useMemo(
-    () =>
-      connectionRows.filter(
-        (row) =>
-          (!selected || row.from === selected || row.to === selected) &&
-          matchesFilter(row, filter) &&
-          `${row.net} ${row.pin} ${row.destination} ${row.gpio} ${row.voltage} ${row.status}`
-            .toLowerCase()
-            .includes(query.toLowerCase()),
-      ),
-    [selected, filter, query],
-  );
   const relevantEdges = wiringEdges.filter(
     (edge) =>
       filter === "all" ||
@@ -344,96 +330,16 @@ export default function WiringConnections() {
           )}
           <a
             className="text-link"
-            href={wiringEvidence}
+            href={`${wiringEvidence}?lang=${locale}`}
             target="_blank"
             rel="noreferrer"
           >
-            {t(bi("Wiring evidence", "Fuente del cableado"))}
+            {t(bi("Block connection evidence", "Conexiones por bloques"))}
             <ArrowUpRight size={14} />
           </a>
         </aside>
       </div>
-      <div className="connection-table-heading">
-        <h3>{t(bi("Trace every connection.", "Traza cada conexión."))}</h3>
-        <label className="wire-search">
-          <Search size={17} />
-          <input
-            type="search"
-            aria-label={t(bi("Search connections", "Buscar conexiones"))}
-            placeholder={t(
-              bi("Pin, net, GPIO, voltage…", "Pin, red, GPIO, voltaje…"),
-            )}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-      </div>
-      <p className="caption">
-        {rows.length}{" "}
-        {t(
-          bi(
-            "connections shown. Pi numbers are physical header pins; BCM is separate. Display/audio follow the builder's confirmed table. TBD marks future pin assignments.",
-            "conexiones. Los números Pi son pines físicos; BCM es independiente. Pantalla/audio siguen la tabla confirmada. TBD indica pines futuros pendientes.",
-          ),
-        )}
-      </p>
-      <a
-        className="text-link"
-        href="https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#gpio"
-        target="_blank"
-        rel="noreferrer"
-      >
-        {t(
-          bi(
-            "BCM numbering & 3.3 V GPIO reference ?",
-            "Referencia BCM y GPIO de 3.3 V ?",
-          ),
-        )}
-      </a>
-      <div className="connection-table-scroll">
-        <table className="connection-table">
-          <thead>
-            <tr>
-              <th>{t(bi("Source pin", "Pin origen"))}</th>
-              <th>{t(bi("Destination", "Destino"))}</th>
-              <th>BCM / GPIO</th>
-              <th>{t(bi("Net / voltage", "Red / voltaje"))}</th>
-              <th>{t(bi("Evidence", "Evidencia"))}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.pin}</td>
-                <td>{row.destination}</td>
-                <td>{row.gpio}</td>
-                <td>
-                  <strong>{row.net}</strong>
-                  <small>{row.voltage}</small>
-                </td>
-                <td>
-                  <span className={`connection-status ${row.status}`}>
-                    {t(wiringStates[row.status])}
-                  </span>
-                  <a href={row.source} target="_blank" rel="noreferrer">
-                    {t(bi("Source ↗", "Fuente ↗"))}
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {rows.length === 0 && (
-          <p className="empty-connections">
-            {t(
-              bi(
-                "No matching connections. Clear the search, filter or selected node.",
-                "Sin coincidencias. Borra la búsqueda, filtro o nodo seleccionado.",
-              ),
-            )}
-          </p>
-        )}
-      </div>
+      <ConnectionsExplorer filter={filter} />
       <details className="engineering-conflicts" open>
         <summary>
           {t(
