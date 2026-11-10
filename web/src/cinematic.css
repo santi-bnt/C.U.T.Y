@@ -2319,15 +2319,47 @@ html[lang="es"] .hero-baseline {
     -webkit-mask-image: none;
   }
 }
-/* On phones, keep the intro copy close to the oversized title. */
+/* On phones, keep the full intro together and size the hero to its content. */
 @media (max-width: 520px) {
+  .product-hero {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    padding-top: 102px;
+    padding-bottom: 28px;
+  }
+  .hero-overline {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    margin-bottom: 23px;
+  }
+  .product-hero h1 {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    margin: 0 0 0 -5px;
+  }
   .hero-copy {
-    top: calc(154px + 21.6vw);
-    bottom: auto;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin: 16px 0 0;
+  }
+  html[lang="es"] .product-hero {
+    min-height: 0;
+    padding-top: 102px;
   }
   html[lang="es"] .hero-copy {
-    top: auto;
-    margin-top: 16px;
+    margin: 16px 0 0;
+  }
+  .hero-baseline {
+    position: relative;
+    inset: auto;
+    margin-top: 22px;
   }
 }
 .explore-launch[hidden] {
