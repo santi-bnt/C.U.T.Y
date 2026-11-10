@@ -119,10 +119,12 @@ function Header({ motion }: { motion: StoryMotion }) {
   return (
     <header className="site-header" ref={header} data-tone="paper">
       <a className="wordmark" href="#home" aria-label="C.U.T.Y home">
-        <span className="brand-icon">
-          <i />
-          <i />
-        </span>
+        <img
+          className="brand-icon"
+          src={`${import.meta.env.BASE_URL}favicon.svg`}
+          alt=""
+          aria-hidden="true"
+        />
         C.U.T.Y.
       </a>
       <nav

@@ -3,89 +3,124 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f3f3f0" />
+    <meta name="theme-color" content="#FFFFFF" />
     <meta name="description" content="C.U.T.Y. hardware connections grouped by subsystem, with confirmed and pending wiring clearly distinguished." />
     <title>C.U.T.Y. — Wiring evidence</title>
     <style>
       :root {
         color-scheme: light;
         --ink: #171717;
-        --muted: #626262;
+        --muted: #676767;
         --paper: #fff;
         --surface: #f3f3f0;
-        --line: #d9d8d4;
-        --orange: #b94700;
+        --line: rgb(23 23 23 / 16%);
+        --orange: #ff6a00;
+        --orange-deep: #b94700;
         --orange-soft: #fff0e6;
-        --signal: #137463;
+        --signal: #16816d;
         --pending: #735c36;
+        font-family: Arial, Helvetica, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+        font-size: 16px;
+        line-height: 1.6;
       }
       * { box-sizing: border-box; }
-      body { margin: 0; background: var(--surface); color: var(--ink); font: 16px/1.55 Inter, "Segoe UI", Arial, sans-serif; }
-      header, main, footer { width: min(1100px, calc(100% - 36px)); margin-inline: auto; }
-      header { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--line); }
-      .brand { color: var(--ink); font-size: 22px; font-weight: 850; letter-spacing: -.07em; text-decoration: none; }
-      .brand b { color: var(--signal); }
-      .head-actions { display: flex; align-items: center; gap: 18px; }
-      .head-actions a, .source-link { color: var(--orange); font-size: 13px; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
-      .language { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 99px; background: var(--paper); }
-      .language button { border: 0; background: transparent; color: var(--muted); padding: 6px 9px; border-radius: 99px; cursor: pointer; font-weight: 700; }
-      .language button[aria-pressed="true"] { background: var(--orange-soft); color: var(--orange); }
-      main { padding: clamp(36px, 7vw, 84px) 0 64px; }
-      .eyebrow { color: var(--orange); font: 700 11px/1.3 "Courier New", monospace; letter-spacing: .12em; text-transform: uppercase; }
-      h1 { max-width: 850px; margin: 12px 0 14px; font-size: clamp(40px, 7vw, 76px); line-height: .98; letter-spacing: -.075em; }
-      .intro { max-width: 680px; color: var(--muted); font-size: 17px; }
-      .notice { display: flex; gap: 14px; align-items: flex-start; margin: 32px 0 42px; padding: 18px 20px; border: 1px solid #e8c7af; border-radius: 12px; background: var(--orange-soft); }
-      .notice strong { display: block; color: var(--orange); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
-      .notice p { margin: 4px 0 0; font-size: 14px; }
-      h2 { margin: 48px 0 18px; font-size: clamp(24px, 3vw, 36px); letter-spacing: -.05em; }
-      .flow-list { display: grid; gap: 12px; }
-      .flow-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(185px, .82fr) minmax(180px, 1fr); align-items: stretch; gap: 12px; }
-      .block { min-height: 112px; display: flex; flex-direction: column; justify-content: center; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+      html { scroll-padding-top: 96px; }
+      body { margin: 0; overflow-x: hidden; background: var(--paper); color: var(--ink); font: inherit; }
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; }
+      button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+      [hidden] { display: none !important; }
+      .site-header { position: sticky; top: 0; z-index: 20; width: 100%; min-height: 88px; padding: 0 clamp(24px, 5vw, 88px); display: flex; align-items: center; justify-content: space-between; gap: 24px; color: var(--ink); background: rgb(255 255 255 / 96%); border-bottom: 1px solid rgb(255 106 0 / 32%); }
+      .wordmark { display: inline-flex; align-items: center; gap: 9px; flex: 0 0 auto; color: var(--ink); font-size: 24px; font-weight: 800; letter-spacing: -.08em; white-space: nowrap; }
+      .brand-icon { display: block; width: 28px; height: 25px; object-fit: contain; }
+      .nav { display: flex; justify-content: center; align-items: center; gap: clamp(10px, 1.5vw, 20px); font-size: 10px; color: var(--ink); }
+      .nav a { padding: 10px 0; border-bottom: 1px solid transparent; white-space: nowrap; }
+      .nav a:hover, .nav a[aria-current="page"] { color: var(--orange-deep); border-bottom-color: var(--orange-deep); }
+      .head-actions { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+      .menu-toggle { display: none; width: 42px; height: 42px; align-items: center; justify-content: center; border: 1px solid rgb(255 106 0 / 32%); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+      .menu-toggle span, .menu-toggle span::before, .menu-toggle span::after { display: block; width: 15px; height: 1px; background: currentColor; }
+      .menu-toggle span { position: relative; }
+      .menu-toggle span::before, .menu-toggle span::after { position: absolute; left: 0; content: ""; }
+      .menu-toggle span::before { top: -5px; }
+      .menu-toggle span::after { top: 5px; }
+      .back-link, .source-link { color: var(--orange-deep); font-size: 12px; font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+      .language { display: flex; gap: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+      .language button { min-width: 34px; min-height: 38px; padding: 7px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 700; }
+      .language button[aria-pressed="true"] { background: var(--orange-soft); color: var(--orange-deep); }
+      main, footer { width: min(1280px, calc(100% - 2 * clamp(24px, 5vw, 88px))); margin-inline: auto; }
+      main { padding: clamp(52px, 8vw, 112px) 0 88px; }
+      .eyebrow { color: var(--orange-deep); font: 10px/1.5 "Courier New", monospace; letter-spacing: .1em; text-transform: uppercase; }
+      h1 { max-width: 1000px; margin: 12px 0 18px; font-size: clamp(48px, 8.5vw, 112px); font-weight: 700; line-height: .92; letter-spacing: -.075em; }
+      .intro { max-width: 720px; color: var(--muted); font-size: 16px; line-height: 1.8; }
+      .notice { display: flex; gap: 14px; align-items: flex-start; margin: 34px 0 52px; padding: 18px 20px; border: 1px solid rgb(255 106 0 / 32%); border-radius: 12px; background: var(--surface); }
+      .notice > div:first-child { color: var(--orange); }
+      .notice strong { display: block; color: var(--orange-deep); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+      .notice p { margin: 4px 0 0; color: var(--ink); font-size: 14px; }
+      h2 { margin: 64px 0 22px; font-size: clamp(30px, 4vw, 54px); font-weight: 600; line-height: 1; letter-spacing: -.06em; }
+      .flow-list { display: grid; gap: 14px; }
+      .flow-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(185px, .82fr) minmax(180px, 1fr); align-items: stretch; gap: 14px; }
+      .block { min-height: 120px; display: flex; flex-direction: column; justify-content: center; padding: 20px 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
       .block .tag { margin-bottom: 7px; color: var(--muted); font: 700 10px/1.3 "Courier New", monospace; letter-spacing: .09em; text-transform: uppercase; }
       .block strong { font-size: 18px; letter-spacing: -.035em; }
       .block small { margin-top: 5px; color: var(--muted); font-size: 12px; }
-      .block.core { border-color: #2c2c2c; background: var(--ink); color: var(--paper); }
-      .block.core .tag, .block.core small { color: #c9c9c9; }
-      .block.accent { border-color: #e7b594; background: #fffaf6; }
+      .block.core { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+      .block.core .tag, .block.core small { color: #d1d5db; }
+      .block.accent { border-color: rgb(255 106 0 / 42%); background: var(--orange-soft); }
       .link-block { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; text-align: center; }
       .link-block .link-title { color: var(--signal); font: 700 12px/1.3 "Courier New", monospace; }
       .link-block .link-line { position: relative; height: 2px; margin-inline: 10px; background: var(--signal); }
-      .link-block .link-line::before, .link-block .link-line::after { position: absolute; top: 50%; width: 9px; height: 9px; border: 2px solid var(--signal); border-radius: 50%; background: var(--surface); content: ""; transform: translateY(-50%); }
+      .link-block .link-line::before, .link-block .link-line::after { position: absolute; top: 50%; width: 9px; height: 9px; border: 2px solid var(--signal); border-radius: 50%; background: var(--paper); content: ""; transform: translateY(-50%); }
       .link-block .link-line::before { left: -2px; }
       .link-block .link-line::after { right: -2px; }
       .link-block small { color: var(--muted); font-size: 11px; }
       .proposed .link-title { color: var(--pending); }
       .proposed .link-line { height: 0; border-top: 2px dashed var(--pending); background: transparent; }
       .proposed .link-line::before, .proposed .link-line::after { border-color: var(--pending); }
-      .unverified .link-title { color: var(--orange); }
+      .unverified .link-title { color: var(--orange-deep); }
       .unverified .link-line { height: 0; border-top: 2px dotted var(--orange); background: transparent; }
       .unverified .link-line::before, .unverified .link-line::after { border-color: var(--orange); }
       .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
-      .detail { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+      .detail { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
       .detail h3 { margin: 0; padding: 16px 18px; border-bottom: 1px solid var(--line); font-size: 16px; }
       table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      th, td { padding: 9px 12px; border-bottom: 1px solid #ecebe8; text-align: left; vertical-align: top; }
+      th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
       th { color: var(--muted); font: 700 10px/1.3 "Courier New", monospace; text-transform: uppercase; }
       tr:last-child td { border-bottom: 0; }
-      .safety { margin: 24px 0; padding: 22px; border-radius: 12px; background: var(--ink); color: var(--paper); }
-      .safety h2 { margin: 0 0 10px; font-size: 24px; }
+      .safety { margin: 30px 0; padding: 26px; border-radius: 12px; background: var(--ink); color: var(--paper); }
+      .safety h2 { margin: 0 0 12px; font-size: 30px; }
       .safety ul { margin: 0; padding-left: 20px; color: #e3e3e3; }
       .safety li + li { margin-top: 7px; }
-      .source-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 30px; }
-      footer { padding: 20px 0 34px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-      [hidden] { display: none !important; }
-      @media (max-width: 700px) {
-        header, main, footer { width: min(100% - 24px, 560px); }
-        header { align-items: flex-start; gap: 10px; }
-        .head-actions { flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
+      .source-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 36px; }
+      footer { padding: 22px 0 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+      @media (max-width: 1050px) {
+        .nav { gap: 10px; font-size: 9px; }
+        .head-actions .back-link { display: none; }
+      }
+      @media (max-width: 760px) {
+        .site-header { min-height: 76px; padding-inline: 22px; }
+        .wordmark { font-size: 23px; }
+        .brand-icon { width: 24px; height: 23px; }
+        .site-header { flex-wrap: wrap; }
+        .menu-toggle { display: flex; }
+        .nav { display: none; order: 3; flex: 1 0 100%; flex-direction: column; align-items: stretch; gap: 0; padding: 0 0 12px; }
+        .nav.open { display: flex; }
+        .nav a { padding: 10px 2px; }
+        main, footer { width: calc(100% - 44px); }
+        main { padding: 52px 0 68px; }
+        h1 { font-size: clamp(48px, 12vw, 76px); }
+        .intro { font-size: 14px; }
+        h2 { margin-top: 52px; font-size: clamp(30px, 8vw, 42px); }
         .flow-row { grid-template-columns: 1fr; gap: 0; }
-        .block { min-height: 88px; }
-        .link-block { min-height: 68px; }
-        .link-block .link-line { width: 2px; height: 20px; margin: 0 auto; }
+        .block { min-height: 92px; }
+        .link-block { min-height: 76px; }
+        .link-block .link-line { width: 2px; height: 24px; margin: 0 auto; }
         .link-block .link-line::before, .link-block .link-line::after { left: 50%; transform: translate(-50%, -50%); }
         .link-block .link-line::before { top: 0; }
         .link-block .link-line::after { top: 100%; right: auto; }
         .details-grid { grid-template-columns: 1fr; }
+        .safety { padding: 22px; }
       }
       @media (prefers-reduced-motion: no-preference) {
         .flow-row { animation: reveal .45s both; }
@@ -96,10 +131,23 @@
     </style>
   </head>
   <body>
-    <header>
-      <a class="brand" href="../index.html#wiring" aria-label="C.U.T.Y. home">C.U.T.Y<span><b>••</b></span></a>
+    <header class="site-header" data-tone="paper">
+      <a class="wordmark" href="../index.html#home" aria-label="C.U.T.Y. home">
+        <img class="brand-icon" src="../favicon.svg" alt="" aria-hidden="true" />
+        C.U.T.Y.
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="../index.html#home">Home</a>
+        <a href="../index.html#companion">Meet C.U.T.Y.</a>
+        <a href="../index.html#intelligence">Technology</a>
+        <a href="../index.html#pcb-design">PCB Design</a>
+        <a href="../index.html#wiring" aria-current="page">Wiring</a>
+        <a href="../index.html#development">Development</a>
+        <a href="../index.html#live">C.U.T.Y. Live</a>
+      </nav>
       <div class="head-actions">
-        <a href="../index.html#wiring" id="back-link"><span class="lang-en">Back to C.U.T.Y.</span><span class="lang-es" hidden>Volver a C.U.T.Y.</span></a>
+        <a class="back-link" href="../index.html#wiring" id="back-link"><span class="lang-en">Back to wiring</span><span class="lang-es" hidden>Volver a conexiones</span></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false"><span aria-hidden="true"></span></button>
         <div class="language" aria-label="Language selector">
           <button type="button" data-language="en" aria-pressed="true">EN</button>
           <button type="button" data-language="es" aria-pressed="false">ES</button>
@@ -179,6 +227,17 @@
     <script>
       const groups = [...document.querySelectorAll(".lang-en, .lang-es")];
       const buttons = [...document.querySelectorAll("[data-language]")];
+      const menuToggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector(".nav");
+      menuToggle.addEventListener("click", () => {
+        const open = menuToggle.getAttribute("aria-expanded") !== "true";
+        menuToggle.setAttribute("aria-expanded", String(open));
+        nav.classList.toggle("open", open);
+      });
+      nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
+        menuToggle.setAttribute("aria-expanded", "false");
+        nav.classList.remove("open");
+      }));
       const setLanguage = (lang) => {
         document.documentElement.lang = lang;
         groups.forEach((el) => { el.hidden = !el.classList.contains(`lang-${lang}`); });

@@ -370,23 +370,10 @@ p {
   padding: 4px 11px 4px 4px;
 }
 .brand-icon {
-  border: 1px solid var(--orange-line);
   width: 28px;
   height: 25px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.brand-icon i {
-  width: 4px;
-  height: 8px;
-  background: var(--eye-green);
-  border-radius: 4px;
-}
-.site-header .brand-icon i {
-  background: var(--orange);
+  display: block;
+  object-fit: contain;
 }
 .nav {
   display: flex;
