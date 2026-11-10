@@ -2334,7 +2334,7 @@ html[lang="es"] .hero-baseline {
     top: auto;
     left: auto;
     right: auto;
-    margin-bottom: clamp(30px, 4svh, 42px);
+    margin-bottom: clamp(54px, 7svh, 66px);
   }
   .product-hero h1 {
     position: relative;
