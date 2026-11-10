@@ -2325,7 +2325,7 @@ html[lang="es"] .hero-baseline {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: 0;
+    min-height: max(100svh, 680px);
     padding-top: 102px;
     padding-bottom: 28px;
   }
@@ -2350,7 +2350,7 @@ html[lang="es"] .hero-baseline {
     margin: 16px 0 0;
   }
   html[lang="es"] .product-hero {
-    min-height: 0;
+    min-height: max(100svh, 680px);
     padding-top: 102px;
   }
   html[lang="es"] .hero-copy {
@@ -2359,7 +2359,8 @@ html[lang="es"] .hero-baseline {
   .hero-baseline {
     position: relative;
     inset: auto;
-    margin-top: 22px;
+    margin-top: auto;
+    padding-top: 22px;
   }
 }
 .explore-launch[hidden] {
