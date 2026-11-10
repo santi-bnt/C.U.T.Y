@@ -138,6 +138,10 @@
   color: var(--ink);
   position: relative;
   z-index: 3;
+  padding-bottom: 0;
+}
+.assembly-story + #pcb-design {
+  padding-top: 40px;
 }
 .assembly-story .assembly-strip button {
   color: var(--muted);
