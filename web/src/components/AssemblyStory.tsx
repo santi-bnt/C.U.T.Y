@@ -155,7 +155,7 @@ export default function AssemblyStory() {
     return () => window.clearInterval(timer);
   }, [playing, reduced]);
   return (
-    <section id="assembly" className="assembly-story technical-section ink">
+    <section id="assembly" className="assembly-story technical-section paper">
       <div className="technical-heading">
         <span className="eyebrow">
           V17 / NIDO · 06 NOV 2026 — {t(bi("CURRENT PRINT CAD", "CAD DE IMPRESIÓN ACTUAL"))}

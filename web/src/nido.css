@@ -128,9 +128,25 @@
   margin: 8px 0 0;
 }
 .assembly-story {
-  background: var(--dark);
+  --dark: #ffffff;
+  --muted: #666666;
+  --line: rgb(23 23 23 / 16%);
+  --orange-on-dark: var(--orange-strong);
+  --orange-wash: rgb(255 106 0 / 10%);
+  --orange-line: rgb(23 23 23 / 16%);
+  background: var(--paper);
+  color: var(--ink);
   position: relative;
   z-index: 3;
+}
+.assembly-story .assembly-strip button {
+  color: var(--muted);
+  border-color: var(--line);
+  background: var(--surface);
+}
+.assembly-story .assembly-strip button[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: var(--orange);
 }
 .assembly-story .technical-heading h2 {
   max-width: 1000px;
