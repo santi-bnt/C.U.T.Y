@@ -41,19 +41,19 @@ describe("source-backed engineering interfaces", () => {
         <WiringConnections />
       </LocaleProvider>,
     );
-    fireEvent.click(screen.getByRole("button", { name: /^All connections/ }));
+    expect(document.querySelectorAll(".connection-table tbody tr")).toHaveLength(39);
     fireEvent.click(screen.getByRole("button", { name: /^UART$/ }));
     expect(
-      document.querySelectorAll(".connections-table tbody tr"),
+      document.querySelectorAll(".connection-table tbody tr"),
     ).toHaveLength(2);
     fireEvent.change(screen.getByLabelText("Search connections"), {
       target: { value: "BCM 14" },
     });
     expect(
-      document.querySelectorAll(".connections-table tbody tr"),
+      document.querySelectorAll(".connection-table tbody tr"),
     ).toHaveLength(1);
     expect(
-      document.querySelector(".connections-table tbody")?.textContent,
+      document.querySelector(".connection-table tbody")?.textContent,
     ).toContain("STM32 RX");
     fireEvent.click(
       screen.getByRole("button", {
@@ -63,13 +63,9 @@ describe("source-backed engineering interfaces", () => {
     expect(document.querySelector(".wiring-detail")?.textContent).toContain(
       "current remain unverified",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Power" }));
-    fireEvent.click(screen.getByRole("button", { name: /^Power & battery/ }));
-    fireEvent.change(screen.getByLabelText("Search connections"), {
-      target: { value: "" },
-    });
     expect(
-      document.querySelector(".connections-table tbody")?.textContent,
-    ).toContain("6.0 V");
+      document.querySelectorAll(".connection-table tbody tr"),
+    ).toHaveLength(0);
+    expect(screen.getByText(/No matching connections/)).toBeTruthy();
   });
 });
