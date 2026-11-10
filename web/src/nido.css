@@ -233,16 +233,25 @@
   opacity: 0.7;
 }
 .assembly-stage {
+  --dark: #ffffff;
+  --muted: #666666;
+  --line: rgb(23 23 23 / 16%);
+  --orange-line: rgb(23 23 23 / 16%);
+  --orange-wash: rgb(255 106 0 / 10%);
+  --orange-on-dark: var(--orange-strong);
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   align-items: center;
   gap: 6vw;
-  margin-top: 55px;
+  margin: 55px calc(-1 * var(--gutter)) 0;
+  padding: 55px var(--gutter) 30px;
+  background: var(--paper);
+  color: var(--ink);
 }
 .assembly-image {
   position: relative;
   min-width: 0;
-  background: var(--dark);
+  background: var(--paper);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -258,7 +267,7 @@
   bottom: 20px;
   left: 20px;
   font-size: 9px;
-  color: var(--orange-on-dark);
+  color: var(--orange-strong);
 }
 .assembly-caption h3 {
   font-size: clamp(30px, 3.8vw, 60px);
@@ -280,12 +289,18 @@
   min-height: 44px;
 }
 .assembly-strip {
+  --dark: #ffffff;
+  --muted: #666666;
+  --line: rgb(23 23 23 / 16%);
+  --orange-line: rgb(23 23 23 / 16%);
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding: 28px 0 18px;
+  margin-inline: calc(-1 * var(--gutter));
+  padding: 28px var(--gutter) 18px;
+  background: var(--paper);
   scroll-snap-type: x mandatory;
-  scrollbar-color: var(--orange) var(--dark);
+  scrollbar-color: var(--orange) var(--surface);
 }
 .assembly-strip button {
   flex: 0 0 136px;
