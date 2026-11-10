@@ -135,6 +135,36 @@ def test_greeting_then_conversation_then_normal_exit_without_keyboard():
     assert service.turns == 2
 
 
+def test_hands_free_waits_for_active_local_track_before_reopening_microphone():
+    class Music:
+        waited = False
+
+        async def get_playback_state(self):
+            from cuty.music.protocol import PlaybackState
+            return PlaybackState("playing" if not self.waited else "stopped", None, 70)
+
+        async def wait_until_finished(self):
+            self.waited = True
+
+    class Service:
+        voice_exit = False
+        turns = 0
+        music = Music()
+
+        async def greet(self):
+            pass
+
+        async def run_turn(self, stop):
+            self.turns += 1
+            if self.turns == 2:
+                raise ReturnToMenu
+
+    service = Service()
+    asyncio.run(run_hands_free(service))
+    assert service.music.waited
+    assert service.turns == 2
+
+
 def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
     from types import SimpleNamespace
 

@@ -165,6 +165,12 @@ class LocalMusicProvider:
         track = self._tracks[self._index] if 0 <= self._index < len(self._tracks) else None
         return PlaybackState(self._status, track, self.volume)
 
+    async def wait_until_finished(self) -> None:
+        """Let hands-free mode keep the song audible instead of immediately reopening its mic."""
+        task = self._task
+        if task is not None:
+            await asyncio.shield(task)
+
     async def close(self) -> None:
         await self.stop()
 

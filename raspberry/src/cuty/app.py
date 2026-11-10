@@ -64,6 +64,12 @@ async def run_hands_free(service: ConversationService) -> None:
             # Let the final speaker buffers / room echo settle before reopening the mic.
             await asyncio.sleep(0.25)
             await service.run_turn(asyncio.Event())
+            music = getattr(service, "music", None)
+            if music is not None:
+                playback = await music.get_playback_state()
+                wait_for_track = getattr(music, "wait_until_finished", None)
+                if playback.status == "playing" and wait_for_track is not None:
+                    await wait_for_track()
     except ReturnToMenu:
         logging.getLogger("CUTY").info("Volviendo al menú principal por petición de voz.")
 
