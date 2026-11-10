@@ -2252,6 +2252,67 @@ summary::-webkit-details-marker {
   }
 }
 
+/* Spanish copy can wrap taller than the English copy. Keep its hero elements
+   in document flow so the display title never paints over essential content. */
+html[lang="es"] .product-hero {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: max(760px, 100svh);
+  padding-top: clamp(137px, 16svh, 172px);
+  padding-bottom: 32px;
+}
+html[lang="es"] .product-hero h1 {
+  position: relative;
+  inset: auto;
+  flex: 0 0 auto;
+  margin: 0 0 0 -8px;
+}
+html[lang="es"] .hero-copy {
+  position: relative;
+  inset: auto;
+  width: min(330px, 100%);
+  margin-top: auto;
+  margin-bottom: 24px;
+}
+html[lang="es"] .hero-baseline {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  margin-top: 0;
+}
+
+@media (max-width: 1200px) {
+  html[lang="es"] .hero-copy {
+    width: min(290px, 100%);
+  }
+}
+@media (max-width: 900px) {
+  html[lang="es"] .product-hero {
+    min-height: max(850px, 100svh);
+  }
+  html[lang="es"] .product-hero h1 {
+    margin-left: -6px;
+  }
+  html[lang="es"] .hero-copy {
+    width: min(500px, 100%);
+    max-width: 500px;
+  }
+}
+@media (max-width: 520px) {
+  html[lang="es"] .product-hero {
+    min-height: 820px;
+  }
+  html[lang="es"] .product-hero h1 {
+    margin-left: -9px;
+  }
+  html[lang="es"] .hero-copy {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 24px;
+  }
+}
+
 @media (max-width: 900px) {
   .scene-layer[data-chapter="0"] {
     mask-image: none;
