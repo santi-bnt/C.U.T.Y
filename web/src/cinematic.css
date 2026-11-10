@@ -1398,6 +1398,9 @@ summary::-webkit-details-marker {
   color: var(--orange-on-dark);
   width: min(360px, 100%);
 }
+.wiring-section .wire-search {
+  color: #ffffff;
+}
 .wire-search input {
   border: 0;
   background: none;
@@ -1408,6 +1411,10 @@ summary::-webkit-details-marker {
 }
 .wire-search input::placeholder {
   color: var(--orange-on-dark);
+}
+.wiring-section .wire-search input::placeholder {
+  color: #d1d5db;
+  opacity: 1;
 }
 .wire-search:focus-within {
   outline: 2px solid var(--orange-strong);
@@ -1488,6 +1495,9 @@ summary::-webkit-details-marker {
   font-size: 14px;
   padding: 10px 0;
 }
+.wiring-section .engineering-conflicts summary {
+  color: #ffffff;
+}
 .engineering-conflicts summary::after {
   content: " +";
   float: right;
@@ -1503,6 +1513,9 @@ summary::-webkit-details-marker {
   font-size: 12px;
   color: var(--orange-on-dark);
   line-height: 1.9;
+}
+.wiring-section .engineering-conflicts li {
+  color: #d1d5db;
 }
 .engineering-conflicts .text-link {
   color: var(--orange-on-dark);
