@@ -2350,10 +2350,10 @@ html[lang="es"] .hero-baseline {
     margin: clamp(64px, 8svh, 76px) 0 0;
   }
   .hero-copy > p:not(.mono) {
-    margin-bottom: clamp(22px, 3svh, 30px);
+    margin-bottom: clamp(38px, 6svh, 50px);
   }
   .hero-copy .button {
-    margin-top: 8px;
+    margin-top: 14px;
   }
   html[lang="es"] .product-hero {
     min-height: max(100svh, 680px);
