@@ -102,7 +102,7 @@ function Header({ motion }: { motion: StoryMotion }) {
       motion.subscribe(() => {
         const chapter = Math.round(motion.progress);
         if (header.current) {
-          header.current.dataset.tone = [1, 3, 5, 6, 7].includes(chapter)
+          header.current.dataset.tone = [1, 3, 5, 7].includes(chapter)
             ? "ink"
             : "paper";
           header.current
@@ -499,7 +499,7 @@ function Portfolio() {
           id="development"
           number="06"
           label={bi("DEVELOPMENT", "DESARROLLO")}
-          tone="ink"
+          tone="paper"
           side="left"
         >
           <Heading
