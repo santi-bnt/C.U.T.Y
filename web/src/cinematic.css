@@ -2347,7 +2347,7 @@ html[lang="es"] .hero-baseline {
     position: relative;
     inset: auto;
     width: 100%;
-    margin: clamp(42px, 6svh, 54px) 0 0;
+    margin: clamp(64px, 8svh, 76px) 0 0;
   }
   .hero-copy > p:not(.mono) {
     margin-bottom: clamp(22px, 3svh, 30px);
@@ -2360,7 +2360,7 @@ html[lang="es"] .hero-baseline {
     padding-top: 102px;
   }
   html[lang="es"] .hero-copy {
-    margin: clamp(42px, 6svh, 54px) 0 0;
+    margin: clamp(64px, 8svh, 76px) 0 0;
   }
   .hero-baseline {
     position: relative;
