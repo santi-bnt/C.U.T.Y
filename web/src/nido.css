@@ -242,7 +242,7 @@
   --line: rgb(255 255 255 / 16%);
   --orange-line: rgb(255 255 255 / 18%);
   --orange-wash: rgb(255 106 0 / 12%);
-  --orange-on-dark: var(--orange-strong);
+  --orange-on-dark: #ff9b5c;
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   align-items: center;
@@ -279,10 +279,17 @@
   letter-spacing: -0.055em;
   margin: 24px 0;
 }
-.assembly-caption > p {
+.assembly-caption .eyebrow {
   color: var(--orange-on-dark);
+}
+.assembly-caption > p {
+  color: var(--muted);
   font-size: 15px;
   line-height: 1.8;
+}
+.assembly-caption > p.simulation-note {
+  color: var(--muted);
+  opacity: 1;
 }
 .assembly-playback {
   display: flex;
@@ -343,7 +350,7 @@
   --muted: #b8b8b8;
   --line: rgb(255 255 255 / 16%);
   --orange-line: rgb(255 255 255 / 18%);
-  --orange-on-dark: var(--orange-strong);
+  --orange-on-dark: #ff9b5c;
   margin: 0 calc(-1 * var(--gutter));
   padding: 20px var(--gutter);
   background: var(--dark);
@@ -357,7 +364,7 @@
   max-width: 800px;
   font-size: 13px;
   line-height: 1.9;
-  color: var(--orange-on-dark);
+  color: var(--muted);
 }
 .assembly-story .engineering-downloads a {
   color: var(--orange-on-dark);

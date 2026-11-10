@@ -2,7 +2,6 @@
 import { ArrowLeft, ArrowRight, Download, Pause, Play } from "lucide-react";
 import { bi } from "../data/project";
 import { useLocale } from "../state/Locale";
-import { useMedia } from "../state/useMedia";
 const steps = [
   [
     "c_intro",
@@ -140,20 +139,19 @@ const currentRevision = [
 ] as const;
 export default function AssemblyStory() {
   const { locale, t } = useLocale();
-  const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const [step, setStep] = useState(0),
     [playing, setPlaying] = useState(false);
   const [revisionView, setRevisionView] = useState<(typeof currentRevision)[number][0]>("front");
   const current = steps[step];
   const selectedRevision = currentRevision.find(([id]) => id === revisionView)!;
   useEffect(() => {
-    if (!playing || reduced) return;
+    if (!playing) return;
     const timer = window.setInterval(
       () => setStep((s) => (s + 1) % steps.length),
-      5500,
+      2200,
     );
     return () => window.clearInterval(timer);
-  }, [playing, reduced]);
+  }, [playing]);
   return (
     <section id="assembly" className="assembly-story technical-section paper">
       <div className="technical-heading">
@@ -252,8 +250,7 @@ export default function AssemblyStory() {
               <ArrowLeft size={18} />
             </button>
             <button
-              disabled={reduced}
-              aria-pressed={playing && !reduced}
+              aria-pressed={playing}
               onClick={() => setPlaying((p) => !p)}
             >
               {playing ? <Pause size={16} /> : <Play size={16} />}{" "}

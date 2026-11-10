@@ -403,6 +403,12 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
     "src",
     /imprime.webp$/,
   );
+  await page.getByRole("button", { name: "Play sequence" }).click();
+  await expect(page.locator(".assembly-caption h3")).toHaveText(
+    "Start from the ground",
+    { timeout: 5000 },
+  );
+  await page.getByRole("button", { name: "Pause sequence" }).click();
   await page.screenshot({
     path: `test-results/${info.project.name}-assembly.png`,
   });
