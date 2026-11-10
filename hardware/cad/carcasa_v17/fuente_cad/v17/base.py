@@ -139,9 +139,8 @@ def floor():
     for x in (-24.0, 24.0):
         anc = box(x - 4, x + 4, 6.0, 12.0, FLOOR_T, FLOOR_T + 6).cut(box(x - 5, x + 5, 7.5, 10.5, FLOOR_T + 1.5, FLOOR_T + 3.5))
         f = f.fuse(anc)
-    # signature underneath (reads correctly with the base flipped over)
-    for txt, y, size in (("C.U.T.Y  ·  V17 Nido", 34.0, 7.0), ("Diseñado por APL · Guadalajara", -36.0, 5.5)):
-        f = f.cut(text_solid(txt, size, (0, y, 0.6), (1, 0, 0), (0, 0, -1), 0.61, FONT_MED))
+    # name underneath (reads correctly with the base flipped over)
+    f = f.cut(text_solid("C.U.T.Y  ·  V17 Nido", 7.0, (0, 34.0, 0.6), (1, 0, 0), (0, 0, -1), 0.61, FONT_MED))
     return f.clean()
 
 
