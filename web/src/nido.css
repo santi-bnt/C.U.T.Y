@@ -300,7 +300,7 @@
   padding: 28px var(--gutter) 18px;
   background: var(--dark);
   scroll-snap-type: x mandatory;
-  scrollbar-color: var(--orange) var(--surface);
+  scrollbar-color: var(--orange) var(--dark);
 }
 .assembly-strip button {
   flex: 0 0 136px;
@@ -333,6 +333,17 @@
   margin-top: 28px;
   border-top: 1px solid var(--orange-line);
   padding: 20px 0;
+}
+.assembly-story > .cad-evidence {
+  --dark: #171717;
+  --muted: #b8b8b8;
+  --line: rgb(255 255 255 / 16%);
+  --orange-line: rgb(255 255 255 / 18%);
+  --orange-on-dark: var(--orange-strong);
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 20px var(--gutter);
+  background: var(--dark);
+  color: var(--paper);
 }
 .cad-evidence summary {
   cursor: pointer;
