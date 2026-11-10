@@ -2334,7 +2334,7 @@ html[lang="es"] .hero-baseline {
     top: auto;
     left: auto;
     right: auto;
-    margin-bottom: 23px;
+    margin-bottom: clamp(30px, 4svh, 42px);
   }
   .product-hero h1 {
     position: relative;
@@ -2347,14 +2347,20 @@ html[lang="es"] .hero-baseline {
     position: relative;
     inset: auto;
     width: 100%;
-    margin: 16px 0 0;
+    margin: clamp(28px, 4svh, 38px) 0 0;
+  }
+  .hero-copy > p:not(.mono) {
+    margin-bottom: clamp(22px, 3svh, 30px);
+  }
+  .hero-copy .button {
+    margin-top: 8px;
   }
   html[lang="es"] .product-hero {
     min-height: max(100svh, 680px);
     padding-top: 102px;
   }
   html[lang="es"] .hero-copy {
-    margin: 16px 0 0;
+    margin: clamp(28px, 4svh, 38px) 0 0;
   }
   .hero-baseline {
     position: relative;
