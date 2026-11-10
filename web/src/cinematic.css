@@ -2319,6 +2319,17 @@ html[lang="es"] .hero-baseline {
     -webkit-mask-image: none;
   }
 }
+/* On phones, keep the intro copy close to the oversized title. */
+@media (max-width: 520px) {
+  .hero-copy {
+    top: calc(154px + 21.6vw);
+    bottom: auto;
+  }
+  html[lang="es"] .hero-copy {
+    top: auto;
+    margin-top: 16px;
+  }
+}
 .explore-launch[hidden] {
   display: none;
 }
