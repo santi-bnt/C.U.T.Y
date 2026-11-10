@@ -43,6 +43,7 @@ _BASELINE = {
     State.LISTENING: Expression.LISTENING,
     State.THINKING: Expression.THINKING,
     State.SPEAKING: Expression.SPEAKING,
+    State.MUSIC_PAUSED: Expression.IDLE,
 }
 
 
@@ -54,6 +55,9 @@ class ExpressionController:
     def on_state(self, state: State) -> None:
         if state in {State.IDLE, State.ERROR}:
             self._emotion = None
+        if state == State.MUSIC_PLAYING:
+            self.sink.set_expression(Expression.HAPPY, 0.55)
+            return
         if state in _BASELINE:
             event = self._emotion or ExpressionEvent(_BASELINE[state])
             self.sink.set_expression(event.expression, event.intensity)

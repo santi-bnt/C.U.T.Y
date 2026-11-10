@@ -18,6 +18,8 @@ from cuty.face.expression_sink import ExpressionController
 from cuty.llm.web_search import WebSearchError, WebSearchService
 from cuty.audio.thinking import ThinkingVoice
 from cuty.brain.voice_commands import wants_menu
+from cuty.music.commands import MusicCommand, parse_music_command
+from cuty.music.protocol import MusicProvider
 
 RESPONSE_START_TIMEOUT = 15.0
 
@@ -38,6 +40,7 @@ class ConversationService:
         thinking_voice: ThinkingVoice | None = None,
         voice_exit: bool = False,
         half_duplex: bool = False,
+        music: MusicProvider | None = None,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -48,6 +51,8 @@ class ConversationService:
         self.thinking_voice = thinking_voice
         self.voice_exit = voice_exit
         self.half_duplex = half_duplex
+        self.music = music
+        self._pending_music_command: MusicCommand | None = None
         self._log = logging.getLogger("CUTY")
 
     async def greet(self) -> None:
@@ -63,10 +68,18 @@ class ConversationService:
 
     async def run_turn(self, stop: asyncio.Event) -> bool:
         """Record until stop, then stream and play a response. Return False for empty input."""
-        if self.state.current != State.IDLE:
+        if self.state.current == State.ERROR:
+            self.state.set(State.IDLE)
+        if self.state.current not in {State.IDLE, State.MUSIC_PLAYING, State.MUSIC_PAUSED}:
             raise RuntimeError("A conversation turn is already in progress.")
+        music_was_playing = False
+        self._pending_music_command = None
         try:
             if self.half_duplex:
+                if self.music is not None:
+                    music_was_playing = (await self.music.get_playback_state()).status == "playing"
+                    if music_was_playing:
+                        await self.music.pause()
                 # Release the physical playback stream, not just its audio queue.
                 # Some I2S HATs cannot reliably start capture while it is open.
                 await self.speaker.close()
@@ -84,6 +97,13 @@ class ConversationService:
             if chunks == 0:
                 self._log.warning("No se capturó audio del micrófono.")
                 self.state.set(State.IDLE)
+                if self.half_duplex:
+                    await self.speaker.open()
+                if music_was_playing and self.music is not None:
+                    await self.music.resume()
+                    self.state.set(State.MUSIC_PLAYING)
+                elif self.music is not None and (await self.music.get_playback_state()).status == "paused":
+                    self.state.set(State.MUSIC_PAUSED)
                 return False
             self._log.info("Audio del micrófono enviado: %d bytes PCM16", bytes_sent)
             if self.half_duplex:
@@ -93,6 +113,18 @@ class ConversationService:
             self.state.set(State.THINKING)
             await self._receive_response()
             self.state.set(State.IDLE)
+            if self.music is not None and self._pending_music_command is not None:
+                await self._execute_music_command(self._pending_music_command)
+                if self._pending_music_command.action in {"pause", "stop"}:
+                    music_was_playing = False
+            if music_was_playing and self.music is not None:
+                await self.music.resume()
+            if self.music is not None:
+                playback = await self.music.get_playback_state()
+                if playback.status == "playing":
+                    self.state.set(State.MUSIC_PLAYING)
+                elif playback.status == "paused":
+                    self.state.set(State.MUSIC_PAUSED)
             return True
         except ReturnToMenu:
             self.state.set(State.IDLE)
@@ -173,6 +205,9 @@ class ConversationService:
                 elif event.kind == EventKind.INPUT_TRANSCRIPT and event.transcript:
                     self._log.info("Escuché: %s", event.transcript)
                     input_transcript += " " + event.transcript
+                    parsed = parse_music_command(input_transcript)
+                    if parsed is not None:
+                        self._pending_music_command = parsed
                 elif event.kind == EventKind.WEB_SEARCH:
                     web_log = logging.getLogger("WEB")
                     for query in event.search_queries:
@@ -191,6 +226,48 @@ class ConversationService:
                         raise ProviderError("La IA terminó el turno sin enviar voz. No se recibió una respuesta hablada.")
                     return
         raise ProviderError("AI provider called tools too many times without finishing a reply.")
+
+    async def _execute_music_command(self, command: MusicCommand) -> None:
+        if self.music is None:
+            return
+        if command.action == "search" and command.query:
+            tracks = await self.music.search_tracks(command.query)
+            if tracks:
+                await self.music.play(tracks[0].id)
+                self._log.info("MUSIC: playing %s — %s", tracks[0].title, tracks[0].artist)
+                self.state.set(State.MUSIC_PLAYING)
+            else:
+                self._log.info("MUSIC: no local matches for %s", command.query)
+        elif command.action == "pause":
+            await self.music.pause()
+            if (await self.music.get_playback_state()).status == "paused":
+                self.state.set(State.MUSIC_PAUSED)
+        elif command.action == "resume":
+            await self.music.resume()
+            if (await self.music.get_playback_state()).status == "playing":
+                self.state.set(State.MUSIC_PLAYING)
+        elif command.action == "stop":
+            await self.music.stop()
+            self.state.set(State.IDLE)
+        elif command.action == "next":
+            await self.music.next()
+            if (await self.music.get_playback_state()).status == "playing":
+                self.state.set(State.MUSIC_PLAYING)
+        elif command.action == "previous":
+            await self.music.previous()
+            if (await self.music.get_playback_state()).status == "playing":
+                self.state.set(State.MUSIC_PLAYING)
+        elif command.action == "set_volume" and command.volume is not None:
+            await self.music.set_volume(command.volume)
+        elif command.action == "volume_up":
+            current = await self.music.get_playback_state()
+            await self.music.set_volume(min(100, current.volume + 10))
+        elif command.action == "volume_down":
+            current = await self.music.get_playback_state()
+            await self.music.set_volume(max(0, current.volume - 10))
+        elif command.action == "get_current_track":
+            current = await self.music.get_playback_state()
+            self._log.info("MUSIC: current track %s", current.track.title if current.track else "none")
 
     async def _handle_tool(self, call: ToolCall, *, input_transcript: str = "") -> None:
         result: dict[str, object]

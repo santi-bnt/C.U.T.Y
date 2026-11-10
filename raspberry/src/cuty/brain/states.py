@@ -12,14 +12,18 @@ class State(str, Enum):
     LISTENING = "LISTENING"
     THINKING = "THINKING"
     SPEAKING = "SPEAKING"
+    MUSIC_PLAYING = "MUSIC_PLAYING"
+    MUSIC_PAUSED = "MUSIC_PAUSED"
     ERROR = "ERROR"
 
 
 _ALLOWED = {
-    State.IDLE: {State.LISTENING, State.THINKING, State.ERROR},
+    State.IDLE: {State.LISTENING, State.THINKING, State.MUSIC_PLAYING, State.MUSIC_PAUSED, State.ERROR},
     State.LISTENING: {State.THINKING, State.ERROR, State.IDLE},
     State.THINKING: {State.SPEAKING, State.IDLE, State.ERROR},
-    State.SPEAKING: {State.IDLE, State.ERROR},
+    State.SPEAKING: {State.IDLE, State.MUSIC_PLAYING, State.MUSIC_PAUSED, State.ERROR},
+    State.MUSIC_PLAYING: {State.LISTENING, State.MUSIC_PAUSED, State.IDLE, State.ERROR},
+    State.MUSIC_PAUSED: {State.LISTENING, State.MUSIC_PLAYING, State.IDLE, State.ERROR},
     State.ERROR: {State.IDLE},
 }
 

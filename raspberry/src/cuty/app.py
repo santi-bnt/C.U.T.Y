@@ -29,6 +29,7 @@ from cuty.face.expression_sink import (
     CompositeExpressionSink, ConsoleExpressionSink, ExpressionController, FaceLinkExpressionSink,
 )
 from cuty.face.link import FaceLinkSender
+from cuty.music.local import LocalMusicProvider
 from cuty.utils.logging import configure_logging
 
 
@@ -96,6 +97,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     else:
         output_id, output_name = select_working_device(output_selector, input_device=False)
         speaker = SoundDeviceSpeaker(output_id)
+    music_speaker = speaker
     logging.getLogger("AUDIO").info("Microphone: %s", input_name)
     logging.getLogger("AUDIO").info("Speaker: %s", output_name)
 
@@ -121,12 +123,24 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         await speaker.open()
         await provider.connect()
         microphone = SoundDeviceMicrophone(input_id, input_rate)
+        music = LocalMusicProvider(
+            music_speaker,
+            Path(os.getenv("CUTY_MUSIC_DIR", str(Path.home() / "Music" / "CUTY"))),
+            volume=int(os.getenv("CUTY_MUSIC_VOLUME", "70")),
+            on_status=lambda status: state.set({
+                "playing": State.MUSIC_PLAYING,
+                "paused": State.MUSIC_PAUSED,
+                "stopped": State.IDLE,
+                "error": State.ERROR,
+            }[status]) if state.current != State.ERROR or status == "stopped" else None,
+        ) if hands_free else None
         if hands_free:
             microphone = SpeechMicrophone.from_env(microphone, input_rate)
         service = ConversationService(
             provider, microphone, speaker, state, expressions,
             thinking_voice=thinking_voice,
             half_duplex=hands_free,
+            music=music,
         )
         if hands_free:
             await run_hands_free(service)
@@ -155,6 +169,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         try:
             await provider.close()
         finally:
+            if "music" in locals() and music is not None:
+                await music.close()
             await speaker.close()
             if face_link is not None:
                 face_link.close()

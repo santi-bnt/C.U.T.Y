@@ -104,6 +104,46 @@ def test_multiturn_conversation_and_tool_expression():
     assert sink.events[-1][0] == Expression.IDLE
 
 
+def test_voice_transcript_deterministically_dispatches_local_music_search():
+    class Music:
+        def __init__(self):
+            self.status = "stopped"
+            self.volume = 70
+            self.played = []
+
+        async def search_tracks(self, query):
+            from cuty.music.protocol import MusicTrack
+            assert query == "505 de arctic monkeys"
+            return [MusicTrack("track-505", "505", "Arctic Monkeys")]
+
+        async def play(self, track_id):
+            self.played.append(track_id)
+            self.status = "playing"
+
+        async def get_playback_state(self):
+            from cuty.music.protocol import PlaybackState
+            track = None
+            return PlaybackState(self.status, track, self.volume)
+
+        async def pause(self): self.status = "paused"
+        async def resume(self): self.status = "playing"
+        async def stop(self): self.status = "stopped"
+        async def next(self): self.status = "playing"
+        async def previous(self): self.status = "playing"
+        async def set_volume(self, value): self.volume = value
+
+    service, _, _, _, state = make_service([
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Cuty, pon 505 de Arctic Monkeys"),
+        AIEvent(EventKind.AUDIO, audio=b"\x00\x00" * 480),
+        AIEvent(EventKind.DONE),
+    ])
+    music = Music()
+    service.music = music
+    assert asyncio.run(service.run_turn(asyncio.Event()))
+    assert music.played == ["track-505"]
+    assert state.current == State.MUSIC_PLAYING
+
+
 def test_invalid_tool_arguments_are_rejected_and_reply_continues():
     service, provider, _, sink, state = make_service([
         AIEvent(EventKind.DONE, tool_calls=(ToolCall("bad", "set_expression", '{"expression":"speaking","intensity":2}'),)),
