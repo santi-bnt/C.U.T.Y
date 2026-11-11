@@ -4,11 +4,11 @@
    "part": "B1_Base_Cover",
    "group": "base",
    "print_dims_mm": [
-    175.1,
-    173.3,
-    66.5
+    172.6,
+    172.2,
+    66.8
    ],
-   "volume_cm3": 155.1
+   "volume_cm3": 133.9
   },
   {
    "part": "B2_Base_Floor",

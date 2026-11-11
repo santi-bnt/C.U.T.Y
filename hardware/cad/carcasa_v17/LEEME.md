@@ -4,6 +4,8 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
+**Revisión 11 nov 2026:** la cubierta B1 se rediseñó para imprimirse bien: el borde de abajo ahora es un anillo plano de 2.2 mm (antes era redondeado y casi no tocaba la cama, por eso fallaba) y el techo de su hueco interior sube a 45°, así que ya no lleva soportes adentro. Solo necesita soportes bajo la orilla del agujero central y sobre la abertura del cajón. Ya no lleva la firma debajo de la base.
+
 **Revisión 6 nov 2026:** con las medidas reales que tomó el equipo. H3 (visor) trae una cuna para la cámara (la sujeta por el contorno, así no importa dónde tenga los agujeros) y sus barras van a la medida de la pantalla de 5.8 mm. H4 suma una tercera barra para la cámara. S3 (rejilla) trae un bolsillo para la bocina rectangular de 35.4 × 25 × 5.5 mm. La batería es la LiPo 3S 2200 mAh 50C (HM2202) que ya tiene el equipo.
 
 **Revisión 5 nov 2026:** ajustada a las piezas que sí se compraron y a la tornillería de los dos kits de Amazon. Cambiaron K5 (rack), B1, B2 y B3 (batería 3S hasta 109 mm), G2/G3 (manivelas con piso para el tornillo), B4 y K1 (ejes del gimbal con tornillo M4 autorroscante, sin tuerca), K1 y H3 (Pi y pantalla con M2) y H5 (servo de cabeza con M3). La guía paso a paso con fotos 3D está en la guía de armado de C.U.T.Y.
@@ -35,7 +37,7 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 
 | Código | Pieza | Color | Medida en cama (mm) | Cómo imprimir |
 |---|---|---|---|---|
-| B1 | Cubierta del nido | Durazno | 175 × 173 × 66 | Sobre su base · soportes árbol solo por dentro · **sin brim** |
+| B1 | Cubierta del nido | Durazno | 172 × 172 × 67 | Sobre su anillo plano · soportes árbol **solo desde la cama** · brim **solo interior** 5 mm |
 | B2 | Piso del nido | Gris | 165 × 167 × 26 | Plano · sin soportes |
 | B3 | Cajón de batería | Durazno | 119 × 63 × 30 | Sobre el fondo · sin soportes |
 | B4 | Poste del gimbal | Gris | 40 × 40 × 88 | De pie, brida abajo |
@@ -135,7 +137,7 @@ La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de
 ## Verificación (6 nov 2026, con las medidas reales del equipo)
 
 - 30 piezas, cada una un sólido válido; STL herméticos.
-- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 175 × 173 × 66).
+- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 172 × 172 × 67).
 - 113 cuerpos (30 impresos y 83 comprados, incluidos los ejes M4 y los tornillos de las manivelas) revisados por pares con todo armado: 0 interferencias. Los contactos de superficies coincidentes se confirmaron en 0.000 mm³ con booleanas exactas.
 - 18 zonas para cables y conectores (XT60, enchufes de servos, IDC, cables del convertidor, bornes del buck, ventilador de la Pi) libres de plástico.
 - 34 posturas revisadas: gimbal, cabeza y brazos sin choques dentro de los límites de arriba.

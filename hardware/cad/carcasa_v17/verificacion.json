@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-06",
- "revision": "medidas reales del equipo: pantalla 5.8 mm, cámara en cuna con barrita, bocina rectangular 35.4 x 25 x 5.5 en la rejilla, Pi 5 de 90.3 x 56 x 18, ReSpeaker 65.5 x 29.8; batería 3S 2200 del equipo",
+ "fecha": "2026-11-11",
+ "revision": "cubierta B1 imprimible: anillo plano de 2.2 mm en la cama (antes 61 mm2 de contacto), techo interior a 45 grados; sin firma debajo de la base. medidas reales del equipo: pantalla 5.8 mm, cámara en cuna con barrita, bocina rectangular 35.4 x 25 x 5.5 en la rejilla, Pi 5 de 90.3 x 56 x 18, ReSpeaker 65.5 x 29.8; batería 3S 2200 del equipo",
  "piezas_impresas": 30,
  "cuerpos_revisados": 113,
  "interferencias_estaticas_mm3_exactas": 0.0,
@@ -29,5 +29,12 @@
   "camara_ov5647": "PCB 24.4 x 23.3 x 2.3, 7.2 de fondo, lente 8.5 x 8.5",
   "bocina_2w": "35.4 x 25 x 5.5",
   "pendiente": "batería (largo x ancho x alto) y centro del lente de la cámara (el modelo supone 13.7 mm desde el borde de abajo)"
+ },
+ "impresion_B1": {
+  "primera_capa_mm2": 831,
+  "voladizo_mayor_45_mm2_antes": 13313,
+  "voladizo_mayor_45_mm2_ahora": "~3000 (orilla del agujero central y abertura del cajon)",
+  "soportes": "arbol, solo desde la cama",
+  "brim": "solo interior 5 mm"
  }
 }
