@@ -58,7 +58,11 @@ def parse_music_command(text: str) -> MusicCommand | None:
         return MusicCommand("volume_up")
     if re.search(r"\b(baja|reduce|menos volumen|turn it down|decrease volume|volume down)\b", phrase):
         return MusicCommand("volume_down")
-    match = re.search(r"\b(?:ponme|pon|reproduce|reproducir|busca|play|put on|search for)\s+(.+)$", phrase)
+    match = re.search(
+        r"\b(?:me puedes poner|puedes ponerme|puedes poner|me pones|ponme|pon|"
+        r"reproduce|reproducir|busca|can you play|could you play|play|put on|search for)\s+(.+)$",
+        phrase,
+    )
     if match:
         query = match.group(1).strip()
         query = re.sub(r"^(?:(?:(?:la|una) )?cancion(?: de)?|musica de|music by|song by|music|a song)\s+", "", query)
