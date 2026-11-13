@@ -54,10 +54,12 @@ _CONFIG = {
 
 
 class GeminiLiveProvider:
-    def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False) -> None:
+    def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False,
+                 vision_model: str = "gemini-3.8-flash") -> None:
         self._api_key = api_key
         self._model = model
         self._hands_free = hands_free
+        self._vision_model = vision_model
         self._client = genai.Client(api_key=api_key)
         self._manager: Any = None
         self._session: Any = None
@@ -151,6 +153,44 @@ class GeminiLiveProvider:
                 "pregunta en que me puedes ayudar y menciona que puedo decir quiero salir "
                 "para volver al menu. Esto es una instruccion de bienvenida, no quiero salir ahora."
             }]}], turn_complete=True,
+        )
+
+    async def describe_image(self, jpeg: bytes, *, question: str) -> str:
+        """One-shot image understanding via the same configured Gemini client."""
+        if not jpeg or len(jpeg) > 1_500_000:
+            raise ProviderError("La imagen de visión está vacía o supera el límite permitido.")
+        prompt = (
+            "Describe only visible objects and the scene in this image. Use one or two short sentences "
+            "in the same language as the user's question. Do not identify any person, infer a name, "
+            "age, identity, emotion, or sensitive trait, and do not guess details that are unclear. "
+            "The image has opaque privacy masks over detected faces. Question: " + question[:240]
+        )
+        try:
+            response = await asyncio.wait_for(
+                self._client.aio.models.generate_content(
+                    model=self._vision_model,
+                    contents=[types.Part.from_bytes(data=jpeg, mime_type="image/jpeg"), prompt],
+                    config=types.GenerateContentConfig(temperature=0.2, max_output_tokens=96),
+                ),
+                timeout=20.0,
+            )
+        except Exception as exc:
+            raise ProviderError(self._redact(f"Gemini image description failed: {exc}")) from exc
+        description = " ".join((getattr(response, "text", None) or "").split())
+        if not description:
+            raise ProviderError("Gemini no devolvió una descripción de la imagen.")
+        return description[:500]
+
+    async def speak_text(self, text: str) -> None:
+        """Speak a bounded local result through the active Gemini Live voice."""
+        text = " ".join(text.split())[:500]
+        if not text:
+            raise ProviderError("No hay texto para pronunciar.")
+        await self._connected().send_client_content(
+            turns=[{"role": "user", "parts": [{"text":
+                "Di exactamente la siguiente respuesta breve, sin añadir datos ni inventar nada: " + text
+            }]}],
+            turn_complete=True,
         )
 
     async def receive(self) -> AIEvent:

@@ -28,6 +28,7 @@ class Config:
     log_level: str = "INFO"
     debug: bool = False
     model: str = "gemini-3.8-live"
+    vision_model: str = "gemini-3.8-flash"
 
     @classmethod
     def from_env(cls) -> Config:
@@ -55,4 +56,5 @@ class Config:
                 if provider == "gemini"
                 else os.getenv("CUTY_REALTIME_MODEL", "gpt-realtime-2.1")
             ),
+            vision_model=os.getenv("CUTY_GEMINI_VISION_MODEL", "gemini-3.8-flash").strip(),
         )

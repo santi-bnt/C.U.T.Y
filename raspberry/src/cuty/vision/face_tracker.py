@@ -38,6 +38,14 @@ class FaceTarget:
     timestamp: float
 
 
+@dataclass(frozen=True)
+class FaceObservation:
+    generation: int
+    timestamp: float
+    color_bgr: object
+    detections: tuple[Detection, ...]
+
+
 def _env_flag(name: str, default: bool) -> bool:
     value = os.getenv(name)
     if value is None or not value.strip():
@@ -52,7 +60,9 @@ class FaceTracker:
                  detector_factory: Callable[[], object] = create_detector,
                  *, mirror: bool | None = None, fps: float | None = None,
                  lost_after: float = 0.8, smoothing: float = 0.45,
-                 retry_after: float = 5.0, clock: Callable[[], float] = time.monotonic) -> None:
+                 retry_after: float = 5.0, clock: Callable[[], float] = time.monotonic,
+                 vision_ipc_path: str | os.PathLike | None = None,
+                 vision_user: str = "santi") -> None:
         self._camera_factory = camera_factory
         self._detector_factory = detector_factory
         self.mirror = _env_flag("CUTY_CAMERA_MIRROR", True) if mirror is None else mirror
@@ -62,6 +72,13 @@ class FaceTracker:
         self.retry_after = retry_after
         self._clock = clock
         self._lock = threading.Lock()
+        self._frame_condition = threading.Condition()
+        self._frame_generation = 0
+        self._observation: FaceObservation | None = None
+        self._color_requested = threading.Event()
+        self._vision_ipc_path = vision_ipc_path
+        self._vision_user = vision_user
+        self._vision_server = None
         self._target: FaceTarget | None = None
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
@@ -161,23 +178,74 @@ class FaceTracker:
             return None
         return target
 
+    def capture_observation(self, *, after_generation: int | None = None,
+                            timeout: float = 2.0) -> FaceObservation:
+        """Request one color frame from the existing camera loop and wait for it."""
+        with self._frame_condition:
+            baseline = self._frame_generation if after_generation is None else after_generation
+            self._color_requested.set()
+            ready = self._frame_condition.wait_for(
+                lambda: self._observation is not None and self._observation.generation > baseline,
+                timeout=max(0.0, timeout),
+            )
+            if not ready or self._observation is None:
+                raise TimeoutError("No se recibió un fotograma de color reciente de FaceTracker")
+            observation = self._observation
+            self._observation = None
+            image = observation.color_bgr
+            copy = getattr(image, "copy", None)
+            return FaceObservation(
+                observation.generation, observation.timestamp,
+                copy() if callable(copy) else image, observation.detections,
+            )
+
+    def _publish_observation(self, color_bgr, detections: list[Detection], now: float) -> None:
+        with self._frame_condition:
+            self._frame_generation += 1
+            if color_bgr is not None:
+                self._observation = FaceObservation(
+                    self._frame_generation, now, color_bgr, tuple(detections),
+                )
+                self._color_requested.clear()
+            self._frame_condition.notify_all()
+
     # ----- background thread ----------------------------------------------
     def start(self) -> None:
         if self._thread is not None and self._thread.is_alive():
             return
         if self.follow is not None and self.follow.config.enabled:
             self.follow.set_enabled(True)
+        if self._vision_ipc_path is not None and self._vision_server is None:
+            try:
+                import pwd
+                from cuty.vision.ipc import FaceTrackerVisionService, LocalVisionServer
+                uid = pwd.getpwnam(self._vision_user).pw_uid
+                service = FaceTrackerVisionService(self)
+                self._vision_server = LocalVisionServer(
+                    self._vision_ipc_path, service.handle, allowed_uid=uid,
+                )
+                self._vision_server.start()
+            except Exception as exc:
+                self._vision_server = None
+                self._log.error("IPC local de visión desactivado: %s", exc)
         self._stop.clear()
         self._thread = threading.Thread(target=self._run, daemon=True, name="cuty-vision")
         self._thread.start()
 
     def stop(self, timeout: float = 2.0) -> None:
         self._stop.set()
+        if self._vision_server is not None:
+            self._vision_server.stop()
+            self._vision_server = None
         if self._thread is not None:
             self._thread.join(timeout)
             self._thread = None
         with self._lock:
             self._target = None
+        with self._frame_condition:
+            self._observation = None
+            self._color_requested.clear()
+            self._frame_condition.notify_all()
         if self.follow is not None:
             self.follow.set_enabled(False)
         self.status = "detenido"
@@ -205,8 +273,16 @@ class FaceTracker:
             try:
                 while not self._stop.is_set():
                     started = self._clock()
-                    gray = camera.read_gray()
-                    target = self.process(detector.detect(gray), gray.shape[1], gray.shape[0], self._clock())
+                    read_frame = getattr(camera, "read_frame", None)
+                    if callable(read_frame):
+                        frame = read_frame(include_color=self._color_requested.is_set())
+                        gray, color_bgr = frame.gray, frame.color_bgr
+                    else:
+                        gray, color_bgr = camera.read_gray(), None
+                    detections = detector.detect(gray)
+                    now = self._clock()
+                    self._publish_observation(color_bgr, detections, now)
+                    target = self.process(detections, gray.shape[1], gray.shape[0], now)
                     if (target is not None) != seen:
                         seen = target is not None
                         self._log.info("Persona %s", "detectada" if seen else "perdida")

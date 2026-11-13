@@ -30,6 +30,7 @@ from cuty.face.expression_sink import (
 )
 from cuty.face.link import FaceLinkSender
 from cuty.music.local import LocalMusicProvider
+from cuty.vision.ipc import LocalVisionClient
 from cuty.utils.logging import configure_logging
 
 
@@ -117,7 +118,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     state = StateMachine(expressions.on_state)
     expressions.on_state(State.IDLE)
     provider = (
-        GeminiLiveProvider(config.api_key, config.model, hands_free=hands_free)
+        GeminiLiveProvider(config.api_key, config.model, hands_free=hands_free,
+                           vision_model=config.vision_model)
         if config.provider == "gemini"
         else OpenAIRealtimeProvider(config.api_key, config.model)
     )
@@ -147,6 +149,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             thinking_voice=thinking_voice,
             half_duplex=hands_free,
             music=music,
+            vision=LocalVisionClient.from_env() if hands_free else None,
         )
         if hands_free:
             await run_hands_free(service)

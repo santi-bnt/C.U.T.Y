@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+from dataclasses import dataclass
 from typing import Protocol
 
 import numpy as np
@@ -24,8 +25,16 @@ class CameraError(RuntimeError):
     pass
 
 
+@dataclass(frozen=True)
+class CameraFrame:
+    gray: np.ndarray
+    # OpenCV BGR order; populated only on an explicit, user-requested snapshot.
+    color_bgr: np.ndarray | None = None
+
+
 class Camera(Protocol):
     def read_gray(self) -> np.ndarray: ...
+    def read_frame(self, *, include_color: bool = False) -> CameraFrame: ...
     def close(self) -> None: ...
 
 
@@ -53,8 +62,20 @@ class PiCamera:
             raise CameraError(f"No se pudo abrir la cámara de la Raspberry: {exc}") from exc
 
     def read_gray(self) -> np.ndarray:
+        return self.read_frame().gray
+
+    def read_frame(self, *, include_color: bool = False) -> CameraFrame:
         frame = self._cam.capture_array("main")
-        return _rotate(frame[: FRAME_SIZE[1], : FRAME_SIZE[0]], self.rotate)
+        gray = _rotate(frame[: FRAME_SIZE[1], : FRAME_SIZE[0]], self.rotate)
+        color = None
+        if include_color:
+            try:
+                import cv2
+                color = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
+            except Exception as exc:
+                raise CameraError(f"No se pudo convertir el fotograma para visión: {exc}") from exc
+            color = _rotate(color, self.rotate)
+        return CameraFrame(gray=gray, color_bgr=color)
 
     def close(self) -> None:
         try:
@@ -79,13 +100,17 @@ class UsbCamera:
         self._cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # always the newest frame
 
     def read_gray(self) -> np.ndarray:
+        return self.read_frame().gray
+
+    def read_frame(self, *, include_color: bool = False) -> CameraFrame:
         ok, frame = self._cap.read()
         if not ok or frame is None:
             raise CameraError("La cámara USB dejó de enviar imágenes")
+        if frame.shape[1] != FRAME_SIZE[0] or frame.shape[0] != FRAME_SIZE[1]:
+            frame = self._cv2.resize(frame, FRAME_SIZE, interpolation=self._cv2.INTER_AREA)
         gray = self._cv2.cvtColor(frame, self._cv2.COLOR_BGR2GRAY)
-        if gray.shape[1] > FRAME_SIZE[0] * 1.5:
-            gray = self._cv2.resize(gray, FRAME_SIZE, interpolation=self._cv2.INTER_AREA)
-        return _rotate(gray, self.rotate)
+        color = _rotate(frame, self.rotate) if include_color else None
+        return CameraFrame(gray=_rotate(gray, self.rotate), color_bgr=color)
 
     def close(self) -> None:
         self._cap.release()

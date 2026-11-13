@@ -180,3 +180,31 @@ def test_grounded_search_sources_are_emitted_before_done_and_deduplicated_per_tu
     asyncio.run(provider.start_turn())
     provider._queue_search(metadata)
     assert provider._pending.popleft().kind == EventKind.WEB_SEARCH
+
+
+def test_image_description_uses_gemini_multimodal_and_speaks_via_live_session():
+    from types import SimpleNamespace
+
+    seen = []
+
+    class Models:
+        async def generate_content(self, **kwargs):
+            seen.append(kwargs)
+            return SimpleNamespace(text="Una taza sobre la mesa.")
+
+    provider = GeminiLiveProvider("fake-key", hands_free=True)
+    provider._client = SimpleNamespace(aio=SimpleNamespace(models=Models()))
+    session = FakeSession()
+    provider._session = session
+
+    async def exercise():
+        result = await provider.describe_image(b"redacted-jpeg", question="¿Qué ves?")
+        await provider.speak_text(result)
+        assert result == "Una taza sobre la mesa."
+
+    asyncio.run(exercise())
+    assert seen[0]["model"] == "gemini-3.8-flash"
+    assert seen[0]["contents"][0].inline_data.data == b"redacted-jpeg"
+    assert seen[0]["contents"][0].inline_data.mime_type == "image/jpeg"
+    assert session.sent[-1]["turns"][0]["role"] == "user"
+    assert "Una taza sobre la mesa." in session.sent[-1]["turns"][0]["parts"][0]["text"]

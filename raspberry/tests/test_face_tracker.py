@@ -127,6 +127,35 @@ def test_thread_runs_with_fake_camera_and_stops():
     assert tr.latest() is None and not any(t.name == "cuty-vision" for t in threading.enumerate())
 
 
+def test_requested_color_snapshot_reuses_the_single_tracker_camera():
+    opened = []
+    color_reads = []
+
+    class FakeCamera:
+        def __init__(self): opened.append(self)
+        def read_frame(self, *, include_color=False):
+            if include_color:
+                color_reads.append(True)
+            gray = np.zeros((240, 320), dtype=np.uint8)
+            color = np.full((240, 320, 3), 17, dtype=np.uint8) if include_color else None
+            from cuty.vision.camera import CameraFrame
+            return CameraFrame(gray, color)
+        def close(self): pass
+
+    class FakeDetector:
+        def detect(self, _gray): return []
+
+    tr = FaceTracker(FakeCamera, FakeDetector, fps=40)
+    tr.start()
+    try:
+        observation = tr.capture_observation(timeout=1)
+        assert observation.color_bgr.shape == (240, 320, 3)
+        assert len(opened) == 1
+        assert len(color_reads) == 1
+    finally:
+        tr.stop()
+
+
 def test_missing_camera_or_detector_is_not_fatal():
     def no_camera():
         raise CameraError("sin cámara")

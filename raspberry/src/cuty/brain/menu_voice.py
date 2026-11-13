@@ -25,6 +25,12 @@ class MenuVoice:
             command = ["runuser", "-u", self.user, "--", *command]
         env = os.environ.copy()
         env["PYTHONPATH"] = str(self.raspberry / "src")
+        env["CUTY_VISION_USER"] = self.user
+        try:
+            from cuty.vision.ipc import socket_path_for_user
+            env["CUTY_VISION_SOCKET"] = str(socket_path_for_user(self.user))
+        except (ImportError, KeyError):
+            pass
         # Link only to this menu's local listener, not an old PC configuration.
         env["CUTY_FACE_LINK"] = os.getenv("CUTY_FACE_LISTEN", "127.0.0.1:5005")
         env.pop("CUTY_AUDIO_REMOTE_OUTPUT", None)

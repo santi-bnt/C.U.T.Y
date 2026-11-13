@@ -32,7 +32,7 @@ Hardware observations: ReSpeaker capture/playback and Gemini replies were tested
 
 PCB design: [carrier v1.1](../hardware/electronics/kicad/cuty_carrier/README.md) includes native KiCad sources, Gerbers, BOM and schematic exports for Pi 5, STM32F401 Black Pill, Display-G, ReSpeaker and five servo connectors. Fabrication, assembly, electrical validation and integration with firmware remain pending.
 
-Planned: local LLM fallback, standalone STT/TTS, face recognition, persistent memory/behavior, bridge/protocol implementation, telemetry server, STM32F401 firmware, dashboard and mechanical design.
+Implemented in software: consent-based local face templates and unknown-safe matching, plus on-demand still-image description through the existing Gemini key/session voice path. SFace model installation, threshold calibration and physical integration tests remain pending; see [vision privacy/setup](face-vision.md). Planned: local LLM fallback, standalone STT/TTS, persistent memory/behavior, bridge/protocol implementation, telemetry server, STM32F401 firmware, dashboard and mechanical design.
 
 Python TODO modules and C/H comment templates define locations only; they are not fake functional interfaces. Existing dependencies and provider selection are preserved. The [migration inventory](reorganization.md) explains compatibility and untouched local files.
 

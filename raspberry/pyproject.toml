@@ -17,6 +17,9 @@ dependencies = [
   "av>=14,<18",
 ]
 
+[project.optional-dependencies]
+face-recognition = ["opencv-contrib-python-headless>=4.8,<5"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["cuty*"]

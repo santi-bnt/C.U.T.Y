@@ -20,6 +20,10 @@ from cuty.audio.thinking import ThinkingVoice
 from cuty.brain.voice_commands import wants_menu
 from cuty.music.commands import MusicCommand, parse_music_command
 from cuty.music.protocol import MusicProvider
+from cuty.vision.voice_commands import (
+    confirmed_enrollment_name, confirmed_forget, is_explicit_cancel,
+    may_be_vision_intent, vision_intent,
+)
 
 RESPONSE_START_TIMEOUT = 15.0
 
@@ -41,6 +45,7 @@ class ConversationService:
         voice_exit: bool = False,
         half_duplex: bool = False,
         music: MusicProvider | None = None,
+        vision=None,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -52,7 +57,11 @@ class ConversationService:
         self.voice_exit = voice_exit
         self.half_duplex = half_duplex
         self.music = music
+        self.vision = vision
         self._pending_music_command: MusicCommand | None = None
+        self._pending_vision_intent: str | None = None
+        self._face_consent: str | None = None
+        self._last_input_transcript = ""
         self._log = logging.getLogger("CUTY")
 
     async def greet(self) -> None:
@@ -74,6 +83,8 @@ class ConversationService:
             raise RuntimeError("A conversation turn is already in progress.")
         music_was_playing = False
         self._pending_music_command = None
+        self._pending_vision_intent = None
+        self._last_input_transcript = ""
         try:
             if self.half_duplex:
                 if self.music is not None:
@@ -113,6 +124,8 @@ class ConversationService:
             self.state.set(State.THINKING)
             await self._receive_response()
             self.state.set(State.IDLE)
+            if self._pending_vision_intent or self._face_consent:
+                await self._handle_vision_request()
             if self.music is not None and self._pending_music_command is not None:
                 await self._execute_music_command(self._pending_music_command)
                 if self._pending_music_command.action in {"pause", "stop"}:
@@ -178,6 +191,8 @@ class ConversationService:
 
     async def _collect_response(self, audio_queue: asyncio.Queue[bytes | None]) -> None:
         first_audio = False
+        held_audio: list[bytes] = []
+        transcript_seen = False
         input_transcript = ""
         deadline = monotonic() + RESPONSE_START_TIMEOUT
         # A function call can require another response before speech begins.
@@ -199,12 +214,27 @@ class ConversationService:
                     if not event.audio or len(event.audio) % 2:
                         raise ProviderError("AI provider sent invalid PCM16 audio.")
                     first_audio = True
-                    await audio_queue.put(event.audio)
+                    if not transcript_seen:
+                        held_audio.append(event.audio)
+                    elif self._pending_vision_intent is None:
+                        await audio_queue.put(event.audio)
                 elif event.kind == EventKind.TRANSCRIPT and event.transcript:
                     self._log.info("C.U.T.Y: %s", event.transcript)
                 elif event.kind == EventKind.INPUT_TRANSCRIPT and event.transcript:
-                    self._log.info("Escuché: %s", event.transcript)
                     input_transcript += " " + event.transcript
+                    self._last_input_transcript = input_transcript.strip()
+                    transcript_seen = True
+                    if self._face_consent is None:
+                        self._pending_vision_intent = vision_intent(input_transcript)
+                    else:
+                        self._pending_vision_intent = "consent"
+                    if self._pending_vision_intent is None and not may_be_vision_intent(input_transcript):
+                        self._log.info("Escuché: %s", event.transcript)
+                        for audio in held_audio:
+                            await audio_queue.put(audio)
+                        held_audio.clear()
+                    elif self._pending_vision_intent is not None:
+                        held_audio.clear()
                     parsed = parse_music_command(input_transcript)
                     if parsed is not None:
                         self._pending_music_command = parsed
@@ -215,6 +245,10 @@ class ConversationService:
                     for source in event.sources:
                         web_log.info("Fuente: %s — %s", source.title, source.url)
                 elif event.kind == EventKind.DONE:
+                    if self._pending_vision_intent is None and held_audio:
+                        for audio in held_audio:
+                            await audio_queue.put(audio)
+                        held_audio.clear()
                     if self.voice_exit and wants_menu(input_transcript):
                         raise ReturnToMenu
                     if event.tool_calls:
@@ -222,10 +256,118 @@ class ConversationService:
                             await self._handle_tool(call, input_transcript=input_transcript)
                         await self.provider.continue_response()
                         break
-                    if not first_audio:
+                    if not first_audio and self._pending_vision_intent is None and self._face_consent is None:
                         raise ProviderError("La IA terminó el turno sin enviar voz. No se recibió una respuesta hablada.")
                     return
         raise ProviderError("AI provider called tools too many times without finishing a reply.")
+
+    async def _handle_vision_request(self) -> None:
+        """Run local vision/consent actions without blocking FaceTracker or audio loops."""
+        from cuty.vision.recognition import RecognitionUnavailable
+
+        intent = self._pending_vision_intent
+        self._pending_vision_intent = None
+        transcript = self._last_input_transcript
+        if self._face_consent is not None:
+            if is_explicit_cancel(transcript):
+                self._face_consent = None
+                await self._speak_local("De acuerdo. No guardaré ni borraré ningún rostro.")
+                return
+            if self._face_consent == "enroll":
+                name = confirmed_enrollment_name(transcript)
+                if name is None:
+                    await self._speak_local("No recibí una confirmación válida. No se guardó nada. Si quieres, vuelve a decir: confirmo guardar mi rostro y llámame, seguido de tu nombre.")
+                    self._face_consent = None
+                    return
+                self._face_consent = None
+                if self.vision is None:
+                    await self._speak_local("El reconocimiento local no está configurado en este dispositivo; no guardé capturas.")
+                    return
+                try:
+                    result = await asyncio.to_thread(self.vision.enroll, name)
+                    await self._speak_local(f"Listo, guardé localmente {result.get('samples', 0)} plantillas para {name}. No guardé las imágenes.")
+                except (RecognitionUnavailable, OSError, TimeoutError) as exc:
+                    self._log.warning("Registro facial local no disponible (%s)", type(exc).__name__)
+                    await self._speak_local("No pude completar el registro local. No guardé imágenes ni datos parciales.")
+                except Exception as exc:
+                    self._log.exception("Error inesperado durante el registro facial (%s)", type(exc).__name__)
+                    await self._speak_local("Ocurrió un error local y no pude completar el registro facial.")
+                return
+            if self._face_consent == "forget":
+                if not confirmed_forget(transcript):
+                    await self._speak_local("No recibí la confirmación explícita. No borré ningún dato facial.")
+                    self._face_consent = None
+                    return
+                self._face_consent = None
+                if self.vision is None:
+                    await self._speak_local("El reconocimiento local no está configurado. No pude borrar perfiles.")
+                    return
+                try:
+                    result = await asyncio.to_thread(self.vision.forget)
+                    if result.get("deleted"):
+                        message = "He borrado tus plantillas faciales locales. Las de otras personas siguen guardadas."
+                    elif result.get("matched"):
+                        message = "Ese perfil ya no estaba guardado. No cambié los demás."
+                    else:
+                        message = "No pude asociar con confianza tu rostro a un perfil. No borré nada."
+                    await self._speak_local(message)
+                except (RecognitionUnavailable, OSError, TimeoutError) as exc:
+                    self._log.warning("Borrado facial local no disponible (%s)", type(exc).__name__)
+                    await self._speak_local("No pude borrar el archivo local de perfiles.")
+                except Exception as exc:
+                    self._log.exception("Error inesperado durante el borrado facial (%s)", type(exc).__name__)
+                    await self._speak_local("Ocurrió un error local y no pude borrar las plantillas faciales.")
+                return
+
+        if intent in {None, "consent"}:
+            return
+        if intent == "enroll":
+            self._face_consent = "enroll"
+            await self._speak_local("Puedo guardar varias plantillas faciales solo en este Raspberry Pi; no guardaré fotos. Para continuar, di: confirmo guardar mi rostro y llámame, seguido de tu nombre. Di cancela para salir.")
+            return
+        if intent == "forget":
+            self._face_consent = "forget"
+            await self._speak_local("Esto borrará únicamente las plantillas del rostro que pueda reconocerte con confianza; las demás personas no se borrarán. Para confirmar, di: confirmo, olvida mi rostro. Di cancela para salir.")
+            return
+        if self.vision is None:
+            await self._speak_local("La función de visión local no está conectada. No tomé ni envié ninguna imagen.")
+            return
+        try:
+            if intent == "describe":
+                jpeg = await asyncio.to_thread(self.vision.capture_redacted_jpeg)
+                describe = getattr(self.provider, "describe_image", None)
+                if describe is None:
+                    raise RecognitionUnavailable("El proveedor activo no admite comprensión de imágenes")
+                description = await describe(jpeg, question="¿Qué estás viendo?")
+                await self._speak_local(description)
+            elif intent == "identify":
+                result = await asyncio.to_thread(self.vision.identify)
+                if not result.get("known") or not result.get("name"):
+                    await self._speak_local("No te reconozco con suficiente confianza.")
+                else:
+                    await self._speak_local(f"Creo que eres {result['name']}.")
+        except (RecognitionUnavailable, OSError, TimeoutError, ProviderError) as exc:
+            self._log.warning("Solicitud de visión fallida (%s)", type(exc).__name__)
+            await self._speak_local("No pude completar la solicitud de visión ahora. No envié ni guardé datos faciales.")
+        except Exception as exc:
+            self._log.exception("Error inesperado de visión (%s)", type(exc).__name__)
+            await self._speak_local("Ocurrió un error local al procesar la visión.")
+
+    async def _speak_local(self, text: str) -> None:
+        speak = getattr(self.provider, "speak_text", None)
+        if speak is None:
+            self._log.warning("El proveedor activo no admite respuestas de voz locales")
+            return
+        self.state.set(State.THINKING)
+        try:
+            await speak(text)
+            await self._receive_response()
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            self._log.warning("No pude pronunciar una respuesta local (%s)", type(exc).__name__)
+        finally:
+            self.state.set(State.IDLE)
 
     async def _execute_music_command(self, command: MusicCommand) -> None:
         if self.music is None:

@@ -28,6 +28,7 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 - [x] Face detection with YuNet and Haar fallback (`vision/face_detector.py`)
 - [x] Target selection, smoothing and lost-target handling (`vision/face_tracker.py`)
 - [x] Visual eye tracking connected to the animated face
+- [x] Local consent-based face enrollment/matching and request-only Gemini image descriptions (software; SFace model and Pi validation pending)
 - [ ] End-to-end physical camera/detector/gaze validation (camera startup has been observed)
 - [ ] Physical head tracking through STM32 goals and servos
 
@@ -63,10 +64,11 @@ The files under `stm32/App/` are comment-only templates, not working firmware. C
 
 The `web/` directories currently contain documentation/placeholders.
 
-## Phase 7 — Recognition
+## Phase 7 — Recognition validation
 
-- [ ] Face registration
-- [ ] Face recognition
-- [ ] Person identity
+- [x] Consent-gated local enrollment flow, embedding-only storage and unknown-safe matching (software)
+- [ ] Install compatible OpenCV-contrib/SFace model on the Pi
+- [ ] Calibrate match threshold/margin with consented samples and non-matches
+- [ ] Validate local voice/camera/display/audio operation and resource use on the robot
 
-Face detection/tracking is implemented; identifying who a person is remains separate future work. Hardware-specific design, protocol review and safety acceptance must precede motion tests.
+Face matching identifies only a voluntarily registered local profile; it does not perform general identity recognition. The current matcher fails closed until YuNet landmarks and a compatible local SFace model are available. Hardware-specific design, protocol review and safety acceptance must precede motion tests.

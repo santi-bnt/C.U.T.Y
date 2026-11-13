@@ -37,6 +37,7 @@ class Detection(NamedTuple):
     score: float = 1.0
     eyes_x: float | None = None   # midpoint between the eyes, if known
     eyes_y: float | None = None
+    landmarks: tuple[float, ...] | None = None  # YuNet points for local SFace alignment
 
 
 class DetectorError(RuntimeError):
@@ -93,8 +94,11 @@ class YuNetFaceDetector:
         for row in faces:
             x, y, fw, fh = (int(round(v)) for v in row[:4])
             # Landmarks: right eye (4,5), left eye (6,7) in image coordinates.
-            found.append(Detection(x, y, fw, fh, float(row[14]),
-                                   float(row[4] + row[6]) / 2, float(row[5] + row[7]) / 2))
+            found.append(Detection(
+                x, y, fw, fh, float(row[14]),
+                float(row[4] + row[6]) / 2, float(row[5] + row[7]) / 2,
+                tuple(float(v) for v in row[4:14]),
+            ))
         return found
 
 

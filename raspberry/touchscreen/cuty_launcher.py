@@ -28,6 +28,7 @@ try:
     from cuty.face.renderer import Face
     from cuty.vision.camera import camera_mode
     from cuty.vision.face_tracker import FaceTracker
+    from cuty.vision.ipc import socket_path_for_user
     FACE_ERROR = ''
 except ImportError as error:  # e.g. NumPy missing: keep menus working.
     FACE_ERROR = f'Cara no disponible: {error}'
@@ -355,7 +356,9 @@ class Launcher(wifi.Panel):
             self.face_writer = FramebufferWriter(FB, W, H)
         self.face_writer.invalidate()
         if self.tracker is None and camera_mode() != 'off':
-            self.tracker = FaceTracker()
+            self.tracker = FaceTracker(
+                vision_ipc_path=socket_path_for_user(NORM_USER), vision_user=NORM_USER,
+            )
         if self.tracker is not None:
             self.tracker.start()
         self.next_face_frame = 0.0

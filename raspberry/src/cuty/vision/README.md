@@ -36,4 +36,9 @@ output is introduced.
 
 Vision never produces PWM, drives servos, implements body PID or renders the
 display. The same target can later feed high-level head goals through the
-hardware bridge. Identity recognition is separate future work.
+hardware bridge. Optional voice-triggered vision and local face templates are
+documented in [`docs/face-vision.md`](../../../../docs/face-vision.md). They
+reuse this tracker and camera; they do not add another capture device. SFace
+needs a separately installed OpenCV-contrib runtime and model, is disabled in
+practice until configured, and has not been physically validated. Images are
+not stored, and person embeddings stay on the Pi.
