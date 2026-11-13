@@ -223,11 +223,15 @@ class ConversationService:
                 elif event.kind == EventKind.INPUT_TRANSCRIPT and event.transcript:
                     input_transcript += " " + event.transcript
                     self._last_input_transcript = input_transcript.strip()
+                    previous_vision_intent = self._pending_vision_intent
                     transcript_seen = True
                     if self._face_consent is None:
                         self._pending_vision_intent = vision_intent(input_transcript)
                     else:
                         self._pending_vision_intent = "consent"
+                    if self._pending_vision_intent is not None and previous_vision_intent is None:
+                        # Log the action category only; never persist the transcript or image.
+                        self._log.info("Intención local detectada: %s", self._pending_vision_intent)
                     if self._pending_vision_intent is None and not may_be_vision_intent(input_transcript):
                         self._log.info("Escuché: %s", event.transcript)
                         for audio in held_audio:
@@ -334,11 +338,21 @@ class ConversationService:
             return
         try:
             if intent == "describe":
-                jpeg = await asyncio.to_thread(self.vision.capture_redacted_jpeg)
+                try:
+                    jpeg = await asyncio.to_thread(self.vision.capture_redacted_jpeg)
+                except (RecognitionUnavailable, OSError, TimeoutError, ProviderError) as exc:
+                    self._log.warning("Captura local para visión fallida (%s: %s)", type(exc).__name__, self._safe_error(exc))
+                    raise
                 describe = getattr(self.provider, "describe_image", None)
                 if describe is None:
                     raise RecognitionUnavailable("El proveedor activo no admite comprensión de imágenes")
-                description = await describe(jpeg, question="¿Qué estás viendo?")
+                self._log.info("Captura local lista; solicitando descripción visual")
+                try:
+                    description = await describe(jpeg, question="¿Qué estás viendo?")
+                except (RecognitionUnavailable, OSError, TimeoutError, ProviderError) as exc:
+                    self._log.warning("Proveedor de visión falló (%s: %s)", type(exc).__name__, self._safe_error(exc))
+                    raise
+                self._log.info("Descripción visual recibida; preparando respuesta de voz")
                 await self._speak_local(description)
             elif intent == "identify":
                 result = await asyncio.to_thread(self.vision.identify)
@@ -347,7 +361,7 @@ class ConversationService:
                 else:
                     await self._speak_local(f"Creo que eres {result['name']}.")
         except (RecognitionUnavailable, OSError, TimeoutError, ProviderError) as exc:
-            self._log.warning("Solicitud de visión fallida (%s)", type(exc).__name__)
+            self._log.warning("Solicitud de visión fallida (%s: %s)", type(exc).__name__, self._safe_error(exc))
             await self._speak_local("No pude completar la solicitud de visión ahora. No envié ni guardé datos faciales.")
         except Exception as exc:
             self._log.exception("Error inesperado de visión (%s)", type(exc).__name__)
@@ -368,6 +382,14 @@ class ConversationService:
             self._log.warning("No pude pronunciar una respuesta local (%s)", type(exc).__name__)
         finally:
             self.state.set(State.IDLE)
+
+    def _safe_error(self, exc: Exception) -> str:
+        """Keep useful diagnostics while redacting provider credentials and bounding log size."""
+        detail = " ".join(str(exc).split())[:240]
+        redact = getattr(self.provider, "_redact", None)
+        if callable(redact):
+            detail = redact(detail)
+        return detail or "sin detalle"
 
     async def _execute_music_command(self, command: MusicCommand) -> None:
         if self.music is None:
