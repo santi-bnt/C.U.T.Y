@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-12",
- "revision": "primera capa revisada en las 30 piezas: H1 sin pernos de costura y S2 sin ceja (las dos planas sobre la costura), S3 recortada para que el marco de la bocina quede plano en la cama, S4 acostada sobre su cara plana. Sigue la cubierta B1 imprimible del 11 nov y las medidas reales del equipo.",
+ "fecha": "2026-11-13",
+ "revision": "bayoneta de la cubierta B1 corregida: antes, al girarla 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón chocaba (1750 mm3). Ahora la cubierta se mete girada y se gira de regreso, y queda trabada justo alineada. Sigue la revisión de primera capa del 12 nov.",
  "piezas_impresas": 30,
  "cuerpos_revisados": 113,
  "interferencias_estaticas_mm3_exactas": 0.0,
@@ -31,7 +31,7 @@
   "pendiente": "batería (largo x ancho x alto) y centro del lente de la cámara (el modelo supone 13.7 mm desde el borde de abajo)"
  },
  "impresion_B1": {
-  "primera_capa_mm2": 831,
+  "primera_capa_mm2": 848,
   "voladizo_mayor_45_mm2_antes": 13313,
   "voladizo_mayor_45_mm2_ahora": "~3000 (orilla del agujero central y abertura del cajon)",
   "soportes": "arbol, solo desde la cama",
@@ -44,7 +44,7 @@
   "A4_Hand_R": 228,
   "A5_Arm_Cap_L": 111,
   "A6_Arm_Cap_R": 111,
-  "B1_Base_Cover": 831,
+  "B1_Base_Cover": 848,
   "B2_Base_Floor": 20916,
   "B3_Battery_Drawer": 5973,
   "B4_Gimbal_Post": 861,
@@ -69,5 +69,11 @@
   "S3_Tummy_Grille": 340,
   "S4_USB_Plug": 79
  },
- "primera_capa_mm2_minima": 50
+ "primera_capa_mm2_minima": 50,
+ "bayoneta": {
+  "antes_cubierta_girada_vs_cajon_mm3": 1752.7,
+  "ahora_trabada_vs_cajon_mm3": 0.0,
+  "giro_libre_y_sale_en_la_entrada": true,
+  "trabada_sostiene": true
+ }
 }

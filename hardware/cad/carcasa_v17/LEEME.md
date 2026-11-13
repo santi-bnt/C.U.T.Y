@@ -4,6 +4,8 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
+**Revisión 13 nov 2026:** corregí la bayoneta de la cubierta B1. Antes, al girar la cubierta 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón ya no entraba. Ahora la cubierta se baja girada y se gira de regreso: queda trabada justo cuando la abertura está sobre los rieles. **Si ya imprimiste B1, reimprímela**; las demás piezas no cambian.
+
 **Revisión 12 nov 2026:** revisé la primera capa de las 30 piezas. Cuatro tocaban la cama con una puntita y se corrigieron: H1 (casco frontal) ya no tiene pernos y S2 (espalda) ya no tiene ceja que salgan de la costura, así que las dos se imprimen planas sobre la costura; S3 (rejilla) se recortó para que el marco de la bocina quede plano en la cama, y S4 (tapón USB) se acuesta sobre su cara plana. Las mitades siguen alineadas por los clips de la plataforma y las orejas.
 
 **Revisión 11 nov 2026:** la cubierta B1 se rediseñó para imprimirse bien: el borde de abajo ahora es un anillo plano de 2.2 mm (antes era redondeado y casi no tocaba la cama, por eso fallaba) y el techo de su hueco interior sube a 45°, así que ya no lleva soportes adentro. Solo necesita soportes bajo la orilla del agujero central y sobre la abertura del cajón. Ya no lleva la firma debajo de la base.
@@ -113,7 +115,7 @@ La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de
 1. **Piso del nido.** Pega los 4 topes. Desliza los dos servos del gimbal acostados contra sus muros (eje hacia el centro) y atorníllalos (8 × M3 × 10). Centra cada servo a 90° y pon su manivela apuntando al centro con un M3 × 8 allen.
 2. **Poste del gimbal.** Brida en el anillo del piso, 3 × M3 × 10 desde abajo. La ranura del tubo mira al frente.
 3. **Varillas.** Arma las dos varillas a 49 mm entre centros. Atornilla la rótula de abajo a cada manivela (M3 × 10).
-4. **Interruptores y cubierta.** Interruptores a presión en la cubierta (principal a la izquierda, servos a la derecha). Baja la cubierta sobre el piso, alinea las 3 pestañas y gira 14° hasta el clic.
+4. **Interruptores y cubierta.** Interruptores a presión en la cubierta (principal a la izquierda, servos a la derecha). Baja la cubierta sobre el piso girada 14° en sentido antihorario (visto desde arriba) para que entren las 3 pestañas, y gírala 14° en sentido horario hasta que la abertura del cajón quede sobre los rieles del piso.
 5. **Cruceta.** Dentro de la horquilla del poste, M4 × 30 de adelante hacia atrás: pasa libre por la mejilla delantera y la cruceta y se enrosca en la trasera. Aprieta hasta que la cruceta gire sin juego.
 6. **Plataforma.** Sobre la cruceta, el segundo M4 × 30 de izquierda a derecha. Atornilla las rótulas de arriba a las patas (M3 × 12).
 7. **Columna y placa C.U.T.Y.** Columna en la ranura de la plataforma (2 × M3 × 12 desde abajo). Placa en los 4 postes del frente (M3 × 8).
@@ -143,6 +145,7 @@ La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de
 - 113 cuerpos (30 impresos y 83 comprados, incluidos los ejes M4 y los tornillos de las manivelas) revisados por pares con todo armado: 0 interferencias. Los contactos de superficies coincidentes se confirmaron en 0.000 mm³ con booleanas exactas.
 - 18 zonas para cables y conectores (XT60, enchufes de servos, IDC, cables del convertidor, bornes del buck, ventilador de la Pi) libres de plástico.
 - 34 posturas revisadas: gimbal, cabeza y brazos sin choques dentro de los límites de arriba.
+- Bayoneta (13 nov): trabada como está en el modelo, la cubierta no toca el piso ni el cajón; girada 14° de regreso sale libre por las entradas, y trabada no se levanta.
 - Largos de cable revisados en el modelo: extensión XT60 (≈20 cm de recorrido), cable plano de 40 vías (≈12 cm), cámara (≈30–35 cm con la vuelta del cuello), cables de servo (≤22 cm, los MG996R traen 30 cm), interruptores (≈26 cm de recorrido, se cortan de 35 cm).
 
 ## Antes de imprimir todo

@@ -67,12 +67,13 @@ def cover():
         d = (math.cos(a), math.sin(a), 0)
         body = body.cut(cyl_c(10.1, 20, (BASE_R * d[0], BASE_R * d[1], SWITCH_Z), d))
         body = body.cut(cyl(12.5, 6.0, ((BASE_R - 0.4) * d[0], (BASE_R - 0.4) * d[1], SWITCH_Z), d))
-    # bayonet L-slots on the inner wall bottom
+    # bayonet L-slots on the inner wall bottom. As modelled (= assembled) each floor lug sits at the closed end
+    # of its run, so the drawer opening lines up with the floor rails; the open entry is LUG_TURN degrees before.
     for ang in LUG_ANGLES:
-        for k, (a0, a1, z0, z1) in enumerate(((ang - 5.5, ang + 5.5, -1, 6.6), (ang - 5.5, ang + 5.5 + LUG_TURN, 3.3, 6.6))):
+        e = ang - LUG_TURN
+        for a0, a1, z0, z1 in ((e - 5.5, e + 5.5, -1, 6.6), (e - 5.5, ang + 5.5, 2.9, 6.4)):
             slot = _ring_sector(BASE_R - COVER_WALL - 0.2, BASE_R - COVER_WALL + 1.6, a0, a1, z0, z1)
             body = body.cut(slot)
-    # small detent bump at the end of each slot
     return body.clean()
 
 
