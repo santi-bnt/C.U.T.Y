@@ -6,6 +6,9 @@ from cuty.music.commands import MusicCommand, parse_music_command
 @pytest.mark.parametrize(("text", "expected"), [
     ("Cuty, modo música", MusicCommand("phone_mode")),
     ("Siri, music mode", MusicCommand("phone_mode")),
+    ("Cuty, salir del modo música", MusicCommand("exit_phone_mode")),
+    ("Cuty, quita el modo música", MusicCommand("exit_phone_mode")),
+    ("Cuty, exit music mode", MusicCommand("exit_phone_mode")),
     ("Cuty, ¿me puedes poner La Chona?", MusicCommand("search", "la chona")),
     ("Cuty, puedes ponerme una canción de Linkin Park", MusicCommand("search", "linkin park")),
     ("Cuty, pon 505 de Arctic Monkeys", MusicCommand("search", "505 de arctic monkeys")),

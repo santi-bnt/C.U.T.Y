@@ -138,6 +138,33 @@ def test_music_mode_tells_user_to_select_cuty_spotify_from_phone():
     assert "CUTY Spotify" in response
 
 
+def test_enter_and_exit_phone_music_mode_activate_then_deactivate_spotify():
+    from cuty.music.commands import MusicCommand
+
+    class Music:
+        external_output = True
+
+        def __init__(self):
+            self.active = False
+
+        async def activate(self):
+            self.active = True
+
+        async def stop(self):
+            self.active = False
+
+    service, *_ = make_service([])
+    service.music = Music()
+
+    enter = asyncio.run(service._apply_music_command(MusicCommand("phone_mode")))
+    assert service.music.active
+    assert "salir del modo música" in enter
+
+    leave = asyncio.run(service._apply_music_command(MusicCommand("exit_phone_mode")))
+    assert not service.music.active
+    assert "Salí del modo música" in leave
+
+
 def test_multiturn_conversation_and_tool_expression():
     service, provider, speaker, sink, state = make_service([
         AIEvent(EventKind.DONE, tool_calls=(ToolCall("call1", "set_expression", '{"expression":"happy","intensity":0.8}'),)),

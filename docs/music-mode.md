@@ -62,7 +62,7 @@ Ese test no justifica activar escucha concurrente; para eso falta una prueba de 
 
 El repositorio ahora incluye un adaptador opcional: `CUTY_MUSIC_PROVIDER=spotify_soloist`. Soloist reproduce el audio como su propio dispositivo Spotify Connect; C.U.T.Y. solo busca títulos con Spotify Web API y envía la URI/controles al daemon local. La búsqueda requiere un Client ID/Secret de una aplicación de Spotify Developer. Soloist requiere aparte su propia API key; no compartas ninguna de esas credenciales.
 
-En este modo puedes decir "Cuty, modo música" y luego usar Spotify en el celular: abre el selector de dispositivos, elige "CUTY Spotify" y controla las canciones desde la app. La Raspberry debe estar encendida y Soloist activo. El comando de voz confirma cómo entrar al flujo; no inicia una canción por sí mismo.
+En este modo puedes decir "Cuty, modo música" y luego usar Spotify en el celular: abre el selector de dispositivos, elige "CUTY Spotify" y controla las canciones desde la app. La Raspberry debe estar encendida y Soloist activo. Di "salir del modo música" para detener la reproducción y desactivar el dispositivo Connect.
 
 Spotify publica un binario Linux AArch64, aunque su documentación dice que el build AArch64 se prueba principalmente en Raspberry Pi 3 con Raspberry Pi OS basado en Trixie. Soloist requiere PipeWire o PulseAudio para su salida Linux; la app actual de C.U.T.Y. usa PortAudio directamente para el micrófono y bocina Seeed. Por eso la reproducción correcta, la ruta al ReSpeaker y que ambos procesos puedan abrir el audio durante half-duplex necesitan comprobación en esta Raspberry Pi 5 antes de dejar el proveedor activado. No cambies el proveedor hasta que Soloist se oiga por la bocina física.
 

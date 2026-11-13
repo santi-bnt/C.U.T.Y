@@ -526,12 +526,21 @@ class ConversationService:
             return None
         if command.action == "phone_mode":
             if getattr(self.music, "external_output", False):
+                activate = getattr(self.music, "activate", None)
+                if activate is not None:
+                    await activate()
                 return (
                     "Modo música listo. Abre Spotify en tu celular, toca "
                     "Conectar a un dispositivo y elige CUTY Spotify. "
-                    "Desde ahí puedes elegir y controlar la música."
+                    "Para salir, di: salir del modo música."
                 )
             return "El modo música por Spotify no está activado en este momento."
+        if command.action == "exit_phone_mode":
+            if getattr(self.music, "external_output", False):
+                await self.music.stop()
+                self.state.set(State.IDLE)
+                return "Salí del modo música y detuve la reproducción. Ya puedes conversar conmigo."
+            return "El modo música por Spotify no está activo."
         if command.action == "search" and command.query:
             tracks = await self.music.search_tracks(command.query)
             if tracks:

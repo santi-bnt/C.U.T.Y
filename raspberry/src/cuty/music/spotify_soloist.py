@@ -157,6 +157,10 @@ class SpotifySoloistProvider:
     async def pause(self) -> None:
         await self._request("pause")
 
+    async def activate(self) -> None:
+        """Make the Connect device active so the phone can start playback."""
+        await self._request("activate")
+
     async def resume(self) -> None:
         await self._request("activate")
         await self._request("play")
