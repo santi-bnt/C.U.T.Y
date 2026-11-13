@@ -4,6 +4,12 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
+**Revisión 13 nov 2026:** corregí la bayoneta de la cubierta B1. Antes, al girar la cubierta 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón ya no entraba. Ahora la cubierta se baja girada y se gira de regreso: queda trabada justo cuando la abertura está sobre los rieles. **Si ya imprimiste B1, reimprímela**; las demás piezas no cambian. Hay una versión **fija**, sin movimiento en la base y sobre un pedestal bajo, en [carcasa_v17_fija](../carcasa_v17_fija/LEEME.md).
+
+**Revisión 12 nov 2026:** revisé la primera capa de las 30 piezas. Cuatro tocaban la cama con una puntita y se corrigieron: H1 (casco frontal) ya no tiene pernos y S2 (espalda) ya no tiene ceja que salgan de la costura, así que las dos se imprimen planas sobre la costura; S3 (rejilla) se recortó para que el marco de la bocina quede plano en la cama, y S4 (tapón USB) se acuesta sobre su cara plana. Las mitades siguen alineadas por los clips de la plataforma y las orejas.
+
+**Revisión 11 nov 2026:** la cubierta B1 se rediseñó para imprimirse bien: el borde de abajo ahora es un anillo plano de 2.2 mm (antes era redondeado y casi no tocaba la cama, por eso fallaba) y el techo de su hueco interior sube a 45°, así que ya no lleva soportes adentro. Solo necesita soportes bajo la orilla del agujero central y sobre la abertura del cajón. Ya no lleva la firma debajo de la base.
+
 **Revisión 6 nov 2026:** con las medidas reales que tomó el equipo. H3 (visor) trae una cuna para la cámara (la sujeta por el contorno, así no importa dónde tenga los agujeros) y sus barras van a la medida de la pantalla de 5.8 mm. H4 suma una tercera barra para la cámara. S3 (rejilla) trae un bolsillo para la bocina rectangular de 35.4 × 25 × 5.5 mm. La batería es la LiPo 3S 2200 mAh 50C (HM2202) que ya tiene el equipo.
 
 **Revisión 5 nov 2026:** ajustada a las piezas que sí se compraron y a la tornillería de los dos kits de Amazon. Cambiaron K5 (rack), B1, B2 y B3 (batería 3S hasta 109 mm), G2/G3 (manivelas con piso para el tornillo), B4 y K1 (ejes del gimbal con tornillo M4 autorroscante, sin tuerca), K1 y H3 (Pi y pantalla con M2) y H5 (servo de cabeza con M3). La guía paso a paso con fotos 3D está en la guía de armado de C.U.T.Y.
@@ -35,7 +41,7 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 
 | Código | Pieza | Color | Medida en cama (mm) | Cómo imprimir |
 |---|---|---|---|---|
-| B1 | Cubierta del nido | Durazno | 175 × 173 × 66 | Sobre su base · soportes árbol solo por dentro · **sin brim** |
+| B1 | Cubierta del nido | Durazno | 172 × 172 × 67 | Sobre su anillo plano · soportes árbol **solo desde la cama** · brim **solo interior** 5 mm |
 | B2 | Piso del nido | Gris | 165 × 167 × 26 | Plano · sin soportes |
 | B3 | Cajón de batería | Durazno | 119 × 63 × 30 | Sobre el fondo · sin soportes |
 | B4 | Poste del gimbal | Gris | 40 × 40 × 88 | De pie, brida abajo |
@@ -47,13 +53,13 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 | K4 | Cubo del cuello | Gris oscuro | 32 × 32 × 14 | Brida abajo · 100 % relleno |
 | K5 | Rack de potencia | Gris | 38 × 55 × 44 | De lado · soportes mínimos |
 | S1 | Panza | Crema | 148 × 162 × 76 | Sobre la costura · soportes solo en los clips |
-| S2 | Espalda | Crema | 148 × 162 × 67 | Sobre la costura · soportes solo en los clips |
-| S3 | Rejilla de la panza | Naranja | 55 × 55 × 14 | Marco de la bocina abajo · soportes árbol solo bajo el anillo |
-| S4 | Tapón USB | Naranja | 8 × 13 × 12 | De lado |
+| S2 | Espalda | Crema | 148 × 162 × 63 | Sobre la costura · soportes solo en los clips |
+| S3 | Rejilla de la panza | Naranja | 55 × 55 × 11 | Marco de la bocina abajo · soportes árbol solo bajo el anillo |
+| S4 | Tapón USB | Naranja | 8 × 13 × 12 | Sobre su cara plana (la del tapón) |
 | A1, A2 | Brazos | Crema | 104 × 30 × 22 | Cara exterior abajo · 4 perímetros |
 | A3, A4 | Manos | Naranja | 16 × 34 × 14 | Cara exterior abajo |
 | A5, A6 | Tapas de brazo | Naranja | 14 × 14 × 4 | Cara abajo |
-| H1 | Casco frontal | Crema | 160 × 134 × 59 | Sobre la costura · soportes árbol mínimos |
+| H1 | Casco frontal | Crema | 160 × 134 × 56 | Sobre la costura · soportes árbol mínimos |
 | H2 | Casco trasero | Crema | 160 × 134 × 56 | Sobre la costura (el nombre queda arriba) |
 | H3 | Visor | Negro | 121 × 93 × 11 | Cara abajo en PEI texturizado · soportes en las orillas |
 | H4 | Barras de la pantalla y de la cámara | Gris | 85 × 87 × 3 | Planas (3 barras) |
@@ -109,7 +115,7 @@ La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de
 1. **Piso del nido.** Pega los 4 topes. Desliza los dos servos del gimbal acostados contra sus muros (eje hacia el centro) y atorníllalos (8 × M3 × 10). Centra cada servo a 90° y pon su manivela apuntando al centro con un M3 × 8 allen.
 2. **Poste del gimbal.** Brida en el anillo del piso, 3 × M3 × 10 desde abajo. La ranura del tubo mira al frente.
 3. **Varillas.** Arma las dos varillas a 49 mm entre centros. Atornilla la rótula de abajo a cada manivela (M3 × 10).
-4. **Interruptores y cubierta.** Interruptores a presión en la cubierta (principal a la izquierda, servos a la derecha). Baja la cubierta sobre el piso, alinea las 3 pestañas y gira 14° hasta el clic.
+4. **Interruptores y cubierta.** Interruptores a presión en la cubierta (principal a la izquierda, servos a la derecha). Baja la cubierta sobre el piso girada 14° en sentido antihorario (visto desde arriba) para que entren las 3 pestañas, y gírala 14° en sentido horario hasta que la abertura del cajón quede sobre los rieles del piso.
 5. **Cruceta.** Dentro de la horquilla del poste, M4 × 30 de adelante hacia atrás: pasa libre por la mejilla delantera y la cruceta y se enrosca en la trasera. Aprieta hasta que la cruceta gire sin juego.
 6. **Plataforma.** Sobre la cruceta, el segundo M4 × 30 de izquierda a derecha. Atornilla las rótulas de arriba a las patas (M3 × 12).
 7. **Columna y placa C.U.T.Y.** Columna en la ranura de la plataforma (2 × M3 × 12 desde abajo). Placa en los 4 postes del frente (M3 × 8).
@@ -135,10 +141,11 @@ La pantalla se conecta a J13 con cables Dupont (pasan por la ranura delantera de
 ## Verificación (6 nov 2026, con las medidas reales del equipo)
 
 - 30 piezas, cada una un sólido válido; STL herméticos.
-- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 175 × 173 × 66).
+- Todas caben en 180 × 180 × 180 mm (la cubierta B1 es la más grande: 172 × 172 × 67).
 - 113 cuerpos (30 impresos y 83 comprados, incluidos los ejes M4 y los tornillos de las manivelas) revisados por pares con todo armado: 0 interferencias. Los contactos de superficies coincidentes se confirmaron en 0.000 mm³ con booleanas exactas.
 - 18 zonas para cables y conectores (XT60, enchufes de servos, IDC, cables del convertidor, bornes del buck, ventilador de la Pi) libres de plástico.
 - 34 posturas revisadas: gimbal, cabeza y brazos sin choques dentro de los límites de arriba.
+- Bayoneta (13 nov): trabada como está en el modelo, la cubierta no toca el piso ni el cajón; girada 14° de regreso sale libre por las entradas, y trabada no se levanta.
 - Largos de cable revisados en el modelo: extensión XT60 (≈20 cm de recorrido), cable plano de 40 vías (≈12 cm), cámara (≈30–35 cm con la vuelta del cuello), cables de servo (≤22 cm, los MG996R traen 30 cm), interruptores (≈26 cm de recorrido, se cortan de 35 cm).
 
 ## Antes de imprimir todo

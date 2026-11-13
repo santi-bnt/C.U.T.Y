@@ -78,20 +78,21 @@ def main():
     rep = {"non_manifold": bad}
     moving = [n for n in M if grp[n] in verify.MOVING_GROUPS]
     static = [n for n in M if grp[n] == "base"]
-    res = {}
-    for pitch, roll in ((18, 0), (-18, 0), (0, 12), (0, -12), (0, 15), (0, -15), (0, 18), (0, -18), (14, 10), (-14, -10), (14, -10), (-14, 10)):
-        T = compose(rot_matrix((0, 0, base.ROLL_BOLT_Z), (0, 1, 0), roll), rot_matrix((0, 0, base.PITCH_BOLT_Z), (1, 0, 0), pitch))
-        hits = []
-        for n in moving:
-            mm = M[n].transform(T)
-            for s in static:
-                if bb_hit(mm, M[s]):
-                    v = vol(mm, M[s])
-                    if v > 0.5:
-                        hits.append((n, s, round(v, 2)))
-        res[f"pitch{pitch:+d}_roll{roll:+d}"] = hits
-    rep["gimbal"] = res
-    print("gimbal", json.dumps(res), round(time.time() - t0, 1), flush=True)
+    if not build.FIJO:   # the fixed variant has no gimbal
+        res = {}
+        for pitch, roll in ((18, 0), (-18, 0), (0, 12), (0, -12), (0, 15), (0, -15), (0, 18), (0, -18), (14, 10), (-14, -10), (14, -10), (-14, 10)):
+            T = compose(rot_matrix((0, 0, base.ROLL_BOLT_Z), (0, 1, 0), roll), rot_matrix((0, 0, base.PITCH_BOLT_Z), (1, 0, 0), pitch))
+            hits = []
+            for n in moving:
+                mm = M[n].transform(T)
+                for s in static:
+                    if bb_hit(mm, M[s]):
+                        v = vol(mm, M[s])
+                        if v > 0.5:
+                            hits.append((n, s, round(v, 2)))
+            res[f"pitch{pitch:+d}_roll{roll:+d}"] = hits
+        rep["gimbal"] = res
+        print("gimbal", json.dumps(res), round(time.time() - t0, 1), flush=True)
     # head pan
     head = [n for n in M if grp[n] == "head" and not n.endswith("_spline")]
     others = [n for n in M if grp[n] in ("shell", "arms", "core") and n != "K4_Neck_Hub"]

@@ -23,9 +23,11 @@ DRAWER_Z = (FLOOR_T, 34.0)
 ROLL_BOLT_Z = CZ - 3.0
 PITCH_BOLT_Z = CZ + 3.0
 
-# outer cushion profile (r, z), bottom to rim
-PROFILE = [(79.0, 0.0), (84.2, 1.2), (86.0, 4.5), (86.0, 30.0), (85.2, 39.0), (82.6, 47.5), (77.8, 55.5),
+# outer cushion profile (r, z), bottom to rim. Printed upright: the bottom is flat across the whole wall
+# (2.2 mm on the bed + 0.8 mm chamfer) and the dome is a spline above z = 4.5.
+PROFILE = [(85.2, 0.0), (86.0, 0.8), (86.0, 4.5), (86.0, 30.0), (85.2, 39.0), (82.6, 47.5), (77.8, 55.5),
            (71.8, 61.6), (65.6, 65.2)]
+CAVITY_45 = (79.6, 47.5)                      # above this point the cavity ceiling rises at 45 deg (no supports)
 RIM_R = math.sqrt(DISH_R ** 2 - (CZ - BASE_RIM_Z) ** 2)
 
 
@@ -39,16 +41,22 @@ def _revolve_profile(pts_rz, close_to_axis=True):
 
 
 def cover():
-    """Cushion-shaped cover: printed upright, tree supports only inside (open bottom)."""
-    pts = PROFILE + [(RIM_R + 1.2, BASE_RIM_Z + 0.6)]
-    outer = _revolve_profile(pts)
+    """Cushion-shaped cover, printed upright on its flat bottom ring. Only the dish hole edge (centre) and the
+    drawer opening lintel (back) need supports, both from the build plate."""
+    pts = PROFILE[3:] + [(RIM_R + 1.2, BASE_RIM_Z + 0.6)]
+    wp = cq.Workplane("XZ").moveTo(0, 0).lineTo(*PROFILE[0]).lineTo(*PROFILE[1]).lineTo(*PROFILE[2])
+    end_t = (pts[-1][0] - pts[-2][0], pts[-1][1] - pts[-2][1])
+    wp = wp.spline(pts, includeCurrent=True, tangents=[(0, 1), end_t]).lineTo(0, pts[-1][1]).close()
+    outer = wp.revolve(360, (0, 0, 0), (0, 1, 0)).val()
     # top cap above the profile end (the rim) is flat at the rim height; remove everything above the dish
     outer = outer.cut(sphere(DISH_R, C))
     outer = outer.cut(cyl(DISH_HOLE_R, 200, (0, 0, -10)))
     # hollow: inner offset of the outer profile + the dish band thickness
-    inner_pts = [(r - COVER_WALL, z) for r, z in PROFILE[2:6]] + [(74.0, 52.0), (66.0, 58.6), (56.0, 60.0)]
-    inner = cq.Workplane("XZ").moveTo(0, -1).lineTo(PROFILE[2][0] - COVER_WALL, -1).lineTo(*inner_pts[0])
-    inner = inner.spline(inner_pts[1:], includeCurrent=True).lineTo(0, inner_pts[-1][1]).close()
+    r_in = BASE_R - COVER_WALL
+    rc, zc = CAVITY_45
+    inner = cq.Workplane("XZ").moveTo(0, -1).lineTo(r_in, -1).lineTo(r_in, 30.0)
+    inner = inner.spline([(82.2, 39.0), (rc, zc)], includeCurrent=True, tangents=[(0, 1), (-1, 1)])
+    inner = inner.lineTo(rc - 30.0, zc + 30.0).lineTo(0, zc + 30.0).close()
     inner = inner.revolve(360, (0, 0, 0), (0, 1, 0)).val()
     inner = inner.cut(sphere(DISH_R + 2.4, C).fuse(cyl(DISH_R + 2.4, 200, (0, 0, CZ))))
     body = outer.cut(inner)
@@ -59,12 +67,13 @@ def cover():
         d = (math.cos(a), math.sin(a), 0)
         body = body.cut(cyl_c(10.1, 20, (BASE_R * d[0], BASE_R * d[1], SWITCH_Z), d))
         body = body.cut(cyl(12.5, 6.0, ((BASE_R - 0.4) * d[0], (BASE_R - 0.4) * d[1], SWITCH_Z), d))
-    # bayonet L-slots on the inner wall bottom
+    # bayonet L-slots on the inner wall bottom. As modelled (= assembled) each floor lug sits at the closed end
+    # of its run, so the drawer opening lines up with the floor rails; the open entry is LUG_TURN degrees before.
     for ang in LUG_ANGLES:
-        for k, (a0, a1, z0, z1) in enumerate(((ang - 5.5, ang + 5.5, -1, 6.6), (ang - 5.5, ang + 5.5 + LUG_TURN, 3.3, 6.6))):
+        e = ang - LUG_TURN
+        for a0, a1, z0, z1 in ((e - 5.5, e + 5.5, -1, 6.6), (e - 5.5, ang + 5.5, 2.9, 6.4)):
             slot = _ring_sector(BASE_R - COVER_WALL - 0.2, BASE_R - COVER_WALL + 1.6, a0, a1, z0, z1)
             body = body.cut(slot)
-    # small detent bump at the end of each slot
     return body.clean()
 
 

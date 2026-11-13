@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import V   # noqa
 import build
 
-PKG = build.OUT / "CUTY_V17_Nido"
+PKG = build.OUT / ("CUTY_V17_Fijo" if build.FIJO else "CUTY_V17_Nido")
 
 # print orientation: list of (axis, degrees) rotations applied about the part's own centre
 ORIENT = {
@@ -21,7 +21,9 @@ ORIENT = {
     "K1_Core_Deck": [((1, 0, 0), 180)], "K2_Core_Spine": [((1, 0, 0), -90)],
     "K3_Core_Shoulders": [((1, 0, 0), 180)], "K5_Power_Rack": [((1, 0, 0), -90)],
     "S1_Body_Front": [((1, 0, 0), -90)], "S2_Body_Back": [((1, 0, 0), 90)],
-    "S3_Tummy_Grille": [((1, 0, 0), -90)], "S4_USB_Plug": [((0, 1, 0), 90)],
+    "S1_Body_Front_Fixed": [((1, 0, 0), -90)], "S2_Body_Back_Fixed": [((1, 0, 0), 90)],
+    "B1_Pedestal": [((1, 0, 0), 180)],
+    "S3_Tummy_Grille": [((1, 0, 0), -90)], "S4_USB_Plug": [((0, 1, 0), -90)],
     "A1_Arm_L": [((0, 1, 0), -90)], "A2_Arm_R": [((0, 1, 0), 90)],
     "A3_Hand_L": [((0, 1, 0), -90)], "A4_Hand_R": [((0, 1, 0), 90)],
     "A5_Arm_Cap_L": [((0, 1, 0), -90)], "A6_Arm_Cap_R": [((0, 1, 0), 90)],
@@ -29,6 +31,7 @@ ORIENT = {
     "H3_Visor": [((1, 0, 0), 90)], "H4_Display_Bars": [((1, 0, 0), 90)],
     "H6_Ear_L": [((0, 1, 0), -90)], "H7_Ear_R": [((0, 1, 0), 90)],
 }
+
 
 
 def oriented(name, shape):
@@ -64,7 +67,7 @@ def main():
     printed, bought = [], []
     assy = cq.Assembly(name="CUTY_V17_Nido")
     for name, fn, col, grp, _ in build.PRINTED:
-        s = build.cached(name, fn)
+        s = build.world(build.cached(name, fn))
         cq.exporters.export(s, str(PKG / "STEP_partes" / f"{name}.step"))
         o = oriented(name, s)
         stl = PKG / "STL_imprimir" / f"{name}.stl"
@@ -77,7 +80,7 @@ def main():
         print("exported", name, flush=True)
     refs_assy = cq.Assembly(name="Componentes_comprados")
     for n, s, c, g in build.purchased():
-        refs_assy.add(s, name=n, color=cq.Color(*c))
+        refs_assy.add(build.world(s), name=n, color=cq.Color(*c))
         bought.append(n)
     assy.add(refs_assy, name="Componentes_comprados")
     assy.save(str(PKG / "STEP_ensamble" / "CUTY_V17_Ensamble_completo.step"))

@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-06",
- "revision": "medidas reales del equipo: pantalla 5.8 mm, cámara en cuna con barrita, bocina rectangular 35.4 x 25 x 5.5 en la rejilla, Pi 5 de 90.3 x 56 x 18, ReSpeaker 65.5 x 29.8; batería 3S 2200 del equipo",
+ "fecha": "2026-11-13",
+ "revision": "bayoneta de la cubierta B1 corregida: antes, al girarla 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón chocaba (1750 mm3). Ahora la cubierta se mete girada y se gira de regreso, y queda trabada justo alineada. Sigue la revisión de primera capa del 12 nov.",
  "piezas_impresas": 30,
  "cuerpos_revisados": 113,
  "interferencias_estaticas_mm3_exactas": 0.0,
@@ -29,5 +29,51 @@
   "camara_ov5647": "PCB 24.4 x 23.3 x 2.3, 7.2 de fondo, lente 8.5 x 8.5",
   "bocina_2w": "35.4 x 25 x 5.5",
   "pendiente": "batería (largo x ancho x alto) y centro del lente de la cámara (el modelo supone 13.7 mm desde el borde de abajo)"
+ },
+ "impresion_B1": {
+  "primera_capa_mm2": 848,
+  "voladizo_mayor_45_mm2_antes": 13313,
+  "voladizo_mayor_45_mm2_ahora": "~3000 (orilla del agujero central y abertura del cajon)",
+  "soportes": "arbol, solo desde la cama",
+  "brim": "solo interior 5 mm"
+ },
+ "primera_capa_mm2": {
+  "A1_Arm_L": 1735,
+  "A2_Arm_R": 1735,
+  "A3_Hand_L": 228,
+  "A4_Hand_R": 228,
+  "A5_Arm_Cap_L": 111,
+  "A6_Arm_Cap_R": 111,
+  "B1_Base_Cover": 848,
+  "B2_Base_Floor": 20916,
+  "B3_Battery_Drawer": 5973,
+  "B4_Gimbal_Post": 861,
+  "G1_Ujoint_Cross": 149,
+  "G2_Crank_L": 167,
+  "G3_Crank_R": 167,
+  "H1_Head_Front": 1418,
+  "H2_Head_Back": 1386,
+  "H3_Visor": 2250,
+  "H4_Display_Bars": 988,
+  "H5_Head_Base": 3252,
+  "H6_Ear_L": 1304,
+  "H7_Ear_R": 1304,
+  "H8_Antenna": 50,
+  "K1_Core_Deck": 105,
+  "K2_Core_Spine": 9900,
+  "K3_Core_Shoulders": 3005,
+  "K4_Neck_Hub": 747,
+  "K5_Power_Rack": 234,
+  "S1_Body_Front": 695,
+  "S2_Body_Back": 695,
+  "S3_Tummy_Grille": 340,
+  "S4_USB_Plug": 79
+ },
+ "primera_capa_mm2_minima": 50,
+ "bayoneta": {
+  "antes_cubierta_girada_vs_cajon_mm3": 1752.7,
+  "ahora_trabada_vs_cajon_mm3": 0.0,
+  "giro_libre_y_sale_en_la_entrada": true,
+  "trabada_sostiene": true
  }
 }

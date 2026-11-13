@@ -9,8 +9,8 @@ import math
 
 import cadquery as cq
 
-from common import (V, CZ, BODY_WALL, ARM_AXIS_Y, ARM_AXIS_Z, DECK_Z0, DECK_Z1, box, cbox, rbox, cyl, cyl_c, fuse,
-                    cut, superellipse_wire, loft)
+from common import (V, CZ, BODY_WALL, ARM_AXIS_Y, ARM_AXIS_Z, DECK_Z0, DECK_Z1, FIJO, PED_CUT, box, cbox, rbox, cyl,
+                    cyl_c, fuse, cut, superellipse_wire, loft)
 import body
 import core
 import refs
@@ -76,8 +76,9 @@ def mic_points():
 def shell(side):
     sh = body.shell_solid()
     sh = _split(sh, side)
-    # re-cut the bottom rim with a plane: gives a clean, watertight edge for slicing
-    sh = sh.cut(box(-200, 200, -200, 200, -10, body.Z_HOLE + 0.6))
+    # re-cut the bottom rim with a plane: gives a clean, watertight edge for slicing. The fixed variant has
+    # no ball: the body ends flat just under the belly grille and stands on the pedestal.
+    sh = sh.cut(box(-200, 200, -200, 200, -10, PED_CUT if FIJO else body.Z_HOLE + 0.6))
     inner = body.inner_solid()
     # arm hub holes (split by the seam)
     for sx in (-1, 1):
@@ -102,8 +103,9 @@ def shell(side):
         clips = [_deck_clip(a) for a in core.CLIP_ANGLES["back"]]
     for c in clips:
         sh = sh.fuse(c.intersect(_split(body.outer_solid(), side)))
-    # alignment lip on the back shell (sits just inside the front shell's wall)
-    if side == "back":
+    # no alignment lip: nothing may cross the seam, so each shell prints flat on it (the C-clips on the
+    # deck rim and the shoulder beam locate both halves)
+    if False:
         lip_out = _inner_offset_solid(0.2)
         lip = lip_out.intersect(box(-200, 200, ARM_AXIS_Y - 3.5, ARM_AXIS_Y + 0.5, 104.0, 160.0))
         lip = lip.cut(_inner_offset_solid(1.7))
@@ -142,7 +144,7 @@ def tummy_grille():
     lip = _inner_offset_solid(0.2).intersect(lip_disc).cut(_inner_offset_solid(1.8))
     filler = _inner_offset_solid(0.0).intersect(disc).cut(_inner_offset_solid(0.2))
     g = fuse(cap, filler, frame, lip)
-    g = g.cut(box(-60, 60, -41.5, 0, 0, 300))            # keep clear of the deck front edge
+    g = g.cut(box(-60, 60, yf + sp["t"] - 1.0, 0, 0, 300))  # flat print face: nothing behind the frame back
     for k, w in zip(range(-2, 3), (22, 32, 36, 32, 22)):
         g = g.cut(rbox(0, -60, cz + 6.8 * k, w, 40, 3.4, 1.69, "Y").intersect(box(-60, 60, -90, yf - 1.2, 0, 300)))
     return g.clean()

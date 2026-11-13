@@ -10,6 +10,7 @@ SolidWorks native files are the mechanical source of truth.
 | `stl/` | 3D-printing exports |
 | `glb/` | Visualization exports, including `CUTY_V17_Ensamble_completo.glb` |
 | `carcasa_v17/` | Printable V17 “Nido” enclosure: 30 STL files, renders, verification, and parametric CadQuery source |
+| `carcasa_v17_fija/` | Fixed V17 variant on a low pedestal; only head and arms move. Includes 27 STL files, renders, and verification; generated from the same `carcasa_v17/` source with `CUTY_FIJO=1` |
 
 STEP/STL/GLB are derived exports, never replacements for native sources. Record units, source revision, and export purpose with future assets.
 
