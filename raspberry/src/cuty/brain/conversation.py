@@ -379,7 +379,7 @@ class ConversationService:
         except asyncio.CancelledError:
             raise
         except Exception as exc:
-            self._log.warning("No pude pronunciar una respuesta local (%s)", type(exc).__name__)
+            self._log.warning("No pude pronunciar una respuesta local (%s: %s)", type(exc).__name__, self._safe_error(exc))
         finally:
             self.state.set(State.IDLE)
 
