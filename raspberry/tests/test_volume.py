@@ -96,9 +96,9 @@ def test_command_changes_voice_gain_before_buffered_gemini_audio_plays():
         service.microphone = Mic()
         await service.run_turn(__import__("asyncio").Event())
         assert volume.value == 60
-        # Both early and subsequent response chunks wait for the recognized command.
-        assert len(raw_speaker.audio) == 2
-        assert all(audio == (600).to_bytes(2, "little", signed=True) * 4 for audio in raw_speaker.audio)
+        # The pre-transcript chunk is discarded; the next chunk uses the new gain.
+        assert len(raw_speaker.audio) == 1
+        assert raw_speaker.audio[0] == (600).to_bytes(2, "little", signed=True) * 4
 
     asyncio.run(run())
 

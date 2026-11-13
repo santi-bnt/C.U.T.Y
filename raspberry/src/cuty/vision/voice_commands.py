@@ -6,7 +6,8 @@ import re
 import unicodedata
 
 _INTENT_PHRASES = (
-    "que estas viendo", "que ves", "what are you seeing", "what do you see",
+    "que estas viendo", "que estoy viendo", "que estoy mirando", "que ves",
+    "what are you seeing", "what do you see", "what am i seeing", "what am i looking at",
     "recuerda mi rostro", "recuerda mi cara", "remember my face", "learn my face",
     "quien soy", "quien es esta persona", "who am i", "who is this",
     "olvida mi rostro", "olvida mi cara", "forget my face", "forget my face data",
@@ -22,7 +23,8 @@ def normalize(text: str) -> str:
 def vision_intent(transcript: str) -> str | None:
     text = normalize(transcript)
     if any(phrase in text for phrase in (
-        "que estas viendo", "que ves", "what are you seeing", "what do you see",
+        "que estas viendo", "que estoy viendo", "que estoy mirando", "que ves",
+        "what are you seeing", "what do you see", "what am i seeing", "what am i looking at",
     )) or re.search(r"\bque(?:\s+[a-z0-9']+){0,4}\s+estas viendo\b", text) \
             or re.search(r"\bestas viendo\b", text):
         return "describe"
