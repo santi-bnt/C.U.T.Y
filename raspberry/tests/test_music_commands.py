@@ -4,6 +4,8 @@ from cuty.music.commands import MusicCommand, parse_music_command
 
 
 @pytest.mark.parametrize(("text", "expected"), [
+    ("Cuty, modo música", MusicCommand("phone_mode")),
+    ("Siri, music mode", MusicCommand("phone_mode")),
     ("Cuty, pon 505 de Arctic Monkeys", MusicCommand("search", "505 de arctic monkeys")),
     ("Siri, ponme una canci\u00f3n de Queen. Siri, ponme una canci\u00f3n de Queen.", MusicCommand("search", "queen")),
     ("Cuty, reproduce música de Queen", MusicCommand("search", "queen")),

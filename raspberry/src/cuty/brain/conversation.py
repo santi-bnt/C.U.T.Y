@@ -524,6 +524,14 @@ class ConversationService:
     async def _apply_music_command(self, command: MusicCommand) -> str | None:
         if self.music is None:
             return None
+        if command.action == "phone_mode":
+            if getattr(self.music, "external_output", False):
+                return (
+                    "Modo música listo. Abre Spotify en tu celular, toca "
+                    "Conectar a un dispositivo y elige CUTY Spotify. "
+                    "Desde ahí puedes elegir y controlar la música."
+                )
+            return "El modo música por Spotify no está activado en este momento."
         if command.action == "search" and command.query:
             tracks = await self.music.search_tracks(command.query)
             if tracks:

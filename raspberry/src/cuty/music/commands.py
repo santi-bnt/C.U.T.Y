@@ -34,6 +34,8 @@ def parse_music_command(text: str) -> MusicCommand | None:
     phrase = _normalize(text)
     if not phrase:
         return None
+    if re.search(r"\b(?:modo(?: de)? (?:la )?musica|modo spotify|music mode|spotify mode)\b", phrase):
+        return MusicCommand("phone_mode")
     if re.search(r"\b(pausa|pausa la musica|pause|pause the music)\b", phrase):
         return MusicCommand("pause")
     if re.search(r"\b(continua|reanuda|resume|continue)\b", phrase):

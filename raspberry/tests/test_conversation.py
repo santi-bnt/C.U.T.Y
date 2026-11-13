@@ -126,6 +126,18 @@ def test_music_voice_command_is_applied_locally_and_model_audio_is_discarded():
     assert state.current == State.MUSIC_PLAYING
 
 
+def test_music_mode_tells_user_to_select_cuty_spotify_from_phone():
+    from types import SimpleNamespace
+    from cuty.music.commands import MusicCommand
+
+    service, *_ = make_service([])
+    service.music = SimpleNamespace(external_output=True)
+    response = asyncio.run(service._apply_music_command(MusicCommand("phone_mode")))
+
+    assert "Spotify en tu celular" in response
+    assert "CUTY Spotify" in response
+
+
 def test_multiturn_conversation_and_tool_expression():
     service, provider, speaker, sink, state = make_service([
         AIEvent(EventKind.DONE, tool_calls=(ToolCall("call1", "set_expression", '{"expression":"happy","intensity":0.8}'),)),
