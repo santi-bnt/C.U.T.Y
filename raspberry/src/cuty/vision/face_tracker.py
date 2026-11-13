@@ -22,6 +22,12 @@ from typing import Callable
 
 from cuty.vision.camera import Camera, CameraError, open_camera
 from cuty.vision.face_detector import Detection, DetectorError, create_detector
+from cuty.vision.head_follow import (
+    FaceFollowConfig,
+    FaceFollowController,
+    FollowConfigurationError,
+    FollowStatus,
+)
 
 
 @dataclass(frozen=True)
@@ -61,6 +67,22 @@ class FaceTracker:
         self._stop = threading.Event()
         self.status = "detenido"
         self._log = logging.getLogger("VISION")
+        self.follow: FaceFollowController | None = None
+        self._last_follow_log = 0.0
+        try:
+            follow_config = FaceFollowConfig.from_env()
+            if follow_config.enabled:
+                self._log.warning(
+                    "Seguimiento de cabeza habilitado solo en dry-run; "
+                    "no hay protocolo ni actuador STM32 verificado"
+                )
+            if follow_config.dry_run:
+                # Keep an inert controller available for an internal runtime
+                # toggle; it performs no work or I/O while disabled.
+                self.follow = FaceFollowController(follow_config, clock=clock)
+        except FollowConfigurationError as exc:
+            self.status = f"seguimiento de cabeza bloqueado: {exc}"
+            self._log.error("%s", self.status)
 
     # ----- pure tracking logic (no camera), easy to test --------------------
     def _point(self, d: Detection, frame_w: int, frame_h: int) -> tuple[float, float]:
@@ -80,6 +102,7 @@ class FaceTracker:
                 previous = None
             with self._lock:
                 self._target = previous
+            self._update_follow(previous, now)
             return previous
         best = self._choose(boxes, frame_w, frame_h, previous)
         nx, ny = self._point(best, frame_w, frame_h)
@@ -91,7 +114,35 @@ class FaceTracker:
         target = FaceTarget(min(1.0, max(0.0, nx)), min(1.0, max(0.0, ny)), confidence, now)
         with self._lock:
             self._target = target
+        self._update_follow(target, now)
         return target
+
+    def _update_follow(self, target: FaceTarget | None, now: float) -> None:
+        if self.follow is None:
+            return
+        state = self.follow.update(target, now)
+        if now - self._last_follow_log >= 1.0:
+            self._last_follow_log = now
+            self._log.info(
+                "[HEAD FOLLOW DRY-RUN] active=%s track=%s err=(%+.3f,%+.3f) "
+                "pid_pan=%+.3f sim_velocity=%+.3f sim_position=%+.3f (%s)",
+                state.enabled, state.tracking,
+                state.x_error if state.x_error is not None else 0.0,
+                state.y_error if state.y_error is not None else 0.0,
+                state.pid_output, state.velocity, state.simulated_position, state.reason,
+            )
+
+    def set_head_follow_enabled(self, enabled: bool) -> bool:
+        """Internal toggle for simulation; no physical servo path exists."""
+        if self.follow is None:
+            return False
+        self.follow.set_enabled(enabled)
+        self._log.info("Seguimiento facial %s (solo simulación)", "activado" if enabled else "detenido")
+        return True
+
+    @property
+    def head_follow_status(self) -> FollowStatus | None:
+        return self.follow.status if self.follow is not None else None
 
     def _choose(self, boxes: list[Detection], frame_w, frame_h, previous) -> Detection:
         """Prefer big (close) faces, but stick with whoever we were already watching."""
@@ -114,6 +165,8 @@ class FaceTracker:
     def start(self) -> None:
         if self._thread is not None and self._thread.is_alive():
             return
+        if self.follow is not None and self.follow.config.enabled:
+            self.follow.set_enabled(True)
         self._stop.clear()
         self._thread = threading.Thread(target=self._run, daemon=True, name="cuty-vision")
         self._thread.start()
@@ -125,6 +178,8 @@ class FaceTracker:
             self._thread = None
         with self._lock:
             self._target = None
+        if self.follow is not None:
+            self.follow.set_enabled(False)
         self.status = "detenido"
 
     def _run(self) -> None:
@@ -163,6 +218,8 @@ class FaceTracker:
                 self.status = "error de visión"
                 self._log.exception("Error en el seguimiento de caras")
             finally:
+                if self.follow is not None:
+                    self.follow.update(None, self._clock())
                 try:
                     camera.close()
                 except Exception:

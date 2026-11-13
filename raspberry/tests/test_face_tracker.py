@@ -56,6 +56,45 @@ def test_smoothing_moves_part_of_the_way():
     assert 0.4 < second.x < 0.6
 
 
+def test_head_follow_uses_existing_face_target_and_stops_after_half_second(monkeypatch):
+    monkeypatch.setenv("CUTY_FOLLOW_ENABLED", "1")
+    monkeypatch.setenv("CUTY_FOLLOW_DRY_RUN", "1")
+    monkeypatch.setenv("CUTY_FOLLOW_DETECTION_ALPHA", "1")
+    clock = [0.0]
+    tr = tracker(mirror=False, lost_after=0.8, clock=lambda: clock[0])
+    assert tr.follow is not None
+    seen = tr.process([Detection(250, 90, 40, 40)], 320, 240, 0.0)
+    assert seen.x > 0.8 and tr.latest() is seen
+    tr.process([Detection(250, 90, 40, 40)], 320, 240, 0.1)
+    assert tr.head_follow_status.tracking
+    # FaceTracker's eye-gaze retention can be longer; head motion has its own
+    # 0.5 s loss deadline and receives no new camera or detector instance.
+    tr.process([], 320, 240, 0.61)
+    clock[0] = 0.61
+    assert tr.latest() is not None
+    assert not tr.head_follow_status.tracking
+    assert tr.head_follow_status.velocity == 0
+
+
+def test_physical_follow_configuration_is_blocked_without_affecting_tracker(monkeypatch):
+    monkeypatch.setenv("CUTY_FOLLOW_ENABLED", "1")
+    monkeypatch.setenv("CUTY_FOLLOW_DRY_RUN", "0")
+    tr = tracker()
+    assert tr.follow is None
+    assert "bloqueado" in tr.status
+
+
+def test_runtime_follow_toggle_is_available_but_inert_by_default(monkeypatch):
+    monkeypatch.delenv("CUTY_FOLLOW_ENABLED", raising=False)
+    monkeypatch.delenv("CUTY_FOLLOW_DRY_RUN", raising=False)
+    tr = tracker()
+    assert tr.follow is not None and not tr.head_follow_status.enabled
+    assert tr.set_head_follow_enabled(True)
+    assert tr.head_follow_status.enabled
+    assert tr.set_head_follow_enabled(False)
+    assert tr.head_follow_status.reason == "manual stop"
+
+
 def test_rotation():
     frame = np.arange(6).reshape(2, 3)
     assert _rotate(frame, 0) is frame

@@ -28,6 +28,12 @@ opposite way on your mounting.
 | `CUTY_FACE_DETECTOR` | `auto` | `yunet` or `haar` |
 | `CUTY_TRACK_FPS` | `12` | detection rate |
 
+Head following is an optional layer over this same camera loop. It is disabled
+by default and only supports an in-memory dry-run PAN simulation. See
+[`docs/head-follow.md`](../../../../docs/head-follow.md) for parameters,
+validation and the hardware blockers. No second camera, PWM, UART, or servo
+output is introduced.
+
 Vision never produces PWM, drives servos, implements body PID or renders the
 display. The same target can later feed high-level head goals through the
 hardware bridge. Identity recognition is separate future work.
