@@ -90,7 +90,7 @@ class GeminiLiveProvider:
                 config = {
                     **_CONFIG,
                     "system_instruction": _CONFIG["system_instruction"]
-                    + f"\nCurrent local date: {datetime.now().astimezone().date().isoformat()}.",
+                    + f"\nCurrent local date and time: {datetime.now().astimezone().isoformat()}.",
                 }
                 if self._hands_free:
                     config["system_instruction"] += MENU_INSTRUCTIONS
