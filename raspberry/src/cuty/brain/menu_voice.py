@@ -44,13 +44,22 @@ class MenuVoice:
         return None if self.process is None else self.process.poll()
 
     def interrupt_music(self) -> None:
-        """A short touchscreen tap opens listening only while local music is playing."""
+        """A single touchscreen tap opens listening while music is playing."""
         if self.process is None or self.process.poll() is not None:
             return
         from cuty.music.interrupt import interrupt_port
 
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as command:
             command.sendto(b"listen", ("127.0.0.1", interrupt_port()))
+
+    def next_music(self) -> None:
+        """A double touchscreen tap skips the current track."""
+        if self.process is None or self.process.poll() is not None:
+            return
+        from cuty.music.interrupt import interrupt_port
+
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as command:
+            command.sendto(b"next", ("127.0.0.1", interrupt_port()))
 
     def stop(self) -> None:
         process, self.process = self.process, None

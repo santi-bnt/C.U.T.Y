@@ -322,6 +322,14 @@ class ConversationService:
                             await audio_queue.put(audio)
                         held_audio.clear()
                     if self.voice_exit and wants_menu(input_transcript):
+                        if self.music is not None:
+                            try:
+                                await self.music.stop()
+                            except Exception as exc:
+                                self._log.warning(
+                                    "Could not stop external music before returning to menu (%s).",
+                                    type(exc).__name__,
+                                )
                         raise ReturnToMenu
                     if event.tool_calls:
                         for call in event.tool_calls:
@@ -701,6 +709,14 @@ class ConversationService:
                 if not wants_menu(input_transcript):
                     raise ValueError("No explicit exit command was transcribed")
                 await self.provider.submit_tool_result(call.call_id, json.dumps({"ok": True}))
+                if self.music is not None:
+                    try:
+                        await self.music.stop()
+                    except Exception as exc:
+                        self._log.warning(
+                            "Could not stop music before returning to menu (%s).",
+                            type(exc).__name__,
+                        )
                 raise ReturnToMenu
             else:
                 raise ValueError("Unknown tool")

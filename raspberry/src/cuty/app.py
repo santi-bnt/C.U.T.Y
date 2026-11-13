@@ -63,6 +63,7 @@ class Keyboard:
 async def run_hands_free(
     service: ConversationService, music_interrupt: asyncio.Event | None = None,
     interrupt_armed: asyncio.Event | None = None,
+    music_next: asyncio.Event | None = None,
 ) -> None:
     await service.greet()
     service.voice_exit = True
@@ -79,28 +80,52 @@ async def run_hands_free(
                     if music_interrupt is None:
                         await wait_for_track()
                     else:
-                        # Keep half-duplex audio safe, but let a short touchscreen
-                        # tap interrupt this wait and open the microphone.
-                        music_interrupt.clear()
-                        if interrupt_armed is not None:
-                            interrupt_armed.set()
-                        finished = asyncio.create_task(wait_for_track())
-                        interrupted = asyncio.create_task(music_interrupt.wait())
-                        done, pending = await asyncio.wait(
-                            (finished, interrupted), return_when=asyncio.FIRST_COMPLETED,
-                        )
-                        for task in pending:
-                            task.cancel()
-                        await asyncio.gather(*pending, return_exceptions=True)
-                        if interrupt_armed is not None:
-                            interrupt_armed.clear()
-                        music_interrupt.clear()
-                        if interrupted in done:
-                            logging.getLogger("MUSIC").info(
-                                "Touchscreen requested listening; pausing music for half-duplex capture."
+                        # Keep half-duplex safe. One tap opens listening; a double
+                        # tap skips the track and keeps music mode active.
+                        while True:
+                            music_interrupt.clear()
+                            if music_next is not None:
+                                music_next.clear()
+                            if interrupt_armed is not None:
+                                interrupt_armed.set()
+                            finished = asyncio.create_task(wait_for_track())
+                            interrupted = asyncio.create_task(music_interrupt.wait())
+                            waiters = [finished, interrupted]
+                            next_requested = None
+                            if music_next is not None:
+                                next_requested = asyncio.create_task(music_next.wait())
+                                waiters.append(next_requested)
+                            done, pending = await asyncio.wait(
+                                waiters, return_when=asyncio.FIRST_COMPLETED,
                             )
-                        for task in done:
-                            task.result()
+                            for task in pending:
+                                task.cancel()
+                            await asyncio.gather(*pending, return_exceptions=True)
+                            if interrupt_armed is not None:
+                                interrupt_armed.clear()
+                            if interrupted in done:
+                                logging.getLogger("MUSIC").info(
+                                    "Touchscreen requested listening; pausing music for half-duplex capture."
+                                )
+                                for task in done:
+                                    if task is not interrupted:
+                                        task.result()
+                                break
+                            if next_requested is not None and next_requested in done:
+                                try:
+                                    await music.next()
+                                    logging.getLogger("MUSIC").info(
+                                        "Touchscreen double-tap requested next track."
+                                    )
+                                except Exception as exc:
+                                    logging.getLogger("MUSIC").warning(
+                                        "Could not skip track (%s).", type(exc).__name__
+                                    )
+                                    break
+                                continue
+                            for task in done:
+                                task.result()
+                            break
     except ReturnToMenu:
         logging.getLogger("CUTY").info("Volviendo al menú principal por petición de voz.")
 
@@ -198,10 +223,13 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         )
         if hands_free:
             music_interrupt = asyncio.Event()
+            music_next = asyncio.Event()
             interrupt_armed = asyncio.Event()
-            interrupt_transport, _ = await open_interrupt_listener(music_interrupt, interrupt_armed)
+            interrupt_transport, _ = await open_interrupt_listener(
+                music_interrupt, interrupt_armed, music_next,
+            )
             try:
-                await run_hands_free(service, music_interrupt, interrupt_armed)
+                await run_hands_free(service, music_interrupt, interrupt_armed, music_next)
             finally:
                 interrupt_transport.close()
             return 0

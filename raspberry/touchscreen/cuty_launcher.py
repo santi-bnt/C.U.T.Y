@@ -48,6 +48,7 @@ RED = '#ff7878'
 
 FACE_FPS = max(5.0, min(40.0, float(os.getenv('CUTY_FACE_FPS', '20') or 20)))
 FACE_SSAA = {'1': 1, '2': 2, '3': 3}.get(os.getenv('CUTY_FACE_SSAA', '2').strip(), 2)
+FACE_DOUBLE_TAP_SECONDS = 0.35
 START_MODE = os.getenv('CUTY_START_MODE', 'menu').strip().lower()
 
 FONT_PATH = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
@@ -147,6 +148,7 @@ class Launcher(wifi.Panel):
         self.raw_x = self.raw_y = None
         self.last_release = 0
         self.ignore_next_release = False
+        self.pending_face_tap_at = None
         self.last_status_check = 0
         self.voice = MenuVoice(Path(__file__).resolve().parents[1], NORM_USER) if not FACE_ERROR else None
         self.voice_error = ''
@@ -373,6 +375,7 @@ class Launcher(wifi.Panel):
                 self.mode, self.screen = 'menu', 'home'
 
     def leave_face(self):
+        self.pending_face_tap_at = None
         if self.voice is not None:
             self.voice.stop()
         if self.tracker is not None:
@@ -559,6 +562,14 @@ class Launcher(wifi.Panel):
                     timeout = max(0.0, self.next_face_frame - time.monotonic())
                 readable, _, _ = select.select(watch, [], [], timeout)
                 now = time.monotonic()
+                if (self.pending_face_tap_at is not None and
+                        now - self.pending_face_tap_at >= FACE_DOUBLE_TAP_SECONDS):
+                    self.pending_face_tap_at = None
+                    if self.voice is not None:
+                        try:
+                            self.voice.interrupt_music()
+                        except OSError as error:
+                            print('C.U.T.Y music interrupt:', error, flush=True)
                 if self.link is not None and self.link.fileno() in readable:
                     self.apply_link_messages()
                 if self.touch.fd in readable:
@@ -593,10 +604,15 @@ class Launcher(wifi.Panel):
                                     if short_press and self.face is not None:
                                         self.face.blink()
                                         if self.voice is not None:
-                                            try:
-                                                self.voice.interrupt_music()
-                                            except OSError as error:
-                                                print('C.U.T.Y music interrupt:', error, flush=True)
+                                            if (self.pending_face_tap_at is not None and
+                                                    now - self.pending_face_tap_at < FACE_DOUBLE_TAP_SECONDS):
+                                                self.pending_face_tap_at = None
+                                                try:
+                                                    self.voice.next_music()
+                                                except OSError as error:
+                                                    print('C.U.T.Y music next:', error, flush=True)
+                                            else:
+                                                self.pending_face_tap_at = now
                                 else:
                                     if (self.raw_x is not None and self.raw_y is not None
                                             and now-self.last_release >= 0.16):

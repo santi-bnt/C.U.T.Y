@@ -6,7 +6,7 @@ Music Mode solo se crea en `--hands-free`, que es el proceso de voz del robot f�
 
 La salida de voz y la de música comparten la misma salida física del ReSpeaker. La voz pasa por `VolumeSpeaker`; la música usa `LocalMusicProvider` y su propio volumen PCM, de modo que ambos controles siguen separados. En half-duplex, C.U.T.Y. pausa la música y cierra la salida antes de abrir el micrófono, luego vuelve a abrirla para responder y reanuda la pista cuando corresponde.
 
-Durante una pista, la escucha no está abierta: el test de duplex actual emite silencio y solo comprueba que el dispositivo entrega PCM. No prueba cancelación de eco ni reconocimiento fiable mientras suena música. Para pedir algo, da un toque corto a la pantalla; los ojos parpadean, la reproducción se pausa y se abre el micrófono. Di el comando. La pista se reanuda salvo que pidas pausa o detener. Mantén el toque de cinco segundos para salir al menú como antes.
+Durante una pista, la escucha no está abierta: el test de duplex actual emite silencio y solo comprueba que el dispositivo entrega PCM. No prueba cancelación de eco ni reconocimiento fiable mientras suena música. Para pedir algo, da un toque corto a la pantalla; los ojos parpadean, la reproducción se pausa y se abre el micrófono. Di el comando. La pista se reanuda salvo que pidas pausa o detener. Dos toques cortos dentro de 350 ms avanzan a la siguiente canción sin abrir el micrófono. También puedes volver al menú diciendo «salir», «quiero salir» o «salir del modo música»; C.U.T.Y. detiene Spotify antes de salir. Mantén el toque de cinco segundos para salir al menú como antes.
 
 Los comandos deterministas incluyen:
 
