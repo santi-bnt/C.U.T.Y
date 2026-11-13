@@ -64,6 +64,7 @@ class ConversationService:
         self.vision = vision
         self.voice_volume = voice_volume or VoiceVolume.from_env()
         self._pending_music_command: MusicCommand | None = None
+        self._deferred_music_action: tuple[str, str | None] | None = None
         self._pending_volume_command: VolumeCommand | None = None
         self._music_volume_before_mute: int | None = None
         self._pending_vision_intent: str | None = None
@@ -92,6 +93,7 @@ class ConversationService:
             raise RuntimeError("A conversation turn is already in progress.")
         music_was_playing = False
         self._pending_music_command = None
+        self._deferred_music_action = None
         self._pending_volume_command = None
         self._pending_vision_intent = None
         self._last_input_transcript = ""
@@ -137,10 +139,28 @@ class ConversationService:
             if self._pending_vision_intent or self._face_consent:
                 await self._handle_vision_request()
             if self.music is not None and self._pending_music_command is not None:
-                await self._execute_music_command(self._pending_music_command)
-                if self._pending_music_command.action in {"pause", "stop"}:
+                command = self._pending_music_command
+                self._pending_music_command = None
+                response = await self._execute_music_command(command)
+                if command.action in {"pause", "stop"}:
                     music_was_playing = False
+                if response:
+                    playback = await self.music.get_playback_state()
+                    external_output = bool(getattr(self.music, "external_output", False))
+                    resume_after_response = command.action in {"search", "resume", "next", "previous"} and playback.status == "playing"
+                    if resume_after_response and not external_output:
+                        await self.music.pause()
+                    await self._speak_local(response)
+                    if external_output and self._deferred_music_action is not None:
+                        await self._start_deferred_music_action(music_was_playing)
+                        music_was_playing = False
+                    elif resume_after_response:
+                        await self.music.resume()
             if music_was_playing and self.music is not None:
+                if getattr(self.music, "external_output", False):
+                    # Soloist owns the physical output stack; release C.U.T.Y.'s
+                    # PortAudio stream before resuming the external player.
+                    await self.speaker.close()
                 await self.music.resume()
             if self.music is not None:
                 playback = await self.music.get_playback_state()
@@ -245,7 +265,8 @@ class ConversationService:
                         held_audio.append(event.audio)
                     elif self._pending_volume_command is not None:
                         held_audio.append(event.audio)
-                    elif self._pending_vision_intent is None and self._pending_volume_command is None:
+                    elif (self._pending_vision_intent is None and self._pending_volume_command is None
+                          and self._pending_music_command is None):
                         await audio_queue.put(event.audio)
                 elif event.kind == EventKind.TRANSCRIPT and event.transcript:
                     self._log.info("C.U.T.Y: %s", event.transcript)
@@ -264,17 +285,19 @@ class ConversationService:
                     if self._pending_vision_intent is not None and previous_vision_intent is None:
                         # Log the action category only; never persist the transcript or image.
                         self._log.info("Intención local detectada: %s", self._pending_vision_intent)
+                    parsed = parse_music_command(input_transcript) if self.music is not None else None
+                    if self._pending_volume_command is None and parsed is not None:
+                        self._pending_music_command = parsed
                     if (self._pending_vision_intent is None and self._pending_volume_command is None
+                            and self._pending_music_command is None
                             and not may_be_vision_intent(input_transcript)):
                         self._log.info("Escuché: %s", event.transcript)
                         for audio in held_audio:
                             await audio_queue.put(audio)
                         held_audio.clear()
-                    elif self._pending_vision_intent is not None:
+                    elif (self._pending_vision_intent is not None or self._pending_volume_command is not None
+                          or self._pending_music_command is not None):
                         held_audio.clear()
-                    parsed = parse_music_command(input_transcript)
-                    if parsed is not None:
-                        self._pending_music_command = parsed
                 elif event.kind == EventKind.WEB_SEARCH:
                     web_log = logging.getLogger("WEB")
                     for query in event.search_queries:
@@ -292,6 +315,8 @@ class ConversationService:
                             for audio in held_audio:
                                 await audio_queue.put(audio)
                         held_audio.clear()
+                    elif self._pending_vision_intent is None and self._pending_music_command is not None:
+                        held_audio.clear()
                     elif self._pending_vision_intent is None and held_audio:
                         for audio in held_audio:
                             await audio_queue.put(audio)
@@ -304,7 +329,8 @@ class ConversationService:
                         await self.provider.continue_response()
                         break
                     if (not first_audio and self._pending_vision_intent is None
-                            and self._face_consent is None and not volume_command_applied):
+                            and self._face_consent is None and not volume_command_applied
+                            and self._pending_music_command is None):
                         raise ProviderError("La IA terminó el turno sin enviar voz. No se recibió una respuesta hablada.")
                     return
         raise ProviderError("AI provider called tools too many times without finishing a reply.")
@@ -464,36 +490,101 @@ class ConversationService:
             detail = redact(detail)
         return detail or "sin detalle"
 
-    async def _execute_music_command(self, command: MusicCommand) -> None:
+    async def _execute_music_command(self, command: MusicCommand) -> str | None:
+        try:
+            return await self._apply_music_command(command)
+        except Exception as exc:
+            self._log.exception("MUSIC: provider command failed (%s)", type(exc).__name__)
+            return "No pude controlar el reproductor de música ahora. Sigo aquí para ayudarte."
+
+    async def _start_deferred_music_action(self, music_was_playing: bool) -> None:
+        action, track_id = self._deferred_music_action or ("", None)
+        self._deferred_music_action = None
         if self.music is None:
             return
+        await self.speaker.close()
+        try:
+            if action == "play" and track_id:
+                await self.music.play(track_id)
+            elif action == "resume":
+                await self.music.resume()
+            elif action in {"next", "previous"}:
+                await getattr(self.music, action)()
+                if music_was_playing:
+                    await self.music.resume()
+            playback = await self.music.get_playback_state()
+            if playback.status == "playing":
+                self.state.set(State.MUSIC_PLAYING)
+            elif playback.status == "paused":
+                self.state.set(State.MUSIC_PAUSED)
+        except Exception as exc:
+            self._log.exception("MUSIC: deferred provider action failed (%s)", type(exc).__name__)
+            self.state.set(State.IDLE)
+
+    async def _apply_music_command(self, command: MusicCommand) -> str | None:
+        if self.music is None:
+            return None
         if command.action == "search" and command.query:
             tracks = await self.music.search_tracks(command.query)
             if tracks:
-                await self.music.play(tracks[0].id)
-                self._log.info("MUSIC: playing %s — %s", tracks[0].title, tracks[0].artist)
-                self.state.set(State.MUSIC_PLAYING)
+                if getattr(self.music, "external_output", False):
+                    self._deferred_music_action = ("play", tracks[0].id)
+                else:
+                    await self.music.play(tracks[0].id)
+                    self.state.set(State.MUSIC_PLAYING)
+                self._log.info("MUSIC: selected %s — %s", tracks[0].title, tracks[0].artist)
+                return f"Pongo {tracks[0].title} de {tracks[0].artist}."
             else:
                 self._log.info("MUSIC: no local matches for %s", command.query)
+                return "No encontré esa canción con el proveedor de música configurado."
         elif command.action == "pause":
             await self.music.pause()
             if (await self.music.get_playback_state()).status == "paused":
                 self.state.set(State.MUSIC_PAUSED)
+                return "Música pausada."
+            return "No hay música reproduciéndose."
         elif command.action == "resume":
-            await self.music.resume()
+            if getattr(self.music, "external_output", False):
+                current = await self.music.get_playback_state()
+                if current.status in {"paused", "stopped"} and current.track is not None:
+                    self._deferred_music_action = ("resume", None)
+                    return "Continúo la música."
+            else:
+                await self.music.resume()
             if (await self.music.get_playback_state()).status == "playing":
                 self.state.set(State.MUSIC_PLAYING)
+                return "Continúo la música."
+            return "No hay una canción pausada para continuar."
         elif command.action == "stop":
             await self.music.stop()
             self.state.set(State.IDLE)
+            return "Dejé de reproducir música."
         elif command.action == "next":
-            await self.music.next()
-            if (await self.music.get_playback_state()).status == "playing":
+            if getattr(self.music, "external_output", False):
+                current = await self.music.get_playback_state()
+                if current.track is not None:
+                    self._deferred_music_action = ("next", None)
+                    return "Cambio a la siguiente canción."
+            else:
+                await self.music.next()
+            current = await self.music.get_playback_state()
+            if current.status == "playing":
                 self.state.set(State.MUSIC_PLAYING)
+                return f"Siguiente: {current.track.title}." if current.track else "Siguiente canción."
+            return "No hay otra canción en la biblioteca local."
         elif command.action == "previous":
-            await self.music.previous()
-            if (await self.music.get_playback_state()).status == "playing":
+            if getattr(self.music, "external_output", False):
+                current = await self.music.get_playback_state()
+                if current.track is not None:
+                    self._deferred_music_action = ("previous", None)
+                    return "Vuelvo a la canción anterior."
+            else:
+                await self.music.previous()
+            current = await self.music.get_playback_state()
+            if current.status == "playing":
                 self.state.set(State.MUSIC_PLAYING)
+                return f"Anterior: {current.track.title}." if current.track else "Canción anterior."
+            return "No hay otra canción en la biblioteca local."
         elif command.action == "set_volume" and command.volume is not None:
             await self.music.set_volume(command.volume)
         elif command.action == "volume_up":
@@ -505,6 +596,10 @@ class ConversationService:
         elif command.action == "get_current_track":
             current = await self.music.get_playback_state()
             self._log.info("MUSIC: current track %s", current.track.title if current.track else "none")
+            if current.track is None:
+                return "No hay ninguna canción sonando."
+            return f"Está sonando {current.track.title} de {current.track.artist}."
+        return None
 
     async def _apply_volume_command(self, command: VolumeCommand) -> None:
         """Apply validated voice volume instructions before releasing reply audio."""

@@ -1,0 +1,15 @@
+[Unit]
+Description=Spotify Soloist Connect player for C.U.T.Y
+After=pipewire.service pipewire-pulse.service
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/cuty/spotify.env
+ExecStart=/usr/local/bin/soloist --device-name "CUTY Spotify" --api-key ${SOLOIST_API_KEY} --data-dir %h/.local/share/soloist --cache-dir %h/.cache/soloist --initial-volume 70 --ws 127.0.0.1:9090
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

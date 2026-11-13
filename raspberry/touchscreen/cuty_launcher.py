@@ -592,6 +592,11 @@ class Launcher(wifi.Panel):
                                     self.released_at = now
                                     if short_press and self.face is not None:
                                         self.face.blink()
+                                        if self.voice is not None:
+                                            try:
+                                                self.voice.interrupt_music()
+                                            except OSError as error:
+                                                print('C.U.T.Y music interrupt:', error, flush=True)
                                 else:
                                     if (self.raw_x is not None and self.raw_y is not None
                                             and now-self.last_release >= 0.16):

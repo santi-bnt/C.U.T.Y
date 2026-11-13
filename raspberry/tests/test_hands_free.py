@@ -165,6 +165,51 @@ def test_hands_free_waits_for_active_local_track_before_reopening_microphone():
     assert service.turns == 2
 
 
+def test_touchscreen_interrupt_opens_listening_while_music_is_playing():
+    class Music:
+        def __init__(self):
+            self.finished = asyncio.Event()
+            self.wait_cancelled = False
+
+        async def get_playback_state(self):
+            from cuty.music.protocol import PlaybackState
+            return PlaybackState("playing", None, 70)
+
+        async def wait_until_finished(self):
+            try:
+                await self.finished.wait()
+            except asyncio.CancelledError:
+                self.wait_cancelled = True
+                raise
+
+    class Service:
+        voice_exit = False
+        turns = 0
+
+        def __init__(self):
+            self.music = Music()
+
+        async def greet(self):
+            pass
+
+        async def run_turn(self, stop):
+            self.turns += 1
+            if self.turns == 2:
+                raise ReturnToMenu
+
+    async def exercise():
+        service = Service()
+        interrupt = asyncio.Event()
+        task = asyncio.create_task(run_hands_free(service, interrupt))
+        await asyncio.sleep(0.3)
+        interrupt.set()  # physical short tap arrives while waiting on the track
+        await asyncio.wait_for(task, timeout=2)
+        assert service.turns == 2
+        assert service.music.wait_cancelled
+
+    asyncio.run(exercise())
+
+
 def test_app_greets_then_exits_by_voice_and_closes_devices(monkeypatch):
     from types import SimpleNamespace
 

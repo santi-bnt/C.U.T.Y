@@ -5,15 +5,18 @@ from cuty.music.commands import MusicCommand, parse_music_command
 
 @pytest.mark.parametrize(("text", "expected"), [
     ("Cuty, pon 505 de Arctic Monkeys", MusicCommand("search", "505 de arctic monkeys")),
+    ("Siri, ponme una canci\u00f3n de Queen. Siri, ponme una canci\u00f3n de Queen.", MusicCommand("search", "queen")),
     ("Cuty, reproduce música de Queen", MusicCommand("search", "queen")),
     ("Cuty, pon otra canción", MusicCommand("next")),
+    ("Cuty, pon Come Together de The Beatles", MusicCommand("search", "come together de the beatles")),
     ("Cuty, pausa la música", MusicCommand("pause")),
     ("Cuty, continúa", MusicCommand("resume")),
     ("Cuty, baja el volumen al 30 por ciento", MusicCommand("set_volume", volume=30)),
     ("Cuty, sube el volumen", MusicCommand("volume_up")),
     ("Cuty, ¿qué canción está sonando?", MusicCommand("get_current_track")),
     ("Cuty, stop the music", MusicCommand("stop")),
-    ("Cuty, play music by Queen", MusicCommand("search", "music by queen")),
+    ("Cuty, deja de reproducir", MusicCommand("stop")),
+    ("Cuty, play music by Queen", MusicCommand("search", "queen")),
 ])
 def test_bilingual_command_parser(text, expected):
     assert parse_music_command(text) == expected

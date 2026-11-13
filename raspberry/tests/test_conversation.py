@@ -84,6 +84,48 @@ def make_service(events):
     return service, provider, speaker, sink, state
 
 
+def test_music_voice_command_is_applied_locally_and_model_audio_is_discarded():
+    from cuty.music.protocol import MusicTrack, PlaybackState
+
+    service, provider, speaker, _, state = make_service([
+        AIEvent(EventKind.AUDIO, audio=b"\x03\x00" * 64),
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Cuty, pon Come Together de The Beatles"),
+        AIEvent(EventKind.DONE),
+    ])
+
+    class Music:
+        def __init__(self):
+            self.track = MusicTrack("local-id", "Come Together", "The Beatles")
+            self.status = "stopped"
+            self.played = []
+
+        async def search_tracks(self, query):
+            assert query == "come together de the beatles"
+            return [self.track]
+
+        async def play(self, track_id):
+            self.played.append(track_id)
+            self.status = "playing"
+
+        async def get_playback_state(self):
+            return PlaybackState(self.status, self.track if self.status != "stopped" else None, 70)
+
+        async def pause(self): self.status = "paused"
+        async def resume(self): self.status = "playing"
+        async def stop(self): self.status = "stopped"
+        async def next(self): self.status = "playing"
+        async def previous(self): self.status = "playing"
+        async def set_volume(self, _value): pass
+
+    music = Music()
+    service.music = music
+    asyncio.run(service.run_turn(asyncio.Event()))
+
+    assert music.played == ["local-id"]
+    assert speaker.audio == []  # Gemini's generic reply was held and discarded.
+    assert state.current == State.MUSIC_PLAYING
+
+
 def test_multiturn_conversation_and_tool_expression():
     service, provider, speaker, sink, state = make_service([
         AIEvent(EventKind.DONE, tool_calls=(ToolCall("call1", "set_expression", '{"expression":"happy","intensity":0.8}'),)),

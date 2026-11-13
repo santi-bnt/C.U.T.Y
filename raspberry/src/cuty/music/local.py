@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
+import unicodedata
 from pathlib import Path
 from typing import Callable
 
@@ -22,6 +24,7 @@ class LocalMusicProvider:
         self.library = library.expanduser().resolve()
         self.volume = max(0, min(100, int(volume)))
         self._tracks: list[MusicTrack] = []
+        self._track_cache: dict[str, tuple[int, int, MusicTrack]] = {}
         self._task: asyncio.Task | None = None
         self._resume_event = asyncio.Event()
         self._resume_event.set()
@@ -36,21 +39,79 @@ class LocalMusicProvider:
         def scan() -> list[MusicTrack]:
             if not self.library.is_dir():
                 return []
-            return [MusicTrack(str(path), path.stem, "Local library")
-                    for path in sorted(self.library.rglob("*"))
-                    if path.is_file() and path.suffix.lower() in SUPPORTED]
+            tracks = []
+            cache: dict[str, tuple[int, int, MusicTrack]] = {}
+            for path in sorted(self.library.rglob("*")):
+                if not path.is_file() or path.suffix.lower() not in SUPPORTED:
+                    continue
+                try:
+                    info = path.stat()
+                    cached = self._track_cache.get(str(path))
+                    if cached and cached[:2] == (info.st_mtime_ns, info.st_size):
+                        track = cached[2]
+                    else:
+                        track = self._read_track(path)
+                    cache[str(path)] = (info.st_mtime_ns, info.st_size, track)
+                    tracks.append(track)
+                except OSError:
+                    self._log.debug("Skipping inaccessible music file: %s", path)
+            self._track_cache = cache
+            return tracks
         self._tracks = await asyncio.to_thread(scan)
         return self._tracks
+
+    @staticmethod
+    def _read_track(path: Path) -> MusicTrack:
+        """Read embedded tags through the already-required PyAV dependency."""
+        title, artist, duration = path.stem, "Unknown artist", None
+        try:
+            import av
+
+            container = av.open(str(path))
+            try:
+                tags = {str(key).casefold(): str(value).strip()
+                        for key, value in container.metadata.items()}
+                for stream in container.streams:
+                    if stream.type == "audio":
+                        tags.update({str(key).casefold(): str(value).strip()
+                                     for key, value in stream.metadata.items()})
+                        break
+                title = tags.get("title") or title
+                artist = tags.get("artist") or tags.get("album_artist") or artist
+                if container.duration:
+                    duration = float(container.duration) / av.time_base
+            finally:
+                container.close()
+        except Exception:
+            # A malformed or unsupported file can still be searched by filename;
+            # playback will report a clear decoder error if the user selects it.
+            pass
+        return MusicTrack(str(path), title, artist, duration)
 
     async def search_tracks(self, query: str) -> list[MusicTrack]:
         if not isinstance(query, str) or len(query) > 160:
             return []
         tracks = await self._scan()
-        tokens = [part for part in query.casefold().split() if part]
-        ranked = [(sum(token in f"{track.title} {track.artist}".casefold() for token in tokens), track)
-                  for track in tracks]
-        ranked = [(score, track) for score, track in ranked if score]
-        return [track for _, track in sorted(ranked, key=lambda pair: (-pair[0], pair[1].title.casefold()))[:20]]
+        def words(value: str) -> set[str]:
+            folded = unicodedata.normalize("NFKD", value.casefold())
+            plain = "".join(char for char in folded if not unicodedata.combining(char))
+            return set(re.findall(r"[a-z0-9]+", plain))
+
+        ignored = {"de", "del", "la", "el", "los", "las", "the", "by", "and", "song", "music", "cancion", "canciones"}
+        query_words = words(query) - ignored
+        if not query_words:
+            return []
+        ranked = []
+        for track in tracks:
+            title_words, artist_words = words(track.title), words(track.artist)
+            matched = query_words & (title_words | artist_words)
+            if matched:
+                # Prefer full coverage and title/artist matches over incidental substrings.
+                score = (len(matched) / len(query_words), len(matched & title_words), len(matched & artist_words))
+                ranked.append((score, track))
+        return [track for _, track in sorted(
+            ranked, key=lambda pair: (-pair[0][0], -pair[0][1], -pair[0][2], pair[1].title.casefold())
+        )[:20]]
 
     async def get_track(self, track_id: str) -> MusicTrack | None:
         tracks = await self._scan()
@@ -61,10 +122,14 @@ class LocalMusicProvider:
         if track is None:
             raise ValueError("Track is not present in the configured local library.")
         await self.stop()
-        self._index = next(i for i, item in enumerate(self._tracks) if item.id == track_id)
+        self._start_track(next(i for i, item in enumerate(self._tracks) if item.id == track_id))
+
+    def _start_track(self, index: int) -> None:
+        self._index = index
         self._set_status("playing")
         self._resume_event.set()
         generation = self._generation
+        track = self._tracks[index]
         self._task = asyncio.create_task(self._play_file(track, generation), name="cuty-local-music")
 
     async def _play_file(self, track: MusicTrack, generation: int) -> None:
@@ -96,7 +161,12 @@ class LocalMusicProvider:
             self._set_status("error")
         else:
             if generation == self._generation and self._status == "playing":
-                self._set_status("stopped")
+                next_index = self._index + 1
+                if next_index < len(self._tracks):
+                    self._log.info("MUSIC: track ended; advancing to %s", self._tracks[next_index].title)
+                    self._start_track(next_index)
+                else:
+                    self._set_status("stopped")
 
     async def _wait_current(self, generation: int) -> None:
         if generation != self._generation:
@@ -172,10 +242,14 @@ class LocalMusicProvider:
         return PlaybackState(self._status, track, self.volume)
 
     async def wait_until_finished(self) -> None:
-        """Let hands-free mode keep the song audible instead of immediately reopening its mic."""
-        task = self._task
-        if task is not None:
+        """Wait through automatic track advances until playback actually stops."""
+        while True:
+            task = self._task
+            if task is None:
+                return
             await asyncio.shield(task)
+            if task is self._task:
+                return
 
     async def close(self) -> None:
         await self.stop()

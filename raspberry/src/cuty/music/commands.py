@@ -19,7 +19,14 @@ def _normalize(text: str) -> str:
     plain = "".join(char for char in folded if not unicodedata.combining(char))
     plain = re.sub(r"[^a-z0-9%]+", " ", plain)
     plain = re.sub(r"\s+", " ", plain).strip()
-    plain = re.sub(r"^(?:(?:oye|hey) )?(?:cuty|cuti|kuty|kuti)\s+", "", plain)
+    # Streaming transcription can occasionally duplicate an entire utterance.
+    words = plain.split()
+    if len(words) >= 4 and len(words) % 2 == 0:
+        midpoint = len(words) // 2
+        if words[:midpoint] == words[midpoint:]:
+            plain = " ".join(words[:midpoint])
+    # "Cuty" is sometimes transcribed as "Siri" by the microphone recognizer.
+    plain = re.sub(r"^(?:(?:oye|hey) )?(?:cuty|cuti|kuty|kuti|siri)\s+", "", plain)
     return plain
 
 
@@ -31,7 +38,7 @@ def parse_music_command(text: str) -> MusicCommand | None:
         return MusicCommand("pause")
     if re.search(r"\b(continua|reanuda|resume|continue)\b", phrase):
         return MusicCommand("resume")
-    if re.search(r"\b(detente|deten|para la musica|stop|stop the music)\b", phrase):
+    if re.search(r"\b(detente|deten|para la musica|deja de reproducir|deja de poner musica|deten la reproduccion|stop|stop the music|stop playing)\b", phrase):
         return MusicCommand("stop")
     if re.search(r"\b(otra cancion|siguiente|next|next song)\b", phrase):
         return MusicCommand("next")
@@ -49,9 +56,10 @@ def parse_music_command(text: str) -> MusicCommand | None:
         return MusicCommand("volume_up")
     if re.search(r"\b(baja|reduce|menos volumen|turn it down|decrease volume|volume down)\b", phrase):
         return MusicCommand("volume_down")
-    match = re.search(r"\b(?:pon|reproduce|reproducir|busca|play|put on|search for)\s+(?:la cancion\s+|musica de\s+|canciones de\s+)?(.+)$", phrase)
+    match = re.search(r"\b(?:ponme|pon|reproduce|reproducir|busca|play|put on|search for)\s+(.+)$", phrase)
     if match:
         query = match.group(1).strip()
+        query = re.sub(r"^(?:(?:(?:la|una) )?cancion(?: de)?|musica de|music by|song by|music|a song)\s+", "", query)
         query = re.sub(r"\s+(?:por favor|please)$", "", query).strip()
         return MusicCommand("search", query=query[:160]) if query else None
     return None

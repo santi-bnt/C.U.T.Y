@@ -31,6 +31,8 @@ from cuty.face.expression_sink import (
 )
 from cuty.face.link import FaceLinkSender
 from cuty.music.local import LocalMusicProvider
+from cuty.music.spotify_soloist import SpotifySoloistProvider
+from cuty.music.interrupt import open_interrupt_listener
 from cuty.vision.ipc import LocalVisionClient
 from cuty.utils.logging import configure_logging
 
@@ -58,7 +60,10 @@ class Keyboard:
                 await asyncio.sleep(0.05)
 
 
-async def run_hands_free(service: ConversationService) -> None:
+async def run_hands_free(
+    service: ConversationService, music_interrupt: asyncio.Event | None = None,
+    interrupt_armed: asyncio.Event | None = None,
+) -> None:
     await service.greet()
     service.voice_exit = True
     try:
@@ -71,7 +76,31 @@ async def run_hands_free(service: ConversationService) -> None:
                 playback = await music.get_playback_state()
                 wait_for_track = getattr(music, "wait_until_finished", None)
                 if playback.status == "playing" and wait_for_track is not None:
-                    await wait_for_track()
+                    if music_interrupt is None:
+                        await wait_for_track()
+                    else:
+                        # Keep half-duplex audio safe, but let a short touchscreen
+                        # tap interrupt this wait and open the microphone.
+                        music_interrupt.clear()
+                        if interrupt_armed is not None:
+                            interrupt_armed.set()
+                        finished = asyncio.create_task(wait_for_track())
+                        interrupted = asyncio.create_task(music_interrupt.wait())
+                        done, pending = await asyncio.wait(
+                            (finished, interrupted), return_when=asyncio.FIRST_COMPLETED,
+                        )
+                        for task in pending:
+                            task.cancel()
+                        await asyncio.gather(*pending, return_exceptions=True)
+                        if interrupt_armed is not None:
+                            interrupt_armed.clear()
+                        music_interrupt.clear()
+                        if interrupted in done:
+                            logging.getLogger("MUSIC").info(
+                                "Touchscreen requested listening; pausing music for half-duplex capture."
+                            )
+                        for task in done:
+                            task.result()
     except ReturnToMenu:
         logging.getLogger("CUTY").info("Volviendo al menú principal por petición de voz.")
 
@@ -136,17 +165,27 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         await speaker.open()
         await provider.connect()
         microphone = SoundDeviceMicrophone(input_id, input_rate)
-        music = LocalMusicProvider(
-            music_speaker,
-            Path(os.getenv("CUTY_MUSIC_DIR", str(Path.home() / "Music" / "CUTY"))),
-            volume=int(os.getenv("CUTY_MUSIC_VOLUME", "70")),
-            on_status=lambda status: state.set({
-                "playing": State.MUSIC_PLAYING,
-                "paused": State.MUSIC_PAUSED,
-                "stopped": State.IDLE,
-                "error": State.ERROR,
-            }[status]) if state.current != State.ERROR or status == "stopped" else None,
-        ) if hands_free else None
+        music_status = lambda status: state.set({
+            "playing": State.MUSIC_PLAYING,
+            "paused": State.MUSIC_PAUSED,
+            "stopped": State.IDLE,
+            "error": State.ERROR,
+        }[status]) if state.current != State.ERROR or status == "stopped" else None
+        music_provider = os.getenv("CUTY_MUSIC_PROVIDER", "local").strip().lower()
+        if music_provider not in {"local", "spotify_soloist"}:
+            raise ConfigurationError("CUTY_MUSIC_PROVIDER must be local or spotify_soloist.")
+        if music_provider == "spotify_soloist" and not hands_free:
+            raise ConfigurationError("Spotify Soloist Music Mode is available only on the physical robot (--hands-free).")
+        if hands_free and music_provider == "spotify_soloist":
+            music = SpotifySoloistProvider.from_env()
+            log.info("Music provider: Spotify Soloist (separate official audio daemon)")
+        else:
+            music = LocalMusicProvider(
+                music_speaker,
+                Path(os.getenv("CUTY_MUSIC_DIR", str(Path.home() / "Music" / "CUTY"))),
+                volume=int(os.getenv("CUTY_MUSIC_VOLUME", "70")),
+                on_status=music_status,
+            ) if hands_free else None
         if hands_free:
             microphone = SpeechMicrophone.from_env(microphone, input_rate)
         service = ConversationService(
@@ -158,7 +197,13 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             voice_volume=voice_volume,
         )
         if hands_free:
-            await run_hands_free(service)
+            music_interrupt = asyncio.Event()
+            interrupt_armed = asyncio.Event()
+            interrupt_transport, _ = await open_interrupt_listener(music_interrupt, interrupt_armed)
+            try:
+                await run_hands_free(service, music_interrupt, interrupt_armed)
+            finally:
+                interrupt_transport.close()
             return 0
         keyboard = Keyboard()
         while True:
