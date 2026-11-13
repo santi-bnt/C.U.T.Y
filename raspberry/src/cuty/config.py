@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 from dataclasses import dataclass
 
 
@@ -31,7 +30,6 @@ class Config:
     model: str = "gemini-3.8-live"
     vision_model: str = "gemini-3.8-flash"
     vision_timeout: float = 45.0
-    voice_languages: tuple[str, ...] = ("es", "en")
 
     @classmethod
     def from_env(cls) -> Config:
@@ -53,12 +51,6 @@ class Config:
             raise ConfigurationError("CUTY_GEMINI_VISION_TIMEOUT must be between 5 and 120 seconds.") from exc
         if not 5 <= vision_timeout <= 120:
             raise ConfigurationError("CUTY_GEMINI_VISION_TIMEOUT must be between 5 and 120 seconds.")
-        voice_languages = tuple(
-            code.strip() for code in os.getenv("CUTY_VOICE_LANGUAGES", "es,en").split(",") if code.strip()
-        )
-        if not voice_languages or any(not re.fullmatch(r"[a-zA-Z]{2,3}(?:-[a-zA-Z0-9]{2,8})*", code)
-                                      for code in voice_languages):
-            raise ConfigurationError("CUTY_VOICE_LANGUAGES must be a comma-separated list of BCP-47 language codes.")
         return cls(
             api_key=key,
             provider=provider,
@@ -73,5 +65,4 @@ class Config:
             ),
             vision_model=os.getenv("CUTY_GEMINI_VISION_MODEL", "gemini-3.8-flash").strip(),
             vision_timeout=vision_timeout,
-            voice_languages=voice_languages,
         )

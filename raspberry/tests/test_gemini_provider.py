@@ -152,7 +152,7 @@ def test_menu_config_adds_exit_tool_without_changing_keyboard_config():
     asyncio.run(provider.connect())
     assert captured[0].tools[0].function_declarations[-1].name == "return_to_menu"
     assert "return_to_menu" in captured[0].system_instruction
-    assert captured[0].input_audio_transcription.language_codes == ["es", "en"]
+    assert captured[0].input_audio_transcription.language_codes in (None, [])
     assert len(_CONFIG["tools"][0]["function_declarations"]) == 2
 
 

@@ -55,14 +55,12 @@ _CONFIG = {
 
 class GeminiLiveProvider:
     def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False,
-                 vision_model: str = "gemini-3.8-flash", vision_timeout: float = 45.0,
-                 voice_languages: tuple[str, ...] = ("es", "en")) -> None:
+                 vision_model: str = "gemini-3.8-flash", vision_timeout: float = 45.0) -> None:
         self._api_key = api_key
         self._model = model
         self._hands_free = hands_free
         self._vision_model = vision_model
         self._vision_timeout = vision_timeout
-        self._voice_languages = voice_languages
         self._client = genai.Client(api_key=api_key)
         self._manager: Any = None
         self._session: Any = None
@@ -87,9 +85,6 @@ class GeminiLiveProvider:
             try:
                 config = {
                     **_CONFIG,
-                    "input_audio_transcription": {
-                        "language_codes": list(self._voice_languages),
-                    },
                     "system_instruction": _CONFIG["system_instruction"]
                     + f"\nCurrent local date: {datetime.now().astimezone().date().isoformat()}.",
                 }
