@@ -28,6 +28,7 @@ def test_config_defaults_and_devices(monkeypatch):
     assert config.model == "gemini-3.8-live"
     assert config.input_device == "3"
     assert config.output_device == "Speakers"
+    assert config.voice_languages == ("es", "en")
 
 
 def test_invalid_log_level(monkeypatch):
@@ -43,6 +44,14 @@ def test_vision_timeout_is_bounded(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "test-secret")
     monkeypatch.setenv("CUTY_GEMINI_VISION_TIMEOUT", "4")
     with pytest.raises(ConfigurationError, match="CUTY_GEMINI_VISION_TIMEOUT"):
+        Config.from_env()
+
+
+def test_voice_language_hints_require_bcp47_codes(monkeypatch):
+    monkeypatch.setenv("CUTY_AI_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-secret")
+    monkeypatch.setenv("CUTY_VOICE_LANGUAGES", "es,not a language")
+    with pytest.raises(ConfigurationError, match="CUTY_VOICE_LANGUAGES"):
         Config.from_env()
 
 

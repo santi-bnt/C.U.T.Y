@@ -119,7 +119,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     expressions.on_state(State.IDLE)
     provider = (
         GeminiLiveProvider(config.api_key, config.model, hands_free=hands_free,
-                           vision_model=config.vision_model, vision_timeout=config.vision_timeout)
+                           vision_model=config.vision_model, vision_timeout=config.vision_timeout,
+                           voice_languages=config.voice_languages)
         if config.provider == "gemini"
         else OpenAIRealtimeProvider(config.api_key, config.model)
     )
