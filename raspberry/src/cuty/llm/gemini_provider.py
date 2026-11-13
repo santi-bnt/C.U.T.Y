@@ -171,7 +171,11 @@ class GeminiLiveProvider:
                 self._client.aio.models.generate_content(
                     model=self._vision_model,
                     contents=[types.Part.from_bytes(data=jpeg, mime_type="image/jpeg"), prompt],
-                    config=types.GenerateContentConfig(temperature=0.2, max_output_tokens=96),
+                    config=types.GenerateContentConfig(
+                        temperature=0.2,
+                        max_output_tokens=96,
+                        thinking_config=types.ThinkingConfig(thinking_level="low"),
+                    ),
                 ),
                 timeout=self._vision_timeout,
             )

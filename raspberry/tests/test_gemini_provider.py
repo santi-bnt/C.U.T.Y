@@ -207,5 +207,6 @@ def test_image_description_uses_gemini_multimodal_and_speaks_via_live_session():
     assert seen[0]["model"] == "gemini-3.8-flash"
     assert seen[0]["contents"][0].inline_data.data == b"redacted-jpeg"
     assert seen[0]["contents"][0].inline_data.mime_type == "image/jpeg"
+    assert seen[0]["config"].thinking_config.thinking_level == types.ThinkingLevel.LOW
     assert session.sent[-1]["turns"][0]["role"] == "user"
     assert "Una taza sobre la mesa." in session.sent[-1]["turns"][0]["parts"][0]["text"]
