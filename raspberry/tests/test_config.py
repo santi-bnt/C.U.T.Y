@@ -38,6 +38,14 @@ def test_invalid_log_level(monkeypatch):
         Config.from_env()
 
 
+def test_vision_timeout_is_bounded(monkeypatch):
+    monkeypatch.setenv("CUTY_AI_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-secret")
+    monkeypatch.setenv("CUTY_GEMINI_VISION_TIMEOUT", "4")
+    with pytest.raises(ConfigurationError, match="CUTY_GEMINI_VISION_TIMEOUT"):
+        Config.from_env()
+
+
 def test_openai_remains_optional(monkeypatch):
     monkeypatch.setenv("CUTY_AI_PROVIDER", "openai")
     monkeypatch.setenv("OPENAI_API_KEY", "test-secret")

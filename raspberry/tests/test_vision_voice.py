@@ -10,7 +10,7 @@ import pytest
 from cuty.brain.conversation import ConversationService
 from cuty.brain.states import State, StateMachine
 from cuty.face.expression_sink import ExpressionController
-from cuty.llm.provider import AIEvent, EventKind
+from cuty.llm.provider import AIEvent, EventKind, ProviderError
 from cuty.vision.face_detector import Detection
 from cuty.vision.face_tracker import FaceObservation
 from cuty.vision.recognition import FaceProfileStore, LocalFaceRecognition, mask_faces_and_encode
@@ -134,8 +134,6 @@ def test_split_visual_command_never_leaks_the_generic_audio_before_full_transcri
 
 
 def test_failed_vision_provider_keeps_voice_process_alive_and_reports_fallback():
-    from cuty.llm.provider import ProviderError
-
     class Vision:
         def capture_redacted_jpeg(self): return b"synthetic-redacted-jpeg"
 
@@ -149,6 +147,43 @@ def test_failed_vision_provider_keeps_voice_process_alive_and_reports_fallback()
     provider.describe_image = offline
     assert asyncio.run(service.run_turn(asyncio.Event()))
     assert provider.spoken and "No pude completar" in provider.spoken[0]
+    assert speaker.audio == [b"\x02\x00" * 64]
+    assert service.state.current == State.IDLE
+
+
+def test_local_voice_reconnects_once_if_live_session_dies_before_speech():
+    service, _, speaker = make_service([], None)
+
+    class DisconnectedProvider(Provider):
+        def __init__(self):
+            super().__init__([])
+            self.failed_once = True
+            self.reconnected = 0
+
+        async def close(self): pass
+
+        async def connect(self):
+            self.reconnected += 1
+
+        async def receive(self):
+            if self.failed_once:
+                self.failed_once = False
+                raise ProviderError("Gemini Live stopped before completing the response.")
+            return await super().receive()
+
+        async def speak_text(self, text):
+            self.spoken.append(text)
+            if not self.failed_once:
+                self.events.extend([
+                    AIEvent(EventKind.AUDIO, audio=b"\x02\x00" * 64),
+                    AIEvent(EventKind.DONE),
+                ])
+
+    provider = DisconnectedProvider()
+    service.provider = provider
+    asyncio.run(service._speak_local("No pude ver la escena ahora."))
+    assert provider.reconnected == 1
+    assert provider.spoken == ["No pude ver la escena ahora.", "No pude ver la escena ahora."]
     assert speaker.audio == [b"\x02\x00" * 64]
     assert service.state.current == State.IDLE
 

@@ -55,11 +55,12 @@ _CONFIG = {
 
 class GeminiLiveProvider:
     def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False,
-                 vision_model: str = "gemini-3.8-flash") -> None:
+                 vision_model: str = "gemini-3.8-flash", vision_timeout: float = 45.0) -> None:
         self._api_key = api_key
         self._model = model
         self._hands_free = hands_free
         self._vision_model = vision_model
+        self._vision_timeout = vision_timeout
         self._client = genai.Client(api_key=api_key)
         self._manager: Any = None
         self._session: Any = None
@@ -172,8 +173,12 @@ class GeminiLiveProvider:
                     contents=[types.Part.from_bytes(data=jpeg, mime_type="image/jpeg"), prompt],
                     config=types.GenerateContentConfig(temperature=0.2, max_output_tokens=96),
                 ),
-                timeout=20.0,
+                timeout=self._vision_timeout,
             )
+        except TimeoutError as exc:
+            raise ProviderError(
+                f"Gemini image description timed out after {self._vision_timeout:g} seconds."
+            ) from exc
         except Exception as exc:
             raise ProviderError(self._redact(f"Gemini image description failed: {exc}")) from exc
         description = " ".join((getattr(response, "text", None) or "").split())

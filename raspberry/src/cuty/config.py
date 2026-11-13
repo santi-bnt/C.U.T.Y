@@ -29,6 +29,7 @@ class Config:
     debug: bool = False
     model: str = "gemini-3.8-live"
     vision_model: str = "gemini-3.8-flash"
+    vision_timeout: float = 45.0
 
     @classmethod
     def from_env(cls) -> Config:
@@ -44,6 +45,12 @@ class Config:
         level = os.getenv("CUTY_LOG_LEVEL", "INFO").upper()
         if level not in {"DEBUG", "INFO", "WARNING", "ERROR"}:
             raise ConfigurationError("CUTY_LOG_LEVEL must be DEBUG, INFO, WARNING, or ERROR.")
+        try:
+            vision_timeout = float(os.getenv("CUTY_GEMINI_VISION_TIMEOUT", "45"))
+        except ValueError as exc:
+            raise ConfigurationError("CUTY_GEMINI_VISION_TIMEOUT must be between 5 and 120 seconds.") from exc
+        if not 5 <= vision_timeout <= 120:
+            raise ConfigurationError("CUTY_GEMINI_VISION_TIMEOUT must be between 5 and 120 seconds.")
         return cls(
             api_key=key,
             provider=provider,
@@ -57,4 +64,5 @@ class Config:
                 else os.getenv("CUTY_REALTIME_MODEL", "gpt-realtime-2.1")
             ),
             vision_model=os.getenv("CUTY_GEMINI_VISION_MODEL", "gemini-3.8-flash").strip(),
+            vision_timeout=vision_timeout,
         )

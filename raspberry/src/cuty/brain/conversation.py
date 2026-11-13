@@ -378,6 +378,26 @@ class ConversationService:
             await self._receive_response()
         except asyncio.CancelledError:
             raise
+        except ProviderError as exc:
+            # A long multimodal request can outlive Gemini Live's socket. Reconnect
+            # and retry only if no answer audio started, so a partial answer is not repeated.
+            if self.state.current == State.THINKING and hasattr(self.provider, "close"):
+                self._log.warning("Voz local interrumpida; reconectando Gemini Live una vez")
+                try:
+                    await self.provider.close()
+                    await self.provider.connect()
+                    await speak(text)
+                    await self._receive_response()
+                    return
+                except asyncio.CancelledError:
+                    raise
+                except Exception as retry_exc:
+                    self._log.warning(
+                        "Reintento de voz local falló (%s: %s)",
+                        type(retry_exc).__name__, self._safe_error(retry_exc),
+                    )
+            else:
+                self._log.warning("No pude pronunciar una respuesta local (%s: %s)", type(exc).__name__, self._safe_error(exc))
         except Exception as exc:
             self._log.warning("No pude pronunciar una respuesta local (%s: %s)", type(exc).__name__, self._safe_error(exc))
         finally:
