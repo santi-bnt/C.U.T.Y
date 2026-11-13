@@ -82,12 +82,14 @@ def make_service(events, vision):
 
 def test_bilingual_local_intents_and_explicit_consent_phrases():
     assert vision_intent("Cuty, ¿qué estás viendo?") == "describe"
+    assert vision_intent("¿Qué rico estás viendo?") == "describe"
     assert vision_intent("Cuty, what do you see?") == "describe"
     assert vision_intent("recuerda mi rostro") == "enroll"
     assert vision_intent("¿quién soy?") == "identify"
     assert vision_intent("olvida mi cara") == "forget"
     assert may_be_vision_intent("Cuty")
     assert may_be_vision_intent("Cuty, qué estás")
+    assert may_be_vision_intent("Qué rico estás")
     assert not may_be_vision_intent("Cuty, pon música")
     assert confirmed_enrollment_name("Confirmo guardar mi rostro y llámame Santi BNT") == "Santi Bnt"
     assert confirmed_enrollment_name("Confirmo guardar mi rostro, me llamo José") == "José"
@@ -104,7 +106,7 @@ def test_visual_voice_request_suppresses_generic_model_audio_and_speaks_grounded
     service, provider, speaker = make_service([
         # Provider's existing order is audio before the input transcript.
         AIEvent(EventKind.AUDIO, audio=b"\x01\x00" * 64),
-        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Cuty, ¿qué estás viendo?"),
+        AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Cuty, ¿qué rico estás viendo?"),
         AIEvent(EventKind.DONE),
     ], Vision())
     assert asyncio.run(service.run_turn(asyncio.Event()))

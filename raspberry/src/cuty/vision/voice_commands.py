@@ -23,7 +23,7 @@ def vision_intent(transcript: str) -> str | None:
     text = normalize(transcript)
     if any(phrase in text for phrase in (
         "que estas viendo", "que ves", "what are you seeing", "what do you see",
-    )):
+    )) or re.search(r"\bque(?:\s+[a-z0-9']+){0,4}\s+estas viendo\b", text):
         return "describe"
     if any(phrase in text for phrase in (
         "recuerda mi rostro", "recuerda mi cara", "remember my face", "learn my face",
@@ -47,6 +47,8 @@ def may_be_vision_intent(transcript: str) -> bool:
         return False
     words = text.split()
     if words[-1] == "cuty" and len(words) <= 2:
+        return True
+    if re.search(r"\bque(?:\s+[a-z0-9']+){0,4}\s+estas(?:\s+viendo)?$", text):
         return True
     for phrase in _INTENT_PHRASES:
         phrase_words = phrase.split()
