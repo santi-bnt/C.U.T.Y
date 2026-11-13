@@ -165,13 +165,12 @@ def shell(side):
         if (y < SPLIT_Y) == (side == "front"):
             sh = sh.cut(cyl(1.7, 10, (x, y, HEAD_Z0 - 1)))
             sh = sh.cut(cyl(3.0, 1.6, (x, y, HEAD_Z0 - 0.01)))
-    # alignment pins (front) / holes (back) on the seam, inside the corners
+    # seam pads inside the corners. Nothing crosses the seam, so both halves print flat on it;
+    # the halves are located by the base-plate screws and locked by the ear pegs.
     for (x, z) in ((-74.5, 300.0), (74.5, 300.0), (-74.5, 246.0), (74.5, 246.0)):
         blk = cbox(x, SPLIT_Y + (-3.0 if side == "front" else 3.0), z, 7.0, 6.0, 7.0)
         sh = sh.fuse(blk.intersect(inner(-0.01).fuse(_shell())))
-        if side == "front":
-            sh = sh.fuse(cyl(1.4, 3.5, (x, SPLIT_Y, z), (0, 1, 0)))
-        else:
+        if side == "back":
             sh = sh.cut(cyl(1.6, 4.0, (x, SPLIT_Y - 0.01, z), (0, 1, 0)))
     return sh.clean()
 

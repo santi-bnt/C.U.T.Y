@@ -4,6 +4,8 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
+**Revisión 12 nov 2026:** revisé la primera capa de las 30 piezas. Cuatro tocaban la cama con una puntita y se corrigieron: H1 (casco frontal) ya no tiene pernos y S2 (espalda) ya no tiene ceja que salgan de la costura, así que las dos se imprimen planas sobre la costura; S3 (rejilla) se recortó para que el marco de la bocina quede plano en la cama, y S4 (tapón USB) se acuesta sobre su cara plana. Las mitades siguen alineadas por los clips de la plataforma y las orejas.
+
 **Revisión 11 nov 2026:** la cubierta B1 se rediseñó para imprimirse bien: el borde de abajo ahora es un anillo plano de 2.2 mm (antes era redondeado y casi no tocaba la cama, por eso fallaba) y el techo de su hueco interior sube a 45°, así que ya no lleva soportes adentro. Solo necesita soportes bajo la orilla del agujero central y sobre la abertura del cajón. Ya no lleva la firma debajo de la base.
 
 **Revisión 6 nov 2026:** con las medidas reales que tomó el equipo. H3 (visor) trae una cuna para la cámara (la sujeta por el contorno, así no importa dónde tenga los agujeros) y sus barras van a la medida de la pantalla de 5.8 mm. H4 suma una tercera barra para la cámara. S3 (rejilla) trae un bolsillo para la bocina rectangular de 35.4 × 25 × 5.5 mm. La batería es la LiPo 3S 2200 mAh 50C (HM2202) que ya tiene el equipo.
@@ -49,13 +51,13 @@ Capa 0.2 mm, 3 perímetros, 15 % de relleno giroide, PLA. Holguras de encaje de 
 | K4 | Cubo del cuello | Gris oscuro | 32 × 32 × 14 | Brida abajo · 100 % relleno |
 | K5 | Rack de potencia | Gris | 38 × 55 × 44 | De lado · soportes mínimos |
 | S1 | Panza | Crema | 148 × 162 × 76 | Sobre la costura · soportes solo en los clips |
-| S2 | Espalda | Crema | 148 × 162 × 67 | Sobre la costura · soportes solo en los clips |
-| S3 | Rejilla de la panza | Naranja | 55 × 55 × 14 | Marco de la bocina abajo · soportes árbol solo bajo el anillo |
-| S4 | Tapón USB | Naranja | 8 × 13 × 12 | De lado |
+| S2 | Espalda | Crema | 148 × 162 × 63 | Sobre la costura · soportes solo en los clips |
+| S3 | Rejilla de la panza | Naranja | 55 × 55 × 11 | Marco de la bocina abajo · soportes árbol solo bajo el anillo |
+| S4 | Tapón USB | Naranja | 8 × 13 × 12 | Sobre su cara plana (la del tapón) |
 | A1, A2 | Brazos | Crema | 104 × 30 × 22 | Cara exterior abajo · 4 perímetros |
 | A3, A4 | Manos | Naranja | 16 × 34 × 14 | Cara exterior abajo |
 | A5, A6 | Tapas de brazo | Naranja | 14 × 14 × 4 | Cara abajo |
-| H1 | Casco frontal | Crema | 160 × 134 × 59 | Sobre la costura · soportes árbol mínimos |
+| H1 | Casco frontal | Crema | 160 × 134 × 56 | Sobre la costura · soportes árbol mínimos |
 | H2 | Casco trasero | Crema | 160 × 134 × 56 | Sobre la costura (el nombre queda arriba) |
 | H3 | Visor | Negro | 121 × 93 × 11 | Cara abajo en PEI texturizado · soportes en las orillas |
 | H4 | Barras de la pantalla y de la cámara | Gris | 85 × 87 × 3 | Planas (3 barras) |

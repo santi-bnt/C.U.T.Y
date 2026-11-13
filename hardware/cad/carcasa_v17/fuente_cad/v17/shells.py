@@ -102,8 +102,9 @@ def shell(side):
         clips = [_deck_clip(a) for a in core.CLIP_ANGLES["back"]]
     for c in clips:
         sh = sh.fuse(c.intersect(_split(body.outer_solid(), side)))
-    # alignment lip on the back shell (sits just inside the front shell's wall)
-    if side == "back":
+    # no alignment lip: nothing may cross the seam, so each shell prints flat on it (the C-clips on the
+    # deck rim and the shoulder beam locate both halves)
+    if False:
         lip_out = _inner_offset_solid(0.2)
         lip = lip_out.intersect(box(-200, 200, ARM_AXIS_Y - 3.5, ARM_AXIS_Y + 0.5, 104.0, 160.0))
         lip = lip.cut(_inner_offset_solid(1.7))
@@ -142,7 +143,7 @@ def tummy_grille():
     lip = _inner_offset_solid(0.2).intersect(lip_disc).cut(_inner_offset_solid(1.8))
     filler = _inner_offset_solid(0.0).intersect(disc).cut(_inner_offset_solid(0.2))
     g = fuse(cap, filler, frame, lip)
-    g = g.cut(box(-60, 60, -41.5, 0, 0, 300))            # keep clear of the deck front edge
+    g = g.cut(box(-60, 60, yf + sp["t"] - 1.0, 0, 0, 300))  # flat print face: nothing behind the frame back
     for k, w in zip(range(-2, 3), (22, 32, 36, 32, 22)):
         g = g.cut(rbox(0, -60, cz + 6.8 * k, w, 40, 3.4, 1.69, "Y").intersect(box(-60, 60, -90, yf - 1.2, 0, 300)))
     return g.clean()

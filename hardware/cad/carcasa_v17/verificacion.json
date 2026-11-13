@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-11",
- "revision": "cubierta B1 imprimible: anillo plano de 2.2 mm en la cama (antes 61 mm2 de contacto), techo interior a 45 grados; sin firma debajo de la base. medidas reales del equipo: pantalla 5.8 mm, cámara en cuna con barrita, bocina rectangular 35.4 x 25 x 5.5 en la rejilla, Pi 5 de 90.3 x 56 x 18, ReSpeaker 65.5 x 29.8; batería 3S 2200 del equipo",
+ "fecha": "2026-11-12",
+ "revision": "primera capa revisada en las 30 piezas: H1 sin pernos de costura y S2 sin ceja (las dos planas sobre la costura), S3 recortada para que el marco de la bocina quede plano en la cama, S4 acostada sobre su cara plana. Sigue la cubierta B1 imprimible del 11 nov y las medidas reales del equipo.",
  "piezas_impresas": 30,
  "cuerpos_revisados": 113,
  "interferencias_estaticas_mm3_exactas": 0.0,
@@ -36,5 +36,38 @@
   "voladizo_mayor_45_mm2_ahora": "~3000 (orilla del agujero central y abertura del cajon)",
   "soportes": "arbol, solo desde la cama",
   "brim": "solo interior 5 mm"
- }
+ },
+ "primera_capa_mm2": {
+  "A1_Arm_L": 1735,
+  "A2_Arm_R": 1735,
+  "A3_Hand_L": 228,
+  "A4_Hand_R": 228,
+  "A5_Arm_Cap_L": 111,
+  "A6_Arm_Cap_R": 111,
+  "B1_Base_Cover": 831,
+  "B2_Base_Floor": 20916,
+  "B3_Battery_Drawer": 5973,
+  "B4_Gimbal_Post": 861,
+  "G1_Ujoint_Cross": 149,
+  "G2_Crank_L": 167,
+  "G3_Crank_R": 167,
+  "H1_Head_Front": 1418,
+  "H2_Head_Back": 1386,
+  "H3_Visor": 2250,
+  "H4_Display_Bars": 988,
+  "H5_Head_Base": 3252,
+  "H6_Ear_L": 1304,
+  "H7_Ear_R": 1304,
+  "H8_Antenna": 50,
+  "K1_Core_Deck": 105,
+  "K2_Core_Spine": 9900,
+  "K3_Core_Shoulders": 3005,
+  "K4_Neck_Hub": 747,
+  "K5_Power_Rack": 234,
+  "S1_Body_Front": 695,
+  "S2_Body_Back": 695,
+  "S3_Tummy_Grille": 340,
+  "S4_USB_Plug": 79
+ },
+ "primera_capa_mm2_minima": 50
 }
