@@ -166,9 +166,11 @@ class GeminiLiveProvider:
         await self.start_turn()
         await self._connected().send_client_content(
             turns=[{"role": "user", "parts": [{"text":
-                "Acabo de tocar C.U.T.Y en el menu. Saludame brevemente en espanol, "
-                "pregunta en que me puedes ayudar y menciona que puedo decir quiero salir "
-                "para volver al menu. Esto es una instruccion de bienvenida, no quiero salir ahora."
+                "Acabo de abrir C.U.T.Y. Inicia tu respuesta saludandome directamente: "
+                "la primera palabra que pronuncies debe ser 'Hola'. No digas frases de espera "
+                "como 'estoy revisando' antes del saludo. Despues, pregunta brevemente en que "
+                "me puedes ayudar y menciona que puedo decir 'quiero salir' para volver al menu. "
+                "Esto es solo una bienvenida; no quiero salir ahora."
             }]}], turn_complete=True,
         )
 

@@ -76,7 +76,9 @@ class ConversationService:
         self.state.set(State.THINKING)
         try:
             await self.provider.request_greeting()
-            await self._receive_response()
+            # A greeting has no user transcript to release held audio against.
+            # Stream it immediately and don't play a thinking aside before "Hola".
+            await self._receive_response(greeting=True)
             self.state.set(State.IDLE)
         except Exception:
             self.state.set(State.ERROR)
@@ -154,7 +156,7 @@ class ConversationService:
             self.state.set(State.ERROR)
             raise
 
-    async def _receive_response(self) -> None:
+    async def _receive_response(self, *, greeting: bool = False) -> None:
         """Read server events independently of the speaker's blocking playback."""
         audio_queue: asyncio.Queue[bytes | None] = asyncio.Queue(maxsize=64)
         started = monotonic()
@@ -162,11 +164,11 @@ class ConversationService:
         abort_thinking = asyncio.Event()
         thinking_task = (
             asyncio.create_task(self.thinking_voice.run(self.speaker, stop_thinking, abort=abort_thinking))
-            if self.thinking_voice is not None else None
+            if self.thinking_voice is not None and not greeting else None
         )
 
         async def collect() -> None:
-            await self._collect_response(audio_queue)
+            await self._collect_response(audio_queue, greeting=greeting)
             await audio_queue.put(None)
 
         async def play() -> None:
@@ -209,10 +211,14 @@ class ConversationService:
             if thinking_task is not None:
                 await thinking_task
 
-    async def _collect_response(self, audio_queue: asyncio.Queue[bytes | None]) -> None:
+    async def _collect_response(
+        self, audio_queue: asyncio.Queue[bytes | None], *, greeting: bool = False,
+    ) -> None:
         first_audio = False
         held_audio: list[bytes] = []
-        transcript_seen = False
+        # Normal turns hold initial audio until the transcript distinguishes
+        # commands from conversation. The startup greeting has no such input.
+        transcript_seen = greeting
         volume_command_applied = False
         input_transcript = ""
         deadline = monotonic() + RESPONSE_START_TIMEOUT
