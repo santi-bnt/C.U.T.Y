@@ -57,7 +57,7 @@ loader.load(q.get('glb'), (g) => {
     const tex = new THREE.TextureLoader().load('/render/tex/cara_' + faceName + '.png', () => { renderer.render(scene, window.__cam); window.__done = true; });
     tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
     const fm = new THREE.Mesh(new THREE.PlaneGeometry(74.04, 49.56), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
-    fm.position.set(0, 266.0, 47.52);
+    fm.position.set(0, 266.0 + parseFloat(q.get('yoff') || '0'), 47.52);
     scene.add(fm);
     window.__waitFace = true;
   }

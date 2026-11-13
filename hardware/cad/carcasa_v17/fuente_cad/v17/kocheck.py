@@ -9,7 +9,7 @@ bad = []
 for n, k in kos:
     K = to_manifold(k)
     for pn, M in P.items():
-        if n == "ko_pi_sd" and pn == "S2_Body_Back":      # SD is reached with the back shell off
+        if n == "ko_pi_sd" and pn.startswith("S2_Body_Back"):      # SD is reached with the back shell off
             continue
         if bb_hit(K, M, 0.0):
             v = (K ^ M).volume()

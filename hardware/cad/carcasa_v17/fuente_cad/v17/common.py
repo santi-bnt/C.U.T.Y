@@ -6,6 +6,7 @@ viewer's right. C = gimbal centre (the body leans about it).
 from __future__ import annotations
 
 import math
+import os
 
 import cadquery as cq
 
@@ -25,6 +26,9 @@ BALL_HOLE_R = 46.0            # open bottom of the body ball (hidden inside the 
 DISH_HOLE_R = 40.0            # dish opening for post, push-rods and cables
 TILT_DESIGN_DEG = 18.0        # clearances are verified to this lean (firmware limit 15)
 
+FIJO = os.environ.get("CUTY_FIJO") == "1"   # fixed variant: no gimbal, the body stands on a low pedestal
+PED_CUT = 83.0                # fixed variant: the body shells end flat here (just under the belly grille)
+FIXED_SCREWS = [(-17.0, 8.0), (17.0, 8.0), (-10.0, 20.0), (10.0, 20.0)]   # deck to riser: clear of spine, GPIO, Pi posts
 DECK_Z0 = 97.0                # core deck underside
 DECK_T = 3.0
 DECK_Z1 = DECK_Z0 + DECK_T

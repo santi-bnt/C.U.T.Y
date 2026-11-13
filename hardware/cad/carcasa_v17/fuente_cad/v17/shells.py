@@ -9,8 +9,8 @@ import math
 
 import cadquery as cq
 
-from common import (V, CZ, BODY_WALL, ARM_AXIS_Y, ARM_AXIS_Z, DECK_Z0, DECK_Z1, box, cbox, rbox, cyl, cyl_c, fuse,
-                    cut, superellipse_wire, loft)
+from common import (V, CZ, BODY_WALL, ARM_AXIS_Y, ARM_AXIS_Z, DECK_Z0, DECK_Z1, FIJO, PED_CUT, box, cbox, rbox, cyl,
+                    cyl_c, fuse, cut, superellipse_wire, loft)
 import body
 import core
 import refs
@@ -76,8 +76,9 @@ def mic_points():
 def shell(side):
     sh = body.shell_solid()
     sh = _split(sh, side)
-    # re-cut the bottom rim with a plane: gives a clean, watertight edge for slicing
-    sh = sh.cut(box(-200, 200, -200, 200, -10, body.Z_HOLE + 0.6))
+    # re-cut the bottom rim with a plane: gives a clean, watertight edge for slicing. The fixed variant has
+    # no ball: the body ends flat just under the belly grille and stands on the pedestal.
+    sh = sh.cut(box(-200, 200, -200, 200, -10, PED_CUT if FIJO else body.Z_HOLE + 0.6))
     inner = body.inner_solid()
     # arm hub holes (split by the seam)
     for sx in (-1, 1):

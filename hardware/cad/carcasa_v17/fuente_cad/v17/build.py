@@ -22,7 +22,7 @@ import head
 import refs
 import shells
 
-OUT = Path(__file__).resolve().parents[1] / "out"
+OUT = Path(__file__).resolve().parents[1] / ("out_fijo" if FIJO else "out")
 CACHE = OUT / "cache"
 CREAM = (0.95, 0.92, 0.86)
 ORANGE = (0.95, 0.42, 0.10)
@@ -64,6 +64,24 @@ PRINTED = [
     ("H7_Ear_R", lambda: head.ear(1), ORANGE, "head", None),
     ("H8_Antenna", head.antenna, ORANGE, "head", None),
 ]
+if FIJO:   # fixed variant: pedestal instead of the nest + gimbal, flat deck, flat-bottomed body
+    import pedestal
+    _swap = {
+        "B1_Base_Cover": ("B1_Pedestal", pedestal.shell),
+        "B2_Base_Floor": ("B2_Pedestal_Floor", pedestal.floor),
+        "B3_Battery_Drawer": ("B3_Pedestal_Drawer", pedestal.drawer),
+        "B4_Gimbal_Post": ("B4_Deck_Riser", pedestal.riser),
+        "K1_Core_Deck": ("K1_Core_Deck_Fixed", core.deck),
+        "S1_Body_Front": ("S1_Body_Front_Fixed", lambda: shells.shell("front")),
+        "S2_Body_Back": ("S2_Body_Back_Fixed", lambda: shells.shell("back")),
+    }
+    PRINTED = [(_swap[n][0], _swap[n][1], c, g, o) if n in _swap else (n, f, c, g, o)
+               for n, f, c, g, o in PRINTED if not n.startswith(("G1_", "G2_", "G3_"))]
+
+
+def world(shape):
+    """Build frame -> file frame: the fixed variant's table is at z = GROUND while building."""
+    return shape.translate(V(0, 0, -pedestal.GROUND)) if FIJO else shape
 
 
 def cached(name, fn):
@@ -86,15 +104,23 @@ def purchased():
     add(refs.power_modules(), "electronics")
     add(refs.speaker(), "electronics")
     add(refs.imu(), "electronics")
-    add(refs.battery(), "base")
-    add(refs.switches(base.switch_positions()), "base")
+    add(pedestal.battery_refs() if FIJO else refs.battery(), "base")
+    add(refs.switches(pedestal.switch_positions() if FIJO else base.switch_positions()), "base")
     for nm in ("servo_arm_L", "servo_arm_R"):
         add(refs.servo(nm), "core")
-    for nm in ("servo_gimbal_L", "servo_gimbal_R"):
-        add(refs.servo(nm), "base")
+    if not FIJO:
+        for nm in ("servo_gimbal_L", "servo_gimbal_R"):
+            add(refs.servo(nm), "base")
     add(refs.servo("servo_head"), "head")
     add(head.display_ref(), "head")
     add(head.camera_ref(), "head")
+    if FIJO:
+        # 4 x M3 x 10 pan-head screws holding the deck on the riser (head on the deck top, core in the pilot)
+        for k, (x, y) in enumerate(FIXED_SCREWS):
+            scr = fuse(cyl(2.8, 2.4, (x, y, DECK_Z1)), cyl(1.1, 10.0, (x, y, DECK_Z1 - 10.0)))
+            items.append((f"screw_deck_M3_{k}", scr, (0.2, 0.2, 0.22), "core"))
+        add(pedestal.screw_refs(), "base")
+        return items
     # push-rods (M3 rod + 2 ball links each) and the two M4 U-joint bolts
     legs = core.leg_points()
     for key, p in legs.items():
@@ -131,7 +157,7 @@ def main():
     import meshio
     if "--noglb" in sys.argv:
         return parts
-    items = [dict(name=p["name"], shape=p["shape"], color=p["color"], group=p["group"]) for p in parts]
+    items = [dict(name=p["name"], shape=world(p["shape"]), color=p["color"], group=p["group"]) for p in parts]
     meshio.export_glb(items, str(OUT / "cuty_v17.glb"), tol=0.05, ang=0.12)
     meshio.export_glb(items, str(OUT / "cuty_v17_web.glb"), tol=0.25, ang=0.17)
     print("glb done", round(time.time() - t0, 1))

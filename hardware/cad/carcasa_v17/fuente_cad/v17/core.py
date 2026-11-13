@@ -8,8 +8,9 @@ import math
 
 import cadquery as cq
 
-from common import (V, C, CZ, DECK_Z0, DECK_Z1, DECK_T, SPINE_Y0, SPINE_Y1, ARM_AXIS_Y, ARM_AXIS_Z, BODY_WALL,
-                    box, cbox, rbox, cyl, cyl_c, fuse, cut, superellipse_prism, spline_socket, place, rounded_block)
+from common import (V, C, CZ, FIJO, FIXED_SCREWS, DECK_Z0, DECK_Z1, DECK_T, SPINE_Y0, SPINE_Y1, ARM_AXIS_Y, ARM_AXIS_Z,
+                    BODY_WALL, box, cbox, rbox, cyl, cyl_c, fuse, cut, superellipse_prism, spline_socket, place,
+                    rounded_block)
 import body
 import refs
 import base
@@ -46,18 +47,23 @@ def deck():
     d = section_prism(DECK_Z0, DECK_Z1, DECK_CLEAR)
     # speaker clearance at the front, central opening over the U-joint
     d = d.cut(box(-24.0, 24.0, -80.0, -40.5, DECK_Z0 - 1, DECK_Z1 + 1))
-    d = d.cut(cbox(0, 0, DECK_Z0, 13.0, 13.0, 3.0))                   # cross clearance pocket
+    if not FIJO:
+        d = d.cut(cbox(0, 0, DECK_Z0, 13.0, 13.0, 3.0))               # cross clearance pocket
     # cable passages (battery pigtail left, gimbal servo leads right, switch wires)
     for x in (-38.0, 38.0):
         d = d.cut(rounded_block(14.0, 22.0, 10.0, 4.0, 0, (x, 8.0, DECK_Z0 + 1.5)))
+    if FIJO:                                                         # bolted on the fixed column
+        for x, y in FIXED_SCREWS:
+            d = d.cut(cyl(1.7, 10, (x, y, DECK_Z0 - 1)))
     # U-joint fork (pitch bolt along X)
-    for sx in (-1, 1):
+    for sx in (-1, 1) if not FIJO else ():
         ch = box(min(sx * 7.5, sx * 11.5), max(sx * 7.5, sx * 11.5), -5.0, 5.0, base.PITCH_BOLT_Z - 8.0, DECK_Z0 + 0.5)
         d = d.fuse(ch)
-    d = d.cut(cyl(2.15, 20, (-20, 0, base.PITCH_BOLT_Z), (1, 0, 0)))  # M4 x 30 self-tapping: free in the left cheek
-    d = d.cut(cyl(1.7, 20, (0, 0, base.PITCH_BOLT_Z), (1, 0, 0)))     # ... and threads into the right cheek
+    if not FIJO:
+        d = d.cut(cyl(2.15, 20, (-20, 0, base.PITCH_BOLT_Z), (1, 0, 0)))  # M4 x 30 self-tapping: free in the left cheek
+        d = d.cut(cyl(1.7, 20, (0, 0, base.PITCH_BOLT_Z), (1, 0, 0)))     # ... and threads into the right cheek
     # legs carrying the upper ball studs of the push-rods
-    for key, p in leg_points().items():
+    for key, p in (leg_points().items() if not FIJO else ()):
         leg = box(p.x - 4.5, p.x + 4.5, p.y - 11.5, p.y - 3.5, LEG_BOTTOM_Z, DECK_Z0 + 0.5)
         d = d.fuse(leg)
         d = d.cut(cyl_c(1.25, 14, (p.x, p.y - 7.5, LEG_BALL_Z), (0, 1, 0)))   # M3 ball stud, self-tapping

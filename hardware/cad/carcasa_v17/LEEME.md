@@ -4,7 +4,7 @@ Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas i
 
 ![C.U.T.Y V17](renders/frente_34.png)
 
-**Revisión 13 nov 2026:** corregí la bayoneta de la cubierta B1. Antes, al girar la cubierta 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón ya no entraba. Ahora la cubierta se baja girada y se gira de regreso: queda trabada justo cuando la abertura está sobre los rieles. **Si ya imprimiste B1, reimprímela**; las demás piezas no cambian.
+**Revisión 13 nov 2026:** corregí la bayoneta de la cubierta B1. Antes, al girar la cubierta 14° para trabarla, la abertura del cajón quedaba desalineada con los rieles del piso y el cajón ya no entraba. Ahora la cubierta se baja girada y se gira de regreso: queda trabada justo cuando la abertura está sobre los rieles. **Si ya imprimiste B1, reimprímela**; las demás piezas no cambian. Hay una versión **fija**, sin movimiento en la base y sobre un pedestal bajo, en [carcasa_v17_fija](../carcasa_v17_fija/LEEME.md).
 
 **Revisión 12 nov 2026:** revisé la primera capa de las 30 piezas. Cuatro tocaban la cama con una puntita y se corrigieron: H1 (casco frontal) ya no tiene pernos y S2 (espalda) ya no tiene ceja que salgan de la costura, así que las dos se imprimen planas sobre la costura; S3 (rejilla) se recortó para que el marco de la bocina quede plano en la cama, y S4 (tapón USB) se acuesta sobre su cara plana. Las mitades siguen alineadas por los clips de la plataforma y las orejas.
 

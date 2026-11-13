@@ -1,6 +1,6 @@
 # Bill of Materials — as built (Nov 2026)
 
-What the robot is actually built from: the carrier PCB, two small orders (Mouser, Amazon México) and parts the team already owned. Printed parts and screws per step are in [hardware/cad/carcasa_v17/LEEME.md](../hardware/cad/carcasa_v17/LEEME.md).
+What the robot is actually built from: the carrier PCB, two small orders (Mouser, Amazon México) and parts the team already owned. Printed parts and screws per step are in [hardware/cad/carcasa_v17/LEEME.md](../hardware/cad/carcasa_v17/LEEME.md) (moving base) and [hardware/cad/carcasa_v17_fija/LEEME.md](../hardware/cad/carcasa_v17_fija/LEEME.md) (fixed, on a pedestal).
 
 ## Carrier PCB — JLCPCB
 
@@ -31,8 +31,8 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | B0CVS264R1 | Pi 5 CSI cable 22 → 15 pin, 50 cm | Camera |
 | B0G4L68WHY | Taiss self-tapping screws M2/M3/M4 (685 pcs) | Everything into plastic |
 | B07CBZRXQ8 | M3 hex socket screws + nuts (280 pcs) | Servo horns/cranks (into metal) |
-| B07Z1MDC7H | Hobbypark M3 rod ends | Gimbal push-rods |
-| B0D22QGKHN | M3 × 150 threaded rod (10 pcs) | Gimbal push-rods, cut to length |
+| B07Z1MDC7H | Hobbypark M3 rod ends | Gimbal push-rods (gimbal version only) |
+| B0D22QGKHN | M3 × 150 threaded rod (10 pcs) | Gimbal push-rods, cut to length (gimbal version only) |
 | B0B9VKV5N9 | Silicone bumpers | Feet |
 
 ## Already owned by the team (measured)
@@ -44,6 +44,6 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | ReSpeaker 2-Mics Pi HAT V2.0 | 65.5 × 29.8 × 11.5 | plugs into J14 |
 | Arducam OV5647 5 MP | 24.4 × 23.3, 7.2 deep | held by a cradle in the visor |
 | Speaker 2 W / 8 Ω | 35.4 × 25 × 5.5 | to the ReSpeaker speaker port |
-| 5 × MG996R | 40.7 × 19.7 × 37 | head, two arms, two gimbal |
-| LiPo 3S 11.1 V 2200 mAh 50C (HM2202) + balance charger | to measure | drawer fits up to 109 × 35 × 25 |
+| 5 × MG996R | 40.7 × 19.7 × 37 | head, two arms, two gimbal (the fixed version uses 3) |
+| LiPo 3S 11.1 V 2200 mAh 50C (HM2202) + balance charger | to measure | both drawers fit up to 109 × 35 × 25 |
 | Dupont wires, ≈0.85 kg PLA | | |
