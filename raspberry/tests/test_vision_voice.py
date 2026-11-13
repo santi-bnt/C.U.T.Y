@@ -83,6 +83,7 @@ def make_service(events, vision):
 def test_bilingual_local_intents_and_explicit_consent_phrases():
     assert vision_intent("Cuty, ¿qué estás viendo?") == "describe"
     assert vision_intent("¿Qué rico estás viendo?") == "describe"
+    assert vision_intent("Estás viendo.") == "describe"
     assert vision_intent("Cuty, what do you see?") == "describe"
     assert vision_intent("recuerda mi rostro") == "enroll"
     assert vision_intent("¿quién soy?") == "identify"
@@ -90,6 +91,7 @@ def test_bilingual_local_intents_and_explicit_consent_phrases():
     assert may_be_vision_intent("Cuty")
     assert may_be_vision_intent("Cuty, qué estás")
     assert may_be_vision_intent("Qué rico estás")
+    assert may_be_vision_intent("Estás viendo")
     assert not may_be_vision_intent("Cuty, pon música")
     assert confirmed_enrollment_name("Confirmo guardar mi rostro y llámame Santi BNT") == "Santi Bnt"
     assert confirmed_enrollment_name("Confirmo guardar mi rostro, me llamo José") == "José"
