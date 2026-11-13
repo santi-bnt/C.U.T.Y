@@ -19,6 +19,7 @@ from cuty.audio.devices import AudioDeviceError, format_devices, list_devices, s
 from cuty.audio.activity import SpeechMicrophone
 from cuty.audio.microphone import SoundDeviceMicrophone
 from cuty.audio.speaker import SoundDeviceSpeaker
+from cuty.audio.volume import VoiceVolume, VolumeSpeaker
 from cuty.audio.remote import RemoteSpeaker, serve_audio
 from cuty.brain.conversation import ConversationService, ReturnToMenu
 from cuty.brain.states import State, StateMachine
@@ -105,6 +106,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         output_id, output_name = select_working_device(output_selector, input_device=False)
         speaker = SoundDeviceSpeaker(output_id)
     music_speaker = speaker
+    voice_volume = VoiceVolume.from_env()
     logging.getLogger("AUDIO").info("Microphone: %s", input_name)
     logging.getLogger("AUDIO").info("Speaker: %s", output_name)
 
@@ -125,6 +127,9 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     )
     if face_link is not None:
         speaker = LipSyncSpeaker(speaker, face_link)
+    # Volume is PCM software gain on assistant output only. Music retains its
+    # independent provider volume and neither setting touches ALSA/mic gain.
+    speaker = VolumeSpeaker(speaker, voice_volume)
     thinking_voice = ThinkingVoice()
     prepare_thinking = asyncio.create_task(thinking_voice.prepare())
     try:
@@ -150,6 +155,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             half_duplex=hands_free,
             music=music,
             vision=LocalVisionClient.from_env() if hands_free else None,
+            voice_volume=voice_volume,
         )
         if hands_free:
             await run_hands_free(service)

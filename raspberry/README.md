@@ -133,6 +133,11 @@ The CLI logs connection and state changes, expression events, assistant transcri
 
 ## Architecture
 
+Hands-free voice and local Music Mode have independent software output volume
+controls. See [volume commands and Raspberry Pi validation](../docs/voice-volume.md).
+Vision timing, Gemini request diagnosis, and the opt-in high-resolution camera
+experiment are documented in [vision performance](../docs/vision-performance.md).
+
 `src/cuty/brain/` owns conversation and states; `llm/` owns both cloud providers and web lookup; `audio/` owns microphone, speaker, and thinking asides. `src/cuty/main.py` is the entry point and `app.py` wires the CLI. `face/` contains expression events, the animated touchscreen face and the UDP link that carries expressions and lip-sync levels to it; `vision/` tracks the person for the eyes. Other robot modules are placeholders; see [architecture](../docs/architecture.md).
 
 Baseline expressions follow `IDLE`, `LISTENING`, `THINKING`, and `SPEAKING` states. The model may call `set_expression` for a temporary emotion. Invalid tool arguments are rejected and returned to the model without emitting a robot event. No keyword-based emotion matching is used. There is no serial transport or defined UART protocol in this phase.

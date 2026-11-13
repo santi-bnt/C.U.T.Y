@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 from dataclasses import asdict
 from contextlib import aclosing
 from time import monotonic
@@ -17,9 +18,11 @@ from cuty.face.expressions import Expression
 from cuty.face.expression_sink import ExpressionController
 from cuty.llm.web_search import WebSearchError, WebSearchService
 from cuty.audio.thinking import ThinkingVoice
+from cuty.audio.volume import VoiceVolume
 from cuty.brain.voice_commands import wants_menu
 from cuty.music.commands import MusicCommand, parse_music_command
 from cuty.music.protocol import MusicProvider
+from cuty.brain.volume_commands import VolumeCommand, parse_volume_command
 from cuty.vision.voice_commands import (
     confirmed_enrollment_name, confirmed_forget, is_explicit_cancel,
     may_be_vision_intent, vision_intent,
@@ -46,6 +49,7 @@ class ConversationService:
         half_duplex: bool = False,
         music: MusicProvider | None = None,
         vision=None,
+        voice_volume: VoiceVolume | None = None,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -58,7 +62,10 @@ class ConversationService:
         self.half_duplex = half_duplex
         self.music = music
         self.vision = vision
+        self.voice_volume = voice_volume or VoiceVolume.from_env()
         self._pending_music_command: MusicCommand | None = None
+        self._pending_volume_command: VolumeCommand | None = None
+        self._music_volume_before_mute: int | None = None
         self._pending_vision_intent: str | None = None
         self._face_consent: str | None = None
         self._last_input_transcript = ""
@@ -83,6 +90,7 @@ class ConversationService:
             raise RuntimeError("A conversation turn is already in progress.")
         music_was_playing = False
         self._pending_music_command = None
+        self._pending_volume_command = None
         self._pending_vision_intent = None
         self._last_input_transcript = ""
         try:
@@ -163,18 +171,30 @@ class ConversationService:
 
         async def play() -> None:
             first = True
+            first_audio_at = None
+            write_time = 0.0
+            audio_chunks = 0
             while True:
                 audio = await audio_queue.get()
                 if audio is None:
+                    self._log.info(
+                        "[AUDIO PERF] response_playback_ms=%.1f speaker_write_ms=%.1f chunks=%d",
+                        (monotonic() - (first_audio_at or started)) * 1000,
+                        write_time * 1000, audio_chunks,
+                    )
                     return
                 if first:
+                    first_audio_at = monotonic()
                     stop_thinking.set()
                     if thinking_task is not None:
                         await asyncio.shield(thinking_task)
                     self.state.set(State.SPEAKING)
                     self._log.info("Primera voz en %.2f s", monotonic() - started)
                     first = False
+                write_started = monotonic()
                 await self.speaker.write(audio)
+                write_time += monotonic() - write_started
+                audio_chunks += 1
 
         tasks = [asyncio.create_task(collect()), asyncio.create_task(play())]
         try:
@@ -193,6 +213,7 @@ class ConversationService:
         first_audio = False
         held_audio: list[bytes] = []
         transcript_seen = False
+        volume_command_applied = False
         input_transcript = ""
         deadline = monotonic() + RESPONSE_START_TIMEOUT
         # A function call can require another response before speech begins.
@@ -216,13 +237,18 @@ class ConversationService:
                     first_audio = True
                     if not transcript_seen:
                         held_audio.append(event.audio)
-                    elif self._pending_vision_intent is None:
+                    elif self._pending_volume_command is not None:
+                        held_audio.append(event.audio)
+                    elif self._pending_vision_intent is None and self._pending_volume_command is None:
                         await audio_queue.put(event.audio)
                 elif event.kind == EventKind.TRANSCRIPT and event.transcript:
                     self._log.info("C.U.T.Y: %s", event.transcript)
                 elif event.kind == EventKind.INPUT_TRANSCRIPT and event.transcript:
                     input_transcript += " " + event.transcript
                     self._last_input_transcript = input_transcript.strip()
+                    self._pending_volume_command = parse_volume_command(
+                        input_transcript, step=self.voice_volume.step
+                    )
                     previous_vision_intent = self._pending_vision_intent
                     transcript_seen = True
                     if self._face_consent is None:
@@ -232,7 +258,8 @@ class ConversationService:
                     if self._pending_vision_intent is not None and previous_vision_intent is None:
                         # Log the action category only; never persist the transcript or image.
                         self._log.info("Intención local detectada: %s", self._pending_vision_intent)
-                    if self._pending_vision_intent is None and not may_be_vision_intent(input_transcript):
+                    if (self._pending_vision_intent is None and self._pending_volume_command is None
+                            and not may_be_vision_intent(input_transcript)):
                         self._log.info("Escuché: %s", event.transcript)
                         for audio in held_audio:
                             await audio_queue.put(audio)
@@ -249,7 +276,17 @@ class ConversationService:
                     for source in event.sources:
                         web_log.info("Fuente: %s — %s", source.title, source.url)
                 elif event.kind == EventKind.DONE:
-                    if self._pending_vision_intent is None and held_audio:
+                    if self._pending_volume_command is not None:
+                        command = self._pending_volume_command
+                        self._pending_volume_command = None
+                        await self._apply_volume_command(command)
+                        volume_command_applied = True
+                        self._pending_music_command = None
+                        if self._pending_vision_intent is None:
+                            for audio in held_audio:
+                                await audio_queue.put(audio)
+                        held_audio.clear()
+                    elif self._pending_vision_intent is None and held_audio:
                         for audio in held_audio:
                             await audio_queue.put(audio)
                         held_audio.clear()
@@ -260,7 +297,8 @@ class ConversationService:
                             await self._handle_tool(call, input_transcript=input_transcript)
                         await self.provider.continue_response()
                         break
-                    if not first_audio and self._pending_vision_intent is None and self._face_consent is None:
+                    if (not first_audio and self._pending_vision_intent is None
+                            and self._face_consent is None and not volume_command_applied):
                         raise ProviderError("La IA terminó el turno sin enviar voz. No se recibió una respuesta hablada.")
                     return
         raise ProviderError("AI provider called tools too many times without finishing a reply.")
@@ -339,7 +377,10 @@ class ConversationService:
         try:
             if intent == "describe":
                 try:
+                    capture_started = monotonic()
                     jpeg = await asyncio.to_thread(self.vision.capture_redacted_jpeg)
+                    self._log.info("[VISION PERF] capture_ipc_redact_encode_total_ms=%.1f jpeg_bytes=%d",
+                                   (monotonic() - capture_started) * 1000, len(jpeg))
                 except (RecognitionUnavailable, OSError, TimeoutError, ProviderError) as exc:
                     self._log.warning("Captura local para visión fallida (%s: %s)", type(exc).__name__, self._safe_error(exc))
                     raise
@@ -373,9 +414,11 @@ class ConversationService:
             self._log.warning("El proveedor activo no admite respuestas de voz locales")
             return
         self.state.set(State.THINKING)
+        started = monotonic()
         try:
             await speak(text)
             await self._receive_response()
+            self._log.info("[VISION PERF] local_response_total_ms=%.1f", (monotonic() - started) * 1000)
         except asyncio.CancelledError:
             raise
         except ProviderError as exc:
@@ -384,8 +427,12 @@ class ConversationService:
             if self.state.current == State.THINKING and hasattr(self.provider, "close"):
                 self._log.warning("Voz local interrumpida; reconectando Gemini Live una vez")
                 try:
-                    await self.provider.close()
-                    await self.provider.connect()
+                    restart = getattr(self.provider, "restart_voice_session", None)
+                    if restart is not None:
+                        await restart()
+                    else:
+                        await self.provider.close()
+                        await self.provider.connect()
                     await speak(text)
                     await self._receive_response()
                     return
@@ -452,6 +499,59 @@ class ConversationService:
         elif command.action == "get_current_track":
             current = await self.music.get_playback_state()
             self._log.info("MUSIC: current track %s", current.track.title if current.track else "none")
+
+    async def _apply_volume_command(self, command: VolumeCommand) -> None:
+        """Apply validated voice volume instructions before releasing reply audio."""
+        target = command.target
+        if target == "active":
+            try:
+                playback = await self.music.get_playback_state() if self.music is not None else None
+            except Exception as exc:
+                self._log.warning("No pude leer estado de música para volumen (%s)", type(exc).__name__)
+                playback = None
+            target = "music" if playback is not None and playback.status in {"playing", "paused"} else "voice"
+
+        targets = {"both"} if target == "both" else {target}
+        for selected in targets:
+            if selected == "voice":
+                if command.action == "mute":
+                    value = self.voice_volume.mute()
+                elif command.action == "unmute":
+                    value = self.voice_volume.unmute()
+                elif command.action == "set":
+                    value = self.voice_volume.set(command.value)
+                else:
+                    value = self.voice_volume.adjust(command.value or 0)
+                self._log.info("[VOLUME] voice=%d%%", value)
+            elif selected == "music":
+                if self.music is None:
+                    self._log.warning("[VOLUME] No hay proveedor de música activo")
+                    continue
+                try:
+                    playback = await self.music.get_playback_state()
+                    if command.action == "mute":
+                        if playback.volume > 0:
+                            self._music_volume_before_mute = playback.volume
+                        value = 0
+                    elif command.action == "unmute":
+                        value = self._music_volume_before_mute or max(1, int(os.getenv("CUTY_MUSIC_VOLUME", "70")))
+                        self._music_volume_before_mute = None
+                    elif command.action == "set":
+                        value = command.value
+                        if value == 0 and playback.volume > 0:
+                            self._music_volume_before_mute = playback.volume
+                        elif value > 0:
+                            self._music_volume_before_mute = None
+                    else:
+                        value = max(0, min(100, playback.volume + (command.value or 0)))
+                        if value == 0 and playback.volume > 0:
+                            self._music_volume_before_mute = playback.volume
+                        elif value > 0:
+                            self._music_volume_before_mute = None
+                    await self.music.set_volume(value)
+                    self._log.info("[VOLUME] music=%d%%", value)
+                except Exception as exc:
+                    self._log.warning("[VOLUME] No pude cambiar volumen de música (%s)", type(exc).__name__)
 
     async def _handle_tool(self, call: ToolCall, *, input_transcript: str = "") -> None:
         result: dict[str, object]

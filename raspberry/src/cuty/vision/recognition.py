@@ -7,8 +7,10 @@ are stored, and enrollment is called only after the voice consent flow confirms.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
+import time
 from pathlib import Path
 from typing import Protocol, Sequence
 
@@ -237,6 +239,20 @@ class LocalFaceRecognition:
         face = observation.detections[0]
         if face.score < self.min_confidence or min(face.w, face.h) < self.min_face_px:
             raise RecognitionUnavailable("El rostro se ve demasiado pequeño o poco claro")
+        image_h, image_w = observation.color_bgr.shape[:2]
+        source_w, source_h = observation.detection_size or (image_w, image_h)
+        sx, sy = image_w / source_w, image_h / source_h
+        if sx != 1.0 or sy != 1.0:
+            landmarks = face.landmarks
+            scaled = Detection(
+                round(face.x * sx), round(face.y * sy), round(face.w * sx), round(face.h * sy),
+                face.score,
+                face.eyes_x * sx if face.eyes_x is not None else None,
+                face.eyes_y * sy if face.eyes_y is not None else None,
+                tuple(value * (sx if index % 2 == 0 else sy)
+                      for index, value in enumerate(landmarks)) if landmarks else None,
+            )
+            face = scaled
         return self._engine().embed(observation.color_bgr, face)
 
     def enroll(self, name: str, observations: Sequence[FaceObservation]) -> str:
@@ -289,17 +305,29 @@ def mask_faces_and_encode(observation: FaceObservation, *, jpeg_quality: int = 7
         raise RecognitionUnavailable("No hay imagen en color para describir")
     try:
         import cv2
+        started = time.monotonic()
         image = observation.color_bgr.copy()
         height, width = image.shape[:2]
+        source_w, source_h = observation.detection_size or (width, height)
+        sx, sy = width / source_w, height / source_h
         for face in observation.detections:
-            pad_x, pad_y = int(face.w * 0.25), int(face.h * 0.25)
-            x0, y0 = max(0, face.x - pad_x), max(0, face.y - pad_y)
-            x1, y1 = min(width, face.x + face.w + pad_x), min(height, face.y + face.h + pad_y)
+            x, y, fw, fh = round(face.x * sx), round(face.y * sy), round(face.w * sx), round(face.h * sy)
+            pad_x, pad_y = int(fw * 0.25), int(fh * 0.25)
+            x0, y0 = max(0, x - pad_x), max(0, y - pad_y)
+            x1, y1 = min(width, x + fw + pad_x), min(height, y + fh + pad_y)
             cv2.rectangle(image, (x0, y0), (x1, y1), (32, 32, 32), thickness=-1)
+        masked_at = time.monotonic()
         ok, encoded = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, jpeg_quality])
+        encoded_at = time.monotonic()
         if not ok:
             raise RecognitionUnavailable("OpenCV no pudo codificar el fotograma")
-        return bytes(encoded)
+        result = bytes(encoded)
+        logging.getLogger("VISION").info(
+            "[VISION PERF] redact_ms=%.1f jpeg_encode_ms=%.1f jpeg_bytes=%d dimensions=%dx%d",
+            (masked_at - started) * 1000, (encoded_at - masked_at) * 1000,
+            len(result), width, height,
+        )
+        return result
     except RecognitionUnavailable:
         raise
     except Exception as exc:

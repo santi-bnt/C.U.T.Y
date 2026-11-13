@@ -27,6 +27,7 @@ opposite way on your mounting.
 | `CUTY_CAMERA_MIRROR` | `1` | `0` if the eyes move the wrong way |
 | `CUTY_FACE_DETECTOR` | `auto` | `yunet` or `haar` |
 | `CUTY_TRACK_FPS` | `12` | detection rate |
+| `CUTY_CAMERA_HIGH_RES_SNAPSHOT` | `0` | Optional PiCamera2 main=1296×972 + lores=320×240 dual stream; off pending Pi validation |
 
 Head following is an optional layer over this same camera loop. It is disabled
 by default and only supports an in-memory dry-run PAN simulation. See
@@ -42,3 +43,8 @@ reuse this tracker and camera; they do not add another capture device. SFace
 needs a separately installed OpenCV-contrib runtime and model, is disabled in
 practice until configured, and has not been physically validated. Images are
 not stored, and person embeddings stay on the Pi.
+
+The optional dual-resolution snapshot mode and Pi benchmark procedure are
+documented in [`docs/vision-performance.md`](../../../../docs/vision-performance.md).
+Keep high-resolution mode disabled until OV5647 stream sizes, memory, latency,
+voice, and face rendering have been measured together on the target Pi.

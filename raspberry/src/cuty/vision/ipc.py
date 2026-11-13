@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import os
 import socket
 import struct
@@ -70,8 +71,14 @@ class FaceTrackerVisionService:
         action = request.get("action")
         if action == "capture":
             from cuty.vision.recognition import mask_faces_and_encode
+            started = time.monotonic()
             observation = self.tracker.capture_observation(timeout=3.0)
+            captured = time.monotonic()
             image = mask_faces_and_encode(observation)
+            logging.getLogger("VISION").info(
+                "[VISION PERF] ipc_capture_wait_ms=%.1f total_capture_prepare_ms=%.1f",
+                (captured - started) * 1000, (time.monotonic() - started) * 1000,
+            )
             return {"ok": True, "jpeg": base64.b64encode(image).decode("ascii")}
         if action == "identify":
             recognition = self._recognition()
@@ -231,6 +238,7 @@ class LocalVisionClient:
         return response
 
     def capture_redacted_jpeg(self) -> bytes:
+        started = time.monotonic()
         response = self._request("capture")
         try:
             image = base64.b64decode(response["jpeg"], validate=True)
@@ -240,6 +248,10 @@ class LocalVisionClient:
         if not image or len(image) > MAX_MESSAGE:
             from cuty.vision.recognition import RecognitionUnavailable
             raise RecognitionUnavailable("Imagen de visión inválida o demasiado grande")
+        logging.getLogger("VISION").info(
+            "[VISION PERF] ipc_roundtrip_decode_ms=%.1f jpeg_bytes=%d",
+            (time.monotonic() - started) * 1000, len(image),
+        )
         return image
 
     def identify(self) -> dict:

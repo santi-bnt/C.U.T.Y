@@ -195,6 +195,7 @@ def test_image_description_uses_gemini_multimodal_and_speaks_via_live_session():
 
     provider = GeminiLiveProvider("fake-key", hands_free=True)
     provider._client = SimpleNamespace(aio=SimpleNamespace(models=Models()))
+    provider._vision_client = SimpleNamespace(aio=SimpleNamespace(models=Models()))
     session = FakeSession()
     provider._session = session
 

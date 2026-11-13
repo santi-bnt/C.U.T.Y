@@ -81,17 +81,12 @@ class LocalMusicProvider:
                     for frame in packet.decode():
                         for converted in resampler.resample(frame):
                             await self._wait_current(generation)
-                            pcm = bytes(converted.planes[0])[:converted.samples * 2]
-                            if self.volume != 100:
-                                import array
-                                samples = array.array("h"); samples.frombytes(pcm)
-                                gain = self.volume / 100
-                                samples = array.array("h", (max(-32768, min(32767, int(sample * gain))) for sample in samples))
-                                pcm = samples.tobytes()
+                            pcm = self._scale_pcm(bytes(converted.planes[0])[:converted.samples * 2])
                             await self._write(pcm, generation)
                 for converted in resampler.resample(None):
                     await self._wait_current(generation)
-                    await self._write(bytes(converted.planes[0])[:converted.samples * 2], generation)
+                    pcm = self._scale_pcm(bytes(converted.planes[0])[:converted.samples * 2])
+                    await self._write(pcm, generation)
             finally:
                 container.close()
         except asyncio.CancelledError:
@@ -160,6 +155,17 @@ class LocalMusicProvider:
         if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 100:
             raise ValueError("Volume must be an integer from 0 to 100.")
         self.volume = value
+
+    def _scale_pcm(self, pcm: bytes) -> bytes:
+        if self.volume == 100 or not pcm:
+            return pcm
+        import array
+        samples = array.array("h")
+        samples.frombytes(pcm)
+        gain = self.volume / 100
+        for index, sample in enumerate(samples):
+            samples[index] = max(-32768, min(32767, round(sample * gain)))
+        return samples.tobytes()
 
     async def get_playback_state(self) -> PlaybackState:
         track = self._tracks[self._index] if 0 <= self._index < len(self._tracks) else None

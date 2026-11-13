@@ -304,3 +304,49 @@ def test_redacted_jpeg_masks_detected_faces_in_memory():
     assert cv2.encoded[45, 50].max() < 70
     assert cv2.encoded[5, 5].mean() > 90
     assert np.all(image[45, 50] == (40, 120, 210))  # source frame was not mutated
+
+
+def test_high_resolution_observation_scales_mask_to_detector_coordinates():
+    image = np.full((480, 640, 3), 180, dtype=np.uint8)
+    face = Detection(100, 50, 80, 100, 0.99)
+    observation = FaceObservation(1, 1.0, image, (face,), (320, 240))
+
+    class FakeCV2(types.ModuleType):
+        IMWRITE_JPEG_QUALITY = 1
+        def rectangle(self, target, first, second, color, thickness):
+            target[first[1]:second[1] + 1, first[0]:second[0] + 1] = color
+        def imencode(self, _extension, image, _options):
+            self.encoded = image.copy()
+            return True, np.array([1], dtype=np.uint8)
+
+    cv2 = FakeCV2("cv2")
+    old_cv2 = sys.modules.get("cv2")
+    sys.modules["cv2"] = cv2
+    try:
+        mask_faces_and_encode(observation)
+    finally:
+        if old_cv2 is None:
+            sys.modules.pop("cv2", None)
+        else:
+            sys.modules["cv2"] = old_cv2
+    assert np.all(cv2.encoded[140, 260] == (32, 32, 32))
+    assert np.all(cv2.encoded[10, 10] == (180, 180, 180))
+
+
+def test_high_resolution_sface_detection_landmarks_are_scaled_before_embedding():
+    class Engine:
+        def __init__(self): self.seen = None
+        def embed(self, image, detection):
+            self.seen = (image.shape, detection)
+            return np.ones(32, dtype=np.float32)
+        def compare(self, _first, _second): return 1.0
+
+    engine = Engine()
+    recognizer = LocalFaceRecognition(engine=engine)
+    face = Detection(100, 50, 80, 100, 0.99, 120, 90, tuple(float(v) for v in range(10)))
+    observation = FaceObservation(1, 1.0, np.zeros((480, 640, 3), np.uint8), (face,), (320, 240))
+    recognizer._embedding(observation)
+    scaled = engine.seen[1]
+    assert scaled[:4] == (200, 100, 160, 200)
+    assert scaled.eyes_x == 240 and scaled.eyes_y == 180
+    assert scaled.landmarks == tuple(float(v * 2) for v in range(10))

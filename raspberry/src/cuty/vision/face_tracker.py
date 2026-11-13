@@ -20,7 +20,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-from cuty.vision.camera import Camera, CameraError, open_camera
+from cuty.vision.camera import FRAME_SIZE, Camera, CameraError, open_camera
 from cuty.vision.face_detector import Detection, DetectorError, create_detector
 from cuty.vision.head_follow import (
     FaceFollowConfig,
@@ -44,6 +44,7 @@ class FaceObservation:
     timestamp: float
     color_bgr: object
     detections: tuple[Detection, ...]
+    detection_size: tuple[int, int] | None = None
 
 
 def _env_flag(name: str, default: bool) -> bool:
@@ -196,7 +197,7 @@ class FaceTracker:
             copy = getattr(image, "copy", None)
             return FaceObservation(
                 observation.generation, observation.timestamp,
-                copy() if callable(copy) else image, observation.detections,
+                copy() if callable(copy) else image, observation.detections, FRAME_SIZE,
             )
 
     def _publish_observation(self, color_bgr, detections: list[Detection], now: float) -> None:
@@ -270,6 +271,9 @@ class FaceTracker:
             self.status = "siguiendo"
             self._log.info("Cámara lista; los ojos siguen a las personas")
             seen = False
+            metric_started = self._clock()
+            metric_frames = 0
+            capture_total = detect_total = frame_to_pan_total = 0.0
             try:
                 while not self._stop.is_set():
                     started = self._clock()
@@ -277,15 +281,36 @@ class FaceTracker:
                     if callable(read_frame):
                         frame = read_frame(include_color=self._color_requested.is_set())
                         gray, color_bgr = frame.gray, frame.color_bgr
+                        captured_at = frame.captured_at or self._clock()
                     else:
                         gray, color_bgr = camera.read_gray(), None
+                        captured_at = self._clock()
+                    capture_finished = self._clock()
+                    capture_total += capture_finished - started
+                    detect_started = capture_finished
                     detections = detector.detect(gray)
                     now = self._clock()
+                    detect_total += now - detect_started
                     self._publish_observation(color_bgr, detections, now)
                     target = self.process(detections, gray.shape[1], gray.shape[0], now)
+                    pan_completed = self._clock()
+                    frame_to_pan_total += max(0.0, pan_completed - captured_at)
+                    metric_frames += 1
                     if (target is not None) != seen:
                         seen = target is not None
                         self._log.info("Persona %s", "detectada" if seen else "perdida")
+                    elapsed = now - metric_started
+                    if elapsed >= 5.0:
+                        self._log.info(
+                            "[VISION PERF] fps=%.2f capture_ms=%.1f detect_ms=%.1f frame_to_pan_ms=%.1f frames=%d",
+                            metric_frames / elapsed,
+                            capture_total * 1000 / max(1, metric_frames),
+                            detect_total * 1000 / max(1, metric_frames),
+                            frame_to_pan_total * 1000 / max(1, metric_frames), metric_frames,
+                        )
+                        metric_started = now
+                        metric_frames = 0
+                        capture_total = detect_total = frame_to_pan_total = 0.0
                     self._stop.wait(max(0.0, period - (self._clock() - started)))
             except CameraError as exc:
                 self.status = f"cámara perdida: {exc}"

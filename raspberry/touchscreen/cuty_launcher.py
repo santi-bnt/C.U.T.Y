@@ -547,6 +547,10 @@ class Launcher(wifi.Panel):
         if START_MODE == 'face':
             self.enter_face()
         self.render()
+        face_metric_started = time.monotonic()
+        face_metric_frames = 0
+        face_metric_render = 0.0
+        face_metric_late = 0
         try:
             while True:
                 watch = [self.touch.fd] + ([self.link.fileno()] if self.link else [])
@@ -613,10 +617,27 @@ class Launcher(wifi.Panel):
                             now-self.released_at > 0.35):
                         self.hold_since = self.released_at = None
                     if not FACE_ERROR and now >= self.next_face_frame:
+                        render_started = time.monotonic()
                         self.draw_face_frame(now)
+                        render_elapsed = time.monotonic() - render_started
+                        face_metric_frames += 1
+                        face_metric_render += render_elapsed
+                        if render_elapsed > 1 / FACE_FPS:
+                            face_metric_late += 1
                         self.next_face_frame += 1/FACE_FPS
                         if self.next_face_frame < now:  # ran late: skip, don't burst
                             self.next_face_frame = now + 1/FACE_FPS
+                    metric_elapsed = now - face_metric_started
+                    if self.mode == 'face' and metric_elapsed >= 5.0:
+                        if face_metric_frames:
+                            print('[FACE PERF] fps=%.2f render_ms=%.1f late_frames=%d samples=%d' % (
+                                face_metric_frames / metric_elapsed,
+                                face_metric_render * 1000 / face_metric_frames,
+                                face_metric_late, face_metric_frames), flush=True)
+                        face_metric_started = now
+                        face_metric_frames = 0
+                        face_metric_render = 0.0
+                        face_metric_late = 0
         except KeyboardInterrupt:
             pass
         finally:

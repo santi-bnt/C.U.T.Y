@@ -55,13 +55,17 @@ _CONFIG = {
 
 class GeminiLiveProvider:
     def __init__(self, api_key: str, model: str = "gemini-3.8-live", *, hands_free: bool = False,
-                 vision_model: str = "gemini-3.8-flash", vision_timeout: float = 45.0) -> None:
+                 vision_model: str = "gemini-3.8-flash", vision_timeout: float = 20.0) -> None:
         self._api_key = api_key
         self._model = model
         self._hands_free = hands_free
         self._vision_model = vision_model
         self._vision_timeout = vision_timeout
         self._client = genai.Client(api_key=api_key)
+        # Keep one-shot HTTP image requests isolated from the long-lived Live
+        # WebSocket's HTTP/session resources. A slow image call must not tear
+        # down the audio client when its timeout cancels the request.
+        self._vision_client = genai.Client(api_key=api_key)
         self._manager: Any = None
         self._session: Any = None
         self._messages: AsyncIterator[types.LiveServerMessage] | None = None
@@ -123,7 +127,19 @@ class GeminiLiveProvider:
         try:
             await self._disconnect()
         finally:
-            await self._client.aio.aclose()
+            try:
+                await self._client.aio.aclose()
+            finally:
+                await self._vision_client.aio.aclose()
+
+    async def restart_voice_session(self) -> None:
+        """Reconnect only Live audio after a stale/failed speech response."""
+        try:
+            await self._disconnect()
+        except Exception as exc:
+            self._log.warning("Gemini Live cleanup before reconnect failed (%s)", type(exc).__name__)
+            self._session = self._manager = self._messages = None
+        await self.connect()
 
     async def start_turn(self) -> None:
         self._messages = None
@@ -157,7 +173,7 @@ class GeminiLiveProvider:
         )
 
     async def describe_image(self, jpeg: bytes, *, question: str) -> str:
-        """One-shot image understanding via the same configured Gemini client."""
+        """One-shot image understanding via an isolated client with the same API key."""
         if not jpeg or len(jpeg) > 1_500_000:
             raise ProviderError("La imagen de visión está vacía o supera el límite permitido.")
         prompt = (
@@ -167,8 +183,10 @@ class GeminiLiveProvider:
             "The image has opaque privacy masks over detected faces. Question: " + question[:240]
         )
         try:
+            started = asyncio.get_running_loop().time()
+            self._log.info("[VISION PERF] provider_request_start model=%s jpeg_bytes=%d", self._vision_model, len(jpeg))
             response = await asyncio.wait_for(
-                self._client.aio.models.generate_content(
+                self._vision_client.aio.models.generate_content(
                     model=self._vision_model,
                     contents=[types.Part.from_bytes(data=jpeg, mime_type="image/jpeg"), prompt],
                     config=types.GenerateContentConfig(
@@ -180,11 +198,17 @@ class GeminiLiveProvider:
                 timeout=self._vision_timeout,
             )
         except TimeoutError as exc:
+            self._log.warning("[VISION PERF] provider_request_timeout seconds=%.2f jpeg_bytes=%d",
+                              self._vision_timeout, len(jpeg))
             raise ProviderError(
                 f"Gemini image description timed out after {self._vision_timeout:g} seconds."
             ) from exc
         except Exception as exc:
             raise ProviderError(self._redact(f"Gemini image description failed: {exc}")) from exc
+        finally:
+            if "started" in locals():
+                self._log.info("[VISION PERF] provider_request_ms=%.1f",
+                               (asyncio.get_running_loop().time() - started) * 1000)
         description = " ".join((getattr(response, "text", None) or "").split())
         if not description:
             raise ProviderError("Gemini no devolvió una descripción de la imagen.")
