@@ -60,4 +60,4 @@ Consulta [ejecución y despliegue](web/README.md). Desde `web/`, usa `npm ci` y 
 
 [Mapa de conexiones por bloques (HTML)](docs/conexiones.html) · [Señales (SVG)](docs/assets/conexiones-senales.svg) · [Alimentación (SVG)](docs/assets/conexiones-alimentacion.svg)
 
-Las pruebas locales no certifican la pantalla física ni el arranque de su servicio tras reiniciar la Raspberry.
+Las pruebas locales no certifican la pantalla física ni el arranque de su servicio tras reiniciar la Raspberry
