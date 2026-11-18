@@ -10,13 +10,13 @@
 #include "../App/rtos/motion_tasks.c"
 typedef struct { unsigned capacity,size,count,head; unsigned char *data; } Queue;
 typedef struct { void (*function)(void *); void *argument; uint32_t flags; } Thread;
-static Queue *allocated[6]; static unsigned allocations;
+static Queue *allocated[8]; static unsigned allocations;
 static Thread threads[4]; static unsigned thread_count;
 static Thread *running; static uint32_t tick; static jmp_buf boundary;
 osMessageQueueId_t osMessageQueueNew(uint32_t count,uint32_t size,const void *attr) {
     (void)attr; Queue *q=calloc(1,sizeof(*q)); assert(q);
     q->capacity=count; q->size=size; q->data=calloc(count,size); assert(q->data);
-    assert(allocations<6); allocated[allocations++]=q; return q;
+    assert(allocations<8); allocated[allocations++]=q; return q;
 }
 osStatus_t osMessageQueuePut(osMessageQueueId_t id,const void *message,uint8_t priority,uint32_t timeout) {
     (void)priority; assert(timeout==0); Queue *q=id;
@@ -53,9 +53,9 @@ int main(void) {
     assert(!cuty_uart_rx_isr('x'));
     assert(cuty_rtos_create() && cuty_rtos_start());
     assert(!cuty_rtos_create());
-    receive("V1,HB\nV1,ARM\nV1,START\nV1,TARGET,0,100\nV1,TARGET,0,350\n");
-    run_once(communication);
-    assert(((Queue *)targets)->count==1); /* overwrite, never FIFO stale goals */
+    receive("V2,HB\nV2,ARM\nV2,START\nV2,TARGET,HEAD_PAN,350\n");
+    while (((Queue *)rx)->count) run_once(communication);
+    assert(((Queue *)targets[CUTY_HEAD_PAN])->count==1); /* overwrite, never FIFO stale goals */
     assert(((Queue *)commands)->count==3);
     run_once(servo);
     assert(controller.safety.state==CUTY_ACTIVE);
@@ -63,11 +63,16 @@ int main(void) {
     CutyReply reply; unsigned replies_read=0;
     while(cuty_take_reply(&reply)) { assert(reply.accepted); ++replies_read; }
     assert(replies_read==4);
+    receive("V2,TARGET,LEFT_ARM,200\nV2,TARGET,RIGHT_ARM,-300\n");
+    run_once(communication); run_once(servo);
+    assert(fabs(controller.axes[CUTY_LEFT_ARM].target-0.2)<0.00001);
+    assert(fabs(controller.axes[CUTY_RIGHT_ARM].target+0.3)<0.00001);
+    while(cuty_take_reply(&reply)) assert(reply.accepted);
     /* Target before a state transition cannot be applied after re-arm. */
-    receive("V1,TARGET,0,900\nV1,DISARM\nV1,ARM\nV1,START\n");
+    receive("V2,TARGET,HEAD_PAN,900\nV2,DISARM\nV2,ARM\nV2,START\n");
     run_once(communication); run_once(servo);
     assert(controller.safety.state==CUTY_ACTIVE && controller.axes[0].target==controller.axes[0].commanded);
-    receive("V1,TARGET,0,500\n"); run_once(communication);
+    receive("V2,TARGET,HEAD_PAN,500\n"); run_once(communication);
     tick=101; run_once(servo); /* stale mailbox goal rejected */
     assert(controller.axes[0].target==controller.axes[0].commanded);
     tick=500; run_once(servo);

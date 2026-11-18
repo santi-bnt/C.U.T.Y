@@ -18,7 +18,7 @@
 Camera → detector → tracker → normalized X/Y target.
 - face consumes it for pupil rendering.
 - future brain/behavior consumes it for head goals → hardware bridge → UART → STM32 motion/safety.
-- STM32 IMU → STM32 body PID → servos/safety; measurements feed telemetry.
+- Future IMU data may feed diagnostics after sensor selection and calibration. Body PID is outside the current fixed-base three-joint configuration.
 - Raspberry audio and LLM → expression + lip-sync level over local UDP → face.
 - Raspberry aggregates subsystem and STM32 status for web observation.
 

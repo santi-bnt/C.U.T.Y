@@ -28,8 +28,8 @@ export const motionTasks: MotionTask[] = [
       "Bytes RX → comandos validados / ACK o ERR",
     ),
     resources: bi(
-      "RX queue (256 timestamped entries), target mailbox (1), command queue (8). Zero-timeout ISR enqueue.",
-      "Cola RX (256 entradas con timestamp), buzón de objetivos (1), cola de comandos (8). Encolado ISR sin espera.",
+      "RX queue (256 timestamped entries), three target mailboxes (one per joint), command queue (8). Zero-timeout ISR enqueue.",
+      "Cola RX (256 entradas con timestamp), tres buzones de objetivos, cola de comandos (8). Encolado ISR sin espera.",
     ),
     files: [
       "stm32/App/communication/uart_protocol.c",
@@ -149,24 +149,24 @@ export const motionSteps = [
     "Raspberry genera PAN +0.35 en unidades normalizadas de demostración.",
   ),
   bi(
-    "UART delivers V1,TARGET,0,350 followed by LF.",
-    "UART entrega V1,TARGET,0,350 seguido de LF.",
+    "UART delivers V2,TARGET,HEAD_PAN,350 followed by LF.",
+    "UART entrega V2,TARGET,HEAD_PAN,350 seguido de LF.",
   ),
   bi(
     "CommunicationTask validates the frame and range.",
     "CommunicationTask valida la trama y el rango.",
   ),
   bi(
-    "The single-slot mailbox replaces any obsolete goal.",
-    "El buzón de una entrada reemplaza objetivos obsoletos.",
+      "The joint's single-slot mailbox replaces its obsolete goal.",
+      "El buzón de la articulación reemplaza sus objetivos obsoletos.",
   ),
   bi(
     "ServoControlTask computes a velocity- and acceleration-limited transition.",
     "ServoControlTask calcula una transición limitada en velocidad y aceleración.",
   ),
   bi(
-    "TIM1 / TIM4 would latch the next pulse width. No hardware output occurs here.",
-    "TIM1 / TIM4 aplicarían el próximo ancho de pulso. Aquí no se genera salida física.",
+    "TIM4 would latch the PAN pulse width. No hardware output occurs here.",
+    "TIM4 aplicaría el ancho de pulso PAN. Aquí no se genera salida física.",
   ),
   bi(
     "DiagnosticsTask returns commanded-position telemetry, not a measurement.",

@@ -1,0 +1,2148 @@
+{
+  "revision": "V17 Fijo - source package 2026-11-13",
+  "auditedOn": "2026-11-17",
+  "selectionReason": "Official fixed variant; all ten requested latest originals match this folder byte for byte. Copy suffixes (2) are not revisions. Historical grouped plates and gimbal parts are not assembly components.",
+  "latestBundle": "CUTY_10_Piezas_Nuevas_Acomodadas_A1_Mini.zip",
+  "parts": [
+    {
+      "name": "A1_Arm_L",
+      "file": "A1_Arm_L.stl",
+      "sha256": "c5347be36d00b9a20726859b2e4acab673976f2ab9a8fb88ee540fb863da15e3",
+      "bytes": 543584,
+      "previousSameNameSha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "A2_Arm_R",
+      "file": "A2_Arm_R.stl",
+      "sha256": "5bfe8c7e298a5829832e285937e02b5f86dd965c4ca12793491dca943a2236e6",
+      "bytes": 543584,
+      "previousSameNameSha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "A3_Hand_L",
+      "file": "A3_Hand_L.stl",
+      "sha256": "50710fb69063d4b3391bef44ff13b62a18c0585aa3801cb93da609b5f805d7e1",
+      "bytes": 1217084,
+      "previousSameNameSha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "A4_Hand_R",
+      "file": "A4_Hand_R.stl",
+      "sha256": "6719649fcbf10fe8210c47e2402bdd592ba5085ef7eb9b9cf45a6210eee083d2",
+      "bytes": 1217084,
+      "previousSameNameSha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "A5_Arm_Cap_L",
+      "file": "A5_Arm_Cap_L.stl",
+      "sha256": "4affb1d1a11d9bcf50bc9ffa57126e992921153a2acb53b1a0c85d69a9b6267d",
+      "bytes": 428284,
+      "previousSameNameSha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/A5_Arm_Cap_L(2).stl"
+    },
+    {
+      "name": "A6_Arm_Cap_R",
+      "file": "A6_Arm_Cap_R.stl",
+      "sha256": "5773ff16d9b1c44c0029c7533d15fcaf2658012a9da8d169b6800ee9711ebf9e",
+      "bytes": 428284,
+      "previousSameNameSha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/A6_Arm_Cap_R(2).stl"
+    },
+    {
+      "name": "B1_Pedestal",
+      "file": "B1_Pedestal.stl",
+      "sha256": "038675bff867f2654eee0c7e5cb2d73d02e9cf1c23570dcaabe4044f86c16439",
+      "bytes": 399884,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/B1_Pedestal.stl"
+    },
+    {
+      "name": "B2_Pedestal_Floor",
+      "file": "B2_Pedestal_Floor.stl",
+      "sha256": "d58519180e7c08005f98b3a83478adc4054e2c82c3837b478c9a114a57906db7",
+      "bytes": 781684,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/B2_Pedestal_Floor.stl"
+    },
+    {
+      "name": "B3_Pedestal_Drawer",
+      "file": "B3_Pedestal_Drawer.stl",
+      "sha256": "c07268a6a346f3c3250c8dab71fd9645c8580f89fbb5c3a20e7ef5271137c032",
+      "bytes": 22884,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/B3_Pedestal_Drawer.stl"
+    },
+    {
+      "name": "B4_Deck_Riser",
+      "file": "B4_Deck_Riser.stl",
+      "sha256": "c788653ab137d06aed2cd98c9937f6229336a5c4681220eecc4253c72a7ccba5",
+      "bytes": 353684,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/B4_Deck_Riser.stl"
+    },
+    {
+      "name": "H1_Head_Front",
+      "file": "H1_Head_Front.stl",
+      "sha256": "54fb896a2c539c58758de0f0a3d63a824c2fe42119d3a74b359f5e50e44b6c14",
+      "bytes": 902384,
+      "previousSameNameSha256": "feb5e9b878288bc22e026b5ec2fe5f94bd3d8ed4bf4ceca56470a705f1f7ac6c",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "H2_Head_Back",
+      "file": "H2_Head_Back.stl",
+      "sha256": "c38f1655b7808040d6da45c793b2b634e8c47fb8c83838ed794b3aaaf69cccbd",
+      "bytes": 1258184,
+      "previousSameNameSha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "H3_Visor",
+      "file": "H3_Visor.stl",
+      "sha256": "cbedb51d0f0ef00d0e3ac58c614c76555a348faa496701738b250653d6ed607b",
+      "bytes": 554484,
+      "previousSameNameSha256": "c37b256e0127917ddc6c2bec42b2ab20a79d1d388873f69be1e4c8b3aeca7f05",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "H4_Display_Bars",
+      "file": "H4_Display_Bars.stl",
+      "sha256": "a353c43c5566222d538413bb5429adb8a70acb0aec03b6f825f311b43ed77ce6",
+      "bytes": 231084,
+      "previousSameNameSha256": "896c6c6c340c25e1d3b3d47a6b821e7b8a5e3b10b243e75c7b393a97f7bf0a2e",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "H5_Head_Base",
+      "file": "H5_Head_Base.stl",
+      "sha256": "283ea9b636cdb1853aff7fddc392c2fb0c11f12533a1273a688ae6448293c7bc",
+      "bytes": 332884,
+      "previousSameNameSha256": "222ac356dd57ce6ac8baedd29c785997347d001b5f36c3ea5dad760c9e1dd52d",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/H5_Head_Base(2).stl"
+    },
+    {
+      "name": "H6_Ear_L",
+      "file": "H6_Ear_L.stl",
+      "sha256": "f251025eab5d35bf9338597fcbe7dd106252d0f35415ec3b292c9cb7683da2ea",
+      "bytes": 151784,
+      "previousSameNameSha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "H7_Ear_R",
+      "file": "H7_Ear_R.stl",
+      "sha256": "ec84b55a6417891d87b81f92f1fb14d8090635af8c62864197e25ee8f592a9f3",
+      "bytes": 151784,
+      "previousSameNameSha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/H7_Ear_R(2).stl"
+    },
+    {
+      "name": "H8_Antenna",
+      "file": "H8_Antenna.stl",
+      "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+      "bytes": 453184,
+      "previousSameNameSha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+      "comparison": "identical bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "K1_Core_Deck_Fixed",
+      "file": "K1_Core_Deck_Fixed.stl",
+      "sha256": "f5073953eda7e0995562ebfb782df7b1f44a9f883733d9fe24995555f75995a4",
+      "bytes": 559284,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/K1_Core_Deck_Fixed.stl"
+    },
+    {
+      "name": "K2_Core_Spine",
+      "file": "K2_Core_Spine.stl",
+      "sha256": "da9528263e1c606019062af9bc6322839588b480ed55d8a706d0f3b2f3f92a06",
+      "bytes": 459284,
+      "previousSameNameSha256": "75aef7f0db0915305728de2c9ef3f39760d4240a2a967448a8d146648833c1bc",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "K3_Core_Shoulders",
+      "file": "K3_Core_Shoulders.stl",
+      "sha256": "80310bc3c13ff803d6af54bb37ab19933fd1ca9d642d58205f6ec0a66470a449",
+      "bytes": 414384,
+      "previousSameNameSha256": "90982432556818e9d043a1c761ec40ecd58673c6f6a856223f23c6862963f434",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "K4_Neck_Hub",
+      "file": "K4_Neck_Hub.stl",
+      "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+      "bytes": 275384,
+      "previousSameNameSha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+      "comparison": "identical bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "K5_Power_Rack",
+      "file": "K5_Power_Rack.stl",
+      "sha256": "fca136559af661c46e4699af8af10132f6ac815f28ae2fc54eac7c35bd41b5dd",
+      "bytes": 142284,
+      "previousSameNameSha256": "8b3b09a93c9cac36cb39961374fc0c1f8ed857c39d6fd7889bf862c6381c462b",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "S1_Body_Front_Fixed",
+      "file": "S1_Body_Front_Fixed.stl",
+      "sha256": "5e9a0110a0b390c96ccd44887328a077524d82a9ea8edf89a6ea55d4fdeb89e5",
+      "bytes": 1435884,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": "STL_Originales_Intactos/S1_Body_Front_Fixed.stl"
+    },
+    {
+      "name": "S2_Body_Back_Fixed",
+      "file": "S2_Body_Back_Fixed.stl",
+      "sha256": "5c0386c99cf1a04227e25d6263658b4890dad946ecea15cb94a5f48477347f3a",
+      "bytes": 1346684,
+      "previousSameNameSha256": null,
+      "comparison": "fixed-variant replacement",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "S3_Tummy_Grille",
+      "file": "S3_Tummy_Grille.stl",
+      "sha256": "258aa168c3b99ce09e021fa21ac8e51a7c265fdf8565e11b7cb64c8901569575",
+      "bytes": 305584,
+      "previousSameNameSha256": "db04a97166934b13cc58aa39efab11c6635312a245489db0bb2c1fcccc812f96",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    },
+    {
+      "name": "S4_USB_Plug",
+      "file": "S4_USB_Plug.stl",
+      "sha256": "e8dc6637f68870c6320dee18d75cad30d15c152282873c16aa091365bae4f077",
+      "bytes": 92284,
+      "previousSameNameSha256": "c2594c3eb832b262b7517aac90f0b2422b87474f820417c5b5def7449614a510",
+      "comparison": "different bytes",
+      "confirmedInLatestBundle": null
+    }
+  ],
+  "availableRepositoryStls": [
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A1_Arm_L.stl",
+      "sha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587",
+      "bytes": 543584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A2_Arm_R.stl",
+      "sha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb",
+      "bytes": 543584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A3_Hand_L.stl",
+      "sha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86",
+      "bytes": 1217084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A4_Hand_R.stl",
+      "sha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40",
+      "bytes": 1217084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A5_Arm_Cap_L.stl",
+      "sha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5",
+      "bytes": 428284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/A6_Arm_Cap_R.stl",
+      "sha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e",
+      "bytes": 428284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/B1_Base_Cover.stl",
+      "sha256": "bdd47b82d87e589b7affce7b34249724f305652860d5603e95c85f3ad41884f8",
+      "bytes": 652284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/B2_Base_Floor.stl",
+      "sha256": "f6236837b5054f29b42d54d5a2539f21271799cf1e56c15acb2b32d9479e2e9c",
+      "bytes": 1161084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/B3_Battery_Drawer.stl",
+      "sha256": "bb8093cdf4b6926056ff6322fa56f4885096dcf99a684d668d1a78c7a8a4dadc",
+      "bytes": 43784
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/B4_Gimbal_Post.stl",
+      "sha256": "667ede2c45a406def8c6a106e5a352ebf6fe95ca77abbbcd65bf440be77baaeb",
+      "bytes": 210084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/G1_Ujoint_Cross.stl",
+      "sha256": "202a57e20d90a53197c5ae8f5825a6ad24703719c0ff7418e4a2e5a9d175f97b",
+      "bytes": 53084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/G2_Crank_L.stl",
+      "sha256": "a7fd05a74f8e218f534d33aea8a631b2aea0ae6700d36c063ab35c21701f4096",
+      "bytes": 86584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/G3_Crank_R.stl",
+      "sha256": "78d825306990c5e33abedc6f40783b0603f0e76f09f4119f8d79e3971036dfcb",
+      "bytes": 86584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H1_Head_Front.stl",
+      "sha256": "feb5e9b878288bc22e026b5ec2fe5f94bd3d8ed4bf4ceca56470a705f1f7ac6c",
+      "bytes": 902384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H2_Head_Back.stl",
+      "sha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e",
+      "bytes": 1258184
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H3_Visor.stl",
+      "sha256": "c37b256e0127917ddc6c2bec42b2ab20a79d1d388873f69be1e4c8b3aeca7f05",
+      "bytes": 554484
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H4_Display_Bars.stl",
+      "sha256": "896c6c6c340c25e1d3b3d47a6b821e7b8a5e3b10b243e75c7b393a97f7bf0a2e",
+      "bytes": 231084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H5_Head_Base.stl",
+      "sha256": "222ac356dd57ce6ac8baedd29c785997347d001b5f36c3ea5dad760c9e1dd52d",
+      "bytes": 332884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H6_Ear_L.stl",
+      "sha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0",
+      "bytes": 151784
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H7_Ear_R.stl",
+      "sha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8",
+      "bytes": 151784
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/H8_Antenna.stl",
+      "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+      "bytes": 453184
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/K1_Core_Deck.stl",
+      "sha256": "5a0b3440eb8f657f39b612fc00bf9472e67090968c1ddac0eaccf55b768a6090",
+      "bytes": 563584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/K2_Core_Spine.stl",
+      "sha256": "75aef7f0db0915305728de2c9ef3f39760d4240a2a967448a8d146648833c1bc",
+      "bytes": 459284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/K3_Core_Shoulders.stl",
+      "sha256": "90982432556818e9d043a1c761ec40ecd58673c6f6a856223f23c6862963f434",
+      "bytes": 414384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/K4_Neck_Hub.stl",
+      "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+      "bytes": 275384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/K5_Power_Rack.stl",
+      "sha256": "8b3b09a93c9cac36cb39961374fc0c1f8ed857c39d6fd7889bf862c6381c462b",
+      "bytes": 142284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/S1_Body_Front.stl",
+      "sha256": "f3376cc026f145998d07ed80ae9e9a25e459074de91e82c69da5f70b60164493",
+      "bytes": 1528384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/S2_Body_Back.stl",
+      "sha256": "0094b5317ba6b4954093101cb57802f87c769df8276a92f4fe8de4c291c08752",
+      "bytes": 1413884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/S3_Tummy_Grille.stl",
+      "sha256": "db04a97166934b13cc58aa39efab11c6635312a245489db0bb2c1fcccc812f96",
+      "bytes": 305584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17/STL_imprimir/S4_USB_Plug.stl",
+      "sha256": "c2594c3eb832b262b7517aac90f0b2422b87474f820417c5b5def7449614a510",
+      "bytes": 92284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A1_Arm_L.stl",
+      "sha256": "c5347be36d00b9a20726859b2e4acab673976f2ab9a8fb88ee540fb863da15e3",
+      "bytes": 543584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A2_Arm_R.stl",
+      "sha256": "5bfe8c7e298a5829832e285937e02b5f86dd965c4ca12793491dca943a2236e6",
+      "bytes": 543584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A3_Hand_L.stl",
+      "sha256": "50710fb69063d4b3391bef44ff13b62a18c0585aa3801cb93da609b5f805d7e1",
+      "bytes": 1217084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A4_Hand_R.stl",
+      "sha256": "6719649fcbf10fe8210c47e2402bdd592ba5085ef7eb9b9cf45a6210eee083d2",
+      "bytes": 1217084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A5_Arm_Cap_L.stl",
+      "sha256": "4affb1d1a11d9bcf50bc9ffa57126e992921153a2acb53b1a0c85d69a9b6267d",
+      "bytes": 428284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/A6_Arm_Cap_R.stl",
+      "sha256": "5773ff16d9b1c44c0029c7533d15fcaf2658012a9da8d169b6800ee9711ebf9e",
+      "bytes": 428284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/B1_Pedestal.stl",
+      "sha256": "038675bff867f2654eee0c7e5cb2d73d02e9cf1c23570dcaabe4044f86c16439",
+      "bytes": 399884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/B2_Pedestal_Floor.stl",
+      "sha256": "d58519180e7c08005f98b3a83478adc4054e2c82c3837b478c9a114a57906db7",
+      "bytes": 781684
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/B3_Pedestal_Drawer.stl",
+      "sha256": "c07268a6a346f3c3250c8dab71fd9645c8580f89fbb5c3a20e7ef5271137c032",
+      "bytes": 22884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/B4_Deck_Riser.stl",
+      "sha256": "c788653ab137d06aed2cd98c9937f6229336a5c4681220eecc4253c72a7ccba5",
+      "bytes": 353684
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H1_Head_Front.stl",
+      "sha256": "54fb896a2c539c58758de0f0a3d63a824c2fe42119d3a74b359f5e50e44b6c14",
+      "bytes": 902384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H2_Head_Back.stl",
+      "sha256": "c38f1655b7808040d6da45c793b2b634e8c47fb8c83838ed794b3aaaf69cccbd",
+      "bytes": 1258184
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H3_Visor.stl",
+      "sha256": "cbedb51d0f0ef00d0e3ac58c614c76555a348faa496701738b250653d6ed607b",
+      "bytes": 554484
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H4_Display_Bars.stl",
+      "sha256": "a353c43c5566222d538413bb5429adb8a70acb0aec03b6f825f311b43ed77ce6",
+      "bytes": 231084
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H5_Head_Base.stl",
+      "sha256": "283ea9b636cdb1853aff7fddc392c2fb0c11f12533a1273a688ae6448293c7bc",
+      "bytes": 332884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H6_Ear_L.stl",
+      "sha256": "f251025eab5d35bf9338597fcbe7dd106252d0f35415ec3b292c9cb7683da2ea",
+      "bytes": 151784
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H7_Ear_R.stl",
+      "sha256": "ec84b55a6417891d87b81f92f1fb14d8090635af8c62864197e25ee8f592a9f3",
+      "bytes": 151784
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/H8_Antenna.stl",
+      "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+      "bytes": 453184
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/K1_Core_Deck_Fixed.stl",
+      "sha256": "f5073953eda7e0995562ebfb782df7b1f44a9f883733d9fe24995555f75995a4",
+      "bytes": 559284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/K2_Core_Spine.stl",
+      "sha256": "da9528263e1c606019062af9bc6322839588b480ed55d8a706d0f3b2f3f92a06",
+      "bytes": 459284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/K3_Core_Shoulders.stl",
+      "sha256": "80310bc3c13ff803d6af54bb37ab19933fd1ca9d642d58205f6ec0a66470a449",
+      "bytes": 414384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/K4_Neck_Hub.stl",
+      "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+      "bytes": 275384
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/K5_Power_Rack.stl",
+      "sha256": "fca136559af661c46e4699af8af10132f6ac815f28ae2fc54eac7c35bd41b5dd",
+      "bytes": 142284
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/S1_Body_Front_Fixed.stl",
+      "sha256": "5e9a0110a0b390c96ccd44887328a077524d82a9ea8edf89a6ea55d4fdeb89e5",
+      "bytes": 1435884
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/S2_Body_Back_Fixed.stl",
+      "sha256": "5c0386c99cf1a04227e25d6263658b4890dad946ecea15cb94a5f48477347f3a",
+      "bytes": 1346684
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/S3_Tummy_Grille.stl",
+      "sha256": "258aa168c3b99ce09e021fa21ac8e51a7c265fdf8565e11b7cb64c8901569575",
+      "bytes": 305584
+    },
+    {
+      "path": "hardware/cad/carcasa_v17_fija/STL_imprimir/S4_USB_Plug.stl",
+      "sha256": "e8dc6637f68870c6320dee18d75cad30d15c152282873c16aa091365bae4f077",
+      "bytes": 92284
+    }
+  ],
+  "otherAvailableArchives": [
+    {
+      "archive": "CUTY_10_Piezas_Nuevas_Acomodadas_A1_Mini.zip",
+      "entries": [
+        {
+          "name": "Placas_STL_Acomodadas/Placa_01_A1_Mini.stl",
+          "bytes": 1435884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "495e9d218d451139ef962ea2e20808559128469e382953b58f352f942201002d"
+        },
+        {
+          "name": "Placas_STL_Acomodadas/Placa_02_A1_Mini.stl",
+          "bytes": 1609884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            52
+          ],
+          "sha256": "69e9e66fa55bc8fbf23943eebe3a4ffe39a25c6ef0574400c0f38eb94c3abba1"
+        },
+        {
+          "name": "Placas_STL_Acomodadas/Placa_03_A1_Mini.stl",
+          "bytes": 1266184,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            52
+          ],
+          "sha256": "331e4c66e910d428797d3d49ecac267b7d5d9bf8de7eba62dbf51b98963c6a26"
+        },
+        {
+          "name": "Placas_STL_Acomodadas/Placa_04_A1_Mini.stl",
+          "bytes": 582084,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            52
+          ],
+          "sha256": "0091eeb28283a005f13afd2fe3f84c394fe5abf35eab8214d7664677d9d492b4"
+        },
+        {
+          "name": "STL_Originales_Intactos/A5_Arm_Cap_L(2).stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "4affb1d1a11d9bcf50bc9ffa57126e992921153a2acb53b1a0c85d69a9b6267d"
+        },
+        {
+          "name": "STL_Originales_Intactos/A6_Arm_Cap_R(2).stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "5773ff16d9b1c44c0029c7533d15fcaf2658012a9da8d169b6800ee9711ebf9e"
+        },
+        {
+          "name": "STL_Originales_Intactos/B1_Pedestal.stl",
+          "bytes": 399884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "038675bff867f2654eee0c7e5cb2d73d02e9cf1c23570dcaabe4044f86c16439"
+        },
+        {
+          "name": "STL_Originales_Intactos/B2_Pedestal_Floor.stl",
+          "bytes": 781684,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "d58519180e7c08005f98b3a83478adc4054e2c82c3837b478c9a114a57906db7"
+        },
+        {
+          "name": "STL_Originales_Intactos/B3_Pedestal_Drawer.stl",
+          "bytes": 22884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "c07268a6a346f3c3250c8dab71fd9645c8580f89fbb5c3a20e7ef5271137c032"
+        },
+        {
+          "name": "STL_Originales_Intactos/B4_Deck_Riser.stl",
+          "bytes": 353684,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "c788653ab137d06aed2cd98c9937f6229336a5c4681220eecc4253c72a7ccba5"
+        },
+        {
+          "name": "STL_Originales_Intactos/H5_Head_Base(2).stl",
+          "bytes": 332884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "283ea9b636cdb1853aff7fddc392c2fb0c11f12533a1273a688ae6448293c7bc"
+        },
+        {
+          "name": "STL_Originales_Intactos/H7_Ear_R(2).stl",
+          "bytes": 151784,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "ec84b55a6417891d87b81f92f1fb14d8090635af8c62864197e25ee8f592a9f3"
+        },
+        {
+          "name": "STL_Originales_Intactos/K1_Core_Deck_Fixed.stl",
+          "bytes": 559284,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "f5073953eda7e0995562ebfb782df7b1f44a9f883733d9fe24995555f75995a4"
+        },
+        {
+          "name": "STL_Originales_Intactos/S1_Body_Front_Fixed.stl",
+          "bytes": 1435884,
+          "date": [
+            2026,
+            11,
+            18,
+            2,
+            15,
+            50
+          ],
+          "sha256": "5e9a0110a0b390c96ccd44887328a077524d82a9ea8edf89a6ea55d4fdeb89e5"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_30_Piezas_11_Placas_B2_Actualizado_A1_Mini.zip",
+      "entries": [
+        {
+          "name": "STL_11_Placas/Placa_01.stl",
+          "bytes": 2400484,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "a062a4f0db37e90f8ff82c7ec20974cd180c2e383b916d31d75ad29209113ed7"
+        },
+        {
+          "name": "STL_11_Placas/Placa_02.stl",
+          "bytes": 1048084,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "74f0fefbfe8027463bddbd0430e8163155203c1890bb2514f0ca94beefc5dc08"
+        },
+        {
+          "name": "STL_11_Placas/Placa_03.stl",
+          "bytes": 1003184,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "234d0f445e985813bfc723974c6b49ab63e92bac65953df7c527de442fb1df61"
+        },
+        {
+          "name": "STL_11_Placas/Placa_04.stl",
+          "bytes": 1258184,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "c0da37d6bc700f86abdc47e34a2d41b93fcdc2e4772667e5ec2c34d0c6c4f902"
+        },
+        {
+          "name": "STL_11_Placas/Placa_05.stl",
+          "bytes": 1437084,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "fe7f7acefda0980d37dd072d0f6a6cedcfc9e8f1e8db921a59fba98d6fddeebd"
+        },
+        {
+          "name": "STL_11_Placas/Placa_06.stl",
+          "bytes": 1528384,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "16058143ac5234915fe075e733f2a499603d5db09cdc126364ae1e9e628cc24c"
+        },
+        {
+          "name": "STL_11_Placas/Placa_07.stl",
+          "bytes": 459284,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "2f3df60c490a1fda67593b0e905dbc808440582dc082c524c404032ad5b5a513"
+        },
+        {
+          "name": "STL_11_Placas/Placa_08.stl",
+          "bytes": 231084,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "b62c955c4d14450ad676ffa3812acfa356200345446c98b2f9ef5116a5ddbf2e"
+        },
+        {
+          "name": "STL_11_Placas/Placa_09.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "ba5a1c1d6b38937f6c2a840c5f11ab7c9a7d9689b9a31281790250ef930d6749"
+        },
+        {
+          "name": "STL_11_Placas/Placa_10.stl",
+          "bytes": 1161084,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "99dcb29b2faa9932cb3bd5c6ae1b1d421cf7cffd7227d9d9c9dcfc30d3be9046"
+        },
+        {
+          "name": "STL_11_Placas/Placa_11.stl",
+          "bytes": 4857184,
+          "date": [
+            2026,
+            11,
+            10,
+            23,
+            46,
+            14
+          ],
+          "sha256": "9ac9e3731d1d5387cef38e89b86c270504f060e23bc47c5151e1ec83a392f347"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_30_Piezas_11_Placas_KS_Actualizadas.zip",
+      "entries": [
+        {
+          "name": "Piezas_Individuales_30/A1_Arm_L.stl",
+          "bytes": 543584,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587"
+        },
+        {
+          "name": "Piezas_Individuales_30/A2_Arm_R.stl",
+          "bytes": 543584,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb"
+        },
+        {
+          "name": "Piezas_Individuales_30/A3_Hand_L.stl",
+          "bytes": 1217084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86"
+        },
+        {
+          "name": "Piezas_Individuales_30/A4_Hand_R.stl",
+          "bytes": 1217084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40"
+        },
+        {
+          "name": "Piezas_Individuales_30/A5_Arm_Cap_L.stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5"
+        },
+        {
+          "name": "Piezas_Individuales_30/A6_Arm_Cap_R.stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e"
+        },
+        {
+          "name": "Piezas_Individuales_30/B1_Base_Cover.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "81f820b2bbe11bce6d7730c75a9af6e5c70bbb090409e0a6f1129a19df99bf01"
+        },
+        {
+          "name": "Piezas_Individuales_30/B2_Base_Floor.stl",
+          "bytes": 1161084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "f6236837b5054f29b42d54d5a2539f21271799cf1e56c15acb2b32d9479e2e9c"
+        },
+        {
+          "name": "Piezas_Individuales_30/B3_Battery_Drawer.stl",
+          "bytes": 43784,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "bb8093cdf4b6926056ff6322fa56f4885096dcf99a684d668d1a78c7a8a4dadc"
+        },
+        {
+          "name": "Piezas_Individuales_30/B4_Gimbal_Post.stl",
+          "bytes": 210084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "acdd6e8eb74bf397b63cc7a4692ad7126fed2b37e24ee1b50a67ce06d755b890"
+        },
+        {
+          "name": "Piezas_Individuales_30/G1_Ujoint_Cross.stl",
+          "bytes": 53084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "202a57e20d90a53197c5ae8f5825a6ad24703719c0ff7418e4a2e5a9d175f97b"
+        },
+        {
+          "name": "Piezas_Individuales_30/G2_Crank_L.stl",
+          "bytes": 86584,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "a7fd05a74f8e218f534d33aea8a631b2aea0ae6700d36c063ab35c21701f4096"
+        },
+        {
+          "name": "Piezas_Individuales_30/G3_Crank_R.stl",
+          "bytes": 86584,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "78d825306990c5e33abedc6f40783b0603f0e76f09f4119f8d79e3971036dfcb"
+        },
+        {
+          "name": "Piezas_Individuales_30/H1_Head_Front.stl",
+          "bytes": 1003184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "b9187e4276647d1b15f4cca573e6cd8805867c83ac7c08d1b131b0b8c3db03d1"
+        },
+        {
+          "name": "Piezas_Individuales_30/H2_Head_Back.stl",
+          "bytes": 1258184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e"
+        },
+        {
+          "name": "Piezas_Individuales_30/H3_Visor.stl",
+          "bytes": 554484,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "c37b256e0127917ddc6c2bec42b2ab20a79d1d388873f69be1e4c8b3aeca7f05"
+        },
+        {
+          "name": "Piezas_Individuales_30/H4_Display_Bars.stl",
+          "bytes": 231084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "896c6c6c340c25e1d3b3d47a6b821e7b8a5e3b10b243e75c7b393a97f7bf0a2e"
+        },
+        {
+          "name": "Piezas_Individuales_30/H5_Head_Base.stl",
+          "bytes": 332884,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "222ac356dd57ce6ac8baedd29c785997347d001b5f36c3ea5dad760c9e1dd52d"
+        },
+        {
+          "name": "Piezas_Individuales_30/H6_Ear_L.stl",
+          "bytes": 151784,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0"
+        },
+        {
+          "name": "Piezas_Individuales_30/H7_Ear_R.stl",
+          "bytes": 151784,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            12
+          ],
+          "sha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8"
+        },
+        {
+          "name": "Piezas_Individuales_30/H8_Antenna.stl",
+          "bytes": 453184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            10
+          ],
+          "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66"
+        },
+        {
+          "name": "Piezas_Individuales_30/K1_Core_Deck.stl",
+          "bytes": 559284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "f5073953eda7e0995562ebfb782df7b1f44a9f883733d9fe24995555f75995a4"
+        },
+        {
+          "name": "Piezas_Individuales_30/K2_Core_Spine.stl",
+          "bytes": 459284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "da9528263e1c606019062af9bc6322839588b480ed55d8a706d0f3b2f3f92a06"
+        },
+        {
+          "name": "Piezas_Individuales_30/K3_Core_Shoulders.stl",
+          "bytes": 414384,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "80310bc3c13ff803d6af54bb37ab19933fd1ca9d642d58205f6ec0a66470a449"
+        },
+        {
+          "name": "Piezas_Individuales_30/K4_Neck_Hub.stl",
+          "bytes": 275384,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b"
+        },
+        {
+          "name": "Piezas_Individuales_30/K5_Power_Rack.stl",
+          "bytes": 142284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "fca136559af661c46e4699af8af10132f6ac815f28ae2fc54eac7c35bd41b5dd"
+        },
+        {
+          "name": "Piezas_Individuales_30/S1_Body_Front.stl",
+          "bytes": 1435884,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "5e9a0110a0b390c96ccd44887328a077524d82a9ea8edf89a6ea55d4fdeb89e5"
+        },
+        {
+          "name": "Piezas_Individuales_30/S2_Body_Back.stl",
+          "bytes": 1346684,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "5c0386c99cf1a04227e25d6263658b4890dad946ecea15cb94a5f48477347f3a"
+        },
+        {
+          "name": "Piezas_Individuales_30/S3_Tummy_Grille.stl",
+          "bytes": 305584,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "258aa168c3b99ce09e021fa21ac8e51a7c265fdf8565e11b7cb64c8901569575"
+        },
+        {
+          "name": "Piezas_Individuales_30/S4_USB_Plug.stl",
+          "bytes": 92284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            34,
+            8
+          ],
+          "sha256": "e8dc6637f68870c6320dee18d75cad30d15c152282873c16aa091365bae4f077"
+        },
+        {
+          "name": "STL_11_Placas/Placa_01.stl",
+          "bytes": 2388784,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "eacca60583d706bd315880278eb12cebaf9d41b66dbf6b22a47e6d1e45fe245d"
+        },
+        {
+          "name": "STL_11_Placas/Placa_02.stl",
+          "bytes": 1043784,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "530dd6c9217abab7b7a08a288ea1335a86f1c4e02ed2c0ea13a0d591f7f27a2a"
+        },
+        {
+          "name": "STL_11_Placas/Placa_03.stl",
+          "bytes": 1003184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "234d0f445e985813bfc723974c6b49ab63e92bac65953df7c527de442fb1df61"
+        },
+        {
+          "name": "STL_11_Placas/Placa_04.stl",
+          "bytes": 1258184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "c0da37d6bc700f86abdc47e34a2d41b93fcdc2e4772667e5ec2c34d0c6c4f902"
+        },
+        {
+          "name": "STL_11_Placas/Placa_05.stl",
+          "bytes": 1346684,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "4a46af8c1d0351802755a71c6d49c0e5e079bd41733cfb51f00b94c77fe0a2ae"
+        },
+        {
+          "name": "STL_11_Placas/Placa_06.stl",
+          "bytes": 1435884,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "3b4ed3bc17f4cd6d12ed95fde5bfa2452e67ca567cbef97bcc60c13b5d77c3c5"
+        },
+        {
+          "name": "STL_11_Placas/Placa_07.stl",
+          "bytes": 459284,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "2f3df60c490a1fda67593b0e905dbc808440582dc082c524c404032ad5b5a513"
+        },
+        {
+          "name": "STL_11_Placas/Placa_08.stl",
+          "bytes": 231084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "b62c955c4d14450ad676ffa3812acfa356200345446c98b2f9ef5116a5ddbf2e"
+        },
+        {
+          "name": "STL_11_Placas/Placa_09.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "ba5a1c1d6b38937f6c2a840c5f11ab7c9a7d9689b9a31281790250ef930d6749"
+        },
+        {
+          "name": "STL_11_Placas/Placa_10.stl",
+          "bytes": 1161084,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "99dcb29b2faa9932cb3bd5c6ae1b1d421cf7cffd7227d9d9c9dcfc30d3be9046"
+        },
+        {
+          "name": "STL_11_Placas/Placa_11.stl",
+          "bytes": 4857184,
+          "date": [
+            2026,
+            11,
+            13,
+            6,
+            43,
+            2
+          ],
+          "sha256": "9ac9e3731d1d5387cef38e89b86c270504f060e23bc47c5151e1ec83a392f347"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_STL_Agrupados_A1_Mini.zip",
+      "entries": [
+        {
+          "name": "03_Head_Front_Arm_Left.stl",
+          "bytes": 1546684,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "87fa7077454e79e8d44a9e7126232969aca93e5593cec387c9f5de76709addab"
+        },
+        {
+          "name": "01_Base_Cover.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "4e8e1210439ca67bf7cdfead1e2e40fb1d28931e8b9742c8d2ed3e96327bd8f2"
+        },
+        {
+          "name": "05_Visor_Display_Head.stl",
+          "bytes": 1502084,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "1e1d67b123f94ac99fa172d582c0da1820370ebeeccc8bf18e823520b09e4d32"
+        },
+        {
+          "name": "04_Head_Back_Arm_Right.stl",
+          "bytes": 1801684,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "efd239274929f2ab9059f094656526597cb1c2f5b7a3f8a13951ea6179c2d3cb"
+        },
+        {
+          "name": "02_Base_Floor.stl",
+          "bytes": 3593784,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "00d57b58ad82ce1147b0185e381907684f02510b29ce9cb4943ee783fd588c41"
+        },
+        {
+          "name": "06_Battery_Mechanism_SmallParts.stl",
+          "bytes": 3695884,
+          "date": [
+            2026,
+            11,
+            7,
+            4,
+            58,
+            46
+          ],
+          "sha256": "3c0958e0b1907c4e61d0e7aa8176d1eef54154573396de7527f05c0e6228de47"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_Todas_30_Piezas_Agrupadas_A1_Mini.zip",
+      "entries": [
+        {
+          "name": "Placa_01.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "a27b1b3ecb87f7156ca31710df1ed14308014ae8a7080f56ee9e93d868f8fa5f"
+        },
+        {
+          "name": "Placa_02.stl",
+          "bytes": 3593784,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "9f20ea2ec8fe2123ec4f65512b750a7c37cae6350d63ef4c2bc4abb7cadaaf69"
+        },
+        {
+          "name": "Placa_03.stl",
+          "bytes": 2260284,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "7653f7c022337397173477bfaeb5fa6549766820999254bc56d16019c1c0cc0b"
+        },
+        {
+          "name": "Placa_04.stl",
+          "bytes": 1437084,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "02fa6d4cf424263831097e138090484d39eebbcc4e5a86cc7a1e7952d6704156"
+        },
+        {
+          "name": "Placa_05.stl",
+          "bytes": 2456084,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "1e389f8a49f3cfedd64edac27bc7df3a7d74958b782d4e1fb8fbcc5daab9576a"
+        },
+        {
+          "name": "Placa_06.stl",
+          "bytes": 1672484,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "0f991331233c8bfd1fb4a1f6a0bf83103307fe8073f7c317e13076582a5f9488"
+        },
+        {
+          "name": "Placa_07.stl",
+          "bytes": 1424384,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "33f2b6c394ebff7e649a06cc4776594161ed942eb6d66792871af897ead4c2aa"
+        },
+        {
+          "name": "Placa_08.stl",
+          "bytes": 3690484,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "c9c660765ccd08a9125a75a32a836e1929f9a2ff21dcba2ddc071dbeb628eb87"
+        },
+        {
+          "name": "Placa_09.stl",
+          "bytes": 1386084,
+          "date": [
+            2026,
+            11,
+            7,
+            5,
+            3,
+            42
+          ],
+          "sha256": "8f2cfc4a289019ef98c05f0a9adcb46bbd874fbe2e9ad3295d0d77164c3948df"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_V17_Nido_rev.zip",
+      "entries": [
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/B3_Battery_Drawer.stl",
+          "bytes": 43784,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            12
+          ],
+          "sha256": "bb8093cdf4b6926056ff6322fa56f4885096dcf99a684d668d1a78c7a8a4dadc"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/S3_Tummy_Grille.stl",
+          "bytes": 415284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            22
+          ],
+          "sha256": "142741bfadf67eab65f3b295cdf6f80cfae4586fe80ef308fd1ea55092f4e450"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H8_Antenna.stl",
+          "bytes": 453184,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            26
+          ],
+          "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H5_Head_Base.stl",
+          "bytes": 332884,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            26
+          ],
+          "sha256": "f7b127e7f2683a28927c73a71f4ab2c5a23f22a8ed32621c70a7d81d452d444b"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/G2_Crank_L.stl",
+          "bytes": 93384,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "cc5f2c05492c35127ae2f3ee76950274e1e0999b2916cd47910fd73212ba2ab9"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/S1_Body_Front.stl",
+          "bytes": 1528384,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            18
+          ],
+          "sha256": "f3376cc026f145998d07ed80ae9e9a25e459074de91e82c69da5f70b60164493"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/S2_Body_Back.stl",
+          "bytes": 1437084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            20
+          ],
+          "sha256": "30ad204904acba7b2245827c530f4f2e2126ff2b5b4e199c18a4a9d9318f8bf2"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H4_Display_Bars.stl",
+          "bytes": 154084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "d7cb139ee6bea3b046494613dd209ace8b2692a2a0576cb7a3403fdc793d22f4"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/B1_Base_Cover.stl",
+          "bytes": 1428484,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            10
+          ],
+          "sha256": "81f820b2bbe11bce6d7730c75a9af6e5c70bbb090409e0a6f1129a19df99bf01"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H3_Visor.stl",
+          "bytes": 623984,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "200411fbe1dc02c0196bcd59c8d5af92620a754ec3ab5dbecdec213663fa649e"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/B2_Base_Floor.stl",
+          "bytes": 3593784,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            12
+          ],
+          "sha256": "8ee1796375d758a22affd29aa13335a74ddb7bd8ee977170793d8d6ce2649f99"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H2_Head_Back.stl",
+          "bytes": 1258184,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H7_Ear_R.stl",
+          "bytes": 151784,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            26
+          ],
+          "sha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/K1_Core_Deck.stl",
+          "bytes": 563584,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "59026b402e8d6115a5b11f1fd46d08d81463d18fbfaf3552455b0a3daf9ee734"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A3_Hand_L.stl",
+          "bytes": 1217084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/S4_USB_Plug.stl",
+          "bytes": 92284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            22
+          ],
+          "sha256": "b665ed22503f81731355cd52797024fd2698a09199f3d031044248d75f86da50"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A4_Hand_R.stl",
+          "bytes": 1217084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A1_Arm_L.stl",
+          "bytes": 543584,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H1_Head_Front.stl",
+          "bytes": 1003184,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "b9187e4276647d1b15f4cca573e6cd8805867c83ac7c08d1b131b0b8c3db03d1"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A5_Arm_Cap_L.stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/K2_Core_Spine.stl",
+          "bytes": 459284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "75aef7f0db0915305728de2c9ef3f39760d4240a2a967448a8d146648833c1bc"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A6_Arm_Cap_R.stl",
+          "bytes": 428284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/B4_Gimbal_Post.stl",
+          "bytes": 210084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "acdd6e8eb74bf397b63cc7a4692ad7126fed2b37e24ee1b50a67ce06d755b890"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/K5_Power_Rack.stl",
+          "bytes": 142284,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "8b3b09a93c9cac36cb39961374fc0c1f8ed857c39d6fd7889bf862c6381c462b"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/A2_Arm_R.stl",
+          "bytes": 543584,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            24
+          ],
+          "sha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/K3_Core_Shoulders.stl",
+          "bytes": 414384,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "90982432556818e9d043a1c761ec40ecd58673c6f6a856223f23c6862963f434"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/K4_Neck_Hub.stl",
+          "bytes": 275384,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/G1_Ujoint_Cross.stl",
+          "bytes": 53084,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "202a57e20d90a53197c5ae8f5825a6ad24703719c0ff7418e4a2e5a9d175f97b"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/G3_Crank_R.stl",
+          "bytes": 93384,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            14
+          ],
+          "sha256": "24e6c7e8c65cd4f17f2df258fae0f79609e64ec71fffc3d5425a242212c2be8e"
+        },
+        {
+          "name": "CUTY_V17_Nido/STL_imprimir/H6_Ear_L.stl",
+          "bytes": 151784,
+          "date": [
+            2026,
+            11,
+            5,
+            19,
+            44,
+            26
+          ],
+          "sha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0"
+        }
+      ]
+    },
+    {
+      "archive": "CUTY_V23_all_files.zip",
+      "entries": [
+        {
+          "name": "CUTY_V23_Assembly_V16_Body_Arms.stl",
+          "bytes": 5172384,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            48
+          ],
+          "sha256": "b71d2ef7849d17b01807f5437b0d49266c7ec7dd2ce2ef0645001e73350a49c6"
+        },
+        {
+          "name": "aligned_parts/Arm_Right.stl",
+          "bytes": 73684,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "462b874b82cdce62b754f8c8fca38f8d63f6ab5fe1ab7b70436bd8dd87e4909d"
+        },
+        {
+          "name": "aligned_parts/Head_Left_V23.stl",
+          "bytes": 1092284,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "fadb8607cb47d3b563723ca9e0465afa3afe0d00ba27ee0593c140c124363c8c"
+        },
+        {
+          "name": "aligned_parts/Body_Upper_Right.stl",
+          "bytes": 583584,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "f8348169bd94f1917c95c007261257c565bc1e02e1d71f4f2c433e52d07aaafa"
+        },
+        {
+          "name": "aligned_parts/Body_Lower_Left.stl",
+          "bytes": 423584,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "cd3410fdd8104b847b021a5ce6540a00bbf1ad822801f6feaf762810dbc7062a"
+        },
+        {
+          "name": "aligned_parts/Body_Lower_Right.stl",
+          "bytes": 407684,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "6e1533717ceebc1def74c8f75aa3fee11dc8a747a880c514f4d1e4ac358efe99"
+        },
+        {
+          "name": "aligned_parts/Head_Right_V23.stl",
+          "bytes": 1064784,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "4879ab38ffe4689191ec9c14b07b859fa561bc0092840d6bfca3e6631d735de5"
+        },
+        {
+          "name": "aligned_parts/Arm_Left.stl",
+          "bytes": 73684,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "5baf5a51740a0da270ce029f37b59b85d66b14a3be6b5a973847c78e6b8dcc5e"
+        },
+        {
+          "name": "aligned_parts/Camera_Back_Cap_V23.stl",
+          "bytes": 829884,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "756e920f3eec56e8bd117e1820e77b0b91deb67168b3cc350acf37aaa18f0494"
+        },
+        {
+          "name": "aligned_parts/Body_Upper_Left.stl",
+          "bytes": 623884,
+          "date": [
+            2026,
+            11,
+            5,
+            7,
+            15,
+            46
+          ],
+          "sha256": "1c6a51950828d227095b58f164e51d5b4e4a23b8e6ce34afb871eb361a9812e9"
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 #define CUTY_BODY_H
 #include "../communication/uart_protocol.h"
 #include "../safety/safety.h"
-#define CUTY_AXES 5
+#include "../joints.h"
 typedef struct { float minimum, maximum, max_velocity, max_acceleration; } CutyLimits;
 typedef struct { float target, commanded, velocity; } CutyAxis;
 typedef struct {

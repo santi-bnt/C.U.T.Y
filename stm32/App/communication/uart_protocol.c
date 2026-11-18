@@ -1,16 +1,23 @@
 #include "uart_protocol.h"
 #include <string.h>
 bool cuty_parse_line(const char *s, CutyCommand *out) {
-    static const char *names[] = {"V1,HB", "V1,ARM", "V1,START", "V1,DISARM", "V1,RESET"};
+    static const char *names[] = {"V2,HB", "V2,ARM", "V2,START", "V2,DISARM", "V2,RESET"};
     if (!s || !out) return false;
     CutyCommand c = {0};
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); ++i) {
         if (!strcmp(s, names[i])) { c.kind = (CutyCommandKind)i; *out = c; return true; }
     }
-    if (strncmp(s, "V1,TARGET,", 10)) return false;
+    if (strncmp(s, "V2,TARGET,", 10)) return false;
     s += 10;
-    if (*s < '0' || *s > '4' || s[1] != ',') return false;
-    c.axis = (unsigned)(*s - '0'); s += 2;
+    static const char *joints[CUTY_AXES] = {"HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"};
+    unsigned axis;
+    for (axis = 0; axis < CUTY_AXES; ++axis) {
+        size_t length = strlen(joints[axis]);
+        if (!strncmp(s, joints[axis], length) && s[length] == ',') {
+            c.axis = axis; s += length + 1; break;
+        }
+    }
+    if (axis == CUTY_AXES) return false;
     bool negative = *s == '-'; if (negative) ++s;
     int value = 0; unsigned digits = 0;
     while (*s >= '0' && *s <= '9') {

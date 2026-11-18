@@ -1,9 +1,3 @@
-# Body Control Plan
+# Body control
 
-STM32 owns head PAN/TILT, left/right ear, future left/right arm, body/base X/Y axes, IMU, two-axis PID, PWM, calibrated limits, and real-time safety.
-
-Body roll/pitch control may use two servos and IMU feedback. Mechanical geometry, coupled kinematics, coordinate frames, sensor calibration, control frequency, gains, filtering, saturation/anti-windup, travel/rate limits, and safe fault behavior remain to be designed.
-
-Raspberry requests high-level goals such as `SET_BODY,8,0` or `CENTER_BODY`; it must not continuously stream raw PWM. These examples do not fix angle units, signs, numeric bounds, or motion trajectories.
-
-STM32 should eventually report target/measured/error for both PID axes and distinguish commanded servo position from measurement. The future dashboard plots telemetry only. Portable normalized setpoint logic now exists; physical servo output and PID remain unimplemented. See [FreeRTOS motion control](freertos-motion-control.md) for the actual implementation boundary.
+The current design plans three active joints: HEAD_PAN, LEFT_ARM and RIGHT_ARM. The carrier retains five PWM outputs; J7?J9 are proposed for these joints and J10/J11 are reserved. Physical mapping, calibration and safety remain unverified. See [FreeRTOS motion control](freertos-motion-control.md).

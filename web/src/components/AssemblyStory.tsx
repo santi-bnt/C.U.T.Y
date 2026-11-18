@@ -156,7 +156,7 @@ export default function AssemblyStory() {
     <section id="assembly" className="assembly-story technical-section paper">
       <div className="technical-heading">
         <span className="eyebrow">
-          V17 / NIDO · 06 NOV 2026 — {t(bi("CURRENT PRINT CAD", "CAD DE IMPRESIÓN ACTUAL"))}
+          V17 / FIJO · 13 NOV 2026 — {t(bi("CURRENT PRINT CAD", "CAD DE IMPRESIÓN ACTUAL"))}
         </span>
         <h2>
           {t(
@@ -169,8 +169,8 @@ export default function AssemblyStory() {
         <p>
           {t(
             bi(
-              "The latest printable V17 Nido revision incorporates measured electronics, camera and speaker dimensions. Browse the author-provided design views and download the current print files.",
-              "La última revisión imprimible del Nido V17 incorpora medidas de la electrónica, la cámara y la bocina. Explora las vistas del diseño y descarga los archivos actuales de impresión.",
+              "The fixed V17 version uses a stationary pedestal and three planned servos. Explore the author CAD views and 27 original printable STL files.",
+              "El V17 fijo usa un pedestal inmóvil y tres servos previstos. Explora las vistas CAD y los 27 STL originales de impresión.",
             ),
           )}
         </p>
@@ -179,13 +179,13 @@ export default function AssemblyStory() {
         <figure className="latest-cad-image">
           <img
             src={asset(selectedRevision[3])}
-            alt={t(bi(`V17 Nido CAD view: ${selectedRevision[1]}`, `Vista CAD del Nido V17: ${selectedRevision[2]}`))}
+            alt={t(bi(`V17 Fixed CAD view: ${selectedRevision[1]}`, `Vista CAD del V17 Fijo: ${selectedRevision[2]}`))}
             width="1100"
             height="1100"
             loading="lazy"
           />
           <figcaption className="mono">
-            {t(bi("AUTHOR CAD RENDER · 06 NOV 2026", "RENDER CAD DEL AUTOR · 06 NOV 2026"))}
+            {t(bi("AUTHOR CAD RENDER · 13 NOV 2026", "RENDER CAD DEL AUTOR · 13 NOV 2026"))}
           </figcaption>
         </figure>
         <div className="latest-cad-copy">
@@ -194,8 +194,8 @@ export default function AssemblyStory() {
           <p>
             {t(
               bi(
-                "The November 6 print CAD adds a camera cradle and retaining bar, sizes the display bars to the measured 5.8 mm panel, and shapes the grille around the 35.4 × 25 × 5.5 mm speaker. The battery drawer is designed for the team's HM2202 pack envelope; its exact dimensions still need measurement.",
-                "El CAD de impresión del 6 de noviembre añade una cuna y barra para la cámara, ajusta las barras a la pantalla medida de 5.8 mm y forma la rejilla alrededor de la bocina de 35.4 × 25 × 5.5 mm. El cajón está diseñado para la batería HM2202 del equipo; aún falta medir sus dimensiones exactas.",
+                "The fixed pedestal replaces the gimbal. Head PAN and both arms are planned; physical fit and motion remain unvalidated.",
+                "El pedestal fijo reemplaza al gimbal. Se prevén cabeza PAN y ambos brazos; el ajuste y movimiento físicos siguen sin validar.",
               ),
             )}
           </p>
@@ -213,8 +213,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-                "The supplied CAD report lists 30 watertight printable parts, 0 reported static interferences and 34 checked poses. Those are author-reported model checks, not physical print, assembly or electrical validation. The interactive GLB is rebuilt from this November 6 CAD revision, including the camera cradle and measured display/camera bars.",
-                "El reporte CAD suministrado enumera 30 piezas imprimibles herméticas, 0 interferencias estáticas reportadas y 34 posturas revisadas. Son comprobaciones del modelo reportadas por el autor, no validación física de impresión, ensamble o electricidad. El GLB interactivo se reconstruyó desde esta revisión CAD del 6 de noviembre e incluye la cuna de cámara y las barras medidas para pantalla y cámara.",
+                "The interactive GLB uses 27 original STL meshes with rigid placement. Purchased components are simplified; some fasteners and cable envelopes are omitted. Physical fit and motion remain unvalidated.",
+                "El GLB interactivo usa 27 mallas STL originales colocadas rígidamente. Los componentes comprados son simplificados; faltan algunos tornillos y envolventes de cables. El ajuste y movimiento físicos siguen sin validar.",
               ),
             )}
           </p>
@@ -272,8 +272,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-              "This 18-step image sequence depicts an earlier Nido assembly reference. The interactive GLB and current November 6 printable CAD share the updated enclosure geometry; purchased electronics remain simplified CAD envelopes.",
-              "Esta secuencia de 18 pasos muestra una referencia anterior de armado Nido. El GLB interactivo y la CAD imprimible actual del 6 de noviembre comparten la geometría nueva de la carcasa; los componentes electrónicos comprados siguen como envolventes CAD simplificadas.",
+              "This 18-step image sequence depicts an earlier Nido assembly reference. The current interactive GLB uses the fixed-pedestal STL set; purchased electronics remain simplified CAD envelopes.",
+              "Esta secuencia de 18 pasos muestra el ensamble Nido histórico. El GLB actual usa el pedestal fijo; los componentes electrónicos son referencias simplificadas.",
               ),
             )}
           </p>
@@ -325,18 +325,18 @@ export default function AssemblyStory() {
         <p>
           {t(
             bi(
-                "The November 6 print package includes 30 oriented STL parts, the matching CadQuery source, part dimensions and the author's verification report. The report has not been independently rerun here; physical fit, wiring and motor safety still need their own checks.",
-                "El paquete de impresión del 6 de noviembre incluye 30 STL orientados, la fuente CadQuery correspondiente, dimensiones y el reporte de verificación del autor. Aquí no se volvió a ejecutar de forma independiente; ajuste físico, cableado y seguridad de motores aún requieren sus propias comprobaciones.",
+                "The fixed print package includes 27 original STL parts, source references, dimensions and the author's verification report. The report has not been independently rerun here; physical fit, wiring and motor safety still need their own checks.",
+                "El paquete fijo incluye 27 STL originales, referencias CAD, dimensiones y el reporte del autor. El ajuste físico y la seguridad de motores siguen pendientes.",
             ),
           )}
         </p>
         <div className="engineering-downloads">
           {[
-            ["nido-print-stl.zip", "30 STL · 06 Nov"],
-            ["source-readme.md", "README · 06 Nov"],
-            ["current-cad-source.zip", "CadQuery source / Fuente CadQuery"],
-            ["print-parts.json", "Dimensions / Medidas"],
-            ["author-cad-verification.json", "CAD report / Reporte CAD"],
+            ["fixed-print-stl.zip", "27 STL · 13 Nov"],
+            ["fixed-source-readme.md", "README · 13 Nov"],
+            ["fixed-cad-source.zip", "CAD source / Fuente CAD"],
+            ["fixed-print-parts.json", "Dimensions / Medidas"],
+            ["fixed-author-cad-verification.json", "CAD report / Reporte CAD"],
             ["provenance.json", "Provenance / Procedencia"],
           ].map(([file, label]) => (
             <a href={asset(file)} key={file} download>

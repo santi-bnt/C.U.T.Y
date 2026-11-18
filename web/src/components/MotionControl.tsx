@@ -108,8 +108,8 @@ export default function MotionControl() {
           <p className="motion-mailbox" data-active={step === 3}>
             {t(
               bi(
-                "CommunicationTask → latest-target queue [1] → ServoControlTask",
-                "CommunicationTask → cola del último objetivo [1] → ServoControlTask",
+                "CommunicationTask → three latest-target queues [1 each] → ServoControlTask",
+                "CommunicationTask → tres colas de último objetivo [1 cada una] → ServoControlTask",
               ),
             )}
           </p>
@@ -194,13 +194,13 @@ export default function MotionControl() {
               bi("PHYSICAL HARDWARE · PENDING", "HARDWARE FÍSICO · PENDIENTE"),
             )}
           </span>
-          <h3>TIM4 CH1–4 + TIM1 CH1 → 5 × PWM → MG996R</h3>
+          <h3>STM32F401 / FreeRTOS → 3 × MG996R</h3>
           <p>
-            PB6 / PB7 / PB8 / PB9 + PA8 ·{" "}
+            TIM4 CH1–3 / PB6 / PB7 / PB8 ·{" "}
             {t(
               bi(
-                "head and arms mapping pending",
-                "asignación de cabeza y brazos pendiente",
+                "HEAD_PAN (J7) · LEFT_ARM (J8) · RIGHT_ARM (J9). PCB: 5 channels; J10 / TIM4 CH4 / PB9 and J11 / TIM1 CH1 / PA8 reserved, disabled and without actuators.",
+                "HEAD_PAN (J7) · LEFT_ARM (J8) · RIGHT_ARM (J9). PCB: 5 canales; J10 / TIM4 CH4 / PB9 y J11 / TIM1 CH1 / PA8 reservados, deshabilitados y sin actuadores.",
               ),
             )}
           </p>

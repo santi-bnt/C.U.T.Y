@@ -13,7 +13,7 @@
       "sha256": "a7a752dfb33c8f2b82f807d749824edb41150272b21b340d6c01e8ed856b8a69"
     }
   ],
-  "geometrySource": "hardware/cad/carcasa_v17/fuente_cad/v17/build.py + web/scripts/data/cadquery/parts.json",
+  "geometrySource": "hardware/cad/carcasa_v17_fija/STL_imprimir",
   "optimization": "gltfpack 1.3.0 -kn -km -vp 16 -vn 12 -cc; no simplification requested",
   "images": [
     {
@@ -90,8 +90,8 @@
     }
   ],
   "sourceGlbSha256": "f12cf82ecc33b98479a6ce443bd78b0f50b5c385d7cecb48645fcd8b1928d539",
-  "webGlbSha256": "eb87271d3f4969188d21b4182efa63ab5085625c86168753f8343a295dbec792",
-  "webGlbBytes": 1093424,
+  "webGlbSha256": "24b495e0bf83f4936db1ee14ac207880e186a7af56a2489ac75c7129c7ee0c4b",
+  "webGlbBytes": 22095244,
   "limitations": [
     "Purchased electronics are simplified mechanical solids.",
     "CAD verification is an author-supplied report, not rerun or physical validation.",
@@ -329,9 +329,1543 @@
     ],
     "reportScope": "Author-supplied CAD/model checks; not independently rerun or physical validation."
   },
-  "webGlbRevision": "V17 Nido - 2026-11-06",
-  "webGlbPrintCadNote": "The interactive model is rebuilt from the November 6 CadQuery revision. The optimized mesh preserves the updated camera cradle, three display/camera bars, and LCD component.",
+  "webGlbRevision": "V17 Fijo STL / 2026-11-13",
+  "webGlbPrintCadNote": "Current fixed STL meshes, rigidly assembled; historical purchased electronics are simplified references. Physical fit and motion remain unvalidated.",
   "currentModelBuild": {
+    "revision": "V17 Fijo STL / 2026-11-13",
+    "auditedOn": "2026-11-17",
+    "sourceDirectory": "hardware/cad/carcasa_v17_fija/STL_imprimir",
+    "webGlbSha256": "24b495e0bf83f4936db1ee14ac207880e186a7af56a2489ac75c7129c7ee0c4b",
+    "webGlbBytes": 22095244,
+    "sourceReference": {
+      "path": "hardware/cad/glb/archive/CUTY_V17_Nido_20261106_web.glb",
+      "sha256": "eb87271d3f4969188d21b4182efa63ab5085625c86168753f8343a295dbec792",
+      "scope": "Historical purchased envelopes only; not printed geometry"
+    },
+    "geometryPolicy": "Original STL positions and triangle order exported exactly. Rigid node matrices only. No repair, remeshing, quantization or structural scaling.",
+    "printed": [
+      {
+        "name": "A1_Arm_L",
+        "file": "A1_Arm_L.stl",
+        "sha256": "c5347be36d00b9a20726859b2e4acab673976f2ab9a8fb88ee540fb863da15e3",
+        "bytes": 543584,
+        "previousSameNameSha256": "4009ce3cb38ebd1cd32c5704b5fb249d0b3875197615663dbeecfa365623a587",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 10870,
+        "printBoundsMm": [
+          [
+            -51.995338439941406,
+            -15,
+            -1.4210854715202004e-14
+          ],
+          [
+            52,
+            15,
+            21.399999618530273
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -1.1639096436992562e-14,
+            -15,
+            -52
+          ],
+          [
+            21.399999618530273,
+            15,
+            51.995338439941406
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          -1,
+          -6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          -86.99999904632568,
+          90.2955711364746,
+          -5.999999999999995,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "A2_Arm_R",
+        "file": "A2_Arm_R.stl",
+        "sha256": "5bfe8c7e298a5829832e285937e02b5f86dd965c4ca12793491dca943a2236e6",
+        "bytes": 543584,
+        "previousSameNameSha256": "b967481285d771b3bc2f7ed35d20c2d2d96389d62d9bd3970094868bed5f25cb",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 10870,
+        "printBoundsMm": [
+          [
+            -52,
+            -15,
+            -1.4210854715202004e-14
+          ],
+          [
+            51.995338439941406,
+            15,
+            21.399999618530273
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -21.399999618530273,
+            -15,
+            -52
+          ],
+          [
+            1.1639096436992562e-14,
+            15,
+            51.995338439941406
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          -1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          86.99999904632568,
+          90.2955711364746,
+          -5.999999999999995,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "A3_Hand_L",
+        "file": "A3_Hand_L.stl",
+        "sha256": "50710fb69063d4b3391bef44ff13b62a18c0585aa3801cb93da609b5f805d7e1",
+        "bytes": 1217084,
+        "previousSameNameSha256": "41e7423a162e22b12e3a16c346276857a72041d3e9fc882c00c5a6bec72d7f86",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 24340,
+        "printBoundsMm": [
+          [
+            -7.949999809265137,
+            -17.148815155029297,
+            1.0000000116860974e-7
+          ],
+          [
+            7.948963165283203,
+            17.14990997314453,
+            14.40000057220459
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            1.0000000068181265e-7,
+            -17.148815155029297,
+            -7.948963165283203
+          ],
+          [
+            14.40000057220459,
+            17.14990997314453,
+            7.949999809265138
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          -1,
+          -6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          -88.20000033610229,
+          40.151475238800046,
+          -3.9464273452758762,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "A4_Hand_R",
+        "file": "A4_Hand_R.stl",
+        "sha256": "6719649fcbf10fe8210c47e2402bdd592ba5085ef7eb9b9cf45a6210eee083d2",
+        "bytes": 1217084,
+        "previousSameNameSha256": "0c58a59232b73f52afa56110e7a3d105dfbf05deee44bd6fe64f4a50cfc3df40",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 24340,
+        "printBoundsMm": [
+          [
+            -7.948963165283203,
+            -17.148815155029297,
+            1.0000000116860974e-7
+          ],
+          [
+            7.949999809265137,
+            17.14990997314453,
+            14.40000057220459
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -14.40000057220459,
+            -17.148815155029297,
+            -7.948963165283203
+          ],
+          [
+            -1.0000000068181265e-7,
+            17.14990997314453,
+            7.949999809265138
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          -1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          88.20000033610229,
+          40.151475238800046,
+          -3.9464273452758762,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "A5_Arm_Cap_L",
+        "file": "A5_Arm_Cap_L.stl",
+        "sha256": "4affb1d1a11d9bcf50bc9ffa57126e992921153a2acb53b1a0c85d69a9b6267d",
+        "bytes": 428284,
+        "previousSameNameSha256": "19b586bb27f965eae6eb829dcf1339b9c2c57f024ccd09dc5c53532dadb467c5",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/A5_Arm_Cap_L(2).stl",
+        "triangles": 8564,
+        "printBoundsMm": [
+          [
+            -7,
+            -6.997824192047119,
+            -5.995204438854964e-16
+          ],
+          [
+            7,
+            6.997824192047119,
+            4.400000095367432
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -3.306546416093564e-16,
+            -6.997824192047119,
+            -7
+          ],
+          [
+            4.400000095367432,
+            6.997824192047119,
+            7
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          -1,
+          -6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          -87.40000081062317,
+          127.3,
+          -5.999999821186058,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "A6_Arm_Cap_R",
+        "file": "A6_Arm_Cap_R.stl",
+        "sha256": "5773ff16d9b1c44c0029c7533d15fcaf2658012a9da8d169b6800ee9711ebf9e",
+        "bytes": 428284,
+        "previousSameNameSha256": "ad2436572e1f217f987d6468ab402cf919056f4fcad1ceb16ac660cc8498484e",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/A6_Arm_Cap_R(2).stl",
+        "triangles": 8564,
+        "printBoundsMm": [
+          [
+            -7,
+            -6.997824192047119,
+            -5.995204438854964e-16
+          ],
+          [
+            7,
+            6.997824192047119,
+            4.400000095367432
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -4.400000095367432,
+            -6.997824192047119,
+            -7
+          ],
+          [
+            3.306546416093564e-16,
+            6.997824192047119,
+            7
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          -1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          87.40000081062317,
+          127.3,
+          -5.999999821186058,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "B1_Pedestal",
+        "file": "B1_Pedestal.stl",
+        "sha256": "038675bff867f2654eee0c7e5cb2d73d02e9cf1c23570dcaabe4044f86c16439",
+        "bytes": 399884,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/B1_Pedestal.stl",
+        "triangles": 7996,
+        "printBoundsMm": [
+          [
+            -62.999900817871094,
+            -63,
+            -2.4016957474905644e-16
+          ],
+          [
+            63,
+            62.98218536376953,
+            34
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -62.999900817871094,
+            -62.98218536376953,
+            -34.00000000000001
+          ],
+          [
+            63,
+            63,
+            -4.656133759306296e-15
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1.8369701987210297e-16,
+          1,
+          0,
+          0,
+          -1,
+          -1.8369701987210297e-16,
+          0,
+          -0.000049591064453125,
+          34.000000000000014,
+          2.0818995585505015e-15,
+          1
+        ],
+        "datum": "Pedestal: table z=GROUND; back radial extreme y=63",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "B2_Pedestal_Floor",
+        "file": "B2_Pedestal_Floor.stl",
+        "sha256": "d58519180e7c08005f98b3a83478adc4054e2c82c3837b478c9a114a57906db7",
+        "bytes": 781684,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/B2_Pedestal_Floor.stl",
+        "triangles": 15632,
+        "printBoundsMm": [
+          [
+            -59.599998474121094,
+            -59.599998474121094,
+            1.000000082740371e-7
+          ],
+          [
+            59.599998474121094,
+            59.599998474121094,
+            10
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -59.599998474121094,
+            -59.599998474121094,
+            1.000000082740371e-7
+          ],
+          [
+            59.599998474121094,
+            59.599998474121094,
+            10
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          -1.000000082740371e-7,
+          -6.123234502375419e-24,
+          1
+        ],
+        "datum": "Pedestal floor on table, common Z axis",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "B3_Pedestal_Drawer",
+        "file": "B3_Pedestal_Drawer.stl",
+        "sha256": "c07268a6a346f3c3250c8dab71fd9645c8580f89fbb5c3a20e7ef5271137c032",
+        "bytes": 22884,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/B3_Pedestal_Drawer.stl",
+        "triangles": 456,
+        "printBoundsMm": [
+          [
+            -22.600000381469727,
+            -58.59086608886719,
+            -3.552713678800501e-15
+          ],
+          [
+            22.600000381469727,
+            58.59086608886719,
+            27.399999618530273
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -22.600000381469727,
+            -58.59086608886719,
+            -3.552713678800501e-15
+          ],
+          [
+            22.600000381469727,
+            58.59086608886719,
+            27.399999618530273
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          3.2000000000000033,
+          -4.4091339111328125,
+          1
+        ],
+        "datum": "Drawer face y=63, tray bottom z=GROUND+3.2",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "B4_Deck_Riser",
+        "file": "B4_Deck_Riser.stl",
+        "sha256": "c788653ab137d06aed2cd98c9937f6229336a5c4681220eecc4253c72a7ccba5",
+        "bytes": 353684,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/B4_Deck_Riser.stl",
+        "triangles": 7072,
+        "printBoundsMm": [
+          [
+            -28.5,
+            -28.49114227294922,
+            0
+          ],
+          [
+            28.5,
+            28.49114227294922,
+            14.300000190734863
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -28.5,
+            -28.49114227294922,
+            0
+          ],
+          [
+            28.5,
+            28.49114227294922,
+            14.300000190734863
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          34,
+          2.0818995585505003e-15,
+          1
+        ],
+        "datum": "Riser bottom at PED_TOP=82.7",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H1_Head_Front",
+        "file": "H1_Head_Front.stl",
+        "sha256": "54fb896a2c539c58758de0f0a3d63a824c2fe42119d3a74b359f5e50e44b6c14",
+        "bytes": 902384,
+        "previousSameNameSha256": "feb5e9b878288bc22e026b5ec2fe5f94bd3d8ed4bf4ceca56470a705f1f7ac6c",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 18046,
+        "printBoundsMm": [
+          [
+            -80,
+            -67.25,
+            1.000001077500201e-7
+          ],
+          [
+            80,
+            67.25,
+            55.61935806274414
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -80,
+            -55.61935806274414,
+            -67.25
+          ],
+          [
+            80,
+            -1.0000010363214524e-7,
+            67.25
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          224.05,
+          -4.00000010000009,
+          1
+        ],
+        "datum": "Head front seam y=HEAD_YC=4, neck bottom z=205.5",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H2_Head_Back",
+        "file": "H2_Head_Back.stl",
+        "sha256": "c38f1655b7808040d6da45c793b2b634e8c47fb8c83838ed794b3aaaf69cccbd",
+        "bytes": 1258184,
+        "previousSameNameSha256": "59aacbfde39216db65ac81672a208dd56577d714ede784c779e3da641465cc0e",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 25162,
+        "printBoundsMm": [
+          [
+            -80,
+            -67.25,
+            2.5095051904566734e-14
+          ],
+          [
+            80,
+            67.25,
+            56
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -80,
+            2.4303834568271032e-14,
+            -67.25
+          ],
+          [
+            80,
+            56,
+            67.25
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1.2246467991473532e-16,
+          0,
+          0,
+          1.2246467991473532e-16,
+          -1,
+          0,
+          0,
+          224.05,
+          -3.999999999999962,
+          1
+        ],
+        "datum": "Head back seam y=4, neck bottom z=205.5",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H3_Visor",
+        "file": "H3_Visor.stl",
+        "sha256": "cbedb51d0f0ef00d0e3ac58c614c76555a348faa496701738b250653d6ed607b",
+        "bytes": 554484,
+        "previousSameNameSha256": "c37b256e0127917ddc6c2bec42b2ab20a79d1d388873f69be1e4c8b3aeca7f05",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 11088,
+        "printBoundsMm": [
+          [
+            -60.599998474121094,
+            -46.599998474121094,
+            1.0000002248489182e-7
+          ],
+          [
+            60.599998474121094,
+            46.599998474121094,
+            10.72065544128418
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -60.599998474121094,
+            1.0000002028052757e-7,
+            -46.599998474121094
+          ],
+          [
+            60.599998474121094,
+            10.72065544128418,
+            46.599998474121094
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1.2246467991473532e-16,
+          0,
+          0,
+          1.2246467991473532e-16,
+          -1,
+          0,
+          0,
+          225.3,
+          51.99999909632571,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H4_Display_Bars",
+        "file": "H4_Display_Bars.stl",
+        "sha256": "a353c43c5566222d538413bb5429adb8a70acb0aec03b6f825f311b43ed77ce6",
+        "bytes": 231084,
+        "previousSameNameSha256": "896c6c6c340c25e1d3b3d47a6b821e7b8a5e3b10b243e75c7b393a97f7bf0a2e",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 4620,
+        "printBoundsMm": [
+          [
+            -42.5,
+            -43.525001525878906,
+            -3.2157685251848317e-16
+          ],
+          [
+            42.5,
+            43.525001525878906,
+            3
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -42.5,
+            -2.6651376900775633e-15,
+            -43.525001525878906
+          ],
+          [
+            42.5,
+            3.0000000000000027,
+            43.525001525878906
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1.2246467991473532e-16,
+          0,
+          0,
+          1.2246467991473532e-16,
+          -1,
+          0,
+          0,
+          226.175,
+          41.45000076293947,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H5_Head_Base",
+        "file": "H5_Head_Base.stl",
+        "sha256": "283ea9b636cdb1853aff7fddc392c2fb0c11f12533a1273a688ae6448293c7bc",
+        "bytes": 332884,
+        "previousSameNameSha256": "222ac356dd57ce6ac8baedd29c785997347d001b5f36c3ea5dad760c9e1dd52d",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/H5_Head_Base(2).stl",
+        "triangles": 6656,
+        "printBoundsMm": [
+          [
+            -48,
+            -24,
+            0
+          ],
+          [
+            48,
+            24,
+            9.600000381469727
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -48,
+            -24,
+            0
+          ],
+          [
+            48,
+            24,
+            9.600000381469727
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          165.69999675750734,
+          -3.99999999999999,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H6_Ear_L",
+        "file": "H6_Ear_L.stl",
+        "sha256": "f251025eab5d35bf9338597fcbe7dd106252d0f35415ec3b292c9cb7683da2ea",
+        "bytes": 151784,
+        "previousSameNameSha256": "5e973aaa575152d7190ae61bd14606232b8ebb909a3fc5807e557441f5e82ba0",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 3034,
+        "printBoundsMm": [
+          [
+            -23,
+            -22.99577522277832,
+            9.999999406318238e-8
+          ],
+          [
+            23,
+            22.99577522277832,
+            21.5
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            9.999999265483857e-8,
+            -22.99577522277832,
+            -23
+          ],
+          [
+            21.5,
+            22.99577522277832,
+            23
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          -1,
+          -6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          -90.00000005,
+          225.3,
+          -3.9991254806518417,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H7_Ear_R",
+        "file": "H7_Ear_R.stl",
+        "sha256": "ec84b55a6417891d87b81f92f1fb14d8090635af8c62864197e25ee8f592a9f3",
+        "bytes": 151784,
+        "previousSameNameSha256": "e7458db782fbcda86a094969cdc91e02fff65195112711ccd823177ced7d57e8",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/H7_Ear_R(2).stl",
+        "triangles": 3034,
+        "printBoundsMm": [
+          [
+            -23,
+            -22.99577522277832,
+            9.999999406318238e-8
+          ],
+          [
+            23,
+            22.99577522277832,
+            21.5
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -21.5,
+            -22.99577522277832,
+            -23
+          ],
+          [
+            -9.999999265483857e-8,
+            22.99577522277832,
+            23
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          -1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          90.00000005,
+          225.3,
+          -3.9991254806518417,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "H8_Antenna",
+        "file": "H8_Antenna.stl",
+        "sha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+        "bytes": 453184,
+        "previousSameNameSha256": "4a8586901176d1bae1acd4e8529a9a9532e68ce149b1d47e3720636f73d71b66",
+        "comparison": "identical bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 9062,
+        "printBoundsMm": [
+          [
+            -9,
+            -8.99720287322998,
+            0
+          ],
+          [
+            9,
+            8.99720287322998,
+            34
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -9,
+            -8.99720287322998,
+            0
+          ],
+          [
+            9,
+            8.99720287322998,
+            34
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          282.3,
+          -3.9999999999999827,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "K1_Core_Deck_Fixed",
+        "file": "K1_Core_Deck_Fixed.stl",
+        "sha256": "f5073953eda7e0995562ebfb782df7b1f44a9f883733d9fe24995555f75995a4",
+        "bytes": 559284,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/K1_Core_Deck_Fixed.stl",
+        "triangles": 11184,
+        "printBoundsMm": [
+          [
+            -61.7470703125,
+            -59.17145538330078,
+            1.0000000116860974e-7
+          ],
+          [
+            61.760520935058594,
+            59.16657257080078,
+            8
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -61.7470703125,
+            -59.17145538330078,
+            1.0000000116860974e-7
+          ],
+          [
+            61.760520935058594,
+            59.16657257080078,
+            8
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          -0.006725311279296875,
+          48.2999999,
+          -0.0024414062499970423,
+          1
+        ],
+        "datum": "Fixed deck at DECK_Z0=97, common XY axis",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "K2_Core_Spine",
+        "file": "K2_Core_Spine.stl",
+        "sha256": "da9528263e1c606019062af9bc6322839588b480ed55d8a706d0f3b2f3f92a06",
+        "bytes": 459284,
+        "previousSameNameSha256": "75aef7f0db0915305728de2c9ef3f39760d4240a2a967448a8d146648833c1bc",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 9184,
+        "printBoundsMm": [
+          [
+            -54.75,
+            -47.75,
+            -1.386053612895905e-16
+          ],
+          [
+            54.75,
+            47.75,
+            10
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -54.75,
+            -10.000000000000004,
+            -47.75
+          ],
+          [
+            54.75,
+            -2.494290188661419e-15,
+            47.75
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          -1.25,
+          97.55,
+          10.000000000000002,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "K3_Core_Shoulders",
+        "file": "K3_Core_Shoulders.stl",
+        "sha256": "80310bc3c13ff803d6af54bb37ab19933fd1ca9d642d58205f6ec0a66470a449",
+        "bytes": 414384,
+        "previousSameNameSha256": "90982432556818e9d043a1c761ec40ecd58673c6f6a856223f23c6862963f434",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 8286,
+        "printBoundsMm": [
+          [
+            -57,
+            -16,
+            1.000000082740371e-7
+          ],
+          [
+            57,
+            16,
+            66
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -57,
+            -16,
+            -66
+          ],
+          [
+            57,
+            16.000000000000007,
+            -1.0000000727587923e-7
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1.8369701987210297e-16,
+          1,
+          0,
+          0,
+          -1,
+          -1.8369701987210297e-16,
+          0,
+          0,
+          149.30000005,
+          -1.9999999999999873,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "K4_Neck_Hub",
+        "file": "K4_Neck_Hub.stl",
+        "sha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+        "bytes": 275384,
+        "previousSameNameSha256": "eb8b617d6b9a06af60efb2c21e61d449b4b2edb86dec100754154401c19c179b",
+        "comparison": "identical bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 5506,
+        "printBoundsMm": [
+          [
+            -16,
+            -15.995026588439941,
+            0
+          ],
+          [
+            16,
+            15.995026588439941,
+            14.5
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -16,
+            -15.995026588439941,
+            0
+          ],
+          [
+            16,
+            15.995026588439941,
+            14.5
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          0,
+          1,
+          6.123233995736766e-17,
+          0,
+          0,
+          149.3,
+          9.141988355634992e-15,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "K5_Power_Rack",
+        "file": "K5_Power_Rack.stl",
+        "sha256": "fca136559af661c46e4699af8af10132f6ac815f28ae2fc54eac7c35bd41b5dd",
+        "bytes": 142284,
+        "previousSameNameSha256": "8b3b09a93c9cac36cb39961374fc0c1f8ed857c39d6fd7889bf862c6381c462b",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 2844,
+        "printBoundsMm": [
+          [
+            -18.75,
+            -27.5,
+            0
+          ],
+          [
+            18.75,
+            27.5,
+            43.5
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -18.75,
+            -43.5,
+            -27.5
+          ],
+          [
+            18.75,
+            -1.1940306291686695e-15,
+            27.5
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          107.55,
+          -33.49999999999999,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "S1_Body_Front_Fixed",
+        "file": "S1_Body_Front_Fixed.stl",
+        "sha256": "5e9a0110a0b390c96ccd44887328a077524d82a9ea8edf89a6ea55d4fdeb89e5",
+        "bytes": 1435884,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": "STL_Originales_Intactos/S1_Body_Front_Fixed.stl",
+        "triangles": 28716,
+        "printBoundsMm": [
+          [
+            -73.6015625,
+            -63.00954818725586,
+            1.0322529675477199e-7
+          ],
+          [
+            73.59819030761719,
+            63.0094108581543,
+            74.51432037353516
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -73.6015625,
+            -74.51432037353516,
+            -63.00954818725586
+          ],
+          [
+            73.59819030761719,
+            -1.0322529289771923e-7,
+            63.0094108581543
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0.00168609619140625,
+          97.30954818725586,
+          -6.000000103225287,
+          1
+        ],
+        "datum": "Front shell seam y=ARM_AXIS_Y=6, bottom z=PED_CUT=83",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "S2_Body_Back_Fixed",
+        "file": "S2_Body_Back_Fixed.stl",
+        "sha256": "5c0386c99cf1a04227e25d6263658b4890dad946ecea15cb94a5f48477347f3a",
+        "bytes": 1346684,
+        "previousSameNameSha256": null,
+        "comparison": "fixed-variant replacement",
+        "confirmedInLatestBundle": null,
+        "triangles": 26932,
+        "printBoundsMm": [
+          [
+            -73.56307220458984,
+            -63.00835037231445,
+            1.0314229825780785e-7
+          ],
+          [
+            73.56253051757812,
+            63.00954818725586,
+            62.599998474121094
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -73.56307220458984,
+            1.0314230201795948e-7,
+            -63.00954818725586
+          ],
+          [
+            73.56253051757812,
+            62.599998474121094,
+            63.00835037231445
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1.2246467991473532e-16,
+          0,
+          0,
+          1.2246467991473532e-16,
+          -1,
+          0,
+          0.000270843505859375,
+          97.30954818725586,
+          -5.999999896857692,
+          1
+        ],
+        "datum": "Rear shell seam y=6, bottom z=83",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "S3_Tummy_Grille",
+        "file": "S3_Tummy_Grille.stl",
+        "sha256": "258aa168c3b99ce09e021fa21ac8e51a7c265fdf8565e11b7cb64c8901569575",
+        "bytes": 305584,
+        "previousSameNameSha256": "db04a97166934b13cc58aa39efab11c6635312a245489db0bb2c1fcccc812f96",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 6110,
+        "printBoundsMm": [
+          [
+            -27.599838256835938,
+            -27.20762062072754,
+            1.0000047012681534e-7
+          ],
+          [
+            27.599998474121094,
+            27.208988189697266,
+            11.199999809265137
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            -27.599838256835938,
+            -11.199999809265135,
+            -27.20762062072754
+          ],
+          [
+            27.599998474121094,
+            -1.0000046926898009e-7,
+            27.208988189697266
+          ]
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          -0.000080108642578125,
+          65.29931621551513,
+          57.399999899999536,
+          1
+        ],
+        "datum": "Grille flat rear y=SPEAKER_FRONT+thickness-1=-57.4, z=114",
+        "exportedPositionsExact": true
+      },
+      {
+        "name": "S4_USB_Plug",
+        "file": "S4_USB_Plug.stl",
+        "sha256": "e8dc6637f68870c6320dee18d75cad30d15c152282873c16aa091365bae4f077",
+        "bytes": 92284,
+        "previousSameNameSha256": "c2594c3eb832b262b7517aac90f0b2422b87474f820417c5b5def7449614a510",
+        "comparison": "different bytes",
+        "confirmedInLatestBundle": null,
+        "triangles": 1844,
+        "printBoundsMm": [
+          [
+            -4,
+            -6.300000190734863,
+            1.0000000116860974e-7
+          ],
+          [
+            4,
+            6.300000190734863,
+            11.514081954956055
+          ]
+        ],
+        "cadBoundsAfterUnrotation": [
+          [
+            1.0000000094230086e-7,
+            -6.300000190734863,
+            -4
+          ],
+          [
+            11.514081954956055,
+            6.300000190734863,
+            4.000000000000001
+          ]
+        ],
+        "matrix": [
+          6.123233995736766e-17,
+          -1,
+          -6.123233995736766e-17,
+          0,
+          0,
+          6.123233995736766e-17,
+          -1,
+          0,
+          1,
+          6.123233995736766e-17,
+          3.749399456654644e-33,
+          0,
+          57.12857336766358,
+          63.3,
+          33.4000005722046,
+          1
+        ],
+        "datum": "Existing source CAD placement, shared with fixed variant",
+        "exportedPositionsExact": true
+      }
+    ],
+    "pivots": {
+      "HEAD_PAN": {
+        "point": [
+          0,
+          166.3,
+          0
+        ],
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "source": "refs.py SERVO_FRAMES.servo_head; pedestal.GROUND"
+      },
+      "LEFT_ARM": {
+        "point": [
+          -63,
+          127.3,
+          -6
+        ],
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "source": "refs.py ARM_SERVO_TOP_X; common.py ARM_AXIS_Z/Y; pedestal.GROUND"
+      },
+      "RIGHT_ARM": {
+        "point": [
+          63,
+          127.3,
+          -6
+        ],
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "source": "same CAD shoulder-shaft datums"
+      }
+    },
+    "omittedHistoricalReferences": [
+      "battery_lead",
+      "servo_gimbal_L_case",
+      "servo_gimbal_L_spline",
+      "servo_gimbal_R_case",
+      "servo_gimbal_R_spline",
+      "pushrod_L",
+      "pushrod_R",
+      "bolt_roll_M4",
+      "bolt_pitch_M4",
+      "screw_crank_L",
+      "screw_crank_R"
+    ],
+    "omittedNewPurchasedReferences": [
+      "8 pedestal/deck screws",
+      "battery lead envelope",
+      "XT60 joint envelope"
+    ],
+    "validation": "27 printed parts and 3 servo cases; exact local vertices and source SHA-256 checked. Datum alignment and bounding dimensions checked, not exact collision or physical fit validation."
+  },
+  "sourcePackageGlbSha256": "0d604e5edfaa8332aa2df40562cf05b2d06728c236c5cabd6ec9095d132b12d1",
+  "historicalModelBuild": {
     "revision": "V17 Nido - 2026-11-06",
     "nativeGlb": "node_modules/.cache/cadquery-builder/out/cuty_v17_web.glb",
     "nativeGlbSha256": "f12cf82ecc33b98479a6ce443bd78b0f50b5c385d7cecb48645fcd8b1928d539",
@@ -342,6 +1876,5 @@
       "displayBarHeightMm": 87.04998779296875,
       "lcdMesh": "lcd_touch_panel"
     }
-  },
-  "sourcePackageGlbSha256": "0d604e5edfaa8332aa2df40562cf05b2d06728c236c5cabd6ec9095d132b12d1"
+  }
 }

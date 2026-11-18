@@ -83,7 +83,7 @@ export const components = [
     tag: bi("ACTUATION", "ACTUACIÓN"),
     stage: "planned",
     detail: bi(
-      "Five servo connectors are included in the carrier design. Physical motion, calibrated limits and motor safety are future work. This viewer does not control servos.",
+      "Three servos are planned for head PAN and both arms. The carrier has five connectors; two are reserved. Physical motion, calibrated limits and motor safety are future work. This viewer does not control servos.",
       "El diseño de la carrier incluye cinco conectores de servo. El movimiento, los límites y la seguridad están pendientes. Este visor no controla servos.",
     ),
     interface: "PWM — planned",
@@ -238,7 +238,7 @@ export const milestones: { stage: Stage; title: Copy; items: Copy[] }[] = [
         "PWM, límites de servo y seguridad",
       ),
       bi(
-        "Servo-driven head tracking, IMU and body PID",
+        "Servo-driven head PAN and arm motion; future IMU",
         "Seguimiento mecánico con servos, IMU y PID de cuerpo",
       ),
       bi(

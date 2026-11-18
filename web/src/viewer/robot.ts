@@ -19,6 +19,13 @@ const photoBase = themeColor("--robot-base", "#dfc09a");
 const photoGray = themeColor("--robot-gray", "#888a88");
 const photoOrange = themeColor("--orange", "#ff6a00");
 export const photoPaletteByMaterial: Record<string, string> = {
+  S1_Body_Front_Fixed: photoWhite,
+  S2_Body_Back_Fixed: photoWhite,
+  B1_Pedestal: photoBase,
+  B3_Pedestal_Drawer: photoBase,
+  B2_Pedestal_Floor: photoGray,
+  B4_Deck_Riser: photoGray,
+  K1_Core_Deck_Fixed: photoGray,
   S1_Body_Front: photoWhite,
   S2_Body_Back: photoWhite,
   A1_Arm_L: photoWhite,

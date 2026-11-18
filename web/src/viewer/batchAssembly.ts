@@ -21,12 +21,17 @@ export function batchStaticAssembly(prepared: Object3D) {
   const materialIndexes = new Map<string, number>();
   prepared.traverse((child) => {
     if (!(child instanceof Mesh)) return;
-    const geometry = child.geometry.clone().applyMatrix4(child.matrixWorld);
+    let geometry = child.geometry.clone().applyMatrix4(child.matrixWorld);
     if (child.name === modelInfo.screenMesh) {
       const screen = new Mesh(geometry, child.material);
       screen.name = child.name;
       screens.push(screen);
     } else {
+      if (geometry.index) {
+        const expanded = geometry.toNonIndexed();
+        geometry.dispose();
+        geometry = expanded;
+      }
       for (const attribute of Object.keys(geometry.attributes))
         if (!["position", "normal"].includes(attribute))
           geometry.deleteAttribute(attribute);

@@ -52,9 +52,16 @@ describe("deployed V17 assembly with integrated display", () => {
     const arm = prepared.object.getObjectByName("A2_Arm_R")!;
     const head = prepared.object.getObjectByName("H1_Head_Front")!;
     updateAssembly(prepared.object, "assembled", "wave", 1);
-    expect(Math.abs(arm.rotation.x)).toBeGreaterThan(0.5);
+    expect(Math.abs(arm.rotation.x)).toBeGreaterThan(0.1);
+    const left = prepared.object.getObjectByName("A1_Arm_L")!;
+    const body = prepared.object.getObjectByName("S1_Body_Front_Fixed")!;
+    expect(left.rotation.x).toBe(0);
+    updateAssembly(prepared.object, "assembled", "left-arm", 1);
+    expect(Math.abs(left.rotation.x)).toBeGreaterThan(0.1);
+    expect(arm.rotation.x).toBe(0);
     updateAssembly(prepared.object, "assembled", "look", 1);
     expect(Math.abs(head.rotation.y)).toBeGreaterThan(0.1);
+    expect(body.position.length()).toBe(0);
     updateAssembly(prepared.object, "exploded", "none", 0);
     expect(head.position.length()).toBeGreaterThan(30);
     updateAssembly(prepared.object, "interior", "none", 0);

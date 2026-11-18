@@ -1,5 +1,6 @@
 #ifndef CUTY_UART_H
 #define CUTY_UART_H
+#include "../joints.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>

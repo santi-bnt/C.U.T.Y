@@ -1,6 +1,6 @@
 # STM32 Control
 
-Future head/ear/arm/body motion control and two-axis body PID. Body/base movement may use two servos and IMU feedback to regulate roll/pitch.
+The fixed version plans head PAN and left/right arm motion. Body/base movement is not part of this configuration.
 
 Inputs: validated high-level target and calibrated IMU measurement. Outputs: servo goals through the servos/safety boundaries, plus target/measured/error telemetry.
 

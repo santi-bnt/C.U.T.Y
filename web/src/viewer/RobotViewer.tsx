@@ -357,6 +357,16 @@ export default function RobotViewer({ motion }: { motion: StoryMotion }) {
               </button>
               <button
                 disabled={reduced}
+                aria-pressed={pose === "left-arm"}
+                onClick={() => {
+                  setAssemblyView("assembled");
+                  setPose((p) => (p === "left-arm" ? "none" : "left-arm"));
+                }}
+              >
+                {t(bi("Left arm demo", "Demo brazo izquierdo"))}
+              </button>
+              <button
+                disabled={reduced}
                 aria-pressed={pose === "look"}
                 onClick={() => {
                   setAssemblyView("assembled");
@@ -369,8 +379,8 @@ export default function RobotViewer({ motion }: { motion: StoryMotion }) {
             <p className="simulation-note">
               {t(
                 bi(
-                  "Named CAD parts · visual simulation only. No motors are controlled.",
-                  "Piezas CAD con nombre · solo simulación visual. No controla motores.",
+                  "Head PAN + left/right arms · CAD shaft pivots · small illustrative angles, not calibrated travel. Wave demo moves the right arm. No motors are controlled.",
+                  "Cabeza PAN + brazos izquierdo/derecho · pivotes de ejes CAD · ángulos ilustrativos pequeños, no recorrido calibrado. El saludo mueve el brazo derecho. No controla motores.",
                 ),
               )}
             </p>

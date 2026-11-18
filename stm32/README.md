@@ -1,6 +1,6 @@
 # C.U.T.Y STM32F401 Firmware
 
-Owns real-time physical control: PWM, servo motion, head PAN/TILT, ears, future arms, body/base axes, IMU acquisition, PID feedback, and safety limits.
+Owns real-time physical control: PWM, servo motion, head PAN, left arm and right arm, future IMU acquisition, and safety limits. J10 and J11 are reserved; physical control remains unvalidated.
 
 The current control hardware is an **STM32F401 Black Pill**, also targeted by the [carrier PCB v1.1](../hardware/electronics/kicad/cuty_carrier/README.md). Confirm the exact MCU suffix and board revision before generating firmware.
 

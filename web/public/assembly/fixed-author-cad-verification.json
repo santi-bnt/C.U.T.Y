@@ -1,0 +1,104 @@
+{
+ "fecha": "2026-11-13",
+ "revision": "versión fija con pedestal: el cuerpo termina plano a la altura de la rejilla y se para en un pedestal de Ø126 x 34 mm con el cajón de la batería (a lo largo, sale por atrás) y los dos interruptores a los lados. 4.9 cm más bajo que con la columna.",
+ "altura_total_mm": 316.3,
+ "pedestal_mm": {
+  "diametro": 126.0,
+  "alto": 34.0
+ },
+ "huella_mm": "180 x 137 (brazos a brazos x panza a espalda)",
+ "manos_sobre_la_mesa_mm": 32.2,
+ "piezas_impresas": 27,
+ "cuerpos_revisados": 109,
+ "interferencias_estaticas_mm3_exactas": 0.0,
+ "contactos_de_malla_revisados": "S1/S3 (5.96 mm3 en malla) y la zona del USB-C de la Pi contra S2 (1.7 mm3 en malla) dan 0 con la intersección exacta",
+ "zonas_libres": "18/18",
+ "posturas": 22,
+ "limites": {
+  "giro_cabeza": "±90°",
+  "brazos": "±120°",
+  "base": "fija"
+ },
+ "servos": {
+  "J7": "cabeza",
+  "J8": "brazo izquierdo",
+  "J9": "brazo derecho",
+  "J10": "libre",
+  "J11": "libre"
+ },
+ "pedestal": {
+  "pares_revisados_exactos": 190,
+  "choques": [],
+  "cajon_sale_130mm_sin_choques": true,
+  "retén_del_cajon": "topes de 0.3 mm bajo las pestañas del cajón (holgura bajo los rieles 0.4 mm)",
+  "bayoneta": "se mete girada 14° y se gira de regreso; al cerrar el cajón queda alineada y no se puede girar",
+  "bayoneta_sin_choques": true,
+  "carcasas_se_deslizan_sin_tocar_el_pedestal": true
+ },
+ "bateria": {
+  "modelo": "HM2202 3S 2200 mAh 50C",
+  "medida_supuesta_mm": "108 x 35 x 25",
+  "el_cajon_acepta_mm": "hasta 109 x 35 x 25",
+  "pendiente": "medir la batería real"
+ },
+ "tornillos_plataforma": {
+  "plataforma_a_soporte": "4 x M3 x 10",
+  "soporte_a_pedestal": "4 x M3 x 12",
+  "holgura_cabeza_a_pi_mm": 2.6
+ },
+ "largos_de_cable_mm": {
+  "bateria_a_J1": "≈200 de los 300 de la extensión (bahía izquierda → agujero del pedestal → hueco de la plataforma → J1)",
+  "interruptores_a_J2_J3": "≈190 por cable (35 cm disponibles)",
+  "J12_a_Pi": "≈120 (cable 200)",
+  "camara": "≈300-350 (cable 500)",
+  "servos": "≤220 (MG996R 300)"
+ },
+ "stl_hermeticos": true,
+ "cama_180": true,
+ "medidas_reales_mm": {
+  "pantalla_display_g": "85 x 55.3 x 5.8",
+  "raspberry_pi_5": "90.3 x 56 x 18",
+  "respeaker_2mics": "65.5 x 29.8 x 11.5",
+  "camara_ov5647": "PCB 24.4 x 23.3 x 2.3, 7.2 de fondo, lente 8.5 x 8.5",
+  "bocina_2w": "35.4 x 25 x 5.5",
+  "pendiente": "batería (largo x ancho x alto) y centro del lente de la cámara (el modelo supone 13.7 mm desde el borde de abajo)"
+ },
+ "primera_capa_mm2": {
+  "A1_Arm_L": 1735,
+  "A2_Arm_R": 1735,
+  "A3_Hand_L": 228,
+  "A4_Hand_R": 228,
+  "A5_Arm_Cap_L": 111,
+  "A6_Arm_Cap_R": 111,
+  "B1_Pedestal": 10583,
+  "B2_Pedestal_Floor": 10744,
+  "B3_Pedestal_Drawer": 4867,
+  "B4_Deck_Riser": 2062,
+  "H1_Head_Front": 1418,
+  "H2_Head_Back": 1386,
+  "H3_Visor": 2250,
+  "H4_Display_Bars": 988,
+  "H5_Head_Base": 3252,
+  "H6_Ear_L": 1304,
+  "H7_Ear_R": 1304,
+  "H8_Antenna": 50,
+  "K1_Core_Deck_Fixed": 10651,
+  "K2_Core_Spine": 9900,
+  "K3_Core_Shoulders": 3005,
+  "K4_Neck_Hub": 747,
+  "K5_Power_Rack": 234,
+  "S1_Body_Front_Fixed": 518,
+  "S2_Body_Back_Fixed": 518,
+  "S3_Tummy_Grille": 340,
+  "S4_USB_Plug": 79
+ },
+ "voladizo_mayor_45_mm2": {
+  "B1_Pedestal": 762,
+  "B2_Pedestal_Floor": 1056,
+  "B3_Pedestal_Drawer": 141,
+  "B4_Deck_Riser": 0,
+  "K1_Core_Deck_Fixed": 14,
+  "S1_Body_Front_Fixed": 10622,
+  "S2_Body_Back_Fixed": 11336
+ }
+}

@@ -1,9 +1,13 @@
+# Current configuration update
+
+Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes.
+
 # FreeRTOS / Motion Control — initial, dry-run only
 
 ## Actual implementation boundary
 
 The portable C modules implement byte-stream framing, strict experimental command parsing,
-five normalized commanded setpoints, a damped trajectory filter, position/velocity/acceleration
+three normalized commanded setpoints, a damped trajectory filter, position/velocity/acceleration
 limits, heartbeat checks, a latched safety state machine, and a pure pulse-width conversion.
 They do not initialize pins, start timers, transmit UART, read sensors, or move a servo.
 The CMSIS-RTOS2 adapter is initial integration source, not a validated STM32 firmware image.
@@ -40,9 +44,8 @@ FreeRTOS syscall-safe IRQ priority is mandatory for the RX hook.
 RTOS resources:
 
 - RX: 256 timestamped byte entries (typically 2048 B on ARM), not a 256-byte DMA ring.
-- Control events: 8 envelopes; targets: one envelope, latest goal wins globally.
-  This initial contract is a single-axis goal; simultaneous poses require a future
-  full-pose payload or per-axis mailboxes, not rapid independent axis commands.
+- Control events: 8 envelopes; targets: three one-entry mailboxes, one per joint; the latest goal wins per joint.
+  Each message commands one joint; a coordinated atomic pose is not implemented.
 - Snapshot and telemetry queues: one controller snapshot each; replies: eight entries.
 - Approximate queue payload <4 KiB, four stacks 4864 B; control blocks, allocator,
   idle/timer stacks, driver/DMA buffers and interrupt/main stack are additional.
@@ -58,7 +61,7 @@ RTOS resources:
 
 Communication owns the target producer; overwriting uses nonblocking Get + Put with a
 single producer and a single consumer. The consumer processes at most eight state events
-and one latest target per poll. A sequence barrier drops goals received before the latest
+and one latest target per joint per poll. A sequence barrier drops goals received before the latest
 state-change command. Events older than 100 ms are rejected; delayed heartbeat records
 retain their receive timestamps. RX overflow/malformed lines set a fault flag.
 The queue byte timestamp is assigned in the ISR hook, and a frame uses its LF timestamp.
@@ -72,7 +75,7 @@ currently fault counters/flags, not per-frame UART ERR records. Diagnostics coun
 include RX fault notifications and reply/snapshot congestion; final TX-queue losses,
 task runtimes and memory high-water marks still need instrumentation.
 
-## Experimental protocol V1 (host/dry-run only)
+## Experimental protocol V2 (host/dry-run only)
 
 Separate from the legacy SET_HEAD/SET_BODY design sketches in docs/protocol.
 LF terminated, optional single CR before LF. Max 63 stored bytes, ASCII only;
@@ -81,16 +84,14 @@ No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra
 
 | Record without LF | Meaning |
 | --- | --- |
-| V1,HB | Refresh heartbeat (does not recover a fault) |
-| V1,ARM | DISARMED → READY, only with fresh heartbeat |
-| V1,START | READY → ACTIVE, only with fresh heartbeat |
-| V1,DISARM | Inhibit output and discard movement; FAULT stays latched, other states → DISARMED |
-| V1,RESET | FAULT → DISARMED; clears heartbeat validity |
-| V1,TARGET,0,350 | Axis index 0..4; signed integer -1000..1000 milli-units → -1..1 |
+| V2,HB | Refresh heartbeat (does not recover a fault) |
+| V2,ARM | DISARMED → READY, only with fresh heartbeat |
+| V2,START | READY → ACTIVE, only with fresh heartbeat |
+| V2,DISARM | Inhibit output and discard movement; FAULT stays latched, other states → DISARMED |
+| V2,RESET | FAULT → DISARMED; clears heartbeat validity |
+| V2,TARGET,HEAD_PAN,350 | Joint HEAD_PAN, LEFT_ARM or RIGHT_ARM; signed integer -1000..1000 milli-units → -1..1 |
 
-Axes are abstract simulation slots, not calibrated joint mappings; slot 0 is the web's
-PAN example only. No degree or PWM commands are accepted. Five servo-to-joint assignments
-remain unverified. The V1 sketch has no CRC/session handshake, replay protection or
+Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Their coordinates remain abstract simulation units, not calibrated physical angles. No degree or PWM commands are accepted. The proposed J7–J9 assignments remain physically unverified. The V2 sketch has no CRC/session handshake, replay protection or
 link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
 must settle integrity, sessions, acknowledgements, error vocabulary and recovery.
 No Raspberry adapter is enabled and no compatibility with older command sketches is claimed.

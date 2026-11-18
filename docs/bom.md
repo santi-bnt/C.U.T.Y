@@ -44,6 +44,6 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | ReSpeaker 2-Mics Pi HAT V2.0 | 65.5 × 29.8 × 11.5 | plugs into J14 |
 | Arducam OV5647 5 MP | 24.4 × 23.3, 7.2 deep | held by a cradle in the visor |
 | Speaker 2 W / 8 Ω | 35.4 × 25 × 5.5 | to the ReSpeaker speaker port |
-| 5 × MG996R | 40.7 × 19.7 × 37 | head, two arms, two gimbal (the fixed version uses 3) |
+| 3 × MG996R | 40.7 × 19.7 × 37 | planned for head PAN and two arms; the earlier Nido variant used two additional gimbal servos |
 | LiPo 3S 11.1 V 2200 mAh 50C (HM2202) + balance charger | to measure | both drawers fit up to 109 × 35 × 25 |
 | Dupont wires, ≈0.85 kg PLA | | |

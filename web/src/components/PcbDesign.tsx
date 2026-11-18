@@ -97,6 +97,7 @@ export default function PcbDesign() {
           )}
         </span>
       </div>
+      <p>{t(bi("The carrier supports five servo channels. The current configuration uses three: head PAN, left arm and right arm. The other two are reserved for future expansion.", "La carrier PCB admite cinco canales de servo. La configuración actual utiliza tres: cabeza PAN, brazo izquierdo y brazo derecho. Los otros dos están reservados para futuras ampliaciones."))}</p>
       <div className="pcb-layout">
         <div className="pcb-inspector">
           <div className="engineering-toolbar">

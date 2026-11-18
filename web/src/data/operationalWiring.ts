@@ -244,8 +244,8 @@ const detail: Record<string, ReturnType<typeof bi>> = {
     "UART de 3.3 V propuesto, TX/RX cruzados y tierra común. Pines UART STM32 y los cinco PWM aún por asignar.",
   ),
   servos: bi(
-    "Five MG996R: red to regulated 6 V, brown/black to servo ground, orange/yellow to assigned STM32 PWM. Final PWM assignments are pending.",
-    "Cinco MG996R: rojo a 6 V regulados, marrón/negro a GND y naranja/amarillo a PWM STM32. Asignaciones PWM pendientes.",
+    "Three MG996R planned: red to regulated 6 V, brown/black to servo ground, orange/yellow to assigned STM32 PWM. Final PWM assignments are pending.",
+    "Tres MG996R previstos: rojo a 6 V regulados, marrón/negro a GND y naranja/amarillo a PWM STM32. Asignaciones PWM pendientes.",
   ),
   camera: bi(
     "The builder confirmed camera operation and facial tracking. OV5647 15-pin CSI connects to Pi 5 CAM/DISP 22-pin through a compatible adapter. Power and image travel through CSI; individual contacts are not enumerated.",

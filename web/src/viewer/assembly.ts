@@ -1,6 +1,7 @@
 ﻿import { Vector3, type Object3D, Mesh } from "three";
+import nido from "../data/nido.generated.json";
 export type AssemblyView = "assembled" | "interior" | "exploded";
-export type PoseDemo = "none" | "wave" | "look";
+export type PoseDemo = "none" | "wave" | "left-arm" | "look";
 export function explosionOffset(name: string) {
   if (/^H[1-8]_/.test(name))
     return new Vector3(
@@ -42,14 +43,19 @@ export function updateAssembly(
       pose === "look" &&
       /^(H[1-8]_|lcd_|camera_|servo_head_case)/.test(child.name)
     ) {
-      angle = Math.sin(time * 0.9) * 0.38;
+      angle = Math.sin(time * 0.9) * 0.15;
       axis.set(0, 1, 0);
-      pivot.set(0, 212, 0);
+      pivot.fromArray(nido.pivots.HEAD_PAN.point);
     }
     if (pose === "wave" && /^(A[246]_|servo_arm_R_spline)/.test(child.name)) {
-      angle = -0.85 + Math.sin(time * 4) * 0.16;
+      angle = Math.sin(time * 4) * 0.18;
       axis.set(1, 0, 0);
-      pivot.set(0, 176, -6);
+      pivot.fromArray(nido.pivots.RIGHT_ARM.point);
+    }
+    if (pose === "left-arm" && /^(A[135]_|servo_arm_L_spline)/.test(child.name)) {
+      angle = Math.sin(time * 4) * 0.18;
+      axis.set(1, 0, 0);
+      pivot.fromArray(nido.pivots.LEFT_ARM.point);
     }
     if (angle) {
       child.quaternion.setFromAxisAngle(axis, angle);

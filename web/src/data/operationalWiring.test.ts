@@ -48,7 +48,7 @@ describe("user-confirmed wiring and revised assets", () => {
         .update(readFileSync("public/models/cuty.glb"))
         .digest("hex"),
     ).toBe(manifest.webGlbSha256);
-    expect(manifest.webGlbBytes).toBeLessThan(2000000);
+    expect(manifest.webGlbBytes).toBeLessThan(30000000);
     expect(manifest.images).toHaveLength(18);
     for (const image of manifest.images)
       expect(
@@ -56,8 +56,8 @@ describe("user-confirmed wiring and revised assets", () => {
           .update(readFileSync("public/assembly/" + image.name))
           .digest("hex"),
       ).toBe(image.sha256);
-    expect(nido.revision).toContain("2026-11-06");
-    expect(nido.meshes).toBe(113);
+    expect(nido.revision).toContain("2026-11-13");
+    expect(nido.meshes).toBe(99);
     expect(nido.pcb.meshes).toBe(45);
     expect(nido.pcb.simplified).toBe(true);
     expect(

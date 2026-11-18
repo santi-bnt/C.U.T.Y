@@ -9,7 +9,7 @@
 #define SUPERVISE 2U
 typedef struct { CutyCommand command; uint32_t received_ms, sequence; } Envelope;
 typedef struct { uint8_t byte; uint32_t received_ms; } RxByte;
-static osMessageQueueId_t rx, commands, targets, snapshots, replies, telemetry;
+static osMessageQueueId_t rx, commands, targets[CUTY_AXES], snapshots, replies, telemetry;
 static osThreadId_t communication, servo, safety, diagnostics;
 static CutyController controller;
 static bool created;
@@ -37,8 +37,8 @@ static void communication_task(void *unused) {
                 if (e.command.kind == CUTY_TARGET) {
                     Envelope old;
                     /* One producer; consumer may empty it between Get and Put. */
-                    osMessageQueueGet(targets,&old,0,0);
-                    status=osMessageQueuePut(targets,&e,0,0);
+                    osMessageQueueGet(targets[e.command.axis],&old,0,0);
+                    status=osMessageQueuePut(targets[e.command.axis],&e,0,0);
                 } else status=osMessageQueuePut(commands,&e,0,0);
                 if (status != osOK) osThreadFlagsSet(servo,INVALID_RX);
             }
@@ -67,12 +67,14 @@ static void servo_task(void *unused) {
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
         }
         cuty_safety_check(&controller.safety,now);
-        if (osMessageQueueGet(targets,&e,0,0)==osOK) {
+        for (unsigned axis=0; axis<CUTY_AXES; ++axis) {
+          if (osMessageQueueGet(targets[axis],&e,0,0)==osOK) {
             bool newer=(int32_t)(e.sequence-barrier)>0;
             bool accepted=newer && (uint32_t)(now-e.received_ms)<=100 &&
                 cuty_control_command(&controller,&e.command,now);
             CutyReply reply={e.sequence,accepted};
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
+          }
         }
         uint32_t elapsed=now-last_step;
         if (elapsed>=20) {
@@ -114,11 +116,14 @@ bool cuty_rtos_create(void) {
     if (!cuty_control_init(&controller,limits,500,CUTY_FREEZE_COMMAND)) return false;
     rx=osMessageQueueNew(256,sizeof(RxByte),0);
     commands=osMessageQueueNew(8,sizeof(Envelope),0);
-    targets=osMessageQueueNew(1,sizeof(Envelope),0);
+    for (unsigned axis=0; axis<CUTY_AXES; ++axis) {
+        targets[axis]=osMessageQueueNew(1,sizeof(Envelope),0);
+        if (!targets[axis]) return false;
+    }
     snapshots=osMessageQueueNew(1,sizeof(CutySnapshot),0);
     replies=osMessageQueueNew(8,sizeof(CutyReply),0);
     telemetry=osMessageQueueNew(1,sizeof(CutySnapshot),0);
-    if (!rx||!commands||!targets||!snapshots||!replies||!telemetry) return false;
+    if (!rx||!commands||!snapshots||!replies||!telemetry) return false;
     const osThreadAttr_t ca={.name="CommunicationTask",.stack_size=1536,.priority=osPriorityAboveNormal};
     const osThreadAttr_t va={.name="ServoControlTask",.stack_size=1536,.priority=osPriorityHigh};
     const osThreadAttr_t sa={.name="SafetyTask",.stack_size=768,.priority=osPriorityHigh1};

@@ -1,0 +1,358 @@
+{
+ "printed": [
+  {
+   "part": "B1_Pedestal",
+   "group": "base",
+   "print_dims_mm": [
+    126.1,
+    126.1,
+    34.1
+   ],
+   "volume_cm3": 65.7
+  },
+  {
+   "part": "B2_Pedestal_Floor",
+   "group": "base",
+   "print_dims_mm": [
+    119.2,
+    119.2,
+    10.1
+   ],
+   "volume_cm3": 41.4
+  },
+  {
+   "part": "B3_Pedestal_Drawer",
+   "group": "base",
+   "print_dims_mm": [
+    45.3,
+    117.2,
+    27.5
+   ],
+   "volume_cm3": 17.1
+  },
+  {
+   "part": "B4_Deck_Riser",
+   "group": "base",
+   "print_dims_mm": [
+    57.0,
+    57.0,
+    14.3
+   ],
+   "volume_cm3": 28.5
+  },
+  {
+   "part": "K1_Core_Deck_Fixed",
+   "group": "core",
+   "print_dims_mm": [
+    123.5,
+    118.4,
+    8.0
+   ],
+   "volume_cm3": 31.9
+  },
+  {
+   "part": "K2_Core_Spine",
+   "group": "core",
+   "print_dims_mm": [
+    109.5,
+    95.5,
+    10.0
+   ],
+   "volume_cm3": 40.2
+  },
+  {
+   "part": "K3_Core_Shoulders",
+   "group": "core",
+   "print_dims_mm": [
+    114.0,
+    32.1,
+    66.0
+   ],
+   "volume_cm3": 17.8
+  },
+  {
+   "part": "K4_Neck_Hub",
+   "group": "core",
+   "print_dims_mm": [
+    32.0,
+    32.0,
+    14.5
+   ],
+   "volume_cm3": 6.3
+  },
+  {
+   "part": "K5_Power_Rack",
+   "group": "core",
+   "print_dims_mm": [
+    37.5,
+    55.0,
+    43.5
+   ],
+   "volume_cm3": 7.2
+  },
+  {
+   "part": "S1_Body_Front_Fixed",
+   "group": "shell",
+   "print_dims_mm": [
+    148.2,
+    127.0,
+    75.5
+   ],
+   "volume_cm3": 70.5
+  },
+  {
+   "part": "S2_Body_Back_Fixed",
+   "group": "shell",
+   "print_dims_mm": [
+    148.1,
+    127.0,
+    63.6
+   ],
+   "volume_cm3": 66.3
+  },
+  {
+   "part": "S3_Tummy_Grille",
+   "group": "shell",
+   "print_dims_mm": [
+    55.3,
+    54.6,
+    11.4
+   ],
+   "volume_cm3": 7.2
+  },
+  {
+   "part": "S4_USB_Plug",
+   "group": "shell",
+   "print_dims_mm": [
+    8.2,
+    12.8,
+    11.6
+   ],
+   "volume_cm3": 0.7
+  },
+  {
+   "part": "A1_Arm_L",
+   "group": "arms",
+   "print_dims_mm": [
+    104.0,
+    30.1,
+    21.5
+   ],
+   "volume_cm3": 33.8
+  },
+  {
+   "part": "A2_Arm_R",
+   "group": "arms",
+   "print_dims_mm": [
+    104.1,
+    30.1,
+    21.5
+   ],
+   "volume_cm3": 33.8
+  },
+  {
+   "part": "A3_Hand_L",
+   "group": "arms",
+   "print_dims_mm": [
+    15.9,
+    34.3,
+    14.4
+   ],
+   "volume_cm3": 4.6
+  },
+  {
+   "part": "A4_Hand_R",
+   "group": "arms",
+   "print_dims_mm": [
+    15.9,
+    34.3,
+    14.4
+   ],
+   "volume_cm3": 4.6
+  },
+  {
+   "part": "A5_Arm_Cap_L",
+   "group": "arms",
+   "print_dims_mm": [
+    14.0,
+    14.0,
+    4.4
+   ],
+   "volume_cm3": 0.7
+  },
+  {
+   "part": "A6_Arm_Cap_R",
+   "group": "arms",
+   "print_dims_mm": [
+    14.0,
+    14.0,
+    4.4
+   ],
+   "volume_cm3": 0.7
+  },
+  {
+   "part": "H1_Head_Front",
+   "group": "head",
+   "print_dims_mm": [
+    160.1,
+    134.5,
+    55.7
+   ],
+   "volume_cm3": 72.9
+  },
+  {
+   "part": "H2_Head_Back",
+   "group": "head",
+   "print_dims_mm": [
+    160.1,
+    134.5,
+    56.0
+   ],
+   "volume_cm3": 96.0
+  },
+  {
+   "part": "H3_Visor",
+   "group": "head",
+   "print_dims_mm": [
+    121.2,
+    93.2,
+    10.8
+   ],
+   "volume_cm3": 27.8
+  },
+  {
+   "part": "H4_Display_Bars",
+   "group": "head",
+   "print_dims_mm": [
+    85.0,
+    87.1,
+    3.0
+   ],
+   "volume_cm3": 3.0
+  },
+  {
+   "part": "H5_Head_Base",
+   "group": "head",
+   "print_dims_mm": [
+    96.0,
+    48.0,
+    9.6
+   ],
+   "volume_cm3": 11.7
+  },
+  {
+   "part": "H6_Ear_L",
+   "group": "head",
+   "print_dims_mm": [
+    46.0,
+    46.0,
+    21.5
+   ],
+   "volume_cm3": 16.9
+  },
+  {
+   "part": "H7_Ear_R",
+   "group": "head",
+   "print_dims_mm": [
+    46.0,
+    46.0,
+    21.5
+   ],
+   "volume_cm3": 16.9
+  },
+  {
+   "part": "H8_Antenna",
+   "group": "head",
+   "print_dims_mm": [
+    18.0,
+    18.0,
+    34.0
+   ],
+   "volume_cm3": 2.9
+  }
+ ],
+ "purchased_refs": [
+  "pcb_board",
+  "pcb_R5",
+  "pcb_J10",
+  "pcb_J14",
+  "pcb_R3",
+  "pcb_J8",
+  "pcb_R9",
+  "pcb_D2",
+  "pcb_D4",
+  "pcb_R11",
+  "pcb_U1",
+  "pcb_J7",
+  "pcb_D1",
+  "pcb_R2",
+  "pcb_J9",
+  "pcb_R7",
+  "pcb_R1",
+  "pcb_F2",
+  "pcb_F1",
+  "pcb_R4",
+  "pcb_J2",
+  "pcb_C1",
+  "pcb_C2",
+  "pcb_J6",
+  "pcb_J13",
+  "pcb_J11",
+  "pcb_J1",
+  "pcb_R8",
+  "pcb_R6",
+  "pcb_C3",
+  "pcb_J5",
+  "pcb_J3",
+  "pcb_J15",
+  "pcb_R12",
+  "pcb_J12",
+  "pcb_JP1",
+  "pcb_J4",
+  "pcb_D3",
+  "pcb_R10",
+  "pcb_blackpill",
+  "pcb_blackpill_usb",
+  "respeaker_hat",
+  "respeaker_jack",
+  "fuse_F1",
+  "fuse_F2",
+  "pi5_board",
+  "pi5_usb_eth",
+  "pi5_sd_card",
+  "pi5_cooler",
+  "pi5_gpio",
+  "pi5_usbc",
+  "pi5_hdmi",
+  "buck_6v",
+  "reg_5v1_usbc",
+  "speaker_2w",
+  "speaker_2w_cone",
+  "imu_mpu6050",
+  "battery_3s_2200",
+  "battery_lead",
+  "xt60_joint",
+  "switch_main",
+  "switch_servos",
+  "servo_arm_L_case",
+  "servo_arm_L_spline",
+  "servo_arm_R_case",
+  "servo_arm_R_spline",
+  "servo_head_case",
+  "servo_head_spline",
+  "lcd_touch_panel",
+  "lcd_module",
+  "lcd_pcb",
+  "lcd_header",
+  "camera_board",
+  "camera_lens",
+  "screw_deck_M3_0",
+  "screw_deck_M3_1",
+  "screw_deck_M3_2",
+  "screw_deck_M3_3",
+  "screw_riser_M3x12_0",
+  "screw_riser_M3x12_1",
+  "screw_riser_M3x12_2",
+  "screw_riser_M3x12_3"
+ ]
+}
