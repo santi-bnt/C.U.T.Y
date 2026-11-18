@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import { existsSync } from "node:fs";
 const edge = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
+const port = Number(process.env.CUTY_TEST_PORT || 5173);
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -8,7 +9,7 @@ export default defineConfig({
   timeout: 45_000,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:5173",
+    baseURL: `http://127.0.0.1:${port}`,
     launchOptions: {
       executablePath: existsSync(edge) ? edge : undefined,
       args: ["--enable-unsafe-swiftshader"],
@@ -35,8 +36,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --strictPort",
-    url: "http://127.0.0.1:5173",
+    command: `npm run dev -- --strictPort --port ${port}`,
+    url: `http://127.0.0.1:${port}`,
     reuseExistingServer: true,
   },
 });

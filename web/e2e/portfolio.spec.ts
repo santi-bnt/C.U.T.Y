@@ -47,7 +47,7 @@ test("persistent product story, original display, manual controls and translatio
     const navigation = page.getByRole("navigation", {
       name: "Main navigation",
     });
-    await expect(navigation.getByRole("link")).toHaveCount(7);
+    await expect(navigation.getByRole("link")).toHaveCount(8);
     await navigation.locator('a[href="#pcb-design"]').click();
     await expect(menu).toHaveAttribute("aria-expanded", "false");
     await chapter(page, "home", 0);

@@ -11,8 +11,8 @@ overlays ni firmware.
 El CAD V17 coloca la referencia y el soporte de cámara dentro del conjunto
 `head`, y define un servo `servo_head` en la base de cabeza, descrito en el CAD
 como PAN. Esto confirma la intención del diseño, no el montaje físico actual.
-El código STM32 de UART/servos sigue siendo plantilla TODO, sin framing,
-asignación de PWM, límites ni calibración. Por ello no hay adaptador de hardware
+Ahora existe [lógica STM32 portable](freertos-motion-control.md) para framing,
+consignas y límites simulados; faltan UART/PWM físicos y calibración. Por ello no hay adaptador de hardware
 y el modo físico se rechaza. No se afirma seguimiento físico funcional.
 
 Solo se calcula PID PAN en **unidades normalizadas simuladas**, no grados,

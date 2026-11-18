@@ -1,0 +1,172 @@
+.motion-control {
+  position: relative;
+  z-index: 2;
+  padding: 100px var(--gutter);
+  background: var(--ink);
+  color: var(--paper);
+}
+.motion-control .motion-heading {
+  max-width: 840px;
+  margin-bottom: 28px;
+}
+.motion-control h2 {
+  font-size: clamp(32px, 5vw, 72px);
+  line-height: 1.05;
+  margin: 18px 0 24px;
+}
+.motion-control h3 {
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.3;
+  margin: 12px 0;
+}
+.motion-control p {
+  max-width: 88ch;
+}
+.motion-control .motion-notice {
+  border-left: 2px solid var(--orange);
+  padding: 12px 20px;
+}
+.motion-control .motion-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  font:
+    12px/1.6 "Courier New",
+    monospace;
+  margin: 28px 0;
+  color: var(--orange-on-dark);
+}
+.motion-control .motion-layer {
+  border: 1px solid var(--line);
+  padding: clamp(18px, 3vw, 36px);
+}
+.motion-control .motion-flow {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.motion-control .motion-flow svg {
+  flex-shrink: 0;
+}
+.motion-control [data-active="true"] {
+  border-color: var(--orange);
+  color: var(--orange-on-dark);
+}
+.motion-control .motion-flow[data-active="true"] svg {
+  animation: motion-flow-pulse 1.2s ease-in-out infinite;
+}
+.motion-control .motion-tasks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+  align-items: start;
+}
+.motion-control .motion-task {
+  min-width: 0;
+  border: 1px solid var(--line);
+  padding: 16px;
+}
+.motion-control summary {
+  cursor: pointer;
+  min-height: 44px;
+  overflow-wrap: anywhere;
+}
+.motion-control .motion-task summary {
+  font:
+    14px/1.6 "Courier New",
+    monospace;
+}
+.motion-control .motion-task dl {
+  font-size: 13px;
+}
+.motion-control .motion-task dt {
+  color: var(--orange-on-dark);
+  margin-top: 14px;
+}
+.motion-control .motion-task dd {
+  margin: 2px 0;
+  color: var(--paper);
+}
+.motion-control .text-link {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  margin: 12px 0;
+}
+.motion-control .motion-states {
+  font:
+    14px/1.8 "Courier New",
+    monospace;
+  color: var(--orange-on-dark);
+  overflow-wrap: anywhere;
+}
+.motion-control .motion-demo,
+.motion-control .motion-why {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.motion-control .motion-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0;
+}
+.motion-control button {
+  color: var(--paper);
+  background: transparent;
+  border: 1px solid var(--orange-line);
+  border-radius: 24px;
+  padding: 10px 18px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.motion-control button:hover {
+  background: var(--orange-wash);
+}
+.motion-control button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.motion-control .motion-demo-status {
+  min-height: 5em;
+  padding: 18px;
+  border: 1px solid var(--orange-line);
+}
+.motion-control ol {
+  padding-left: 24px;
+  color: var(--muted);
+}
+.motion-control li {
+  padding: 5px 0 5px 8px;
+}
+.motion-control li[aria-current="step"] {
+  color: var(--orange-on-dark);
+}
+@keyframes motion-flow-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (max-width: 700px) {
+  .motion-control {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+  .motion-control .motion-tasks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-control *,
+  .motion-control *::before,
+  .motion-control *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

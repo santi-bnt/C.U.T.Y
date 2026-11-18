@@ -6,4 +6,4 @@ Body roll/pitch control may use two servos and IMU feedback. Mechanical geometry
 
 Raspberry requests high-level goals such as `SET_BODY,8,0` or `CENTER_BODY`; it must not continuously stream raw PWM. These examples do not fix angle units, signs, numeric bounds, or motion trajectories.
 
-STM32 should eventually report target/measured/error for both PID axes and distinguish commanded servo position from measurement. The future dashboard plots telemetry only. All firmware files are placeholders; no servo or PID implementation exists.
+STM32 should eventually report target/measured/error for both PID axes and distinguish commanded servo position from measurement. The future dashboard plots telemetry only. Portable normalized setpoint logic now exists; physical servo output and PID remain unimplemented. See [FreeRTOS motion control](freertos-motion-control.md) for the actual implementation boundary.

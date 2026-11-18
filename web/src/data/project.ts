@@ -70,8 +70,8 @@ export const components = [
     tag: bi("MOTION", "MOVIMIENTO"),
     stage: "planned",
     detail: bi(
-      "Carrier target: STM32F401CCU6 Black Pill. The planned real-time controller will receive high-level UART goals and own PWM, motion and safety. Current firmware files are placeholders.",
-      "La carrier está diseñada para STM32F401CCU6 Black Pill. El controlador recibirá objetivos UART y gestionará PWM, movimiento y seguridad. El firmware actual contiene plantillas.",
+      "Carrier target: STM32F401CCU6 Black Pill. The planned real-time controller will receive high-level UART goals and own PWM, motion and safety. Portable C logic exists; board integration is pending.",
+      "La carrier está diseñada para STM32F401CCU6 Black Pill. El controlador recibirá objetivos UART y gestionará PWM, movimiento y seguridad. Existe lógica C portable; falta integrarla en placa.",
     ),
     interface: "UART / PWM — planned",
     path: "stm32",

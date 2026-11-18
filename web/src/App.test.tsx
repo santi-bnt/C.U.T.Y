@@ -47,7 +47,7 @@ describe("portfolio interactions", () => {
       screen.getByRole("button", { name: /FUTURE REAL-TIME CONTROL/ }),
     );
     expect(
-      screen.getByText(/Current firmware files are placeholders/),
+      screen.getByText(/Portable C logic exists; board integration is pending/),
     ).toBeTruthy();
   });
   it("changes face illustration and toggles synthetic mouth motion", () => {

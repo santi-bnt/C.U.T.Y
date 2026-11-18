@@ -41,7 +41,7 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 - [ ] Head movement
 - [ ] Body PID
 
-The files under `stm32/App/` are comment-only templates, not working firmware. Carrier pin assignments do not replace firmware implementation or physical tests.
+Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. The physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
 
 ## Phase 5 — Electronics and Mechanical Design
 

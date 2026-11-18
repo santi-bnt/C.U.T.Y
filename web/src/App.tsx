@@ -39,6 +39,7 @@ import AssemblyStory from "./components/AssemblyStory";
 import { modelInfo } from "./data/model";
 import PcbDesign from "./components/PcbDesign";
 import WiringConnections from "./components/WiringConnections";
+import MotionControl from "./components/MotionControl";
 const RobotViewer = lazy(() => import("./viewer/RobotViewer"));
 
 function Heading({ first, second }: { first: Copy; second?: Copy }) {
@@ -94,6 +95,7 @@ function Header({ motion }: { motion: StoryMotion }) {
     { id: "hardware-explorer", label: bi("Technology", "Tecnología") },
     { id: "pcb-design", label: bi("PCB Design", "Diseño PCB") },
     { id: "wiring", label: bi("Wiring & Connections", "Conexiones") },
+    { id: "motion-control", label: bi("FreeRTOS", "FreeRTOS") },
     { id: "development", label: bi("Development", "Desarrollo") },
     { id: "live", label: bi("C.U.T.Y. Live", "C.U.T.Y. Live") },
   ];
@@ -101,14 +103,23 @@ function Header({ motion }: { motion: StoryMotion }) {
     () =>
       motion.subscribe(() => {
         const chapter = Math.round(motion.progress);
+        const bounds = document
+          .getElementById("motion-control")
+          ?.getBoundingClientRect();
+        const inMotion =
+          !!bounds &&
+          bounds.top <= window.innerHeight * 0.5 &&
+          bounds.bottom > window.innerHeight * 0.5;
         if (header.current) {
-          header.current.dataset.tone = [1, 3, 5, 7].includes(chapter)
-            ? "ink"
-            : "paper";
+          header.current.dataset.tone =
+            inMotion || [1, 3, 5, 7].includes(chapter) ? "ink" : "paper";
           header.current
             .querySelectorAll<HTMLAnchorElement>("nav a")
             .forEach((link) => {
-              if (link.hash === `#${chapterIds[chapter]}`)
+              if (
+                link.hash ===
+                `#${inMotion ? "motion-control" : chapterIds[chapter]}`
+              )
                 link.setAttribute("aria-current", "location");
               else link.removeAttribute("aria-current");
             });
@@ -635,6 +646,7 @@ function Portfolio() {
             </a>
           </div>
         </section>
+        <MotionControl />
       </main>
       <footer className="product-footer paper">
         <a className="wordmark" href="#home">

@@ -1,7 +1,7 @@
 # STM32 Communication
 
-Future UART receive/transmit, framing, validation, command dispatch, and telemetry emission. C/H templates contain no parser.
+Portable V1 framing and parsing now exist in uart_protocol.c/.h. The CMSIS dry-run adapter queues validated commands; physical UART RX/TX drivers remain pending.
 
-Consume high-level commands and emit measured state. Do not treat incoming data as direct PWM authority. Validate frame length, command shape, units and limits before dispatch; exact rules are not finalized.
+Consume high-level targets; distinguish commanded state from unavailable measurements. V1 uses normalized milli-units, not degrees or direct PWM. See [architecture and experimental grammar](../../../docs/freertos-motion-control.md).
 
 See [protocol](../../../docs/protocol/protocol.md). Baud rate, acknowledgement/error handling, checksum, and binary framing remain open.

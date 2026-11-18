@@ -4,4 +4,4 @@ Future real-time enforcement of calibrated position/speed limits, command timeou
 
 All physical movement must pass STM32 safety checks. Sleep/wake or connection loss must not bypass limits. Actual safe states, thresholds, power interlocks, and recovery rules are TBD and require hardware review.
 
-Templates are not a safety implementation.
+Portable DISARMED/READY/ACTIVE/FAULT, heartbeat and fault-policy logic now exist. They are not validated physical safety: interlocks, task-liveness watchdog and mechanical fault policy remain pending. See [states, risks and testing](../../../docs/freertos-motion-control.md).
