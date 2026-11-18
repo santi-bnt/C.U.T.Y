@@ -1879,7 +1879,7 @@
   },
   "fixedAssemblySequence": {
     "source": "web/public/models/cuty.glb",
-    "method": "18 browser-rendered illustrative component visibility stages; no mesh edits",
+    "method": "18 illustrative CAD stages; animated arm gestures and battery drawer; reduced-motion stills; no mesh edits",
     "images": [
       {
         "name": "fixed-01.webp",
@@ -1943,15 +1943,25 @@
       },
       {
         "name": "fixed-16.webp",
-        "sha256": "473d6c455d19766fbbbff3bad6b59f0bf97ae5e02da23483b50980d79f592ec0"
+        "sha256": "2a546983fccaf639ab1f1a78f8ea74045f6880976af5f558024ed522611a9928"
       },
       {
         "name": "fixed-17.webp",
-        "sha256": "440ebda768da68b86bbb2fcb84db2907949885212e4a5793bcc7cfa7e5539a5e"
+        "sha256": "06f135593c376ebf92794050dd6f0d7a812262d08364aba11bc7d3ad76f6d791"
       },
       {
         "name": "fixed-18.webp",
         "sha256": "440ebda768da68b86bbb2fcb84db2907949885212e4a5793bcc7cfa7e5539a5e"
+      }
+    ],
+    "reducedMotionStillImages": [
+      {
+        "name": "fixed-16-still.webp",
+        "sha256": "473d6c455d19766fbbbff3bad6b59f0bf97ae5e02da23483b50980d79f592ec0"
+      },
+      {
+        "name": "fixed-17-still.webp",
+        "sha256": "15ecbdac53f0033ba1794f2b6ebed57c69cc55dd0862b2310e043a21cfb48e4f"
       }
     ]
   }

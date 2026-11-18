@@ -16,3 +16,7 @@ iniciar Vite en el puerto 5188 y ejecutar `node scripts/render-fixed-assembly.mj
 Estas imágenes muestran etapas ilustrativas de visibilidad de componentes y no
 certifican un procedimiento físico ni las holguras. Sus hashes se registran en
 `web/public/assembly/provenance.json`.
+
+Las etapas 16 y 17 son WebP animados que ilustran los brazos y el cajón; tienen
+versiones estáticas para movimiento reducido. Para regenerarlas se requiere Pillow
+con soporte WebP y se puede seleccionar el intérprete con CUTY_RENDER_PYTHON.

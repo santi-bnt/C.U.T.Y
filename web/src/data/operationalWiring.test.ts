@@ -53,6 +53,8 @@ describe("user-confirmed wiring and revised assets", () => {
     expect(manifest.fixedAssemblySequence.images).toHaveLength(18);
     for (const image of manifest.fixedAssemblySequence.images)
       expect(createHash("sha256").update(readFileSync("public/assembly/" + image.name)).digest("hex")).toBe(image.sha256);
+    for (const image of manifest.fixedAssemblySequence.reducedMotionStillImages)
+      expect(createHash("sha256").update(readFileSync("public/assembly/" + image.name)).digest("hex")).toBe(image.sha256);
     for (const image of manifest.images)
       expect(
         createHash("sha256")

@@ -1,4 +1,4 @@
-import { AmbientLight, CanvasTexture, Color, DirectionalLight, ImageLoader, Mesh, OrthographicCamera, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from "three";
+import { AmbientLight, CanvasTexture, Color, DirectionalLight, ImageLoader, Mesh, OrthographicCamera, Quaternion, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { prepareRobot } from "../src/viewer/robot";
@@ -37,10 +37,24 @@ const stagePatterns=[
   /.*/,
   /.*/,
 ];
-declare global { interface Window { renderAssemblyStage: (stage:number)=>void } }
-window.renderAssemblyStage=(stage:number)=>{
+declare global { interface Window { renderAssemblyStage: (stage:number, progress?:number)=>void } }
+window.renderAssemblyStage=(stage:number,progress=0)=>{
   const pattern=stagePatterns[stage];
-  prepared.object.traverse(child=>{if(child instanceof Mesh) child.visible=pattern.test(child.name);});
+  prepared.object.traverse(child=>{
+    if(!(child instanceof Mesh)) return;
+    child.visible=pattern.test(child.name);
+    child.position.set(0,0,0);
+    child.quaternion.identity();
+    if(stage===15 && /^(A[1-6]_|servo_arm_[LR]_spline)/.test(child.name)) {
+      const pivot=new Vector3(child.name.includes("_L")?-63:63,127.3,-6);
+      const rotation=new Quaternion().setFromAxisAngle(new Vector3(1,0,0),0.22*Math.sin(progress*Math.PI*2));
+      child.quaternion.copy(rotation);
+      child.position.copy(pivot).sub(pivot.clone().applyQuaternion(rotation));
+    }
+    if(stage===16 && /^(B3_Pedestal_Drawer|battery_3s_2200)$/.test(child.name)) child.position.z=-105*(1-progress);
+  });
+  camera.position.set(stage===16 ? -410 : 410,stage===16 ? 270 : 310,stage===16 ? -670 : 670);
+  camera.lookAt(new Vector3(0,stage===16 ? 145 : 155,0));
   renderer.render(scene,camera);
 };
 window.renderAssemblyStage(0);

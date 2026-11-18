@@ -112,15 +112,15 @@ const steps = [
     "c_brazos",
     "Small gestures",
     "Pequeños gestos",
-    "Separate arm parts now support visual motion demonstrations.",
-    "Las piezas separadas permiten demostraciones visuales de movimiento.",
+    "Both arms move around their shoulder joints in a visual simulation.",
+    "Ambos brazos se mueven sobre sus articulaciones en una simulación visual.",
   ],
   [
     "c_bateria",
     "A removable home",
     "Un espacio extraíble",
-    "The revised drawer follows the battery envelope in the supplied CAD.",
-    "El cajón revisado sigue la envolvente de batería del CAD recibido.",
+    "The drawer and battery are shown pulled out from the rear of the pedestal.",
+    "El cajón y la batería se muestran extraídos por la parte trasera del pedestal.",
   ],
   [
     "c_listo",
@@ -222,13 +222,16 @@ export default function AssemblyStory() {
       </div>
       <div className="assembly-stage">
         <div className="assembly-image">
-          <img
-            src={asset(`fixed-${String(step + 1).padStart(2, "0")}.webp`)}
+          <picture>
+            {(step === 15 || step === 16) && <source media="(prefers-reduced-motion: reduce)" srcSet={asset(`fixed-${step+1}-still.webp?v=motion-20261118`)} />}
+            <img
+            src={asset(`fixed-${String(step + 1).padStart(2, "0")}.webp${step === 15 || step === 16 ? "?v=motion-20261118" : ""}`)}
             alt={locale === "en" ? current[1] : current[2]}
             loading="lazy"
             width="1218"
             height="1080"
           />
+          </picture>
           <span className="mono">
             {String(step + 1).padStart(2, "0")} / 18 —{" "}
             {t(bi("FIXED CAD · VISUAL SEQUENCE", "CAD FIJO · SECUENCIA VISUAL"))}
@@ -302,7 +305,7 @@ export default function AssemblyStory() {
           >
             <img
               loading="lazy"
-              src={asset(`fixed-${String(i + 1).padStart(2, "0")}.webp`)}
+              src={asset(`fixed-${String(i + 1).padStart(2, "0")}${i === 15 || i === 16 ? "-still.webp?v=motion-20261118" : ".webp"}`)}
               width="110"
               height="98"
               alt=""

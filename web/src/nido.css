@@ -259,7 +259,8 @@
   border-radius: 8px;
   overflow: hidden;
 }
-.assembly-image > img {
+.assembly-image > img,
+.assembly-image > picture > img {
   display: block;
   width: 100%;
   height: auto;
