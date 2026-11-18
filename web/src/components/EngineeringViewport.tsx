@@ -36,6 +36,7 @@ class Boundary extends Component<
 }
 export default function EngineeringViewport(props: EngineeringProps) {
   const root = useRef<HTMLDivElement>(null);
+  const [attempt, setAttempt] = useState(0);
   const [seen, setSeen] = useState(false),
     [active, setActive] = useState(true);
   const { t } = useLocale();
@@ -63,6 +64,9 @@ export default function EngineeringViewport(props: EngineeringProps) {
           "Vista 3D no disponible. El diseño y las tablas de conexiones siguen accesibles.",
         ),
       )}
+      <button className="button secondary" onClick={() => setAttempt((value) => value + 1)}>
+        {t(bi("Retry 3D preview", "Reintentar vista 3D"))}
+      </button>
     </div>
   );
   return (
@@ -74,7 +78,7 @@ export default function EngineeringViewport(props: EngineeringProps) {
         bi("Interactive CAD reference", "Referencia CAD interactiva"),
       )}
     >
-      <Boundary fallback={fallback}>
+      <Boundary key={attempt} fallback={fallback}>
         <Suspense
           fallback={
             <div className="engineering-loading" role="status">

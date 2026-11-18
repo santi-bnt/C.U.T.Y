@@ -50,6 +50,9 @@ describe("user-confirmed wiring and revised assets", () => {
     ).toBe(manifest.webGlbSha256);
     expect(manifest.webGlbBytes).toBeLessThan(30000000);
     expect(manifest.images).toHaveLength(18);
+    expect(manifest.fixedAssemblySequence.images).toHaveLength(18);
+    for (const image of manifest.fixedAssemblySequence.images)
+      expect(createHash("sha256").update(readFileSync("public/assembly/" + image.name)).digest("hex")).toBe(image.sha256);
     for (const image of manifest.images)
       expect(
         createHash("sha256")

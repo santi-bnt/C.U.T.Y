@@ -16,6 +16,14 @@ import { modelInfo } from "../data/model";
 import { photoPaletteByMaterial, prepareRobot } from "./robot";
 
 describe("deployed V17 assembly with integrated display", () => {
+  it("ships a lighter fixed-version interior with the three servo references", async () => {
+    const bytes = readFileSync("public/models/wiring-interior.glb");
+    expect(bytes.byteLength).toBeLessThan(readFileSync("public/models/cuty.glb").byteLength);
+    const gltf = await new GLTFLoader().parseAsync(new Uint8Array(bytes).buffer, "");
+    for (const name of ["servo_head_case", "servo_arm_L_case", "servo_arm_R_case", "lcd_touch_panel"])
+      expect(gltf.scene.getObjectByName(name)).toBeTruthy();
+    expect(gltf.scene.getObjectByName("servo_gimbal_L_case")).toBeFalsy();
+  });
   it("batches the static body without changing any triangle or oriented bounds", async () => {
     const bytes = readFileSync("public/models/cuty.glb");
     const gltf = await new GLTFLoader()

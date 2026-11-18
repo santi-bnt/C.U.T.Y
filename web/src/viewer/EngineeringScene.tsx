@@ -17,7 +17,6 @@ import {
 import type { OrbitControls as Controls } from "three-stdlib";
 import type { EngineeringProps } from "../components/EngineeringViewport";
 import { wiringEdges, wiringNodes } from "../data/operationalWiring";
-import { modelInfo } from "../data/model";
 import { partName } from "./robot";
 import { useMedia } from "../state/useMedia";
 import { themeColor } from "../theme";
@@ -46,7 +45,7 @@ function Content(props: EngineeringProps) {
   const { scene } = useGLTF(
     props.mode === "pcb"
       ? `${import.meta.env.BASE_URL}models/carrier-assembly.glb`
-      : modelInfo.url,
+      : `${import.meta.env.BASE_URL}models/wiring-interior.glb?v=fixed-20261118`,
   );
   const { invalidate } = useThree();
   const controls = useRef<Controls>(null);

@@ -9,3 +9,10 @@ El GLB contiene las 27 mallas originales y conserva sus vértices y orden de tri
 Los pivotes se basan en los ejes del CAD; las amplitudes son ilustrativas y no están calibradas. Las colisiones exactas del GLB no se han repetido: CadQuery no pudo cargar una dependencia bloqueada por la política de aplicaciones del sistema. Hay que verificar transformaciones y holguras en CAD, y el ajuste físico antes de fabricar o mover el mecanismo.
 
 Para reproducir el GLB, ejecutar desde web/ los comandos `npm ci` y `node scripts/build-fixed-model.mjs`. El script verifica los hashes y vértices; no repara ni vuelve a triangular los STL. El modelo sin cuantización ocupa aproximadamente 22 MB. El GLB histórico se conserva en hardware/cad/glb/archive/ como fuente de referencias compradas.
+
+Para regenerar el modelo interior ligero de conexiones, ejecutar desde web/
+`node scripts/build-wiring-model.mjs`. Para regenerar los 18 cuadros visuales,
+iniciar Vite en el puerto 5188 y ejecutar `node scripts/render-fixed-assembly.mjs`.
+Estas imágenes muestran etapas ilustrativas de visibilidad de componentes y no
+certifican un procedimiento físico ni las holguras. Sus hashes se registran en
+`web/public/assembly/provenance.json`.

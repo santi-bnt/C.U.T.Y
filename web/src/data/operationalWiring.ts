@@ -270,7 +270,7 @@ const detail: Record<string, ReturnType<typeof bi>> = {
 };
 export const wiringNodes = cadNodes.map((n) => ({
   ...n,
-  label: n.id === "ground" ? "Common GND / Tierra común" : n.label,
+  label: n.id === "ground" ? "Common GND / Tierra común" : n.id === "servos" ? "MG996R × 3" : n.label,
   detail: detail[n.id] ?? n.detail,
   voltage:
     n.id === "stm"

@@ -383,6 +383,7 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
     "Inside",
     "Assembled",
     "Wave demo",
+    "Left arm demo",
     "Look demo",
   ]) {
     const button = page.getByRole("button", { name, exact: true });
@@ -401,7 +402,7 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   );
   await expect(page.locator(".assembly-image img")).toHaveAttribute(
     "src",
-    /imprime.webp$/,
+    /fixed-02.webp$/,
   );
   await page.getByRole("button", { name: "Play sequence" }).click();
   await expect(page.locator(".assembly-caption h3")).toHaveText(
@@ -419,6 +420,7 @@ test("kinetic opening, named-part demos, assembly imagery and spatial connection
   await expect(page.locator(".engineering-viewport.wiring canvas")).toHaveCount(
     1,
   );
+  await expect(page.getByText("3D preview unavailable.", { exact: false })).toHaveCount(0);
   await page
     .locator(".spatial-parts")
     .getByRole("button", { name: "ReSpeaker 2-Mics V2.0", exact: true })

@@ -14,50 +14,50 @@ const steps = [
     "imprime",
     "Made in layers",
     "Hecho por capas",
-    "30 printable parts in the supplied revised CAD package.",
-    "30 piezas imprimibles en el paquete CAD revisado.",
+    "27 printable parts in the fixed-base CAD package.",
+    "27 piezas imprimibles en el paquete CAD de base fija.",
   ],
   [
     "c_piso",
     "Start from the ground",
     "Desde la base",
-    "The floor carries the two gimbal servos.",
-    "El piso aloja los dos servos del gimbal.",
+    "The pedestal floor supports the fixed base.",
+    "El piso del pedestal sostiene la base fija.",
   ],
   [
     "c_poste",
     "A fixed reference",
     "Un punto fijo",
-    "The post supports the universal joint.",
-    "El poste sostiene la junta universal.",
+    "The pedestal forms the stationary base.",
+    "El pedestal forma la base inmóvil.",
   ],
   [
     "c_varillas",
-    "Translate the motion",
-    "Transmitir movimiento",
-    "Cranks and connecting rods link the base to the platform.",
-    "Manivelas y varillas conectan la base con la plataforma.",
+    "A removable drawer",
+    "Un cajón extraíble",
+    "The battery drawer slides into the pedestal.",
+    "El cajón de batería se desliza dentro del pedestal.",
   ],
   [
     "c_cubierta",
-    "The nest",
-    "El nido",
-    "The cover encloses the stationary base.",
-    "La cubierta envuelve la base fija.",
+    "Support for the core",
+    "Soporte para el núcleo",
+    "The riser sits on the fixed pedestal.",
+    "El soporte se coloca sobre el pedestal fijo.",
   ],
   [
     "c_cruceta",
-    "Two axes, one joint",
-    "Dos ejes, una junta",
-    "A mechanical view of the universal joint.",
-    "Una vista mecánica de la junta universal.",
+    "The core deck",
+    "La plataforma del núcleo",
+    "The fixed deck mounts on the riser.",
+    "La plataforma fija se monta sobre el soporte.",
   ],
   [
     "c_plataforma",
     "A place for everything",
     "Un lugar para todo",
-    "The deck provides the mounting structure.",
-    "La plataforma ofrece la estructura de montaje.",
+    "The spine rises from the fixed deck.",
+    "La columna se levanta desde la plataforma fija.",
   ],
   [
     "c_placa",
@@ -223,7 +223,7 @@ export default function AssemblyStory() {
       <div className="assembly-stage">
         <div className="assembly-image">
           <img
-            src={asset(current[0] + ".webp")}
+            src={asset(`fixed-${String(step + 1).padStart(2, "0")}.webp`)}
             alt={locale === "en" ? current[1] : current[2]}
             loading="lazy"
             width="1218"
@@ -231,7 +231,7 @@ export default function AssemblyStory() {
           />
           <span className="mono">
             {String(step + 1).padStart(2, "0")} / 18 —{" "}
-            {t(bi("EARLIER ASSEMBLY REFERENCE", "REFERENCIA DE ENSAMBLE ANTERIOR"))}
+            {t(bi("FIXED CAD · VISUAL SEQUENCE", "CAD FIJO · SECUENCIA VISUAL"))}
           </span>
         </div>
         <div className="assembly-caption">
@@ -272,8 +272,8 @@ export default function AssemblyStory() {
           <p className="simulation-note">
             {t(
               bi(
-              "This 18-step image sequence depicts an earlier Nido assembly reference. The current interactive GLB uses the fixed-pedestal STL set; purchased electronics remain simplified CAD envelopes.",
-              "Esta secuencia de 18 pasos muestra el ensamble Nido histórico. El GLB actual usa el pedestal fijo; los componentes electrónicos son referencias simplificadas.",
+              "This visual sequence uses the fixed-pedestal GLB and original STL meshes. Purchased components are simplified, and physical fit remains unverified.",
+              "Esta secuencia visual usa el GLB de pedestal fijo y las mallas STL originales. Los componentes comprados son simplificados y el ajuste físico sigue sin verificar.",
               ),
             )}
           </p>
@@ -302,7 +302,7 @@ export default function AssemblyStory() {
           >
             <img
               loading="lazy"
-              src={asset(s[0] + ".webp")}
+              src={asset(`fixed-${String(i + 1).padStart(2, "0")}.webp`)}
               width="110"
               height="98"
               alt=""
