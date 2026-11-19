@@ -27,7 +27,7 @@ La placa C.U.T.Y v1.1 es 100 % de agujero pasante (THT) y solo lleva componentes
    - Sin conformal coating ni depaneling.
 3. En la sección de la PCB elige *Enter PCB parameters*:
    - 100.1 × 92.1 mm, 2 capas, FR-4 TG130, 1.6 mm.
-   - **Cobre 2 oz** si los cinco servos van a forzar al mismo tiempo; 1 oz si no.
+   - **Cobre:** la version mecanica actual usa tres servos activos y conserva cinco conectores. El espesor debe elegirse con el presupuesto de corriente medido; la carga simultanea aun no esta validada.
    - HASL lead free, máscara verde, serigrafía blanca.
    - Cantidad de PCB: 5 (las que no se ensamblan te llegan vacías).
    - *Calculate* → *Save to cart*.

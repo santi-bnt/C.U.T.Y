@@ -1,6 +1,8 @@
+**Mechanical configuration:** fixed pedestal and torso, with three active MG996R joints (head PAN and two arms). The PCB still has five servo connectors; J10/J11 are reserved. Physical motion is not yet validated.
+
 # Bill of Materials — as built (Nov 2026)
 
-What the robot is actually built from: the carrier PCB, two small orders (Mouser, Amazon México) and parts the team already owned. Printed parts and screws per step are in [hardware/cad/carcasa_v17/LEEME.md](../hardware/cad/carcasa_v17/LEEME.md).
+Current printed parts and screws follow the fixed-base CAD variant in [fixed-source-readme.md](../assembly/fixed-source-readme.md). The gimbal assembly guide is historical and does not describe this build.
 
 ## Carrier PCB — JLCPCB
 
@@ -21,7 +23,7 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 
 | ASIN | Item | Role |
 | --- | --- | --- |
-| B0CPJGHMPR | STM32F401CCU6 Black Pill | Servo/body controller on U1 |
+| B0CPJGHMPR | STM32F401CCU6 Black Pill | Intended three-joint servo controller on U1; integration pending |
 | B0D1G4C28P | XL4015 5 A adjustable buck | 6 V servo rail (J4 → J5) |
 | B0G5L9RR8C | 12 V → 5 V 5 A 25 W converter, USB-C lead | Raspberry Pi 5 supply (J6) |
 | B07SXVKMQR | Round rocker switch 12 V 20 A (2-pack) | Main (J2) and servo (J3) switches |
@@ -31,8 +33,8 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | B0CVS264R1 | Pi 5 CSI cable 22 → 15 pin, 50 cm | Camera |
 | B0G4L68WHY | Taiss self-tapping screws M2/M3/M4 (685 pcs) | Everything into plastic |
 | B07CBZRXQ8 | M3 hex socket screws + nuts (280 pcs) | Servo horns/cranks (into metal) |
-| B07Z1MDC7H | Hobbypark M3 rod ends | Gimbal push-rods |
-| B0D22QGKHN | M3 × 150 threaded rod (10 pcs) | Gimbal push-rods, cut to length |
+| B07Z1MDC7H | Hobbypark M3 rod ends | Historical Nido gimbal parts; not used by fixed-base design |
+| B0D22QGKHN | M3 × 150 threaded rod (10 pcs) | Historical Nido gimbal parts; not used by fixed-base design |
 | B0B9VKV5N9 | Silicone bumpers | Feet |
 
 ## Already owned by the team (measured)
@@ -44,6 +46,6 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | ReSpeaker 2-Mics Pi HAT V2.0 | 65.5 × 29.8 × 11.5 | plugs into J14 |
 | Arducam OV5647 5 MP | 24.4 × 23.3, 7.2 deep | held by a cradle in the visor |
 | Speaker 2 W / 8 Ω | 35.4 × 25 × 5.5 | to the ReSpeaker speaker port |
-| 5 × MG996R | 40.7 × 19.7 × 37 | head, two arms, two gimbal |
+| 3 active MG996R | 40.7 x 19.7 x 37 | head PAN, left arm, right arm; J10/J11 reserved |
 | LiPo 3S 11.1 V 2200 mAh 50C (HM2202) + balance charger | to measure | drawer fits up to 109 × 35 × 25 |
 | Dupont wires, ≈0.85 kg PLA | | |

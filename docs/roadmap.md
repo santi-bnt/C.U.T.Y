@@ -36,10 +36,9 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 
 - [ ] Board-specific startup, clock configuration and HAL/CMSIS project for the Black Pill
 - [ ] UART protocol implementation and validated Pi-to-STM32 link
-- [ ] Servo control
-- [ ] IMU
-- [ ] Head movement
-- [ ] Body PID
+- [ ] Three-servo control integration: HEAD_PAN, LEFT_ARM, RIGHT_ARM
+- [ ] HEAD_PAN low-pass FIR integration into the board FreeRTOS task
+- [ ] UART and timer/PWM hardware validation (keep actuator outputs disabled until reviewed)
 
 Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. The physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
 
@@ -50,19 +49,17 @@ Portable parsing, commanded-position control and safety logic plus an initial dr
 - [ ] Review the saved DRC report's silkscreen warnings and reproduce checks with KiCad
 - [ ] Fabrication, assembly, power validation and electrical integration
 
-- [ ] Body
-- [ ] Base
-- [ ] Head
-- [ ] Arms
-- [ ] Internal assembly
+- [x] Fixed pedestal/base and fixed torso CAD variant (`carcasa_v17_fija`, 27 STL)
+- [x] Head PAN and two arm joints represented in the fixed CAD; fit/motion not physically validated
+- [ ] Internal assembly and physical fit validation
 
 ## Phase 6 — Dashboard
 
 - [ ] Telemetry
-- [ ] PID graphs
+- [ ] Three-axis telemetry
 - [ ] Digital twin
 
-The `web/` directories currently contain documentation/placeholders.
+The website contains the fixed CAD reference, FreeRTOS motion explanation and local FIR demonstrations. These displays are not connected to physical telemetry or actuators.
 
 ## Phase 7 — Recognition validation
 

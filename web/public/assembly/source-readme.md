@@ -1,3 +1,5 @@
+> **ARCHIVE / ARCHIVO - superseded V17 Nido gimbal variant.** This guide describes the old moving-base design and is retained for history only. The current design is fixed-base `fixed-source-readme.md`.
+
 # C.U.T.Y · Carcasa V17 «Nido»
 
 Robot compañero de 36 cm que se arma a mano como un set de bloques: 30 piezas impresas que encajan con clips, ranuras, una bayoneta y dos llaves (los brazos), sobre una base con gimbal de dos servos. Todo cabe en la cama de 180 × 180 mm de la Bambu A1 mini.

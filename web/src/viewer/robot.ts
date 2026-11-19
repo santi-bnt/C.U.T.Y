@@ -35,7 +35,6 @@ export const photoPaletteByMaterial: Record<string, string> = {
   B1_Base_Cover: photoBase,
   B3_Battery_Drawer: photoBase,
   B2_Base_Floor: photoGray,
-  B4_Gimbal_Post: photoGray,
   K1_Core_Deck: photoGray,
   K2_Core_Spine: photoGray,
   K3_Core_Shoulders: photoGray,

@@ -13,9 +13,18 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { updateAssembly } from "./assembly";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { modelInfo } from "../data/model";
+import nido from "../data/nido.generated.json";
 import { photoPaletteByMaterial, prepareRobot } from "./robot";
 
 describe("deployed V17 assembly with integrated display", () => {
+  it("uses the fixed-CAD datums and only the three active joints", () => {
+    expect(nido.revision).toContain("Fijo STL");
+    expect(nido.activeJoints).toEqual(["HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"]);
+    expect(nido.pivots.HEAD_PAN.point).toEqual([0, 166.3, 0]);
+    expect(nido.pivots.LEFT_ARM.point).toEqual([-63, 127.3, -6]);
+    expect(nido.pivots.RIGHT_ARM.point).toEqual([63, 127.3, -6]);
+    expect(nido.reservedConnectors).toEqual(["J10", "J11"]);
+  });
   it("ships a lighter fixed-version interior with the three servo references", async () => {
     const bytes = readFileSync("public/models/wiring-interior.glb");
     expect(bytes.byteLength).toBeLessThan(readFileSync("public/models/cuty.glb").byteLength);
@@ -63,13 +72,25 @@ describe("deployed V17 assembly with integrated display", () => {
     expect(Math.abs(arm.rotation.x)).toBeGreaterThan(0.1);
     const left = prepared.object.getObjectByName("A1_Arm_L")!;
     const body = prepared.object.getObjectByName("S1_Body_Front_Fixed")!;
+    const pedestal = prepared.object.getObjectByName("B1_Pedestal")!;
+    const fixedParts = [body, pedestal];
+    const expectFixedBase = () => {
+      for (const part of fixedParts) {
+        expect(part.position.length()).toBe(0);
+        expect(part.rotation.x).toBe(0);
+        expect(part.rotation.y).toBe(0);
+        expect(part.rotation.z).toBe(0);
+      }
+    };
+    expectFixedBase();
     expect(left.rotation.x).toBe(0);
     updateAssembly(prepared.object, "assembled", "left-arm", 1);
     expect(Math.abs(left.rotation.x)).toBeGreaterThan(0.1);
+    expectFixedBase();
     expect(arm.rotation.x).toBe(0);
     updateAssembly(prepared.object, "assembled", "look", 1);
     expect(Math.abs(head.rotation.y)).toBeGreaterThan(0.1);
-    expect(body.position.length()).toBe(0);
+    expectFixedBase();
     updateAssembly(prepared.object, "exploded", "none", 0);
     expect(head.position.length()).toBeGreaterThan(30);
     updateAssembly(prepared.object, "interior", "none", 0);
@@ -77,6 +98,7 @@ describe("deployed V17 assembly with integrated display", () => {
     updateAssembly(prepared.object, "assembled", "none", 0);
     expect(head.visible).toBe(true);
     expect(head.position.length()).toBe(0);
+    expectFixedBase();
 
     [...prepared.geometries, ...batched.geometries].forEach((geometry) =>
       geometry.dispose(),

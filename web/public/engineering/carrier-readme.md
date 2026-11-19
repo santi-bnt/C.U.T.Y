@@ -4,7 +4,7 @@
 
 PCB de 2 capas que reemplaza la protoboard y los cables Dupont. Interconecta
 la Raspberry Pi 5, la STM32F401 Black Pill, la pantalla Display-G de 3.5 in,
-el ReSpeaker 2-Mics Pi HAT V2.0 y los cinco MG996R, y distribuye la energía
+el ReSpeaker 2-Mics Pi HAT V2.0 y tres servos MG996R activos; conserva cinco conectores, J7-J9 activos y J10/J11 reservados, y distribuye la energía
 de la LiPo 3S. Todos los módulos van enchufados (cables planos con llave,
 zócalos y tiras de pines), así que se pueden quitar o reemplazar.
 
@@ -37,7 +37,7 @@ repetir las verificaciones con KiCad.
    - Material FR-4, TG130 · Espesor 1.6 mm · Capas 2
    - Pista/espacio mínimos 6/6 mil · Taladro mínimo 0.3 mm (cualquier valor estándar sirve)
    - Acabado HASL lead free · Máscara verde · Serigrafía blanca
-   - **Cobre: 1 oz** basta para uso normal. **Si los 5 servos van a forzar a la vez, pide 2 oz.**
+   - **Cobre: 1 oz** basta para uso normal. La variante actual activa 3 servos simultáneamente como máximo; la PCB conserva cinco conectores y dos quedan reservados. Confirma la capacidad de corriente con la carga real antes de operar.
      Las pistas de batería son de 3 mm y el bus de 6 V va en ambas capas.
    - Cantidad: 5 (el mínimo)
 3. **Ensamblada (recomendado):** sigue [`fab/pcba/LEEME_PCBA.md`](fab/pcba/LEEME_PCBA.md). Ahí están el BOM con
@@ -78,8 +78,8 @@ LiPo 3S ─ J1 XT60 ─ J2 interruptor general ─┬─ F1 10 A ─ J3 interrup
 | --- | --- | --- |
 | Pi pin 8 (TX) | PA3 USART2_RX | Cruzado |
 | Pi pin 10 (RX) | PA2 USART2_TX | |
-| PB6 / PB7 / PB8 / PB9 | Servos 1–4 (J7–J10) | TIM4 CH1–CH4, 220 Ω en serie |
-| PA8 | Servo 5 (J11) | TIM1 CH1, 220 Ω en serie |
+| PB6 / PB7 / PB8 / PB9 | J7-J9 active; J10 reserved | TIM4 CH1-CH4, 220 ohm in series; PWM design mapping only |
+| PA8 | J11 reserved | TIM1 CH1, 220 Ω en serie |
 | PA1 | Divisor de batería | V<sub>bat</sub> = V<sub>ADC</sub> × 122 / 22 (12.6 V → 2.27 V). PA0 queda libre porque tiene el botón KEY de la Black Pill |
 | PB10 / PB3 | J15 I2C2 (SCL/SDA) | Para la IMU futura, con pull-ups de 4.7 kΩ |
 | J12 ↔ J13 | Pantalla (por cable) | Pines 1, 2, 4, 6, 11, 17–26 y GND, numeración física idéntica a la Pi |

@@ -4,6 +4,8 @@ La misma carcasa V17 sin movimiento en la base: el cuerpo termina plano y se par
 
 ![C.U.T.Y V17 Fijo](renders/frente_34.png)
 
+Los datums de animación del modelo web usan los ejes del CAD fijo, en milímetros: HEAD_PAN `[0, 166.3, 0]` alrededor de Y; LEFT_ARM `[-63, 127.3, -6]` y RIGHT_ARM `[63, 127.3, -6]`, ambos alrededor de X. Son pivotes de visualización derivados de los datums de cuello y hombros, no límites de recorrido validados en hardware.
+
 ## Qué cambia respecto a la versión con gimbal
 
 | | Con gimbal («Nido») | Fija |

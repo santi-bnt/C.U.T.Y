@@ -1,84 +1,54 @@
 {
  "printed": [
   {
-   "part": "B1_Base_Cover",
+   "part": "B1_Pedestal",
    "group": "base",
    "print_dims_mm": [
-    175.1,
-    173.3,
-    66.5
+    126.1,
+    126.1,
+    34.1
    ],
-   "volume_cm3": 155.1
+   "volume_cm3": 65.7
   },
   {
-   "part": "B2_Base_Floor",
+   "part": "B2_Pedestal_Floor",
    "group": "base",
    "print_dims_mm": [
-    165.3,
-    166.9,
-    25.8
+    119.2,
+    119.2,
+    10.1
    ],
-   "volume_cm3": 72.6
+   "volume_cm3": 41.4
   },
   {
-   "part": "B3_Battery_Drawer",
+   "part": "B3_Pedestal_Drawer",
    "group": "base",
    "print_dims_mm": [
-    119.3,
-    62.6,
-    30.5
+    45.3,
+    117.2,
+    27.5
    ],
-   "volume_cm3": 30.7
+   "volume_cm3": 17.1
   },
   {
-   "part": "B4_Gimbal_Post",
+   "part": "B4_Deck_Riser",
    "group": "base",
    "print_dims_mm": [
-    40.0,
-    40.0,
-    88.0
+    57.0,
+    57.0,
+    14.3
    ],
-   "volume_cm3": 21.5
+   "volume_cm3": 28.5
   },
   {
-   "part": "G1_Ujoint_Cross",
-   "group": "gimbal",
-   "print_dims_mm": [
-    14.0,
-    14.0,
-    14.0
-   ],
-   "volume_cm3": 2.3
-  },
-  {
-   "part": "G2_Crank_L",
-   "group": "base",
-   "print_dims_mm": [
-    22.0,
-    12.0,
-    6.5
-   ],
-   "volume_cm3": 1.0
-  },
-  {
-   "part": "G3_Crank_R",
-   "group": "base",
-   "print_dims_mm": [
-    22.0,
-    12.0,
-    6.5
-   ],
-   "volume_cm3": 1.0
-  },
-  {
-   "part": "K1_Core_Deck",
+   "part": "K1_Core_Deck_Fixed",
    "group": "core",
    "print_dims_mm": [
     123.5,
     118.4,
-    47.0
+    8.0
    ],
-   "volume_cm3": 38.5
+   "volume_cm3": 31.9
   },
   {
    "part": "K2_Core_Spine",
@@ -121,34 +91,34 @@
    "volume_cm3": 7.2
   },
   {
-   "part": "S1_Body_Front",
+   "part": "S1_Body_Front_Fixed",
    "group": "shell",
    "print_dims_mm": [
     148.2,
-    161.9,
+    127.0,
     75.5
    ],
-   "volume_cm3": 86.4
+   "volume_cm3": 70.5
   },
   {
-   "part": "S2_Body_Back",
+   "part": "S2_Body_Back_Fixed",
    "group": "shell",
    "print_dims_mm": [
     148.1,
-    162.0,
-    66.6
+    127.0,
+    63.6
    ],
-   "volume_cm3": 80.9
+   "volume_cm3": 66.3
   },
   {
    "part": "S3_Tummy_Grille",
    "group": "shell",
    "print_dims_mm": [
     55.3,
-    55.3,
-    13.6
+    54.6,
+    11.4
    ],
-   "volume_cm3": 7.4
+   "volume_cm3": 7.2
   },
   {
    "part": "S4_USB_Plug",
@@ -226,9 +196,9 @@
    "print_dims_mm": [
     160.1,
     134.5,
-    59.2
+    55.7
    ],
-   "volume_cm3": 73.0
+   "volume_cm3": 72.9
   },
   {
    "part": "H2_Head_Back",
@@ -361,16 +331,13 @@
   "imu_mpu6050",
   "battery_3s_2200",
   "battery_lead",
+  "xt60_joint",
   "switch_main",
   "switch_servos",
   "servo_arm_L_case",
   "servo_arm_L_spline",
   "servo_arm_R_case",
   "servo_arm_R_spline",
-  "servo_gimbal_L_case",
-  "servo_gimbal_L_spline",
-  "servo_gimbal_R_case",
-  "servo_gimbal_R_spline",
   "servo_head_case",
   "servo_head_spline",
   "lcd_touch_panel",
@@ -379,11 +346,15 @@
   "lcd_header",
   "camera_board",
   "camera_lens",
-  "pushrod_L",
-  "pushrod_R",
-  "bolt_roll_M4",
-  "bolt_pitch_M4",
-  "screw_crank_L",
-  "screw_crank_R"
- ]
+  "screw_deck_M3_0",
+  "screw_deck_M3_1",
+  "screw_deck_M3_2",
+  "screw_deck_M3_3",
+  "screw_riser_M3x12_0",
+  "screw_riser_M3x12_1",
+  "screw_riser_M3x12_2",
+  "screw_riser_M3x12_3"
+ ],
+ "variant": "V17 fixed base, fixed torso",
+ "status": "Current CAD print parts; 27 STL. Three active servo joints."
 }

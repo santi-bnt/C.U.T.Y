@@ -394,7 +394,7 @@ export const wiringNodes = [
   },
   {
     id: "servos",
-    label: "MG996R × 5",
+    label: "3 active MG996R / 5 outputs",
     refs: ["J7", "J8", "J9", "J10", "J11"],
     x: 180,
     y: 475,
@@ -403,8 +403,8 @@ export const wiringNodes = [
       "Objetivo 6.0 V, buck externo",
     ),
     detail: bi(
-      "Five connectors: pin 1 signal, pin 2 +6 V, pin 3 PGND. The physical − + S order must be checked against orientation; stall-current budget is unverified.",
-      "Cinco conectores: pin 1 señal, pin 2 +6 V, pin 3 PGND. Comprueba la orientación − + S; falta presupuesto de corriente de bloqueo.",
+      "J7–J9 serve head PAN and both arms. J10/J11 are reserved. All five PCB connectors remain: pin 1 signal, pin 2 +6 V, pin 3 PGND. Verify physical orientation and current budget before hardware use.",
+      "J7–J9 corresponden a cabeza PAN y ambos brazos. J10/J11 quedan reservados. Se conservan los cinco conectores PCB: pin 1 señal, pin 2 +6 V, pin 3 PGND. Verifica orientación y corriente antes de usar hardware.",
     ),
   },
   {

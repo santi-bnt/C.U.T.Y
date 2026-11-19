@@ -52,7 +52,7 @@ The repository records an assembled THT order placed with JLCPCB: 37 components 
 
 Pi physical 8 / BCM14 TXD → STM32 RX pin to confirm. STM32 TX pin to confirm → Pi physical 10 / BCM15 RXD. Shared GND, 3.3 V logic; do not apply 5 V UART signals.
 
-Five MG996R: red → regulated 6 V; brown/black → servo GND; orange/yellow → STM32 PWM. All five final PWM pin assignments are pending.
+Three active MG996R (head PAN and two arms): red to regulated 6 V; brown/black to servo GND; orange/yellow to STM32 PWM. The PCB retains five connectors; J10/J11 are reserved. Final PWM pin assignments and physical wiring remain pending.
 
 ## Power
 
@@ -62,4 +62,4 @@ Share electrical GND between Pi, STM32 and servo supply. Do not join positive ou
 
 ## Remaining checks
 
-Display backlight/overlay; STM32 UART pins; five PWM pins; battery protection/fuse/distribution; buck model/current; battery-to-Pi supply; final PCB distribution/connectors. Proposed assignments are not physically proven by the confirmed display/audio test.
+Display backlight/overlay; STM32 UART pins; three active PWM pins (J10/J11 reserved); battery protection/fuse/distribution; buck model/current; battery-to-Pi supply; final PCB distribution/connectors. Proposed assignments are not physically proven by the confirmed display/audio test.

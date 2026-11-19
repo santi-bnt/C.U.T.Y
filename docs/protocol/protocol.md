@@ -4,12 +4,14 @@ Status: design sketch only. No UART implementation or finalized binary protocol 
 
 Raspberry sends high-level goals; STM32 converts them into safe physical movement and emits status/measurements. Do not stream raw servo PWM continuously from Raspberry.
 
-Initial discussion format: one comma-separated ASCII-compatible text record per line, terminated by LF. Examples:
+Initial discussion format: one comma-separated ASCII-compatible text record per line, terminated by LF. These are illustrative single-axis records for the three active joints:
 ```text
-SET_HEAD,15,-4
+SET_HEAD_PAN,15
+SET_LEFT_ARM,8
+SET_RIGHT_ARM,-8
 STATUS,OK
 ```
-Names are uppercase; example decimals use a dot. Exact CRLF tolerance, field grammar, maximum line length, units, and parser rules are not yet agreed. These examples are not a parser specification.
+Names are uppercase; example decimals use a dot. Exact CRLF tolerance, field grammar, maximum line length, units, and parser rules are not yet agreed. These examples are not a parser specification. The base, pedestal and torso are fixed; old `SET_HEAD` PAN/TILT and `SET_BODY` examples are superseded.
 
 See [commands](commands.md) and [telemetry](telemetry.md).
 

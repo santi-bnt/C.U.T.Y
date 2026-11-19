@@ -194,8 +194,8 @@ export default function AssemblyStory() {
           <p>
             {t(
               bi(
-                "The fixed pedestal replaces the gimbal. Head PAN and both arms are planned; physical fit and motion remain unvalidated.",
-                "El pedestal fijo reemplaza al gimbal. Se prevén cabeza PAN y ambos brazos; el ajuste y movimiento físicos siguen sin validar.",
+                "Fixed base, pedestal and torso; only head PAN and both arms have active servo joints. Physical fit and motion remain unvalidated.",
+                "Base, pedestal y cuerpo fijos; solo la cabeza PAN y ambos brazos tienen servos activos. El ajuste y movimiento físicos siguen sin validar.",
               ),
             )}
           </p>

@@ -1,6 +1,6 @@
 # Bill of Materials — as built (Nov 2026)
 
-What the robot is actually built from: the carrier PCB, two small orders (Mouser, Amazon México) and parts the team already owned. Printed parts and screws per step are in [hardware/cad/carcasa_v17/LEEME.md](../hardware/cad/carcasa_v17/LEEME.md) (moving base) and [hardware/cad/carcasa_v17_fija/LEEME.md](../hardware/cad/carcasa_v17_fija/LEEME.md) (fixed, on a pedestal).
+Current mechanics use the fixed-base `carcasa_v17_fija` variant: fixed pedestal and torso, with head PAN and two moving arms. The old gimbal BOM and build guide remain historical. See [current fixed CAD](../hardware/cad/carcasa_v17_fija/LEEME.md).
 
 ## Carrier PCB — JLCPCB
 
@@ -21,7 +21,7 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 
 | ASIN | Item | Role |
 | --- | --- | --- |
-| B0CPJGHMPR | STM32F401CCU6 Black Pill | Servo/body controller on U1 |
+| B0CPJGHMPR | STM32F401CCU6 Black Pill | Intended controller for three active joints; board integration pending |
 | B0D1G4C28P | XL4015 5 A adjustable buck | 6 V servo rail (J4 → J5) |
 | B0G5L9RR8C | 12 V → 5 V 5 A 25 W converter, USB-C lead | Raspberry Pi 5 supply (J6) |
 | B07SXVKMQR | Round rocker switch 12 V 20 A (2-pack) | Main (J2) and servo (J3) switches |
@@ -44,6 +44,6 @@ What the robot is actually built from: the carrier PCB, two small orders (Mouser
 | ReSpeaker 2-Mics Pi HAT V2.0 | 65.5 × 29.8 × 11.5 | plugs into J14 |
 | Arducam OV5647 5 MP | 24.4 × 23.3, 7.2 deep | held by a cradle in the visor |
 | Speaker 2 W / 8 Ω | 35.4 × 25 × 5.5 | to the ReSpeaker speaker port |
-| 3 × MG996R | 40.7 × 19.7 × 37 | planned for head PAN and two arms; the earlier Nido variant used two additional gimbal servos |
+| 3 × MG996R active | 40.7 × 19.7 × 37 | Head PAN, left arm, right arm; two additional PCB connectors remain reserved |
 | LiPo 3S 11.1 V 2200 mAh 50C (HM2202) + balance charger | to measure | both drawers fit up to 109 × 35 × 25 |
 | Dupont wires, ≈0.85 kg PLA | | |
