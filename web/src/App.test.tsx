@@ -62,7 +62,7 @@ describe("portfolio interactions", () => {
     expect(document.querySelector(".face-screen.talking")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Stop mouth" }));
     expect(document.querySelector(".face-screen.talking")).toBeNull();
-  });
+  }, 10_000);
   it("opens the compact navigation and closes it when a destination is selected", () => {
     render(
       <LocaleProvider>

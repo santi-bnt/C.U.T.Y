@@ -21,7 +21,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
     ),
   ).toBeVisible();
   await expect(
-    section.getByText("In development — Hardware integration pending"),
+    section.getByText(`In development \u2014 Hardware integration pending`),
   ).toBeVisible();
   await expect(section.locator(".mc-status-strip")).toContainText(
     "preliminary dry-run",
@@ -30,7 +30,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
   const diagram = section.locator(".mc-diagram");
   const pi = diagram.getByRole("button", { name: /Raspberry Pi 5/ });
   const stm = diagram.getByRole("button", { name: /STM32F401 \+ FreeRTOS/ });
-  const servos = diagram.getByRole("button", { name: /3 × MG996R/ });
+  const servos = diagram.getByRole("button", { name: /3 \u00d7 MG996R/ });
   await expect(pi).toHaveAttribute("aria-pressed", "false");
   await stm.click();
   await expect(stm).toHaveAttribute("aria-pressed", "true");
@@ -51,8 +51,14 @@ test("motion section explains architecture, tasks and safe local simulation", as
     "Implemented: portable parser",
   );
   await expect(section.locator(".mc-task-details")).toContainText("RX bytes");
-  await tasks.getByRole("button", { name: /SafetyTask/ }).click();
-  await expect(section.locator(".mc-task-details")).toContainText("RESET");
+  for (const name of ["ServoControlTask", "SafetyTask", "DiagnosticsTask"]) {
+    const card = tasks.getByRole("button", { name: new RegExp(name) });
+    await card.click();
+    await expect(card).toHaveAttribute("aria-pressed", "true");
+    await expect(section.locator(".mc-task-details h4")).toHaveText(name);
+    if (name === "SafetyTask")
+      await expect(section.locator(".mc-task-details")).toContainText("RESET");
+  }
   await tasks.getByRole("button", { name: /CommunicationTask/ }).click();
 
   await section
@@ -93,7 +99,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
   await section
     .getByRole("button", { name: "Simulate heartbeat loss" })
     .click();
-  await expect(section.getByRole("status")).toContainText("ACTIVE → FAULT");
+  await expect(section.getByRole("status")).toContainText(`ACTIVE \u2192 FAULT`);
   await expect(section.locator(".mc-fault-branch strong")).toHaveAttribute(
     "data-current",
     "true",
@@ -121,14 +127,14 @@ test("motion section explains architecture, tasks and safe local simulation", as
     "not physically validated",
   );
 
-  await page.getByRole("button", { name: "Español", exact: true }).click();
+  await page.getByRole("button", { name: `Espa\u00f1ol`, exact: true }).click();
   await expect(
     section.getByRole("button", { name: "Siguiente" }),
   ).toBeVisible();
   await expect(
-    section.getByRole("button", { name: "Simular pérdida de heartbeat" }),
+    section.getByRole("button", { name: `Simular p\u00e9rdida de heartbeat` }),
   ).toBeVisible();
-  await expect(section).toContainText("La Raspberry Pi procesa visión e IA");
+  await expect(section).toContainText(`La Raspberry Pi procesa visi\u00f3n e IA`);
   const overflow = await section.evaluate(
     (element) => element.scrollWidth > element.clientWidth,
   );
@@ -149,12 +155,20 @@ test("motion section explains architecture, tasks and safe local simulation", as
     section.getByRole("button", { name: "Siguiente" }),
   ).toBeEnabled();
 
-  const nav = page.getByRole("navigation", { name: "Navegación principal" });
+  const nav = page.getByRole("navigation", { name: `Navegaci\u00f3n principal` });
   if (info.project.name !== "desktop")
-    await page.getByRole("button", { name: "Abrir navegación" }).click();
+    await page.getByRole("button", { name: `Abrir navegaci\u00f3n` }).click();
   await nav.getByRole("link", { name: "FreeRTOS", exact: true }).click();
   await expect(page).toHaveURL(/#motion-control$/);
   await expect(page.locator('nav a[href="#motion-control"]')).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  if (info.project.name !== "desktop")
+    await page.getByRole("button", { name: `Abrir navegaci\u00f3n` }).click();
+  await nav.getByRole("link", { name: "DSP / FIR", exact: true }).click();
+  await expect(page).toHaveURL(/#dsp-filters$/);
+  await expect(page.locator('nav a[href="#dsp-filters"]')).toHaveAttribute(
     "aria-current",
     "location",
   );

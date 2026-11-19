@@ -171,6 +171,13 @@ p {
   border: 0;
   border-radius: 0;
   overflow: hidden;
+  pointer-events: none;
+}
+.scene-layer .canvas-wrap * {
+  pointer-events: none !important;
+}
+.scene-layer .loading-model {
+  pointer-events: none;
 }
 .scene-layer canvas {
   pointer-events: none;
@@ -182,9 +189,9 @@ p {
   opacity: 1 !important;
   background: var(--ink);
 }
-.is-exploring canvas {
-  pointer-events: auto;
-  touch-action: none;
+.is-exploring .scene-layer .canvas-wrap canvas {
+  pointer-events: auto !important;
+  touch-action: none !important;
 }
 .explore-launch {
   position: fixed;

@@ -7,6 +7,8 @@ type View = "compare" | "original" | "filtered";
 const RATE = 16_000;
 const TAPS = 511;
 const N = 320;
+const SPECTRUM_BINS = N / 2 + 1;
+let spectrumBasis: { cosine: Float64Array; sine: Float64Array } | undefined;
 
 function coefficients(mode: Mode) {
   if (mode === "head") return Array(5).fill(0.2) as number[];
@@ -40,22 +42,58 @@ function signal(mode: Mode, testHz: number, h: number[]) {
 }
 
 function spectrum(values: number[], rate: number) {
-  const bins = values.length / 2;
-  return Array.from({ length: bins + 1 }, (_, bin) => {
-    const re = values.reduce((sum, sample, n) => sum + sample * Math.cos(2 * Math.PI * bin * n / values.length), 0);
-    const im = values.reduce((sum, sample, n) => sum - sample * Math.sin(2 * Math.PI * bin * n / values.length), 0);
-    return { hz: bin * rate / values.length, amplitude: Math.hypot(re, im) / values.length };
-  });
+  if (!spectrumBasis) {
+    const cosine = new Float64Array(SPECTRUM_BINS * N);
+    const sine = new Float64Array(SPECTRUM_BINS * N);
+    for (let bin = 0; bin < SPECTRUM_BINS; bin++) {
+      for (let sample = 0; sample < N; sample++) {
+        const angle = (2 * Math.PI * bin * sample) / N;
+        const index = bin * N + sample;
+        cosine[index] = Math.cos(angle);
+        sine[index] = Math.sin(angle);
+      }
+    }
+    spectrumBasis = { cosine, sine };
+  }
+
+  const { cosine, sine } = spectrumBasis;
+  const result = new Array<{ hz: number; amplitude: number }>(SPECTRUM_BINS);
+  for (let bin = 0; bin < SPECTRUM_BINS; bin++) {
+    let re = 0;
+    let im = 0;
+    const offset = bin * N;
+    for (let sample = 0; sample < N; sample++) {
+      re += values[sample] * cosine[offset + sample];
+      im -= values[sample] * sine[offset + sample];
+    }
+    result[bin] = {
+      hz: (bin * rate) / N,
+      amplitude: Math.hypot(re, im) / N,
+    };
+  }
+  return result;
 }
 
 function path(values: number[], width: number, height: number, scale: number) {
   return values.map((value, i) => `${i ? "L" : "M"}${(i / (values.length - 1) * width).toFixed(1)},${(height / 2 - value * scale * height / 2).toFixed(1)}`).join(" ");
 }
 
-function Plot({ title, input, filtered, compare = false }: { title: string; input: number[]; filtered: number[]; compare?: boolean }) {
+function responsePath(values: { db: number; phase: number }[], width: number, height: number, kind: "magnitude" | "phase") {
+  const top = 15;
+  const bottom = height - 15;
+  return values.map((value, index) => {
+    const x = (index / (values.length - 1)) * width;
+    const y = kind === "magnitude"
+      ? top + ((0 - value.db) / 80) * (bottom - top)
+      : height / 2 - (value.phase / Math.PI) * ((bottom - top) / 2);
+    return `${index ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+}
+
+function Plot({ title, input, filtered, compare = false, peakReference }: { title: string; input: number[]; filtered: number[]; compare?: boolean; peakReference?: number }) {
   const width = 640, height = 170;
-  const peak = Math.max(1, ...input.map(Math.abs), ...filtered.map(Math.abs));
-  return <figure className="dsp-plot"><figcaption>{title}</figcaption>
+  const peak = peakReference ?? Math.max(1, ...input.map(Math.abs), ...filtered.map(Math.abs));
+  return <figure className="dsp-plot dsp-signal-plot"><figcaption>{title}</figcaption>
     <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title}>
       <path className="dsp-axis" d={`M0 ${height / 2}H${width}`} />
       {(compare || !filtered.length) && <path className="dsp-original" d={path(input, width, height, 1 / peak)} />}
@@ -74,17 +112,36 @@ export default function DigitalSignalProcessing() {
   const h = useMemo(() => coefficients(mode), [mode]);
   const samples = useMemo(() => signal(mode, tone, h), [mode, tone, h]);
   const signalRate = mode === "head" ? 50 : RATE;
-  const frequency = Array.from({ length: 129 }, (_, i) => {
-    const hz = i * (signalRate / 2) / 128;
-    const { magnitude, phase } = response(h, hz, signalRate);
-    return { hz, db: Math.max(-80, 20 * Math.log10(Math.max(magnitude, 1e-8))), phase };
-  });
-  const visibleInput = view === "filtered" ? [] : samples.input.slice(0, N);
-  const visibleFiltered = view === "original" ? [] : samples.filtered.slice(0, N);
+  const frequency = useMemo(
+    () => Array.from({ length: 129 }, (_, i) => {
+      const hz = (i * (signalRate / 2)) / 128;
+      const { magnitude, phase } = response(h, hz, signalRate);
+      return { hz, db: Math.max(-80, 20 * Math.log10(Math.max(magnitude, 1e-8))), phase };
+    }),
+    [h, signalRate],
+  );
+  const visibleInput = useMemo(
+    () => (view === "filtered" ? [] : samples.input.slice(0, N)),
+    [view, samples.input],
+  );
+  const visibleFiltered = useMemo(
+    () => (view === "original" ? [] : samples.filtered.slice(0, N)),
+    [view, samples.filtered],
+  );
   const spectrumInput = useMemo(() => spectrum(samples.input, signalRate), [samples.input, signalRate]);
   const spectrumFiltered = useMemo(() => spectrum(samples.filtered, signalRate), [samples.filtered, signalRate]);
-  const visibleSpectrumInput = view === "filtered" ? [] : spectrumInput.map((bin) => bin.amplitude);
-  const visibleSpectrumFiltered = view === "original" ? [] : spectrumFiltered.map((bin) => bin.amplitude);
+  const spectrumPeak = useMemo(
+    () => Math.max(1e-9, ...spectrumInput.map((bin) => Math.abs(bin.amplitude))),
+    [spectrumInput],
+  );
+  const visibleSpectrumInput = useMemo(
+    () => (view === "filtered" ? [] : spectrumInput.map((bin) => bin.amplitude)),
+    [view, spectrumInput],
+  );
+  const visibleSpectrumFiltered = useMemo(
+    () => (view === "original" ? [] : spectrumFiltered.map((bin) => bin.amplitude)),
+    [view, spectrumFiltered],
+  );
   return <section id="dsp-filters" className="dsp-section ink" aria-labelledby="dsp-title">
     <div className="dsp-heading"><span className="eyebrow">09 / DIGITAL SIGNAL PROCESSING</span>
       <h2 id="dsp-title">Digital Signal Processing / FIR Filters</h2>
@@ -111,20 +168,20 @@ export default function DigitalSignalProcessing() {
       <div className="dsp-tabs" role="group" aria-label={es ? "Vista de señal" : "Signal view"}>
         {(["original", "filtered", "compare"] as const).map((item) => <button type="button" key={item} aria-pressed={view === item} onClick={() => setView(item)}>{item === "compare" ? (es ? "Comparar" : "Compare") : item === "original" ? (es ? "Original" : "Original") : (es ? "Filtrada" : "Filtered")}</button>)}
       </div>
-      {mode === "speech" && <label className="dsp-slider">{es ? "Tono de prueba" : "Test tone"} {tone} Hz<input type="range" min="50" max="7000" step="50" value={tone} onChange={(event) => setTone(Number(event.target.value))} /></label>}
+      {mode === "speech" && <label className="dsp-slider">{es ? "Tono de prueba" : "Test tone"} <output aria-live="polite">{tone} Hz</output><input aria-valuetext={`${tone} Hz`} type="range" min="50" max="7000" step="50" value={tone} onChange={(event) => setTone(Number(event.target.value))} /></label>}
     </div>
     <div className="dsp-plots">
       <Plot title={mode === "head"
         ? (es ? "Referencia PAN sintética · primeros 6.4 s" : "Synthetic PAN target · first 6.4 s")
         : (es ? "Audio sintético · primeros 20 ms" : "Synthetic audio · first 20 ms")} input={visibleInput} filtered={visibleFiltered} compare={view === "compare"} />
-      <figure className="dsp-plot"><figcaption>{es ? "Respuesta en frecuencia · magnitud dB y fase" : "Frequency response · magnitude dB and phase"}</figcaption>
-        <svg viewBox="0 0 640 170" role="img" aria-label="FIR magnitude and phase response">
+      <figure className="dsp-plot dsp-response"><figcaption>{es ? "Respuesta en frecuencia · magnitud dB y fase" : "Frequency response · magnitude dB and phase"}</figcaption>
+        <svg viewBox="0 0 640 170" role="img" aria-label="FIR magnitude and phase response" data-frequency-count={frequency.length} data-sample-rate={signalRate}>
           <path className="dsp-axis" d="M0 15H640M0 85H640M0 155H640" />
-          <path className="dsp-filtered" d={path(frequency.map((p) => (p.db + 80) / 80 * 2 - 1), 640, 170, 0.46)} />
-          <path className="dsp-phase" d={path(frequency.map((p) => p.phase / Math.PI), 640, 170, 0.46)} />
+          <path className="dsp-filtered" d={responsePath(frequency, 640, 170, "magnitude")} />
+          <path className="dsp-phase" d={responsePath(frequency, 640, 170, "phase")} />
         </svg><div className="dsp-legend"><span className="dsp-legend-magnitude">{es ? "Magnitud (−80 a 0 dB)" : "Magnitude (−80 to 0 dB)"}</span><span className="dsp-legend-phase">{es ? "Fase (rad, escalada)" : "Phase (rad, scaled)"}</span><span className="dsp-legend-range">{es ? `0–${signalRate / 2} Hz` : `0–${signalRate / 2} Hz`}</span></div>
       </figure>
-      <Plot title={es ? "Espectro sintético · amplitud relativa" : "Synthetic signal spectrum · relative amplitude"} input={visibleSpectrumInput} filtered={visibleSpectrumFiltered} compare={view === "compare"} />
+      <Plot title={es ? "Espectro sintético · amplitud relativa" : "Synthetic signal spectrum · relative amplitude"} input={visibleSpectrumInput} filtered={visibleSpectrumFiltered} compare={view === "compare"} peakReference={spectrumPeak} />
     </div>
     <p className="dsp-caption">{mode === "head"
       ? (es ? "Media móvil: retardo de grupo 2 muestras. FaceTracker ya suaviza detecciones y su controlador limita movimiento; este FIR se aplica una sola vez en cada actualización STM32 de 20 ms. El sistema completo de cámara a servo aún no está conectado ni validado en hardware." : "Moving average: 2-sample group delay. FaceTracker already smooths detections and its controller limits motion; this FIR runs once per 20 ms STM32 update. The camera-to-servo system is not yet connected or hardware validated.")

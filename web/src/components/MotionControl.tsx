@@ -245,7 +245,7 @@ export default function MotionControl() {
                 />
               ))}
           </div>
-          <TaskDetails task={task} t={t} />
+          <TaskDetails key={task.id} task={task} t={t} />
         </div>
         <details className="mc-future">
           <summary>
@@ -312,7 +312,7 @@ export default function MotionControl() {
               />
             </span>
           </div>
-          <article className="mc-step-card" aria-live="polite">
+          <article key={step} className="mc-step-card" aria-live="polite">
             <span className="eyebrow">{t(motionStepLabels[step])}</span>
             <h4>{t(motionSteps[step])}</h4>
             {step === motionSteps.length - 1 && (

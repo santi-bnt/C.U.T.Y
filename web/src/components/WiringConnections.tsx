@@ -345,8 +345,6 @@ export default function WiringConnections() {
           <a
             className="text-link"
             href={wiringEvidence}
-            target="_blank"
-            rel="noreferrer"
           >
             {t(bi("Wiring evidence", "Fuente del cableado"))}
             <ArrowUpRight size={14} />
