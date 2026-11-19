@@ -1,293 +1,497 @@
 import { useEffect, useState } from "react";
+import { ArrowDown, ArrowRight, ChevronDown, RotateCcw } from "lucide-react";
+import {
+  motionSteps,
+  motionStepLabels,
+  motionStepNodes,
+  motionStepTasks,
+  motionTasks,
+  type MotionTask,
+} from "../data/motionControl";
 import { bi, source } from "../data/project";
-import { motionSteps, motionTasks } from "../data/motionControl";
 import { useLocale } from "../state/Locale";
 import { useMedia } from "../state/useMedia";
 import "./motion-control.css";
 
+type NodeId = "raspberry" | "stm32" | "servos";
+
 export default function MotionControl() {
   const { t } = useLocale();
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
-  const [step, setStep] = useState(-1);
+  const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<NodeId>("stm32");
+  const [selectedTask, setSelectedTask] = useState("servo");
+
   useEffect(() => {
     if (!playing || reduced) return;
     const timer = window.setTimeout(() => {
       if (step >= motionSteps.length - 1) setPlaying(false);
-      else setStep(step + 1);
+      else setStep((current) => current + 1);
     }, 1800);
     return () => window.clearTimeout(timer);
   }, [playing, reduced, step]);
-  const active =
-    step === 2
-      ? "communication"
-      : step === 4
-        ? "servo"
-        : step === 6
-          ? "diagnostics"
-          : step === 7
-            ? "safety"
-            : "";
+
+  const activeNode = motionStepNodes[step] as NodeId;
+  const activeTask = motionStepTasks[step];
+  const task =
+    motionTasks.find((item) => item.id === selectedTask) ?? motionTasks[0];
+  const setStage = (next: number) => {
+    setPlaying(false);
+    setStep(Math.max(0, Math.min(motionSteps.length - 1, next)));
+  };
+
   return (
     <section
       id="motion-control"
       className="motion-control paper"
       aria-labelledby="motion-title"
     >
-      <div className="motion-heading">
-        <span className="eyebrow">08 / REAL-TIME ARCHITECTURE</span>
-        <h2 id="motion-title">FreeRTOS / Motion Control</h2>
-        <p>
+      <header className="mc-intro">
+        <div>
+          <span className="eyebrow">08 / REAL-TIME ARCHITECTURE</span>
+          <h2 id="motion-title">FreeRTOS / Motion Control</h2>
+          <p className="mc-subtitle">
+            {t(
+              bi(
+                "How C.U.T.Y. translates perception into controlled movement.",
+                "Cómo C.U.T.Y. transforma la percepción en movimiento controlado.",
+              ),
+            )}
+          </p>
+          <p className="mc-intro-copy">
+            {t(
+              bi(
+                "The Raspberry Pi processes vision and AI. The STM32F401 is designed to handle real-time movement, signal filtering and local safety.",
+                "La Raspberry Pi procesa visión e IA. El STM32F401 está diseñado para encargarse del movimiento en tiempo real, el filtrado de señal y la seguridad local.",
+              ),
+            )}
+          </p>
+        </div>
+        <div className="mc-release-state" role="note">
+          <span className="mc-state-dot" aria-hidden="true" />
           {t(
             bi(
-              "From intention to motion. The Pi decides where to look; the proposed STM32 layer owns timing and local safety.",
-              "De la intención al movimiento. La Pi decide hacia dónde mirar; la capa STM32 propuesta se encarga de la temporización y la seguridad local.",
+              "In development — Hardware integration pending",
+              "En desarrollo — Integración de hardware pendiente",
+            ),
+          )}
+        </div>
+      </header>
+
+      <ul
+        className="mc-status-strip"
+        aria-label={t(bi("Implementation status", "Estado de implementación"))}
+      >
+        <li>
+          <strong>C logic</strong>
+          <span>{t(bi("implemented", "implementada"))}</span>
+        </li>
+        <li>
+          <strong>CMSIS-RTOS2</strong>
+          <span>{t(bi("preliminary dry-run", "dry-run preliminar"))}</span>
+        </li>
+        <li>
+          <strong>UART / PWM</strong>
+          <span>{t(bi("not validated", "sin validar"))}</span>
+        </li>
+        <li>
+          <strong>{t(bi("Physical motion", "Movimiento físico"))}</strong>
+          <span>{t(bi("unconfirmed", "sin confirmar"))}</span>
+        </li>
+      </ul>
+
+      <div className="mc-diagram-shell">
+        <div className="mc-diagram-heading">
+          <div>
+            <span className="eyebrow">SIGNAL PATH / 01—03</span>
+            <h3>
+              {t(bi("From goal to actuator", "Del objetivo al actuador"))}
+            </h3>
+          </div>
+          <span className="mc-diagram-note">
+            {t(
+              bi(
+                "Planned architecture · local visualization",
+                "Arquitectura propuesta · visualización local",
+              ),
+            )}
+          </span>
+        </div>
+
+        <div
+          className="mc-diagram"
+          aria-label={t(
+            bi(
+              "Selectable motion-control signal path",
+              "Ruta seleccionable de control de movimiento",
+            ),
+          )}
+        >
+          <DiagramNode
+            id="raspberry"
+            selected={selectedNode === "raspberry"}
+            active={activeNode === "raspberry"}
+            onSelect={() => setSelectedNode("raspberry")}
+            number="01"
+            title="Raspberry Pi 5"
+            meta={t(bi("PERCEPTION / PLANNING", "PERCEPCIÓN / PLANIFICACIÓN"))}
+            lines={[
+              "FaceTracker",
+              "Gemini Live",
+              t(bi("Movement goals", "Objetivos de movimiento")),
+            ]}
+          />
+          <DiagramLink
+            active={step === 1}
+            label="UART"
+            detail={t(bi("targets / status", "objetivos / estado"))}
+          />
+          <DiagramNode
+            id="stm32"
+            selected={selectedNode === "stm32"}
+            active={activeNode === "stm32"}
+            onSelect={() => setSelectedNode("stm32")}
+            number="02"
+            title="STM32F401 + FreeRTOS"
+            meta={t(
+              bi(
+                "REAL-TIME CONTROL / IN DEVELOPMENT",
+                "CONTROL EN TIEMPO REAL / EN DESARROLLO",
+              ),
+            )}
+            activeLine={
+              activeTask === "communication"
+                ? 0
+                : activeTask === "servo"
+                  ? 1
+                  : activeTask
+                    ? 2
+                    : undefined
+            }
+            lines={[
+              "CommunicationTask → FreeRTOS queues (3 targets)",
+              "ServoControlTask → FIR low-pass · HEAD_PAN",
+              "SafetyTask · DiagnosticsTask",
+            ]}
+          />
+          <DiagramLink
+            active={step === 5}
+            label={t(bi("Timer outputs", "Salidas de temporizador"))}
+            detail={t(bi("not validated", "sin validar"))}
+          />
+          <DiagramNode
+            id="servos"
+            selected={selectedNode === "servos"}
+            active={activeNode === "servos"}
+            onSelect={() => setSelectedNode("servos")}
+            number="03"
+            title={t(bi("3 × MG996R", "3 × MG996R"))}
+            meta={t(
+              bi(
+                "PHYSICAL OUTPUTS / UNCONFIRMED",
+                "SALIDAS FÍSICAS / SIN CONFIRMAR",
+              ),
+            )}
+            lines={["HEAD_PAN · J7", "LEFT_ARM · J8", "RIGHT_ARM · J9"]}
+          />
+        </div>
+        <p className="mc-carrier-note">
+          {t(
+            bi(
+              "Carrier has five servo channels; J10 and J11 stay reserved. The web simulation sends no commands to hardware.",
+              "La carrier tiene cinco canales para servos; J10 y J11 quedan reservados. La simulación web no envía comandos al hardware.",
             ),
           )}
         </p>
       </div>
-      <p className="motion-notice">
-        {t(
-          bi(
-            "In development · local educational simulation · no robot connection. Portable C logic exists; on-board FreeRTOS, UART and PWM integration remain pending.",
-            "En desarrollo · simulación educativa local · sin conexión al robot. Existe lógica C portable; la integración FreeRTOS, UART y PWM en placa sigue pendiente.",
-          ),
-        )}
-      </p>
-      <div className="motion-legend">
-        <span>
-          Implemented — {t(bi("portable C logic", "lógica C portable"))}
-        </span>
-        <span>Simulated — {t(bi("this diagram", "este diagrama"))}</span>
-        <span>
-          Planned —{" "}
-          {t(bi("board integration / IMU", "integración en placa / IMU"))}
-        </span>
-        <span>Hardware validation pending</span>
-      </div>
-      <div
-        className="motion-diagram"
-        aria-label={t(
-          bi("Three-layer command flow", "Flujo de comandos en tres niveles"),
-        )}
-      >
-        <article className="motion-layer" data-active={step === 0}>
-          <span className="eyebrow">01 / RASPBERRY PI 5</span>
-          <h3>{t(bi("Perceive & plan", "Percibir y planear"))}</h3>
-          <p>
-            FaceTracker · Gemini Live ·{" "}
-            {t(bi("vision → goals → UART", "visión → objetivos → UART"))}
-          </p>
-          <p>
-            {t(
-              bi(
-                "Head follow remains dry-run. No Raspberry GPIO, display or ReSpeaker changes.",
-                "El seguimiento de cabeza sigue en dry-run. Sin cambios a GPIO, pantalla ni ReSpeaker de Raspberry.",
-              ),
-            )}
-          </p>
-        </article>
-        <Flow
-          label={t(
-            bi(
-              "UART · high-level targets ↓ / status ↑",
-              "UART · objetivos de alto nivel ↓ / estado ↑",
-            ),
-          )}
-          active={step === 1}
-        />
-        <article className="motion-layer">
-          <span className="eyebrow">
-            02 / STM32F401 + FREERTOS · PLANNED INTEGRATION
-          </span>
+
+      <div className="mc-task-section">
+        <div className="mc-section-heading">
+          <span className="eyebrow">02 / TASK EXPLORER</span>
           <h3>
             {t(
-              bi("Validate → queue → control", "Validar → encolar → controlar"),
+              bi(
+                "Four tasks. One control owner.",
+                "Cuatro tareas. Un único dueño del control.",
+              ),
             )}
           </h3>
-          <p className="motion-mailbox" data-active={step === 3}>
+          <p>
             {t(
               bi(
-                "CommunicationTask → three latest-target queues [1 each] → ServoControlTask",
-                "CommunicationTask → tres colas de último objetivo [1 cada una] → ServoControlTask",
+                "Select a task to inspect its inputs, resources and implementation status.",
+                "Selecciona una tarea para ver sus entradas, recursos y estado de implementación.",
               ),
             )}
           </p>
-          <div className="motion-tasks">
-            {motionTasks.map((task) => (
-              <details
-                key={task.id}
-                className="motion-task"
-                data-active={active === task.id}
-              >
-                <summary>
-                  {task.name}
-                  <span aria-hidden="true"> +</span>
-                </summary>
-                <p>{t(task.responsibility)}</p>
-                <dl>
-                  <div>
-                    <dt>
-                      {t(
-                        bi(
-                          "Priority / stack budget",
-                          "Prioridad / presupuesto de stack",
-                        ),
-                      )}
-                    </dt>
-                    <dd>{task.priority}</dd>
-                  </div>
-                  <div>
-                    <dt>{t(bi("Activation", "Activación"))}</dt>
-                    <dd>{t(task.activation)}</dd>
-                  </div>
-                  <div>
-                    <dt>{t(bi("Inputs → outputs", "Entradas → salidas"))}</dt>
-                    <dd>{t(task.io)}</dd>
-                  </div>
-                  <div>
-                    <dt>{t(bi("Resources", "Recursos"))}</dt>
-                    <dd>{t(task.resources)}</dd>
-                  </div>
-                  <div>
-                    <dt>{t(bi("Actual status", "Estado real"))}</dt>
-                    <dd>{t(task.status)}</dd>
-                  </div>
-                </dl>
-                {task.files.map((path) => (
-                  <a
-                    className="text-link"
-                    key={path}
-                    href={source(path)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {path}
-                  </a>
-                ))}
-              </details>
-            ))}
+        </div>
+        <div className="mc-task-layout">
+          <div
+            className="mc-task-grid"
+            role="group"
+            aria-label={t(bi("FreeRTOS tasks", "Tareas FreeRTOS"))}
+          >
+            {motionTasks
+              .filter((item) => item.id !== "imu")
+              .map((item) => (
+                <TaskCard
+                  key={item.id}
+                  task={item}
+                  selected={task.id === item.id}
+                  active={activeTask === item.id}
+                  onSelect={() => setSelectedTask(item.id)}
+                  t={t}
+                />
+              ))}
           </div>
-          <p className="motion-states">DISARMED → READY → ACTIVE → FAULT</p>
-          <p>
-            {t(
-              bi(
-                "Boot without output. Fresh heartbeat + explicit ARM and START. A fault stays latched until RESET; heartbeat alone cannot restart motion.",
-                "Arranque sin salida. Heartbeat reciente + ARM y START explícitos. Un fallo permanece enclavado hasta RESET; el heartbeat por sí solo no reinicia el movimiento.",
-              ),
-            )}
-          </p>
-        </article>
-        <Flow
-          label={t(
-            bi(
-              "Commanded pulse widths ↓ / diagnostic snapshots ↑",
-              "Anchos de pulso comandados ↓ / instantáneas de diagnóstico ↑",
-            ),
-          )}
-          active={step === 5 || step === 6}
-        />
-        <article className="motion-layer" data-active={step === 5}>
-          <span className="eyebrow">
-            03 /{" "}
-            {t(
-              bi("PHYSICAL HARDWARE · PENDING", "HARDWARE FÍSICO · PENDIENTE"),
-            )}
-          </span>
-          <h3>STM32F401 / FreeRTOS → 3 × MG996R</h3>
-          <p>
-            TIM4 CH1–3 / PB6 / PB7 / PB8 ·{" "}
-            {t(
-              bi(
-                "HEAD_PAN (J7) · LEFT_ARM (J8) · RIGHT_ARM (J9). PCB: 5 channels; J10 / TIM4 CH4 / PB9 and J11 / TIM1 CH1 / PA8 reserved, disabled and without actuators.",
-                "HEAD_PAN (J7) · LEFT_ARM (J8) · RIGHT_ARM (J9). PCB: 5 canales; J10 / TIM4 CH4 / PB9 y J11 / TIM1 CH1 / PA8 reservados, deshabilitados y sin actuadores.",
-              ),
-            )}
-          </p>
-          <p>
-            {t(
-              bi(
-                "Carrier design evidence, not verified wiring. Hardware-generated pulses; proposed 20 ms control updates are separate from PWM generation. Dedicated servo supply and verified ground references required.",
-                "Evidencia del diseño carrier, no cableado verificado. Pulsos generados por hardware; las actualizaciones de control propuestas de 20 ms son independientes del PWM. Se requiere fuente dedicada para servos y referencias de tierra verificadas.",
-              ),
-            )}
-          </p>
-        </article>
+          <TaskDetails task={task} t={t} />
+        </div>
+        <details className="mc-future">
+          <summary>
+            <span>{t(bi("Future extensions", "Extensiones futuras"))}</span>
+            <span className="mc-future-label">
+              {t(
+                bi(
+                  "Not part of active motion control",
+                  "Fuera del control de movimiento activo",
+                ),
+              )}
+            </span>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <div className="mc-future-content">
+            <strong>
+              IMUTask · {t(bi("not implemented", "no implementada"))}
+            </strong>
+            <p>
+              {t(motionTasks.find((item) => item.id === "imu")!.responsibility)}
+            </p>
+            <a
+              href={source("stm32/App/imu/imu.h")}
+              target="_blank"
+              rel="noreferrer"
+            >
+              stm32/App/imu/imu.h
+            </a>
+          </div>
+        </details>
       </div>
-      <div className="motion-demo">
-        <h3>{t(bi("Follow a PAN goal", "Sigue un objetivo PAN"))}</h3>
-        <p>
-          {t(
-            bi(
-              "Simulated scenario: controller already armed with a fresh heartbeat. Each stage is slowed for explanation; values and timing are illustrative.",
-              "Escenario simulado: controlador ya armado con heartbeat reciente. Cada etapa se ralentiza para explicarla; valores y tiempos son ilustrativos.",
-            ),
-          )}
-        </p>
-        <div className="motion-controls">
-          {!reduced && (
+
+      <div className="mc-lower-grid">
+        <section
+          className="mc-simulation"
+          aria-labelledby="mc-simulation-title"
+        >
+          <div className="mc-section-heading">
+            <span className="eyebrow">03 / LOCAL SIMULATION</span>
+            <h3 id="mc-simulation-title">
+              {t(bi("Follow a PAN goal", "Sigue un objetivo PAN"))}
+            </h3>
+            <p>
+              {t(
+                bi(
+                  "Illustrative dry-run. Stages explain the planned flow; no robot data is read or sent.",
+                  "Dry-run ilustrativo. Los pasos explican el flujo propuesto; no se lee ni envía información al robot.",
+                ),
+              )}
+            </p>
+          </div>
+          <div className="mc-sim-progress">
+            <span>
+              {t(
+                bi(
+                  `Step ${step + 1} of ${motionSteps.length}`,
+                  `Paso ${step + 1} de ${motionSteps.length}`,
+                ),
+              )}
+            </span>
+            <span className="mc-progress-track" aria-hidden="true">
+              <span
+                style={{ width: `${((step + 1) / motionSteps.length) * 100}%` }}
+              />
+            </span>
+          </div>
+          <article className="mc-step-card" aria-live="polite">
+            <span className="eyebrow">{t(motionStepLabels[step])}</span>
+            <h4>{t(motionSteps[step])}</h4>
+            {step === motionSteps.length - 1 && (
+              <p className="mc-fault-note">
+                {t(
+                  bi(
+                    "Fault is latched. A heartbeat alone cannot recover motion.",
+                    "La falla queda enclavada. El heartbeat por sí solo no recupera el movimiento.",
+                  ),
+                )}
+              </p>
+            )}
+          </article>
+          <div
+            className="mc-sim-controls"
+            role="group"
+            aria-label={t(bi("Simulation controls", "Controles de simulación"))}
+          >
             <button
               type="button"
-              onClick={() => {
-                if (!playing && step >= 7) setStep(-1);
-                setPlaying(!playing);
-              }}
+              onClick={() => setStage(step - 1)}
+              disabled={step === 0}
             >
-              {t(
-                playing
-                  ? bi("Pause simulation", "Pausar simulación")
-                  : bi("Play simulation", "Reproducir simulación"),
-              )}
+              <ArrowDown
+                className="mc-previous-icon"
+                size={16}
+                aria-hidden="true"
+              />
+              {t(bi("Previous", "Anterior"))}
             </button>
+            {!reduced && (
+              <button
+                type="button"
+                className="mc-play-button"
+                onClick={() => {
+                  if (!playing && step === motionSteps.length - 1) setStep(0);
+                  setPlaying((value) => !value);
+                }}
+              >
+                {playing
+                  ? t(bi("Pause", "Pausar"))
+                  : t(bi("Play", "Reproducir"))}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setStage(step + 1)}
+              disabled={step === motionSteps.length - 1}
+            >
+              {t(bi("Next", "Siguiente"))}
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="mc-reset-button"
+              onClick={() => setStage(0)}
+            >
+              <RotateCcw size={15} aria-hidden="true" />
+              {t(bi("Reset", "Reiniciar"))}
+            </button>
+          </div>
+          {reduced && (
+            <p className="mc-reduced-note">
+              {t(
+                bi(
+                  "Autoplay is off while reduced motion is enabled. Use Previous and Next to explore.",
+                  "La reproducción automática está desactivada con movimiento reducido. Usa Anterior y Siguiente para explorar.",
+                ),
+              )}
+            </p>
           )}
           <button
             type="button"
-            disabled={step >= 7}
-            onClick={() => {
-              setPlaying(false);
-              setStep(step + 1);
-            }}
-          >
-            {t(bi("Next step", "Siguiente paso"))}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPlaying(false);
-              setStep(7);
-            }}
+            className="mc-heartbeat-button"
+            onClick={() => setStage(motionSteps.length - 1)}
           >
             {t(bi("Simulate heartbeat loss", "Simular pérdida de heartbeat"))}
+            <ArrowRight size={15} aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPlaying(false);
-              setStep(-1);
-            }}
-          >
-            {t(bi("Reset demo", "Reiniciar demo"))}
-          </button>
-        </div>
-        <p className="motion-demo-status" role="status">
-          {step < 0
-            ? t(
+          <p className="mc-sim-status" role="status">
+            {step === motionSteps.length - 1
+              ? t(
+                  bi(
+                    "Simulated · ACTIVE → FAULT · no data is transmitted.",
+                    "Simulado · ACTIVE → FAULT · no se transmiten datos.",
+                  ),
+                )
+              : t(
+                  bi(
+                    `Simulated · Step ${step + 1} of ${motionSteps.length} · no data is transmitted.`,
+                    `Simulado · Paso ${step + 1} de ${motionSteps.length} · no se transmiten datos.`,
+                  ),
+                )}
+          </p>
+          <details className="mc-sequence">
+            <summary>
+              {t(bi("Review all eight stages", "Revisar los ocho pasos"))}
+              <ChevronDown size={17} aria-hidden="true" />
+            </summary>
+            <ol>
+              {motionSteps.map((copy, index) => (
+                <li
+                  key={index}
+                  aria-current={step === index ? "step" : undefined}
+                >
+                  <button type="button" onClick={() => setStage(index)}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    {t(copy)}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </details>
+        </section>
+
+        <section className="mc-safety" aria-labelledby="mc-safety-title">
+          <div className="mc-section-heading">
+            <span className="eyebrow">04 / SAFETY STATES</span>
+            <h3 id="mc-safety-title">
+              {t(
                 bi(
-                  "Simulated · ready to explore. No data is transmitted.",
-                  "Simulated · listo para explorar. No se transmiten datos.",
+                  "Explicit arming. Latched fault.",
+                  "Armado explícito. Falla enclavada.",
                 ),
-              )
-            : `${step + 1}/8 · ${t(motionSteps[step])}`}
-        </p>
-        <ol>
-          {motionSteps.map((copy, i) => (
-            <li key={i} aria-current={step === i ? "step" : undefined}>
-              {t(copy)}
-            </li>
-          ))}
-        </ol>
+              )}
+            </h3>
+          </div>
+          <div
+            className="mc-state-diagram"
+            aria-label={t(
+              bi(
+                "Illustrative control state machine",
+                "Máquina de estados ilustrativa",
+              ),
+            )}
+          >
+            <div className="mc-state-row">
+              {(["DISARMED", "READY", "ACTIVE"] as const).map(
+                (state, index) => (
+                  <span className="mc-state-step" key={state}>
+                    {index > 0 && <ArrowRight size={17} aria-hidden="true" />}
+                    <strong
+                      data-current={
+                        step === 7 && state === "ACTIVE" ? "true" : undefined
+                      }
+                    >
+                      {state}
+                    </strong>
+                  </span>
+                ),
+              )}
+            </div>
+            <div className="mc-fault-branch">
+              <ArrowDown size={17} aria-hidden="true" />
+              <strong data-current={step === 7 ? "true" : undefined}>
+                FAULT
+              </strong>
+            </div>
+          </div>
+          <p className="mc-safety-copy">
+            {t(
+              bi(
+                "Heartbeat loss or invalid control input can latch FAULT. Recovery requires RESET, a fresh heartbeat, then explicit ARM and START. Heartbeat alone does not restart motion.",
+                "La pérdida de heartbeat o una entrada de control inválida puede enclavar FAULT. Para recuperar se requiere RESET, un heartbeat reciente y después ARM y START explícitos. El heartbeat por sí solo no reinicia el movimiento.",
+              ),
+            )}
+          </p>
+          <p className="mc-safety-caveat">
+            {t(
+              bi(
+                "Illustrative software state flow only — not physically validated.",
+                "Flujo ilustrativo de software — sin validación física.",
+              ),
+            )}
+          </p>
+        </section>
       </div>
-      <details className="motion-why">
+
+      <details className="mc-why">
         <summary>
           {t(
             bi(
@@ -295,44 +499,194 @@ export default function MotionControl() {
               "¿Por qué FreeRTOS junto a Linux?",
             ),
           )}
+          <ChevronDown size={18} aria-hidden="true" />
         </summary>
-        <p>
-          {t(
-            bi(
-              "Linux keeps vision, voice and planning flexible. A dedicated microcontroller can isolate periodic control and safety supervision from those workloads. FreeRTOS schedules the tasks; timer peripherals generate PWM independently. Determinism still requires measured execution times, interrupt budgets and hardware validation.",
-              "Linux mantiene flexibles la visión, la voz y la planificación. Un microcontrolador dedicado puede aislar el control periódico y la supervisión de seguridad de esas cargas. FreeRTOS organiza las tareas; los periféricos timer generan PWM de forma independiente. El determinismo aún exige medir tiempos de ejecución, presupuestos de interrupciones y validar el hardware.",
-            ),
-          )}
-        </p>
-        <a
-          className="text-link"
-          href={source("docs/freertos-motion-control.md")}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t(
-            bi(
-              "Architecture, testing & hardware checklist ↗",
-              "Arquitectura, pruebas y verificaciones pendientes ↗",
-            ),
-          )}
-        </a>
+        <div>
+          <p>
+            {t(
+              bi(
+                "Linux keeps vision, voice and planning flexible. A dedicated microcontroller can isolate periodic control and local safety supervision from those workloads. FreeRTOS schedules tasks; timer peripherals generate PWM independently. Determinism still requires measured execution times, interrupt budgets and hardware validation.",
+                "Linux mantiene flexibles la visión, la voz y la planificación. Un microcontrolador dedicado puede aislar el control periódico y la supervisión de seguridad local de esas cargas. FreeRTOS organiza las tareas; los periféricos timer generan PWM de forma independiente. El determinismo aún requiere medir tiempos de ejecución, presupuestos de interrupciones y validar el hardware.",
+              ),
+            )}
+          </p>
+          <a
+            href={source("docs/freertos-motion-control.md")}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t(
+              bi(
+                "Architecture, tests and hardware checklist",
+                "Arquitectura, pruebas y lista de hardware",
+              ),
+            )}
+            <ArrowRight size={15} aria-hidden="true" />
+          </a>
+        </div>
       </details>
     </section>
   );
 }
-function Flow({ label, active }: { label: string; active: boolean }) {
+
+function DiagramNode({
+  id,
+  selected,
+  active,
+  onSelect,
+  number,
+  title,
+  meta,
+  lines,
+  activeLine,
+}: {
+  id: NodeId;
+  selected: boolean;
+  active: boolean;
+  onSelect: () => void;
+  number: string;
+  title: string;
+  meta: string;
+  lines: string[];
+  activeLine?: number;
+}) {
   return (
-    <div className="motion-flow" data-active={active}>
-      <svg width="30" height="44" viewBox="0 0 30 44" aria-hidden="true">
-        <path
-          d="M10 2v36m-6-6 6 6 6-6M23 40V4m-5 6 5-6 5 6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-      </svg>
-      <span>{label}</span>
+    <button
+      type="button"
+      className="mc-node"
+      data-node={id}
+      data-selected={selected}
+      data-flow-active={active}
+      aria-pressed={selected}
+      onClick={onSelect}
+    >
+      <span className="mc-node-meta">
+        <span>{number} /</span>
+        {meta}
+      </span>
+      <strong>{title}</strong>
+      <span className="mc-node-lines">
+        {lines.map((line, index) => (
+          <span key={line} data-active={activeLine === index}>
+            {line}
+          </span>
+        ))}
+      </span>
+    </button>
+  );
+}
+
+function DiagramLink({
+  active,
+  label,
+  detail,
+}: {
+  active: boolean;
+  label: string;
+  detail: string;
+}) {
+  return (
+    <div className="mc-connection" data-flow-active={active}>
+      <ArrowRight size={22} aria-hidden="true" />
+      <strong>{label}</strong>
+      <span>{detail}</span>
     </div>
+  );
+}
+
+function TaskCard({
+  task,
+  selected,
+  active,
+  onSelect,
+  t,
+}: {
+  task: MotionTask;
+  selected: boolean;
+  active: boolean;
+  onSelect: () => void;
+  t: (copy: { en: string; es: string }) => string;
+}) {
+  return (
+    <button
+      type="button"
+      className="mc-task-card"
+      data-selected={selected}
+      data-flow-active={active}
+      aria-pressed={selected}
+      onClick={onSelect}
+    >
+      <span className="mc-task-card-top">
+        <code>{task.name}</code>
+        <span>{t(task.implementation)}</span>
+      </span>
+      <span className="mc-task-summary">{t(task.summary)}</span>
+      <span className="mc-task-meta">
+        <span>
+          <small>{t(bi("Priority", "Prioridad"))}</small>
+          <strong>{task.priority.split(" /")[0]}</strong>
+        </span>
+        <span>
+          <small>{t(bi("Runs", "Se activa"))}</small>
+          <strong>{t(task.condition)}</strong>
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function TaskDetails({
+  task,
+  t,
+}: {
+  task: MotionTask;
+  t: (copy: { en: string; es: string }) => string;
+}) {
+  return (
+    <aside
+      className="mc-task-details"
+      aria-live="polite"
+      aria-label={t(
+        bi("Selected task details", "Detalles de la tarea seleccionada"),
+      )}
+    >
+      <span className="eyebrow">
+        {t(bi("SELECTED TASK", "TAREA SELECCIONADA"))}
+      </span>
+      <h4>{task.name}</h4>
+      <p className="mc-detail-lead">{t(task.responsibility)}</p>
+      <dl>
+        <div>
+          <dt>
+            {t(bi("Priority / stack budget", "Prioridad / memoria de pila"))}
+          </dt>
+          <dd>{task.priority}</dd>
+        </div>
+        <div>
+          <dt>{t(bi("Activation condition", "Condición de activación"))}</dt>
+          <dd>{t(task.activation)}</dd>
+        </div>
+        <div>
+          <dt>{t(bi("Inputs → outputs", "Entradas → salidas"))}</dt>
+          <dd>{t(task.io)}</dd>
+        </div>
+        <div>
+          <dt>{t(bi("Queues / resources", "Colas / recursos"))}</dt>
+          <dd>{t(task.resources)}</dd>
+        </div>
+        <div>
+          <dt>{t(bi("Implementation status", "Estado de implementación"))}</dt>
+          <dd>{t(task.status)}</dd>
+        </div>
+      </dl>
+      <div className="mc-source-links">
+        {task.files.map((path) => (
+          <a key={path} href={source(path)} target="_blank" rel="noreferrer">
+            {path}
+            <ArrowRight size={14} aria-hidden="true" />
+          </a>
+        ))}
+      </div>
+    </aside>
   );
 }

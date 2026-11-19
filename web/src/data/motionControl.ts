@@ -3,6 +3,9 @@ export interface MotionTask {
   id: string;
   name: string;
   priority: string;
+  condition: Copy;
+  summary: Copy;
+  implementation: Copy;
   activation: Copy;
   responsibility: Copy;
   io: Copy;
@@ -15,6 +18,15 @@ export const motionTasks: MotionTask[] = [
     id: "communication",
     name: "CommunicationTask",
     priority: "AboveNormal / 1536 B",
+    condition: bi("UART receive event", "Evento de recepción UART"),
+    summary: bi(
+      "Validates frames and publishes the latest joint goals.",
+      "Valida tramas y publica los objetivos articulares más recientes.",
+    ),
+    implementation: bi(
+      "Portable parser implemented",
+      "Parser portable implementado",
+    ),
     activation: bi(
       "UART event; bounded batch of 64 bytes",
       "Evento UART; lote limitado a 64 bytes",
@@ -44,6 +56,15 @@ export const motionTasks: MotionTask[] = [
     id: "servo",
     name: "ServoControlTask",
     priority: "High / 1536 B",
+    condition: bi("20 ms proposed · 50 Hz", "20 ms propuestos · 50 Hz"),
+    summary: bi(
+      "Applies the HEAD_PAN FIR and prepares bounded setpoints for three joints.",
+      "Aplica el FIR de HEAD_PAN y prepara consignas limitadas para tres ejes.",
+    ),
+    implementation: bi(
+      "Portable C control implemented",
+      "Control C portable implementado",
+    ),
     activation: bi("20 ms / 50 Hz proposed", "20 ms / 50 Hz propuestos"),
     responsibility: bi(
       "Own controller state, consume fresh goals, bound velocity and acceleration, and prepare commanded setpoints. Hardware timers must generate the pulses.",
@@ -71,6 +92,18 @@ export const motionTasks: MotionTask[] = [
     id: "safety",
     name: "SafetyTask",
     priority: "High1 / 768 B",
+    condition: bi(
+      "10 ms proposed · 500 ms dry-run timeout",
+      "10 ms propuestos · timeout dry-run de 500 ms",
+    ),
+    summary: bi(
+      "Requests supervision; the control owner enforces latched safety states.",
+      "Solicita supervisión; el dueño del control aplica estados de seguridad enclavados.",
+    ),
+    implementation: bi(
+      "Portable state logic implemented",
+      "Lógica de estados portable implementada",
+    ),
     activation: bi(
       "10 ms proposed; heartbeat timeout 500 ms in dry-run",
       "10 ms propuestos; timeout de heartbeat de 500 ms en dry-run",
@@ -97,6 +130,15 @@ export const motionTasks: MotionTask[] = [
     id: "diagnostics",
     name: "DiagnosticsTask",
     priority: "Low / 1024 B",
+    condition: bi("200 ms proposed · ≤5 Hz", "200 ms propuestos · ≤5 Hz"),
+    summary: bi(
+      "Reports commanded positions and counters without blocking control.",
+      "Reporta posiciones comandadas y contadores sin bloquear el control.",
+    ),
+    implementation: bi(
+      "Board integration pending",
+      "Integración en placa pendiente",
+    ),
     activation: bi(
       "200 ms / at most 5 Hz proposed",
       "200 ms / máximo 5 Hz propuestos",
@@ -123,6 +165,12 @@ export const motionTasks: MotionTask[] = [
     id: "imu",
     name: "IMUTask",
     priority: "TBD",
+    condition: bi("Future · sensor-dependent", "Futura · depende del sensor"),
+    summary: bi(
+      "A calibrated sensor interface reserved for a future extension.",
+      "Interfaz para sensor calibrado reservada para una extensión futura.",
+    ),
+    implementation: bi("Not implemented", "No implementada"),
     activation: bi("Future; sensor-dependent", "Futura; depende del sensor"),
     responsibility: bi(
       "Reserve a timestamped, calibrated sensor interface. No IMU PID until sensor, axes and mechanics are defined.",
@@ -157,8 +205,8 @@ export const motionSteps = [
     "CommunicationTask valida la trama y el rango.",
   ),
   bi(
-      "The joint's single-slot mailbox replaces its obsolete goal.",
-      "El buzón de la articulación reemplaza sus objetivos obsoletos.",
+    "The joint's single-slot mailbox replaces its obsolete goal.",
+    "El buzón de la articulación reemplaza sus objetivos obsoletos.",
   ),
   bi(
     "ServoControlTask computes a velocity- and acceleration-limited transition.",
@@ -177,3 +225,39 @@ export const motionSteps = [
     "Se pierde el heartbeat: tras el timeout ilustrativo de 500 ms, ACTIVE → FAULT; congelar la consigna, nunca centrar automáticamente. La política física aún no está validada.",
   ),
 ];
+export const motionStepLabels = [
+  bi("Step 1 · Raspberry Pi 5", "Paso 1 · Raspberry Pi 5"),
+  bi("Step 2 · UART link", "Paso 2 · Enlace UART"),
+  bi("Step 3 · CommunicationTask", "Paso 3 · CommunicationTask"),
+  bi("Step 4 · FreeRTOS goal queue", "Paso 4 · Cola de objetivos FreeRTOS"),
+  bi("Step 5 · ServoControlTask", "Paso 5 · ServoControlTask"),
+  bi(
+    "Step 6 · Timer output proposal",
+    "Paso 6 · Propuesta de salida por timer",
+  ),
+  bi("Step 7 · DiagnosticsTask", "Paso 7 · DiagnosticsTask"),
+  bi(
+    "Step 8 · SafetyTask / heartbeat loss",
+    "Paso 8 · SafetyTask / pérdida de heartbeat",
+  ),
+];
+export const motionStepNodes = [
+  "raspberry",
+  "raspberry",
+  "stm32",
+  "stm32",
+  "stm32",
+  "servos",
+  "stm32",
+  "stm32",
+] as const;
+export const motionStepTasks = [
+  undefined,
+  undefined,
+  "communication",
+  "communication",
+  "servo",
+  undefined,
+  "diagnostics",
+  "safety",
+] as const;
