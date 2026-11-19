@@ -1,9 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { LocaleProvider, useLocale } from "../state/Locale";
 import MotionControl from "./MotionControl";
 
-afterEach(() => { cleanup(); vi.useRealTimers(); });
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 function Language() {
   const { setLocale } = useLocale();
@@ -11,55 +21,109 @@ function Language() {
 }
 
 function mount() {
-  return render(<LocaleProvider><Language /><MotionControl /></LocaleProvider>);
+  return render(
+    <LocaleProvider>
+      <Language />
+      <MotionControl />
+    </LocaleProvider>,
+  );
 }
 
 describe("FreeRTOS motion section", () => {
-  it("presents the connected architecture and task inspector", () => {
+  it("shows a selectable architecture and four task cards with advanced details", () => {
     mount();
     expect(screen.getByText(/How C.U.T.Y. translates perception/)).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Raspberry Pi 5" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /STM32F401 \+ FreeRTOS/ })).toBeTruthy();
-    expect(document.querySelector(".mc-reserved-note")?.textContent).toContain("J10 / J11 reserved");
-    const comm = document.querySelector('.mc-task-node[data-node="communication"]') as HTMLButtonElement;
-    expect(comm).toBeTruthy();
-    fireEvent.click(comm);
-    expect(comm.getAttribute("aria-pressed")).toBe("true");
-    expect(document.querySelector('[data-node="communication"]')?.getAttribute("data-selected")).toBe("true");
-    expect(screen.getByLabelText("Selected task details").textContent).toContain("portable parser");
-    expect(document.querySelectorAll(".mc-task-node")).toHaveLength(4);
+    expect(screen.getByText(/CMSIS-RTOS2/)).toBeTruthy();
+    const stm = screen.getByRole("button", { name: /STM32F401 \+ FreeRTOS/ });
+    fireEvent.click(stm);
+    expect(stm.getAttribute("aria-pressed")).toBe("true");
+
+    const taskCards = within(
+      screen.getByRole("group", { name: "FreeRTOS tasks" }),
+    );
+    const communication = taskCards.getByRole("button", {
+      name: /CommunicationTask/,
+    });
+    fireEvent.click(communication);
+    expect(communication.getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen.getByLabelText("Selected task details").textContent,
+    ).toContain("Implemented: portable parser");
+    expect(document.querySelectorAll(".mc-task-card")).toHaveLength(4);
+
     fireEvent.click(screen.getByText("Future extensions"));
-    expect(screen.getByText(/IMUTask.*not implemented/)).toBeTruthy();
+    expect(screen.getByText(/IMUTask · not implemented/)).toBeTruthy();
   });
 
-  it("drives the diagram from the eight-stage simulation and heartbeat fault", () => {
+  it("steps through the eight-stage flow and latches the illustrative heartbeat fault", () => {
     mount();
     expect(screen.getByRole("status").textContent).toContain("Step 1 of 8");
-    for (let i = 0; i < 2; i++) fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(screen.getByRole("status").textContent).toContain("Step 3 of 8");
-    expect(document.querySelector('[data-node="communication"]')?.getAttribute("data-active")).toBe("true");
-    expect(document.querySelector('[data-wire="uart-to-comm"]')?.getAttribute("data-active")).toBe("true");
-    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(document.querySelector('[data-node="safety"]')?.getAttribute("data-active")).toBe("true");
-    expect(document.querySelector('.mc-fault-branch strong[data-current="true"]')?.textContent).toBe("FAULT");
-    fireEvent.click(screen.getByRole("button", { name: "Simulate heartbeat loss" }));
-    expect(screen.getByRole("status").textContent).toContain("ACTIVE");
+    for (let i = 0; i < 7; i++)
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(document.querySelector(".mc-sim-progress")?.textContent).toContain(
+      "Step 8 of 8",
+    );
+    expect(
+      document.querySelector('.mc-task-card[data-flow-active="true"]')
+        ?.textContent,
+    ).toContain("SafetyTask");
+    expect(
+      document.querySelector('.mc-fault-branch strong[data-current="true"]')
+        ?.textContent,
+    ).toBe("FAULT");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Simulate heartbeat loss" }),
+    );
+    expect(screen.getByRole("status").textContent).toContain("ACTIVE → FAULT");
+    expect(
+      (screen.getByRole("button", { name: "Next" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-    expect(screen.getByRole("status").textContent).toContain("Step 1 of 8");
+    expect(document.querySelector(".mc-sim-progress")?.textContent).toContain(
+      "Step 1 of 8",
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "no data is transmitted",
+    );
   });
 
-  it("autoplays, pauses and supports Spanish copy", () => {
+  it("autoplays and pauses without advancing after pause", () => {
     vi.useFakeTimers();
     mount();
     fireEvent.click(screen.getByRole("button", { name: "Play" }));
     act(() => vi.advanceTimersByTime(1800));
     expect(screen.getByRole("status").textContent).toContain("Step 2 of 8");
     fireEvent.click(screen.getByRole("button", { name: "Pause" }));
-    const state = screen.getByRole("status").textContent;
-    act(() => vi.advanceTimersByTime(5000));
-    expect(screen.getByRole("status").textContent).toBe(state);
-    fireEvent.click(screen.getByText("ES"));
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Salidas a actuadores" })).toBeTruthy();
+    const status = screen.getByRole("status").textContent;
+    act(() => vi.advanceTimersByTime(10000));
+    expect(screen.getByRole("status").textContent).toBe(status);
+  });
+
+  it("keeps manual controls available, translates copy, and respects reduced motion", () => {
+    const original = window.matchMedia;
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    try {
+      mount();
+      expect(screen.queryByRole("button", { name: "Play" })).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+      expect(screen.getByRole("status").textContent).toContain("Step 2 of 8");
+      fireEvent.click(screen.getByText("ES"));
+      expect(screen.getByRole("button", { name: "Siguiente" })).toBeTruthy();
+      expect(
+        screen.getByText(/En desarrollo — Integración de hardware pendiente/),
+      ).toBeTruthy();
+      const communication = within(
+        screen.getByRole("group", { name: "Tareas FreeRTOS" }),
+      ).getByRole("button", { name: /CommunicationTask/ });
+      fireEvent.click(communication);
+      expect(communication.getAttribute("aria-pressed")).toBe("true");
+    } finally {
+      window.matchMedia = original;
+    }
   });
 });
