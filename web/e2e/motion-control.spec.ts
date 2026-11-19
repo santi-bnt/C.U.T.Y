@@ -38,10 +38,10 @@ test("motion section explains architecture, tasks and safe local simulation", as
     })),
   );
   expect(new Set(diagramSurfaces.map((node) => node.background))).toEqual(
-    new Set(["rgb(248, 245, 242)"]),
+    new Set(["rgb(252, 250, 248)"]),
   );
   expect(new Set(diagramSurfaces.map((node) => node.border))).toEqual(
-    new Set(["rgb(231, 226, 220)"]),
+    new Set(["rgb(229, 225, 219)"]),
   );
   expect(new Set(diagramSurfaces.map((node) => node.text))).toEqual(
     new Set(["rgb(23, 23, 23)"]),
@@ -57,18 +57,26 @@ test("motion section explains architecture, tasks and safe local simulation", as
   await expect(stm).toHaveAttribute("aria-pressed", "false");
   await expect(servos).toHaveAttribute("aria-pressed", "false");
   expect(await selectedCount()).toBe(0);
+  expect(
+    new Set(
+      await diagramNodes.evaluateAll((nodes) =>
+        nodes.map((node) => getComputedStyle(node, "::after").content),
+      ),
+    ),
+  ).toEqual(new Set(["none"]));
   await stm.click();
   await expect(stm).toHaveAttribute("aria-pressed", "true");
   await expect(stm).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
+  await expect(stm).toHaveCSS("box-shadow", "none");
   await expect(pi).toHaveAttribute("aria-pressed", "false");
   await expect(servos).toHaveAttribute("aria-pressed", "false");
-  await expect(pi).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  await expect(pi).toHaveCSS("border-top-color", "rgb(229, 225, 219)");
   expect(await selectedCount()).toBe(1);
   await servos.click();
   await expect(servos).toHaveAttribute("aria-pressed", "true");
   await expect(servos).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
   await expect(stm).toHaveAttribute("aria-pressed", "false");
-  await expect(stm).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  await expect(stm).toHaveCSS("border-top-color", "rgb(229, 225, 219)");
   expect(await selectedCount()).toBe(1);
   await pi.focus();
   await page.keyboard.press("Enter");
@@ -123,8 +131,9 @@ test("motion section explains architecture, tasks and safe local simulation", as
     .click();
   await expect(section.getByRole("status")).toContainText("Step 3 of 8");
   expect(await selectedCount()).toBe(1);
-  await expect.poll(() => stm.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(248, 245, 242)");
-  await expect(stm).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  await expect.poll(() => stm.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(252, 250, 248)");
+  await expect(stm).toHaveCSS("border-top-color", "rgb(229, 225, 219)");
+  await expect(stm).toHaveCSS("box-shadow", "none");
   await expect(pi).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
   await expect(communication).toHaveAttribute("data-flow-active", "true");
   await expect(stm).toHaveAttribute("data-flow-active", "true");

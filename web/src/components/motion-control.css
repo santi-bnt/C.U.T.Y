@@ -1,7 +1,7 @@
 .motion-control {
   --mc-panel: #f7f7f5;
-  --mc-panel-raised: #f8f5f2;
-  --mc-panel-line: #e7e2dc;
+  --mc-panel-raised: #fcfaf8;
+  --mc-panel-line: #e5e1db;
   position: relative;
   z-index: 2;
   padding: clamp(64px, 7vw, 100px) var(--gutter);
@@ -136,7 +136,6 @@
   gap: 14px;
 }
 .mc-node {
-  position: relative;
   display: flex;
   min-width: 0;
   min-height: 210px;
@@ -156,17 +155,6 @@
 }
 .mc-node[data-selected="true"] {
   border-color: var(--orange);
-  box-shadow: inset 3px 0 var(--orange);
-}
-.mc-node[data-flow-active="true"]::after {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--orange);
-  content: "";
 }
 .mc-node-meta {
   display: flex;
