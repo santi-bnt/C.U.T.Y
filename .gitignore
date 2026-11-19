@@ -16,5 +16,6 @@ cuty_touch_calibration.json
 .codex/
 .agents/
 .pytest_cache/
+raspberry/.pytest-temp-dsp/
 .mypy_cache/
 *.egg-info/

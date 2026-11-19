@@ -1,4 +1,5 @@
 #include "../App/control/body_control.h"
+#include "../App/control/fir_filter.h"
 #include "../App/servos/servo.h"
 #include <assert.h>
 #include <math.h>
@@ -17,6 +18,25 @@ static void arm(CutyController *c,uint32_t now) {
     assert(c->safety.state==CUTY_READY); assert(send(c,"V2,START",now));
 }
 int main(void) {
+    const float moving_average[5]={0.2f,0.2f,0.2f,0.2f,0.2f};
+    CutyFirFilter fir; float value;
+    assert(cuty_fir_init(&fir,moving_average,5)); cuty_fir_reset(&fir,0);
+    for(unsigned i=0;i<5;++i) { assert(cuty_fir_process(&fir,1,&value)); assert(isfinite(value)); }
+    assert(fabs(value-1)<1e-6f);
+    cuty_fir_reset(&fir,0);
+    for(unsigned i=0;i<5;++i) {
+        assert(cuty_fir_process(&fir,i==0 ? 1.0f : 0.0f,&value));
+        assert(fabs(value-0.2f)<1e-6f);
+    }
+    cuty_fir_reset(&fir,0);
+    for(unsigned i=1;i<=5;++i) {
+        assert(cuty_fir_process(&fir,1,&value));
+        assert(fabs(value-0.2f*i)<1e-6f);
+    }
+    cuty_fir_reset(&fir,3);
+    for(unsigned i=0;i<20;++i) { assert(cuty_fir_process(&fir,3,&value)); assert(fabs(value-3)<1e-6f); }
+    assert(!cuty_fir_process(&fir,NAN,&value));
+    assert(!cuty_fir_init(&fir,moving_average,0));
     CutyParser p={0}; CutyCommand cmd;
     const char *valid="V2,TARGET,HEAD_PAN,350\r\n";
     for (size_t i=0;i<strlen(valid);++i)
@@ -47,12 +67,16 @@ int main(void) {
     assert(send(&c,"V2,TARGET,HEAD_PAN,350",0));
     assert(send(&c,"V2,TARGET,HEAD_PAN,-500",0)); /* latest goal wins in core */
     assert(c.axes[0].target==-0.5f);
+    assert(cuty_control_set_head_fir(&c,false));
+    assert(!c.head_pan_fir_enabled && c.axes[CUTY_LEFT_ARM].target==0.25f);
+    assert(cuty_control_set_head_fir(&c,true));
+    assert(c.head_pan_fir_enabled);
     for(uint32_t now=20;now<=8000;now+=20) {
         assert(send(&c,"V2,HB",now)); float old=c.axes[0].velocity;
         cuty_control_tick(&c,now,0.02f);
         assert(c.safety.state==CUTY_ACTIVE);
         if (fabs(c.axes[0].velocity-old)>1.5f*0.02f+1e-6f)
-            printf("trajectory delta: t=%u old=%f new=%f delta=%f\n",now,(double)old,(double)c.axes[0].velocity,fabs(c.axes[0].velocity-old));
+            printf("trajectory delta: t=%lu old=%f new=%f delta=%f\n",(unsigned long)now,(double)old,(double)c.axes[0].velocity,fabs(c.axes[0].velocity-old));
         assert(fabs(c.axes[0].velocity)<=0.80001f);
         assert(fabs(c.axes[0].velocity-old)<=1.5f*0.02f+1e-6f);
         assert(c.axes[0].commanded>=-1 && c.axes[0].commanded<=1);

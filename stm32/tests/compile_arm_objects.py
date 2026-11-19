@@ -10,6 +10,7 @@ parser.add_argument("--cmsis", required=True, help="Directory containing genuine
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 sources = ["App/communication/uart_protocol.c", "App/control/body_control.c",
+           "App/control/fir_filter.c",
            "App/safety/safety.c", "App/servos/servo.c", "App/rtos/motion_tasks.c"]
 subprocess.run([args.cc, "--version"], check=True)
 with tempfile.TemporaryDirectory(prefix="cuty-arm-objects-") as directory:

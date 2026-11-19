@@ -18,6 +18,7 @@ from cuty.llm.gemini_provider import GeminiLiveProvider
 from cuty.audio.devices import AudioDeviceError, format_devices, list_devices, select_working_device, test_microphone_level, test_duplex_level
 from cuty.audio.activity import SpeechMicrophone
 from cuty.audio.microphone import SoundDeviceMicrophone
+from cuty.audio.speech_bandpass import SpeechBandpass
 from cuty.audio.speaker import SoundDeviceSpeaker
 from cuty.audio.volume import VoiceVolume, VolumeSpeaker
 from cuty.audio.remote import RemoteSpeaker, serve_audio
@@ -190,6 +191,10 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         await speaker.open()
         await provider.connect()
         microphone = SoundDeviceMicrophone(input_id, input_rate)
+        speech_filter = SpeechBandpass.from_env(input_rate)
+        log.info("Speech FIR: enabled=%s rate=%d Hz taps=%d delay=%.2f ms",
+                 speech_filter.enabled, input_rate, len(speech_filter.coefficients),
+                 speech_filter.group_delay_seconds * 1000)
         music_status = lambda status: state.set({
             "playing": State.MUSIC_PLAYING,
             "paused": State.MUSIC_PAUSED,
@@ -220,6 +225,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             music=music,
             vision=LocalVisionClient.from_env() if hands_free else None,
             voice_volume=voice_volume,
+            speech_filter=speech_filter,
         )
         if hands_free:
             music_interrupt = asyncio.Event()

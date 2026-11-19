@@ -40,6 +40,7 @@ import { modelInfo } from "./data/model";
 import PcbDesign from "./components/PcbDesign";
 import WiringConnections from "./components/WiringConnections";
 import MotionControl from "./components/MotionControl";
+import DigitalSignalProcessing from "./components/DigitalSignalProcessing";
 const RobotViewer = lazy(() => import("./viewer/RobotViewer"));
 
 function Heading({ first, second }: { first: Copy; second?: Copy }) {
@@ -96,6 +97,7 @@ function Header({ motion }: { motion: StoryMotion }) {
     { id: "pcb-design", label: bi("PCB Design", "Diseño PCB") },
     { id: "wiring", label: bi("Wiring & Connections", "Conexiones") },
     { id: "motion-control", label: bi("FreeRTOS", "FreeRTOS") },
+    { id: "dsp-filters", label: bi("DSP / FIR", "DSP / FIR") },
     { id: "development", label: bi("Development", "Desarrollo") },
     { id: "live", label: bi("C.U.T.Y. Live", "C.U.T.Y. Live") },
   ];
@@ -647,6 +649,7 @@ function Portfolio() {
           </div>
         </section>
         <MotionControl />
+        <DigitalSignalProcessing />
       </main>
       <footer className="product-footer paper">
         <a className="wordmark" href="#home">

@@ -9,6 +9,7 @@ root = Path(__file__).resolve().parents[1]
 compiler_setting = os.environ.get("CC", "cc")
 compiler = [compiler_setting] if Path(compiler_setting).is_file() else shlex.split(compiler_setting)
 sources = ["App/communication/uart_protocol.c", "App/control/body_control.c",
+           "App/control/fir_filter.c",
            "App/safety/safety.c", "App/servos/servo.c"]
 with tempfile.TemporaryDirectory(prefix="cuty-motion-") as directory:
     executable = Path(directory) / ("motion-test.exe" if os.name == "nt" else "motion-test")

@@ -254,6 +254,13 @@ New files:
 - web/e2e/motion-control.spec.ts — desktop/tablet/mobile checks.
 - stm32/App/rtos/motion_tasks.c and motion_tasks.h — dry-run CMSIS adapter.
 - stm32/tests/test_motion.c — portable logic tests.
+- stm32/tests/run_host_tests.py and compile_arm_objects.py — native execution (host compiler required) and ARM object build helpers.
+- stm32/App/control/fir_filter.c/.h — fixed-buffer FIR used only for HEAD_PAN.
+- raspberry/src/cuty/audio/speech_bandpass.py — optional PCM16 input filter, disabled by default.
+- raspberry/tests/test_speech_bandpass.py — host signal, format, and continuity tests.
+- web/src/components/DigitalSignalProcessing.tsx — bilingual, local calculation and plots.
+- web/e2e/digital-signal-processing.spec.ts — desktop/tablet/mobile coverage.
+- docs/digital-signal-processing-fir.md — DSP math, audio implementation, and A/B procedure.
 - stm32/tests/test_rtos.c and fakes/cmsis_os2.h — adapter tests with test doubles.
 - stm32/tests/run_host_tests.py — native compile/run entry point.
 - stm32/tests/compile_arm_objects.py — real ARM object-compilation entry point.
@@ -261,8 +268,9 @@ New files:
 
 Reused the existing UART, body_control, safety and servo C/H files and the IMU header.
 Updated their README files, STM32/body-control/protocol/head-follow/roadmap documentation.
-App.tsx mounts the new section and integrates its navigation link, active state and
-existing header tone. The existing controller summary changes only its implementation
-status sentence; its test assertion follows that sentence. Existing browser tests
-expect the one added link; Playwright can select a different port via CUTY_TEST_PORT.
-No existing viewer, expression, PCB, wiring, global style or Raspberry/hardware file changed.
+App.tsx mounts the motion and DSP sections and integrates their navigation links.
+The DSP section uses scoped styles and local synthetic signals. No physical UART/PWM,
+servo output, PCB, wiring, model geometry, or Raspberry device/driver configuration
+was changed. The Raspberry change is limited to the optional microphone-input
+processor before provider send; the existing camera, playback, and music paths remain
+separate. Playwright can select a different port via CUTY_TEST_PORT.

@@ -4,6 +4,8 @@ Responsibilities: microphone capture, speaker playback, audio-device selection, 
 
 Working files: `microphone.py`, `speaker.py`, `devices.py`, and `thinking.py`. Existing timing, device behavior, and provider-native PCM rates are preserved.
 
+Optional `speech_bandpass.py` filters only incoming PCM16 mono mic blocks before the provider boundary. It designs a symmetric 511-tap Hamming FIR at the selected provider sample rate (Gemini 16 kHz; OpenAI 24 kHz) and preserves channel history between 20 ms blocks. It is disabled unless `CUTY_SPEECH_FIR_ENABLED=1`. Assistant playback and both music paths bypass it. See [DSP implementation and A/B procedure](../../../../docs/digital-signal-processing-fir.md).
+
 Speaker startup negotiates mono/stereo and a supported hardware rate instead
 of requiring direct ALSA `hw` devices to accept 24 kHz. Playback uses the
 existing PyAV dependency for streaming resampling and duplicates mono into

@@ -237,6 +237,22 @@ def test_invalid_tool_arguments_are_rejected_and_reply_continues():
     assert (Expression.SPEAKING, 2) not in sink.events
 
 
+def test_optional_speech_fir_runs_before_provider_and_preserves_pcm_length():
+    from cuty.audio.speech_bandpass import SpeechBandpass
+    service, provider, _, _, _ = make_service([
+        AIEvent(EventKind.AUDIO, audio=b"\0\0" * 480), AIEvent(EventKind.DONE),
+    ])
+    class ToneMicrophone:
+        async def chunks(self, stop):
+            yield b"\xe8\x03" * 480
+            stop.set()
+    service.microphone = ToneMicrophone()
+    service.speech_filter = SpeechBandpass(16000, enabled=True, coefficients=(0.5,))
+    asyncio.run(service.run_turn(asyncio.Event()))
+    assert len(provider.sent[0]) == 960
+    assert provider.sent[0][:2] == b"\xf4\x01"  # 500 from 1000, little-endian PCM16.
+
+
 def test_provider_error_enters_error_state():
     service, _, _, _, state = make_service([ProviderError("disconnected")])
     with pytest.raises(ProviderError, match="disconnected"):

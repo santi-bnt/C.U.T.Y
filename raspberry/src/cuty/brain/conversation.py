@@ -12,6 +12,7 @@ from time import monotonic
 
 from cuty.llm.provider import AIProvider, EventKind, ProviderError, ToolCall
 from cuty.audio.microphone import Microphone
+from cuty.audio.speech_bandpass import SpeechBandpass
 from cuty.audio.speaker import Speaker
 from cuty.brain.states import State, StateMachine
 from cuty.face.expressions import Expression
@@ -50,6 +51,7 @@ class ConversationService:
         music: MusicProvider | None = None,
         vision=None,
         voice_volume: VoiceVolume | None = None,
+        speech_filter: SpeechBandpass | None = None,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -63,6 +65,7 @@ class ConversationService:
         self.music = music
         self.vision = vision
         self.voice_volume = voice_volume or VoiceVolume.from_env()
+        self.speech_filter = speech_filter
         self._pending_music_command: MusicCommand | None = None
         self._deferred_music_action: tuple[str, str | None] | None = None
         self._pending_volume_command: VolumeCommand | None = None
@@ -108,13 +111,16 @@ class ConversationService:
                 await self.speaker.close()
                 await asyncio.sleep(0.1)
             await self.provider.start_turn()
+            if self.speech_filter is not None:
+                self.speech_filter.reset()
             self.state.set(State.LISTENING)
             chunks = 0
             bytes_sent = 0
             async with aclosing(self.microphone.chunks(stop)) as source:
                 async for pcm16 in source:
                     if pcm16:
-                        await self.provider.send_audio(pcm16)
+                        outgoing_pcm = self.speech_filter.process(pcm16) if self.speech_filter else pcm16
+                        await self.provider.send_audio(outgoing_pcm)
                         chunks += 1
                         bytes_sent += len(pcm16)
             if chunks == 0:

@@ -16,6 +16,7 @@ dependencies = [
   "edge-tts>=7,<8",
   "av>=14,<18",
   "httpx>=0.28,<1",
+  "numpy>=1.26,<3",
   "websockets>=13,<17",
 ]
 
