@@ -11,6 +11,11 @@ test("motion section is local, bilingual, accessible and responsive", async ({
   const section = page.locator("#motion-control");
   await section.scrollIntoViewIfNeeded();
   await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator(".scene-layer")).toHaveAttribute(
+    "data-chapter",
+    "8",
+  );
+  await expect(page.locator(".scene-layer")).toHaveCSS("opacity", "0");
   await expect(
     section.getByRole("heading", {
       name: "FreeRTOS / Motion Control",

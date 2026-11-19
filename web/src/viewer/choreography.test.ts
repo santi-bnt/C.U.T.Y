@@ -27,6 +27,14 @@ describe("continuous robot choreography", () => {
     expect(resolveShot(1, true, true, output).visible).toBe(1);
     expect(resolveShot(5, false, false, output).visible).toBe(0);
     expect(resolveShot(6, false, false, output).visible).toBe(1);
+    expect(chapterIds.slice(-3)).toEqual([
+      "motion-control",
+      "dsp-filters",
+      "about",
+    ]);
+    expect(resolveShot(8, false, false, output).visible).toBe(0);
+    expect(resolveShot(9, false, false, output).visible).toBe(0);
+    expect(resolveShot(10, false, false, output).visible).toBe(0);
   });
   it("uses a separate centered mobile track and removes orbit under reduced motion", () => {
     const mobile = resolveShot(0, true, false, emptyShot());

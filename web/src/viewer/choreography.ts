@@ -8,6 +8,8 @@ export const chapterIds = [
   "wiring",
   "development",
   "live",
+  "motion-control",
+  "dsp-filters",
   "about",
 ] as const;
 export interface Shot {
@@ -91,6 +93,24 @@ const desktop: readonly Shot[] = [
     x: -0.48,
     y: 0,
     visible: 1,
+  },
+  {
+    azimuth: 6.48,
+    elevation: 0.025,
+    distance: 6.5,
+    targetY: 1.5,
+    x: -0.65,
+    y: 0,
+    visible: 0,
+  },
+  {
+    azimuth: 6.48,
+    elevation: 0.025,
+    distance: 6.5,
+    targetY: 1.5,
+    x: -0.65,
+    y: 0,
+    visible: 0,
   },
   {
     azimuth: 6.48,
