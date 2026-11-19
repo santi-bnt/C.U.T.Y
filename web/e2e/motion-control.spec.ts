@@ -40,25 +40,41 @@ test("motion section explains architecture, tasks and safe local simulation", as
   expect(new Set(diagramSurfaces.map((node) => node.background))).toEqual(
     new Set(["rgb(248, 245, 242)"]),
   );
-  expect(
-    diagramSurfaces.every((node) =>
-      ["rgb(231, 226, 220)", "rgb(255, 106, 0)"].includes(node.border),
-    ),
-  ).toBe(true);
+  expect(new Set(diagramSurfaces.map((node) => node.border))).toEqual(
+    new Set(["rgb(231, 226, 220)"]),
+  );
   expect(new Set(diagramSurfaces.map((node) => node.text))).toEqual(
     new Set(["rgb(23, 23, 23)"]),
   );
   const pi = diagram.getByRole("button", { name: /Raspberry Pi 5/ });
   const stm = diagram.getByRole("button", { name: /STM32F401 \+ FreeRTOS/ });
   const servos = diagram.getByRole("button", { name: /3 \u00d7 MG996R/ });
+  const selectedCount = () =>
+    diagramNodes.evaluateAll(
+      (nodes) => nodes.filter((node) => node.getAttribute("aria-pressed") === "true").length,
+    );
   await expect(pi).toHaveAttribute("aria-pressed", "false");
+  await expect(stm).toHaveAttribute("aria-pressed", "false");
+  await expect(servos).toHaveAttribute("aria-pressed", "false");
+  expect(await selectedCount()).toBe(0);
   await stm.click();
   await expect(stm).toHaveAttribute("aria-pressed", "true");
+  await expect(stm).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
+  await expect(pi).toHaveAttribute("aria-pressed", "false");
+  await expect(servos).toHaveAttribute("aria-pressed", "false");
+  await expect(pi).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  expect(await selectedCount()).toBe(1);
   await servos.click();
   await expect(servos).toHaveAttribute("aria-pressed", "true");
+  await expect(servos).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
+  await expect(stm).toHaveAttribute("aria-pressed", "false");
+  await expect(stm).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  expect(await selectedCount()).toBe(1);
   await pi.focus();
   await page.keyboard.press("Enter");
   await expect(pi).toHaveAttribute("aria-pressed", "true");
+  await expect(servos).toHaveAttribute("aria-pressed", "false");
+  expect(await selectedCount()).toBe(1);
 
   const tasks = section.locator(".mc-task-grid");
   await expect(tasks.locator(".mc-task-card")).toHaveCount(4);
@@ -86,6 +102,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
     .getByRole("button", { name: "Next" })
     .click();
   await expect(section.getByRole("status")).toContainText("Step 2 of 8");
+  expect(await selectedCount()).toBe(1);
   await expect(section.locator(".mc-connection").first()).toHaveAttribute(
     "data-flow-active",
     "true",
@@ -95,6 +112,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
     .getByRole("button", { name: "Previous" })
     .click();
   await expect(section.getByRole("status")).toContainText("Step 1 of 8");
+  expect(await selectedCount()).toBe(1);
   await section
     .getByRole("group", { name: "Simulation controls" })
     .getByRole("button", { name: "Next" })
@@ -104,7 +122,10 @@ test("motion section explains architecture, tasks and safe local simulation", as
     .getByRole("button", { name: "Next" })
     .click();
   await expect(section.getByRole("status")).toContainText("Step 3 of 8");
+  expect(await selectedCount()).toBe(1);
   await expect.poll(() => stm.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(248, 245, 242)");
+  await expect(stm).toHaveCSS("border-top-color", "rgb(231, 226, 220)");
+  await expect(pi).toHaveCSS("border-top-color", "rgb(255, 106, 0)");
   await expect(communication).toHaveAttribute("data-flow-active", "true");
   await expect(stm).toHaveAttribute("data-flow-active", "true");
   await expect(
@@ -114,8 +135,10 @@ test("motion section explains architecture, tasks and safe local simulation", as
   await play.click();
   const pause = section.getByRole("button", { name: "Pause" });
   await expect(pause).toBeVisible();
+  expect(await selectedCount()).toBe(1);
   await pause.click();
   await expect(section.getByRole("button", { name: "Play" })).toBeVisible();
+  expect(await selectedCount()).toBe(1);
 
   await section
     .getByRole("button", { name: "Simulate heartbeat loss" })
@@ -129,6 +152,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
     section.locator('.mc-task-card[data-flow-active="true"]'),
   ).toContainText("SafetyTask");
   await section.getByRole("button", { name: "Reset" }).click();
+  expect(await selectedCount()).toBe(1);
   await expect(section.getByRole("status")).toContainText("Step 1 of 8");
   await expect(section.getByRole("status")).toContainText(
     "no data is transmitted",

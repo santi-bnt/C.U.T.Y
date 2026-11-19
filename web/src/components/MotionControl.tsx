@@ -20,7 +20,7 @@ export default function MotionControl() {
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [selectedNode, setSelectedNode] = useState<NodeId>("stm32");
+  const [selectedNode, setSelectedNode] = useState<NodeId | null>(null);
   const [selectedTask, setSelectedTask] = useState("servo");
 
   useEffect(() => {
