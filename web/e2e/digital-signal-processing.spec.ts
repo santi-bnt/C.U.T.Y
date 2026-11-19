@@ -4,6 +4,7 @@ test("DSP section switches real FIR calculations and fits the viewport", async (
   await page.goto("/#dsp-filters", { waitUntil: "domcontentloaded" });
   const section = page.locator("#dsp-filters");
   await section.waitFor({ state: "attached", timeout: 15_000 });
+  await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(section.getByRole("heading", { name: "Digital Signal Processing / FIR Filters" })).toBeVisible();
   await section.getByRole("button", { name: "Speech · band-pass" }).click();
   await expect(section.getByText(/511 symmetric Hamming-windowed taps/)).toBeVisible();
