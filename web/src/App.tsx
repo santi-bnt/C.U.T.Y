@@ -613,6 +613,9 @@ function Portfolio() {
             </a>
           </div>
         </Chapter>
+
+        <MotionControl />
+        <DigitalSignalProcessing />
         <section className="project-outro paper" id="about">
           <p className="eyebrow">
             {t(bi("BUILT OUT OF CURIOSITY", "CREADO POR CURIOSIDAD"))}
@@ -648,8 +651,6 @@ function Portfolio() {
             </a>
           </div>
         </section>
-        <MotionControl />
-        <DigitalSignalProcessing />
       </main>
       <footer className="product-footer paper">
         <a className="wordmark" href="#home">

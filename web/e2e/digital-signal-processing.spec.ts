@@ -4,6 +4,8 @@ test("DSP section switches real FIR calculations and fits the viewport", async (
   await page.goto("/#dsp-filters", { waitUntil: "domcontentloaded" });
   const section = page.locator("#dsp-filters");
   await section.waitFor({ state: "attached", timeout: 15_000 });
+  const nextSection = await section.evaluate((node) => node.nextElementSibling?.id);
+  expect(nextSection).toBe("about");
   await expect(section).toHaveCSS("background-color", "rgb(23, 23, 23)");
   await expect(section.getByRole("heading", { name: "Digital Signal Processing / FIR Filters" })).toBeVisible();
   await expect(section.getByRole("button", { name: "Head tracking · low-pass" })).toHaveAttribute("aria-pressed", "true");
