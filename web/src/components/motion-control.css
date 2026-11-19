@@ -1,7 +1,7 @@
 .motion-control {
   --mc-panel: #f7f7f5;
-  --mc-panel-raised: #fff;
-  --mc-panel-line: rgb(23 23 23 / 18%);
+  --mc-panel-raised: #f8f5f2;
+  --mc-panel-line: #e7e2dc;
   position: relative;
   z-index: 2;
   padding: clamp(64px, 7vw, 100px) var(--gutter);
@@ -162,14 +162,15 @@
   box-shadow: inset 3px 0 var(--orange);
 }
 .mc-node[data-flow-active="true"] {
-  background: #fff3e9;
+  background: var(--mc-panel-raised);
   border-color: var(--orange);
+  box-shadow: inset 3px 0 var(--orange);
 }
 .mc-node-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  color: var(--muted);
+  color: #666666;
   font:
     11px/1.5 "Courier New",
     monospace;

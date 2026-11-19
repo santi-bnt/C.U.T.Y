@@ -15,6 +15,26 @@ test("Wiring evidence opens and returns in the same tab with responsive navigati
   await expect(page.getByRole("heading", { name: "Connections, by block." })).toBeVisible();
   await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
   expect(page.context().pages()).toHaveLength(1);
+  const blockStyles = await page.locator(".flow-list .block").evaluateAll((blocks) =>
+    blocks.map((block) => ({
+      background: getComputedStyle(block).backgroundColor,
+      border: getComputedStyle(block).borderTopColor,
+      text: getComputedStyle(block).color,
+      secondary: getComputedStyle(block.querySelector("small")!).color,
+    })),
+  );
+  expect(new Set(blockStyles.map((block) => block.background))).toEqual(
+    new Set(["rgb(248, 245, 242)"]),
+  );
+  expect(new Set(blockStyles.map((block) => block.border))).toEqual(
+    new Set(["rgb(231, 226, 220)"]),
+  );
+  expect(new Set(blockStyles.map((block) => block.text))).toEqual(
+    new Set(["rgb(23, 23, 23)"]),
+  );
+  expect(new Set(blockStyles.map((block) => block.secondary))).toEqual(
+    new Set(["rgb(102, 102, 102)"]),
+  );
 
   if (info.project.name !== "desktop") {
     await page.setViewportSize({ width: 390, height: 844 });

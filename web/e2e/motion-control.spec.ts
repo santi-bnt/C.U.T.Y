@@ -28,6 +28,26 @@ test("motion section explains architecture, tasks and safe local simulation", as
   );
 
   const diagram = section.locator(".mc-diagram");
+  const diagramNodes = diagram.locator(".mc-node");
+  await expect(diagramNodes).toHaveCount(3);
+  const diagramSurfaces = await diagramNodes.evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      background: getComputedStyle(node).backgroundColor,
+      border: getComputedStyle(node).borderTopColor,
+      text: getComputedStyle(node).color,
+    })),
+  );
+  expect(new Set(diagramSurfaces.map((node) => node.background))).toEqual(
+    new Set(["rgb(248, 245, 242)"]),
+  );
+  expect(
+    diagramSurfaces.every((node) =>
+      ["rgb(231, 226, 220)", "rgb(255, 106, 0)"].includes(node.border),
+    ),
+  ).toBe(true);
+  expect(new Set(diagramSurfaces.map((node) => node.text))).toEqual(
+    new Set(["rgb(23, 23, 23)"]),
+  );
   const pi = diagram.getByRole("button", { name: /Raspberry Pi 5/ });
   const stm = diagram.getByRole("button", { name: /STM32F401 \+ FreeRTOS/ });
   const servos = diagram.getByRole("button", { name: /3 \u00d7 MG996R/ });
@@ -84,6 +104,7 @@ test("motion section explains architecture, tasks and safe local simulation", as
     .getByRole("button", { name: "Next" })
     .click();
   await expect(section.getByRole("status")).toContainText("Step 3 of 8");
+  await expect.poll(() => stm.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgb(248, 245, 242)");
   await expect(communication).toHaveAttribute("data-flow-active", "true");
   await expect(stm).toHaveAttribute("data-flow-active", "true");
   await expect(

@@ -19,6 +19,10 @@
         --orange-soft: #fff0e6;
         --signal: #16816d;
         --pending: #735c36;
+        --evidence-card-bg: #f8f5f2;
+        --evidence-card-border: #e7e2dc;
+        --evidence-card-text: #171717;
+        --evidence-card-muted: #666666;
         font-family: Arial, Helvetica, sans-serif;
         color: var(--ink);
         background: var(--paper);
@@ -61,13 +65,13 @@
       h2 { margin: 64px 0 22px; font-size: clamp(30px, 4vw, 54px); font-weight: 600; line-height: 1; letter-spacing: -.06em; }
       .flow-list { display: grid; gap: 14px; }
       .flow-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(185px, .82fr) minmax(180px, 1fr); align-items: stretch; gap: 14px; }
-      .block { min-height: 120px; display: flex; flex-direction: column; justify-content: center; padding: 20px 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
-      .block .tag { margin-bottom: 7px; color: var(--muted); font: 700 10px/1.3 "Courier New", monospace; letter-spacing: .09em; text-transform: uppercase; }
-      .block strong { font-size: 18px; letter-spacing: -.035em; }
-      .block small { margin-top: 5px; color: var(--muted); font-size: 12px; }
-      .block.core { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-      .block.core .tag, .block.core small { color: #d1d5db; }
-      .block.accent { border-color: rgb(255 106 0 / 42%); background: var(--orange-soft); }
+      .block { min-height: 120px; display: flex; flex-direction: column; justify-content: center; padding: 20px 22px; border: 1px solid var(--evidence-card-border); border-radius: 12px; background: var(--evidence-card-bg); color: var(--evidence-card-text); }
+      .block .tag { margin-bottom: 7px; color: var(--evidence-card-muted); font: 700 10px/1.3 "Courier New", monospace; letter-spacing: .09em; text-transform: uppercase; }
+      .block strong { color: var(--evidence-card-text); font-size: 18px; letter-spacing: -.035em; }
+      .block small { margin-top: 5px; color: var(--evidence-card-muted); font-size: 12px; }
+      .block.core { border-color: var(--evidence-card-border); background: var(--evidence-card-bg); color: var(--evidence-card-text); }
+      .block.core .tag, .block.core small { color: var(--evidence-card-muted); }
+      .block.accent { border-color: var(--evidence-card-border); background: var(--evidence-card-bg); }
       .link-block { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; text-align: center; }
       .link-block .link-title { color: var(--signal); font: 700 12px/1.3 "Courier New", monospace; }
       .link-block .link-line { position: relative; height: 2px; margin-inline: 10px; background: var(--signal); }
