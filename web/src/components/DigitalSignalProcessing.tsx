@@ -61,7 +61,7 @@ function Plot({ title, input, filtered, compare = false }: { title: string; inpu
       {(compare || !filtered.length) && <path className="dsp-original" d={path(input, width, height, 1 / peak)} />}
       {filtered.length > 0 && <path className="dsp-filtered" d={path(filtered, width, height, 1 / peak)} />}
     </svg>
-    {compare && <div className="dsp-legend"><span>Original</span><span>FIR output</span></div>}
+    {compare && <div className="dsp-legend"><span className="dsp-legend-original">Original</span><span className="dsp-legend-filtered">FIR output</span></div>}
   </figure>;
 }
 
@@ -92,8 +92,8 @@ export default function DigitalSignalProcessing() {
     </div>
     <div className="dsp-status"><span>{es ? "C en STM32: integrado en lógica portable" : "STM32 C: integrated in portable control logic"}</span><span>{es ? "Python: integrado; audio desactivado por defecto" : "Python: integrated; audio disabled by default"}</span><span>{es ? "Pruebas de software; validación física pendiente" : "Software tests; physical validation pending"}</span></div>
     <div className="dsp-tabs" role="group" aria-label={es ? "Seleccionar filtro" : "Select filter"}>
-      <button aria-pressed={mode === "head"} onClick={() => setMode("head")}>{es ? "Seguimiento de cabeza · pasa-bajas" : "Head tracking · low-pass"}</button>
-      <button aria-pressed={mode === "speech"} onClick={() => setMode("speech")}>{es ? "Voz · pasa-banda" : "Speech · band-pass"}</button>
+      <button type="button" aria-pressed={mode === "head"} onClick={() => setMode("head")}>{es ? "Seguimiento de cabeza · pasa-bajas" : "Head tracking · low-pass"}</button>
+      <button type="button" aria-pressed={mode === "speech"} onClick={() => setMode("speech")}>{es ? "Voz · pasa-banda" : "Speech · band-pass"}</button>
     </div>
     <div className="dsp-flow" aria-label={es ? "Flujo de procesamiento de señales" : "Signal processing flow"}>
       {(mode === "head"
@@ -109,7 +109,7 @@ export default function DigitalSignalProcessing() {
     <p className="dsp-coefficients"><strong>{es ? "Coeficientes h[k]:" : "Coefficients h[k]:"}</strong> {mode === "head" ? "[0.2, 0.2, 0.2, 0.2, 0.2]" : `511 ${es ? "coeficientes simétricos con ventana Hamming · normalizados a" : "symmetric Hamming-windowed taps · normalized at"} ${(150 + 4000) / 2} Hz`}</p>
     <div className="dsp-controls">
       <div className="dsp-tabs" role="group" aria-label={es ? "Vista de señal" : "Signal view"}>
-        {(["original", "filtered", "compare"] as const).map((item) => <button key={item} aria-pressed={view === item} onClick={() => setView(item)}>{item === "compare" ? (es ? "Comparar" : "Compare") : item === "original" ? (es ? "Original" : "Original") : (es ? "Filtrada" : "Filtered")}</button>)}
+        {(["original", "filtered", "compare"] as const).map((item) => <button type="button" key={item} aria-pressed={view === item} onClick={() => setView(item)}>{item === "compare" ? (es ? "Comparar" : "Compare") : item === "original" ? (es ? "Original" : "Original") : (es ? "Filtrada" : "Filtered")}</button>)}
       </div>
       {mode === "speech" && <label className="dsp-slider">{es ? "Tono de prueba" : "Test tone"} {tone} Hz<input type="range" min="50" max="7000" step="50" value={tone} onChange={(event) => setTone(Number(event.target.value))} /></label>}
     </div>
@@ -122,7 +122,7 @@ export default function DigitalSignalProcessing() {
           <path className="dsp-axis" d="M0 15H640M0 85H640M0 155H640" />
           <path className="dsp-filtered" d={path(frequency.map((p) => (p.db + 80) / 80 * 2 - 1), 640, 170, 0.46)} />
           <path className="dsp-phase" d={path(frequency.map((p) => p.phase / Math.PI), 640, 170, 0.46)} />
-        </svg><div className="dsp-legend"><span>{es ? "Magnitud (−80 a 0 dB)" : "Magnitude (−80 to 0 dB)"}</span><span>{es ? "Fase (rad, escalada)" : "Phase (rad, scaled)"}</span><span>{es ? `0–${signalRate / 2} Hz` : `0–${signalRate / 2} Hz`}</span></div>
+        </svg><div className="dsp-legend"><span className="dsp-legend-magnitude">{es ? "Magnitud (−80 a 0 dB)" : "Magnitude (−80 to 0 dB)"}</span><span className="dsp-legend-phase">{es ? "Fase (rad, escalada)" : "Phase (rad, scaled)"}</span><span className="dsp-legend-range">{es ? `0–${signalRate / 2} Hz` : `0–${signalRate / 2} Hz`}</span></div>
       </figure>
       <Plot title={es ? "Espectro sintético · amplitud relativa" : "Synthetic signal spectrum · relative amplitude"} input={visibleSpectrumInput} filtered={visibleSpectrumFiltered} compare={view === "compare"} />
     </div>

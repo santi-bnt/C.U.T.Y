@@ -5,6 +5,30 @@
   background: var(--ink);
   color: var(--paper);
 }
+.motion-control.paper {
+  background: var(--paper);
+  color: var(--ink);
+}
+.motion-control.paper .motion-legend,
+.motion-control.paper .motion-task dt,
+.motion-control.paper .motion-states,
+.motion-control.paper li[aria-current="step"] {
+  color: var(--orange-strong);
+}
+.motion-control.paper [data-active="true"] {
+  border-color: var(--orange);
+  color: var(--orange-strong);
+}
+.motion-control.paper .motion-task dd {
+  color: var(--ink);
+}
+.motion-control.paper button {
+  color: var(--ink);
+  border-color: var(--orange-line);
+}
+.motion-control.paper button:hover {
+  background: var(--orange-wash);
+}
 .motion-control .motion-heading {
   max-width: 840px;
   margin-bottom: 28px;

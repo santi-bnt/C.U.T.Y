@@ -31,7 +31,7 @@ export default function MotionControl() {
   return (
     <section
       id="motion-control"
-      className="motion-control ink"
+      className="motion-control paper"
       aria-labelledby="motion-title"
     >
       <div className="motion-heading">
