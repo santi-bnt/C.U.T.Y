@@ -6,6 +6,7 @@
 
 bool cuty_board_init(void);
 bool cuty_board_start_uart_rx(void);
+void cuty_board_usart2_irq_handler(void);
 bool cuty_board_watchdog_init(void);
 void cuty_board_watchdog_refresh(void);
 void cuty_board_tx_task(void *argument);

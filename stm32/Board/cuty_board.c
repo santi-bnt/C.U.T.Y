@@ -171,4 +171,5 @@ void cuty_board_tx_task(void *argument) {
     }
 }
 
-void USART2_IRQHandler(void) { HAL_UART_IRQHandler(&huart2); }
+/* El vector generado por CubeMX delega aquí para no duplicar USART2_IRQHandler. */
+void cuty_board_usart2_irq_handler(void) { HAL_UART_IRQHandler(&huart2); }
