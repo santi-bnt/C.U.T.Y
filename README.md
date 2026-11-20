@@ -12,7 +12,7 @@ C.U.T.Y/
 │   ├── tests/
 │   ├── scripts/       Preparación de Windows/Raspberry
 │   └── systemd/       Plantilla futura del servicio de voz
-├── stm32/             Firmware futuro: servos, IMU, PID, UART y seguridad
+├── stm32/             Firmware FreeRTOS de la Black Pill: servos, UART y seguridad
 ├── hardware/
 │   ├── cad/           SolidWorks y exportaciones STEP/STL/GLB
 │   └── electronics/   KiCad, esquemas y datasheets
@@ -29,9 +29,9 @@ Las entradas de voz, pantalla e instalación están dentro de `raspberry/`. El G
 - Cara conectada: con cámara, los ojos **siguen a la persona**; las expresiones de la conversación aparecen en la cara y la **boca se mueve con la voz** (enlace UDP local entre la voz y la pantalla). Ver [cara](docs/face.md).
 - Conversación desde el menú: toca C.U.T.Y para recibir un saludo y hablar sin ENTER; di «quiero salir» para volver al inicio. Usa Gemini, el entorno existente y una clave local en `.env`. Ver [configuración](raspberry/touchscreen/README.md#conversación-desde-el-menú).
 - Electrónica: [carrier PCB v1.1](hardware/electronics/kicad/cuty_carrier/README.md) para Raspberry Pi 5 y STM32F401 Black Pill, con KiCad, Gerbers, BOM y esquemático. Fabricación, montaje y validación eléctrica pendientes.
-- La versión fija prevé tres servos MG996R: cabeza PAN y ambos brazos. La carrier conserva cinco salidas; dos quedan reservadas. El firmware portable funciona en dry-run; el control físico y su validación siguen pendientes.
+- La versión fija prevé tres servos MG996R: cabeza PAN y ambos brazos. La carrier conserva cinco salidas; dos quedan reservadas. El firmware FreeRTOS compila y pasa pruebas en host, simulador y QEMU; por defecto no activa el PWM. Falta validarlo en el banco.
 
-Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Los ejemplos UART siguen siendo propuestas.
+Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 posee PWM, movimiento y seguridad: recibe objetivos de alto nivel por UART (protocolo V2), no PWM continuo. Ver [firmware FreeRTOS](docs/freertos-motion-control.md).
 
 ## Voz en Windows
 

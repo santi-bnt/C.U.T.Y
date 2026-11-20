@@ -1,6 +1,6 @@
 # Proposed High-Level Commands
 
-Status: examples only; nothing is implemented. Raspberry/behavior produces goals; STM32 is intended to own trajectories, PWM and safety for three active joints. The base, pedestal and torso are fixed.
+Status: historical examples. The implemented commands are `V2,HB`, `V2,ARM`, `V2,START`, `V2,DISARM`, `V2,RESET` and `V2,TARGET,<joint>,<milli>`; see [the firmware doc](../freertos-motion-control.md#wire-protocol-v2). Raspberry/behavior produces goals; STM32 is intended to own trajectories, PWM and safety for three active joints. The base, pedestal and torso are fixed.
 
 | Example | Proposed intent |
 | --- | --- |

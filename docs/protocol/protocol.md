@@ -1,6 +1,6 @@
 # Proposed Human-Readable UART Protocol
 
-Status: design sketch only. No UART implementation or finalized binary protocol exists.
+Status: superseded by the implemented V2 line protocol (115200 8N1). See [the firmware doc](../freertos-motion-control.md#wire-protocol-v2). The notes below record the original open questions.
 
 Raspberry sends high-level goals; STM32 converts them into safe physical movement and emits status/measurements. Do not stream raw servo PWM continuously from Raspberry.
 

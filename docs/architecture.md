@@ -7,8 +7,8 @@
 | Eyes, pupils, mouth, expressions, screen | Raspberry Pi 5 | face renders only |
 | High-level behavior | Raspberry Pi 5 | brain consumes targets, requests goals |
 | UART bridge and telemetry server | Raspberry Pi 5 | hardware and telemetry |
-| PWM, servos, physical movement | STM32F401 Black Pill | servos/control with safety; firmware pending |
-| IMU, PID, real-time limits | STM32F401 Black Pill | imu/control/safety; firmware pending |
+| PWM, servos, physical movement | STM32F401 Black Pill | FreeRTOS firmware with safety layers; bench validation pending |
+| IMU, PID, real-time limits | STM32F401 Black Pill | limits and safety implemented; IMU/PID not used in the fixed design |
 | Dashboard and digital twin | Web | consumes aggregated telemetry |
 | Mechanical sources | CAD | native SolidWorks files |
 | PCB sources | Electronics | native KiCad files |

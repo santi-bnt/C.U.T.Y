@@ -34,13 +34,15 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 
 ## Phase 4 — STM32F401 Firmware
 
-- [ ] Board-specific startup, clock configuration and HAL/CMSIS project for the Black Pill
-- [ ] UART protocol implementation and validated Pi-to-STM32 link
-- [ ] Three-servo control integration: HEAD_PAN, LEFT_ARM, RIGHT_ARM
-- [ ] HEAD_PAN low-pass FIR integration into the board FreeRTOS task
-- [ ] UART and timer/PWM hardware validation (keep actuator outputs disabled until reviewed)
+- [x] Board-specific startup, clock configuration and CMSIS project for the Black Pill (`make`, register-level, no HAL)
+- [x] V2 UART protocol in both directions plus the Raspberry bridge (`stm32_bridge.py`)
+- [x] Three-servo control integration: HEAD_PAN, LEFT_ARM, RIGHT_ARM (dry-run by default, `make PWM=1` enables outputs)
+- [x] HEAD_PAN low-pass FIR running inside ServoControlTask
+- [x] Task-liveness kill, IWDG and low-battery interlock
+- [ ] Bench validation on the Black Pill: UART link, clocks, PWM on a scope, battery ADC (keep J3 off until reviewed)
+- [ ] Per-joint servo calibration and sign check
 
-Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. The physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
+The firmware is tested on the host, on the real FreeRTOS kernel in a POSIX simulator, and as an ARM image in QEMU. None of that replaces the bench steps. See [bring-up](freertos-motion-control.md#bring-up-on-the-real-robot).
 
 ## Phase 5 — Electronics and Mechanical Design
 

@@ -1,6 +1,6 @@
 # Proposed Telemetry
 
-Status: illustrative records, not implemented or stable. Current design has a fixed base/body and only HEAD_PAN, LEFT_ARM and RIGHT_ARM; the older Nido gimbal/body telemetry is superseded.
+Status: historical examples. The firmware now emits `V2,BOOT`, `V2,ACK`/`V2,NAK`, `V2,TEL` (5 Hz) and `V2,DIAG` (every 5 s); see [the firmware doc](../freertos-motion-control.md#wire-protocol-v2). Current design has a fixed base/body and only HEAD_PAN, LEFT_ARM and RIGHT_ARM; the older Nido gimbal/body telemetry is superseded.
 
 | Example | Proposed meaning |
 | --- | --- |

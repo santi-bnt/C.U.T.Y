@@ -1,276 +1,202 @@
-# Current configuration update
+# FreeRTOS motion firmware (STM32F401 Black Pill)
 
-Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes.
+![FreeRTOS task architecture](assets/freertos-firmware-architecture.svg)
 
-# FreeRTOS / Motion Control — initial, dry-run only
+The STM32 firmware in [`stm32/`](../stm32/README.md) is a complete, buildable FreeRTOS
+image for the STM32F401CC Black Pill on the carrier v1.1. The Raspberry Pi sends
+high-level goals over USART2; the STM32 owns trajectories, limits, PWM and safety for
+the three active joints: HEAD_PAN (J7), LEFT_ARM (J8) and RIGHT_ARM (J9). J10 and J11 are
+reserved and held low.
 
-## Actual implementation boundary
+## Status: what is proven and how
 
-The portable C modules implement byte-stream framing, strict experimental command parsing,
-three normalized commanded setpoints, a damped trajectory filter, position/velocity/acceleration
-limits, heartbeat checks, a latched safety state machine, and a pure pulse-width conversion.
-They do not initialize pins, start timers, transmit UART, read sensors, or move a servo.
-The CMSIS-RTOS2 adapter is initial integration source, not a validated STM32 firmware image.
-There is no CubeMX project, HAL, linker/startup configuration, or on-board test result.
-IMU is an interface declaration; PID remains a placeholder.
-
-The interactive website is a scripted educational visualization. Its PAN +0.35 example,
-slowed stages and 500 ms fault scenario are illustrative, not live telemetry or a firmware
-emulator. It has no serial, Bluetooth, WebSocket, HTTP command or robot-control transport.
-Raspberry head_follow.py remains dry-run; no Raspberry configuration or drivers were changed.
-
-## Ownership and tasks
-
-Pi 5 retains FaceTracker, visual errors, Gemini Live, voice and behavior/planning.
-STM32 is intended to own local motion and timing. FreeRTOS scheduling separates these
-responsibilities; hardware timers, never task delays, generate PWM.
-
-| Task | CMSIS priority | Activation proposal | Stack budget (bytes) | Responsibility |
-| --- | --- | --- | --- | --- |
-| CommunicationTask | AboveNormal | RX event, batch <=64 bytes then yield 1 tick | 1536 | Frame/validate input, coalesce targets, queue control events |
-| ServoControlTask | High | Poll 10 ms; trajectory update 20 ms | 1536 | Sole controller-state owner; apply events, safety and trajectory |
-| SafetyTask | High1 | Absolute 10 ms deadline | 768 | Supervision notification, no shared state writes |
-| DiagnosticsTask | Low | 200 ms / <=5 Hz | 1024 | Copy snapshots to bounded TX queue |
-| IMUTask | TBD | No task created | 0 | Future sensor interface |
-
-These are budgets, not measured execution times or proven priorities. The initial safety
-thread only requests supervision: the sole control owner enforces heartbeat and limits on
-its 10 ms poll. It is NOT an independent safety monitor if that owner stalls.
-An independently validated task-liveness watchdog is still required before physical use.
-All loops block/yield; ISR work is a queue put plus optional error flag, not parsing/logging.
-No mutex is needed for the single-owner controller. Queue messages copy snapshots.
-FreeRTOS syscall-safe IRQ priority is mandatory for the RX hook.
-
-RTOS resources:
-
-- RX: 256 timestamped byte entries (typically 2048 B on ARM), not a 256-byte DMA ring.
-- Control events: 8 envelopes; targets: three one-entry mailboxes, one per joint; the latest goal wins per joint.
-  Each message commands one joint; a coordinated atomic pose is not implemented.
-- Snapshot and telemetry queues: one controller snapshot each; replies: eight entries.
-- Approximate queue payload <4 KiB, four stacks 4864 B; control blocks, allocator,
-  idle/timer stacks, driver/DMA buffers and interrupt/main stack are additional.
-- Start with a provisional 20 KiB FreeRTOS heap only after checking the actual device RAM,
-  link map and total static/dynamic budget. It is not a guaranteed fitting configuration.
-- Allocation failure must abort startup; no scheduler start/retry after partial creation.
-  The first adapter intentionally treats allocation failure as fatal and does not reclaim
-  partial allocations; reset the MCU during development before another create attempt.
-- Initial adapter requires a 1000 Hz kernel tick and accepts only CUTY_RTOS_DRY_RUN=1.
-  Supply CMSIS-RTOS2 headers/library through a compatible STM32Cube FreeRTOS integration.
-- Before scheduler start: osKernelInitialize(), cuty_rtos_create(), cuty_rtos_start().
-  Board initialization must leave actuator outputs disabled; no PWM callbacks are provided.
-
-Communication owns the target producer; overwriting uses nonblocking Get + Put with a
-single producer and a single consumer. The consumer processes at most eight state events
-and one latest target per joint per poll. A sequence barrier drops goals received before the latest
-state-change command. Events older than 100 ms are rejected; delayed heartbeat records
-retain their receive timestamps. RX overflow/malformed lines set a fault flag.
-The queue byte timestamp is assigned in the ISR hook, and a frame uses its LF timestamp.
-Real DMA reception must carry equivalent timestamps, enforce fragment timeouts and
-resynchronize after UART framing/overrun errors. That adapter is not implemented.
-
-Snapshots, reply queues and telemetry use timeout zero; congestion drops records.
-The future UART TX owner can drain cuty_take_reply and cuty_take_telemetry, but no wire
-encoding or HAL transmit driver is supplied. Replies to malformed/overflow input are
-currently fault counters/flags, not per-frame UART ERR records. Diagnostics counters
-include RX fault notifications and reply/snapshot congestion; final TX-queue losses,
-task runtimes and memory high-water marks still need instrumentation.
-
-## Experimental protocol V2 (host/dry-run only)
-
-Separate from the legacy SET_HEAD/SET_BODY design sketches in docs/protocol.
-LF terminated, optional single CR before LF. Max 63 stored bytes, ASCII only;
-embedded NUL, non-ASCII or oversized lines discard through LF. Empty lines are invalid.
-No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra fields.
-
-| Record without LF | Meaning |
-| --- | --- |
-| V2,HB | Refresh heartbeat (does not recover a fault) |
-| V2,ARM | DISARMED → READY, only with fresh heartbeat |
-| V2,START | READY → ACTIVE, only with fresh heartbeat |
-| V2,DISARM | Inhibit output and discard movement; FAULT stays latched, other states → DISARMED |
-| V2,RESET | FAULT → DISARMED; clears heartbeat validity |
-| V2,TARGET,HEAD_PAN,350 | Joint HEAD_PAN, LEFT_ARM or RIGHT_ARM; signed integer -1000..1000 milli-units → -1..1 |
-
-Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Their coordinates remain abstract simulation units, not calibrated physical angles. No degree or PWM commands are accepted. The proposed J7–J9 assignments remain physically unverified. The V2 sketch has no CRC/session handshake, replay protection or
-link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
-must settle integrity, sessions, acknowledgements, error vocabulary and recovery.
-No Raspberry adapter is enabled and no compatibility with older command sketches is claimed.
-
-## Motion and safety
-
-The core starts DISARMED. HB → ARM → START is explicit. A goal in the wrong state,
-nonfinite/out-of-range value, invalid command or excessive control dt faults an armed
-controller. Heartbeat expiry at >=500 ms in the dry-run profile latches FAULT.
-HB alone never recovers; RESET, fresh HB, ARM and START are needed. DISARM is always
-accepted and inhibits output intent, but cannot clear a latched fault. Wrap-safe unsigned elapsed arithmetic
-is used; it assumes polling within the 32-bit millisecond wrap interval.
-
-The initial filter applies a damped acceleration command in normalized units, clamps
-acceleration and velocity and checks each predicted position against configured bounds.
-It is not a calibrated robot trajectory planner, jerk-limited trajectory or IMU PID.
-If bounds cannot be maintained the core faults rather than sending an out-of-range
-position. Fault/disarm freeze the command immediately; normal trajectory acceleration
-limits do not apply to that logical emergency stop. A physical servo may still move
-toward its last commanded position: freezing a setpoint does not prove physical rest.
-
-Fault policies are logical intents only:
-
-- FREEZE_COMMAND retains the last commanded setpoint only if output was previously
-  requested by ACTIVE (never energizes a READY or boot fault), useful where releasing torque
-  could drop a load. It can still stall/heat a servo or trap a mechanism.
-- RELEASE_OUTPUT requests no output, useful where continuing torque is dangerous.
-  It can let a gravity-loaded joint fall.
-
-Neither policy is approved for the real mechanism. There is no universal 90-degree
-safe position. Mechanical risk assessment, torque support, power removal and operator
-recovery must determine the physical policy. Startup/reset must never energize an
-uncalibrated joint; normalized zero is an abstract test initial condition, not physical
-neutral. Before adding PWM, require verified initial pose/calibration and a hardware
-arming gate; the core's output_requested function is not such a gate.
-
-## Pins, timers and configuration proposal (not generated initialization)
-
-The carrier v1.1 netlist and schematic design specify:
-
-| Function | Carrier mapping | MCU alternate function to verify for exact package |
+| Layer | Evidence | Not covered |
 | --- | --- | --- |
-| Pi TX physical 8 → STM32 RX | PA3 / USART2_RX | AF7 |
-| STM32 TX → Pi RX physical 10 | PA2 / USART2_TX | AF7 |
-| PWM outputs 1–4 | PB6/PB7/PB8/PB9 / TIM4 CH1–4 | AF2 |
-| PWM output 5 | PA8 / TIM1 CH1 | AF1 |
+| Portable core (parser, controller, FIR, battery, liveness, wire records) | Host unit tests: `make test-host` | — |
+| Task topology on the real FreeRTOS V11.1 kernel | FreeRTOS POSIX simulator scenario test: `make test-sim` | Cortex-M timing |
+| Cortex-M4F image: startup, vector table, ARM_CM4F port, NVIC, USART2 RX/TX IRQs | QEMU `netduinoplus2` (STM32F405 model): `make test-qemu` | F401 clock tree, TIM4, ADC, IWDG (not modelled) |
+| Raspberry bridge ↔ firmware | `raspberry/tests/test_stm32_bridge.py` against the simulator | Real UART wiring |
+| F401 clocks, TIM4 PWM, ADC, IWDG, carrier wiring, servos | **Not yet validated on hardware.** Follow the bring-up below | — |
 
-The repository names STM32F401CCU6 as the design target. The actual chip marking,
-board revision, package, oscillator and memory have not been observed/verified.
-The netlist confirms design intent, not physical continuity or soldering.
-Consult the exact part's ST datasheet AF tables before generating code.
+The default `make` builds a **dry-run image**: every task runs and telemetry reports what
+would be commanded, but the PWM pins never leave GPIO-low. `make PWM=1` builds the image
+that can drive servos, and only after the Pi sends `HB`, `ARM` and `START`.
 
-Initial proposal: 115200 baud, 8N1; hardware PWM period 20 ms (50 Hz), 1 us counter
-resolution. Compute each timer clock from the verified RCC/APB/TIMPRE configuration,
-then PSC = timer_clock / 1 MHz - 1 and ARR = 19999 only when division is exact.
-For an illustrative timer input of 84 MHz, PSC would be 83. This is NOT a measured
-clock or a generated board configuration. TIM1 is on APB2 and TIM4 on APB1; do not
-assume their input clocks match PCLK. Respect the TIMPRE/APB rules in RM0368.
-Use CCR preload/latching, configure TIM1 output enable correctly, and verify both
-timers with an oscilloscope before connecting servos.
+## Tasks
 
-The 20 ms controller update is separate from PWM generation: tick jitter affects
-when the next setpoint is prepared, not pulse timing from a hardware timer. Measure
-execution time, deadlines, phase/latch latency and missed updates under UART load.
-Actual servo pulse endpoints, direction, deadband, velocity, acceleration and current
-limits require joint-by-joint bench calibration. Never use example 1000–2000 us from
-unit tests as mechanically verified endpoints.
+Hardware timers generate every pulse; tasks only decide the next pulse width. CMSIS-RTOS2
+priorities are passed straight to FreeRTOS (higher number = higher priority).
 
-Keep the dedicated servo supply; verify current capacity, fusing, polarity, noise and
-ground references. The carrier separates PGND/GND and joins at NT1; validate that
-design electrically rather than introducing an unintended second high-current return.
-No changes to Raspberry GPIO, overlays, display, ReSpeaker or drivers are required here.
+| Task | Priority | Activation | Stack (bytes) | Free stack seen* | Responsibility |
+| --- | --- | --- | --- | --- | --- |
+| USART2 IRQ | NVIC 6 | each byte | MSP | — | Timestamp RX bytes into the RX queue; UART errors and overflow become a resync marker; TXE drains the 1 KiB TX ring |
+| SafetyTask | High1 (41) | every 10 ms (absolute) | 1024 | 832 | Supervise ServoControlTask's beat (≤ 50 ms) → refresh IWDG or kill PWM; battery ADC at 10 Hz |
+| ServoControlTask | High (40) | 10 ms poll, 20 ms trajectory step | 1536 | 1188 | Only owner of controller state: state machine, freshness/barriers, HEAD_PAN FIR, damped trajectory, limits, pulses + output gate, snapshot |
+| CommunicationTask | AboveNormal (32) | RX queue, ≤ 64 bytes then yield | 1536 | 1092 | V2 parser; drops lines with lost/garbled bytes; 50 ms gap rule; latest-target mailbox per joint |
+| TxTask | Normal (24) | every 5 ms | 1536 | 820 | Only UART writer: `BOOT`, `ACK`/`NAK`, `TEL`, `DIAG`, whole lines only |
+| DiagnosticsTask | Low (8) | every 200 ms (absolute) | 1024 | 532 | Snapshot → telemetry (5 Hz), state LED, `DIAG` every 5 s |
 
-## Build and tests
+\* Smallest free stack reported by `V2,DIAG` from the ARM image running in QEMU while all
+three joints moved. TxTask was raised from 1024 to 1536 bytes after it showed only 252 bytes
+free. Heap (heap_4, 24 KiB): 12.8 KiB never used.
 
-Portable core, GCC/Clang-compatible C11 compiler on PATH:
+Resources (all allocated before the scheduler starts; allocation failure is fatal):
 
-    python stm32/tests/run_host_tests.py
+| Queue | Depth | Producer → consumer | Overflow behaviour |
+| --- | --- | --- | --- |
+| rx | 256 × 8 B | IRQ → CommunicationTask | Byte lost, next byte flagged, line discarded, `RX` fault if armed |
+| commands | 8 | CommunicationTask → ServoControlTask | `RX` fault |
+| targets | 3 × 1 | CommunicationTask → ServoControlTask | Overwritten: latest goal per joint wins |
+| replies | 8 | ServoControlTask → TxTask | Counted in `dropped` |
+| snapshot | 1 | ServoControlTask → DiagnosticsTask | Overwritten (latest value) |
+| telemetry, diag | 1 each | DiagnosticsTask → TxTask | Dropped, never blocks control |
 
-Windows PowerShell with a portable Zig C compiler, if installed:
+ServoControlTask thread flags: `INVALID_RX`, `SUPERVISE`, `BATTERY_LOW`, `BATTERY_OK`.
+No mutex is needed: the controller has a single owner and queues copy data.
 
-    $env:CC = 'C:/path/to/zig.exe cc'
-    python stm32/tests/run_host_tests.py
+## Safety layers
 
-These compile/run native host C tests: partial CRLF frames, invalid grammar,
-oversized/NUL input and recovery, latest setpoint, velocity/acceleration and bounds,
-state transitions, heartbeat loss and tick rollover, fault recovery and pulse conversion.
-A second executable compiles the actual motion_tasks.c adapter against minimal CMSIS
-test doubles and checks mailbox replacement, state-command barriers, stale goals, reply
-queues, copied snapshots and RX overflow. This is sequential control-flow testing, not
-a preemptive scheduler, genuine CMSIS kernel, IRQ/DMA, HAL or Black Pill validation.
-It does not prove interleavings, task timing or driver integration.
+1. **Controller FAULT** (ServoControlTask): 500 ms without `HB`, malformed/garbled frame,
+   stale command (> 100 ms), control overrun, trajectory limit or low battery. The first
+   reason latches and is reported in `TEL`. Policy is `RELEASE_OUTPUT`: on FAULT the pins
+   go low, so the servos get no pulses. This policy was chosen because the arms hang
+   down at rest and the pan axis carries no gravity load. `RESET` clears the fault;
+   `HB` + `ARM` + `START` re-arm.
+2. **SafetyTask kill**: if ServoControlTask stops beating for more than 50 ms, SafetyTask
+   forces the PWM pins low directly in the board layer. The kill is latched and does not
+   depend on the stuck task.
+3. **IWDG**: after a kill, or if SafetyTask itself or the scheduler stalls, nobody
+   refreshes the independent watchdog. The MCU resets after about 250 ms (LSI tolerance
+   170–470 ms) and boots with outputs disabled. `V2,BOOT,WATCHDOG,...` reports it.
+   Fatal paths (assert, stack overflow, malloc failure, HardFault, MemManage, BusFault,
+   UsageFault, NMI) also kill outputs first.
+4. **J3 servo switch**: the hardware cut of the 6 V rail stays the final authority.
 
-To repeat ARM application-object compilation with a real compiler and CMSIS headers:
+Battery (PA1, divider 122/22, filtered at 10 Hz): below 9.9 V (3.3 V/cell) for 1 s
+latches `BATTERY`, which refuses `ARM` until a pack reads above 11.0 V for 2 s.
+Readings below 5 V mean "no pack" (USB-only bench) and never inhibit.
+Bench note: MG996R servos usually go limp without pulses, but some "digital" variants
+hold their last position. Verify this on the real servos. The J3 switch is the reliable
+cut.
 
-    python stm32/tests/compile_arm_objects.py --cc C:/path/to/arm-none-eabi-gcc.exe --cmsis C:/path/to/CMSIS/RTOS2/Include
+**Enabling outputs:** `START` enables PWM at the last commanded position, which is
+neutral (1500 µs) after boot. The servos then move from wherever they physically are
+to neutral at their own speed. The assembly guide centres every servo at 1500 µs before
+the horn, arm or head goes on, so neutral is the assembled rest pose. Keep hands clear
+and the head facing forward before `START`. Pins switch between AF and GPIO only
+between pulses, so enabling or releasing never emits a runt pulse.
 
-On 2026-11-17 the five application translation units, including the adapter, compiled
-with the installed STM32CubeIDE GNU Tools for STM32 14.3.1 for Cortex-M4, with
--Wall -Wextra -Werror -pedantic. The generic cmsis_os2.h came from the installed
-STM32Cube_FW_H7_V1.13.0 package; no H7 HAL, startup or board configuration was used.
-That checks C/API declarations only: no FreeRTOS library or F401 image was linked.
-Native tests ran with TinyCC 0.9.27 i386 on Windows; that compiler lives only in ignored
-.local-tools/cuty-tcc32/tcc/tcc.exe. GCC/Clang is the recommended normal host test setup.
+## Wire protocol V2
 
-Web:
+115200 8N1, ASCII lines ending in LF (an optional CR before LF is accepted).
 
-    cd web
-    npm run build
-    npm run lint
-    npm test
-    npm run test:e2e
+Raspberry → STM32 (unchanged grammar, max 63 bytes):
 
-If port 5173 is occupied, PowerShell: $env:CUTY_TEST_PORT='5187' before the e2e command.
+| Record | Meaning |
+| --- | --- |
+| `V2,HB` | Refresh the heartbeat. Send ≥ 2 Hz (the bridge sends 10 Hz) |
+| `V2,ARM` | DISARMED → READY, needs a fresh heartbeat and no battery inhibit |
+| `V2,START` | READY → ACTIVE, enables outputs |
+| `V2,DISARM` | Inhibit outputs; FAULT stays latched |
+| `V2,RESET` | FAULT → DISARMED |
+| `V2,TARGET,<joint>,<milli>` | `HEAD_PAN`, `LEFT_ARM`, `RIGHT_ARM`; signed integer −1000..1000 = normalized −1..1 |
 
-The new component tests cover local stage progression/fault/reset, bilingual text and
-reduced motion. Browser checks cover the existing scene/expression/PCB/wiring flows
-plus the new section across desktop/tablet/mobile.
-All styles are scoped to .motion-control. The section is appended after the existing
-outro to preserve the existing chapter positions/3D shot order; the only navigation
-addition uses the current link style. No existing global palette, font, shot, animation,
-PCB or wiring component is restyled.
+STM32 → Raspberry (new):
 
-## Bringing this to an actual STM32
+| Record | Meaning |
+| --- | --- |
+| `V2,BOOT,<reset>,<HSE\|HSI>,<sysclk_hz>,<DRYRUN\|PWM>` | Once after reset. `reset` = POWER, PIN, WATCHDOG, SOFTWARE, BROWNOUT, OTHER |
+| `V2,ACK,<seq>,<cmd>[,<joint>]` / `V2,NAK,...` | Per valid frame; `seq` counts valid frames since boot |
+| `V2,TEL,<ms>,<state>,<reason>,<out>,<head>,<left>,<right>,<battery_mv>,<rx_errors>,<dropped>` | 5 Hz. Positions are commanded milli-units, not measured. `out` is the physical PWM gate. Reasons: NONE, INVALID, RX, STALE, HEARTBEAT, OVERRUN, LIMIT, BATTERY |
+| `V2,DIAG,<ms>,<com>,<srv>,<saf>,<dia>,<tx>,<heap_min>,<rx_ovf>,<tx_ovf>` | Every 5 s: free stack bytes per task, minimum free heap, overflow counters |
 
-1. Record chip marking, exact Black Pill revision, oscillator and power arrangement.
-   Confirm RAM/flash, package AF tables and the carrier schematic/physical pin continuity.
-2. Agree servo/joint mapping, sign, calibration, mechanical limits and risk-specific fault
-   policy. Define safe initial-pose acquisition and explicit physical arming.
-3. Generate a fresh CubeMX/STM32CubeIDE project for that exact MCU with compatible
-   FreeRTOS + CMSIS-RTOS2; set clocks/tick, NVIC syscall priorities, USART2 IRQ or DMA,
-   TIM4/TIM1, timer preloads and disabled initial output. Reserve HAL timebase separately
-   if needed. Version the .ioc and generated build configuration.
-4. Add portable modules and adapter with CUTY_RTOS_DRY_RUN=1 first. Build with the real
-   ARM toolchain and inspect link map, stack/heap and RTOS API compatibility. Do not
-   remove the dry-run guard until independent physical safety integration exists.
-5. Add bounded IRQ/DMA driver/resynchronization, validated TX protocol and a task-liveness
-   watchdog. Confirm timing with stress traffic, queue overflow, scheduler overruns,
-   power interruptions, boot/reset and heartbeat loss while outputs are disconnected.
-6. Measure PWM on a scope first; then one supported/unloaded joint with current-limited
-   supply and physical stop, then mechanical integration. Record actual results.
-   Only then design the opt-in Raspberry adapter; keep existing head follow in dry-run.
+Malformed lines while DISARMED only count `rx_errors`. A booting Pi that prints to the
+UART cannot latch a fault, but disable the Linux serial console on GPIO14/15 anyway
+(`raspi-config` → Interface → Serial: login shell **no**, hardware **yes**). The link has
+no CRC: a corrupted line that still parses would be accepted. This is acceptable on a
+short on-board trace; add a checksum before using longer cables.
 
-## Primary references
+Raspberry side: [`cuty.hardware.stm32_bridge`](../raspberry/src/cuty/hardware/stm32_bridge.py)
+parses every record, keeps the 10 Hz heartbeat and offers a bench console
+(`python -m cuty.hardware.stm32_bridge --port /dev/serial0`). `head_follow.py` stays in
+dry-run; connecting it to the bridge is a separate, reviewed step.
 
-- [ST STM32F401CC product and datasheet downloads](https://www.st.com/en/microcontrollers-microprocessors/stm32f401cc.html)
-- [ST RM0368 reference manual](https://www.st.com/resource/en/reference_manual/rm0368-stm32f401xbc-and-stm32f401xde-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
-- [ARM CMSIS-RTOS2 usage and ISR API restrictions](https://arm-software.github.io/CMSIS_6/latest/RTOS2/usingOS2.html)
-- [ARM CMSIS-RTOS2 threads, priorities and stack bytes](https://arm-software.github.io/CMSIS_6/latest/RTOS2/group__CMSIS__RTOS__ThreadMgmt.html)
-- [ARM CMSIS-FreeRTOS wrapper limitations](https://arm-software.github.io/CMSIS-FreeRTOS/v10.5.1/tech_data.html)
+## Timing measured in the simulator
 
-## File inventory for this addition
+From `make test-sim` (FreeRTOS POSIX port; its tick runs at about 0.9× wall clock, so
+wall-clock numbers are slightly pessimistic):
 
-New files:
+| Scenario | Result |
+| --- | --- |
+| Telemetry period (firmware clock) | exactly 200 ms |
+| `TARGET` → `ACK` | 2–12 ms |
+| HEAD_PAN 0 → 490 milli (FIR + damped trajectory, 0.8/s, 1.5/s²) | 3.3 s, monotonic, no overshoot |
+| Malformed frame while ACTIVE → PWM released | 7–10 ms |
+| Last `HB` → PWM released | 500–560 ms (500 ms timeout) |
+| 9.5 V pack → `FAULT,BATTERY` | 2.7 s (filter settling + 1 s) |
+| Stuck ServoControlTask → PWM killed | 65–75 ms (50 ms + safety period) |
+| Stuck ServoControlTask → watchdog reset | about 310 ms |
 
-- web/src/components/MotionControl.tsx — local interactive section.
-- web/src/components/motion-control.css — styles scoped to the new section.
-- web/src/data/motionControl.ts — bilingual tasks and illustrative stages.
-- web/src/components/MotionControl.test.tsx — component behavior tests.
-- web/e2e/motion-control.spec.ts — desktop/tablet/mobile checks.
-- stm32/App/rtos/motion_tasks.c and motion_tasks.h — dry-run CMSIS adapter.
-- stm32/tests/test_motion.c — portable logic tests.
-- stm32/tests/run_host_tests.py and compile_arm_objects.py — native execution (host compiler required) and ARM object build helpers.
-- stm32/App/control/fir_filter.c/.h — fixed-buffer FIR used only for HEAD_PAN.
-- raspberry/src/cuty/audio/speech_bandpass.py — optional PCM16 input filter, disabled by default.
-- raspberry/tests/test_speech_bandpass.py — host signal, format, and continuity tests.
-- web/src/components/DigitalSignalProcessing.tsx — bilingual, local calculation and plots.
-- web/e2e/digital-signal-processing.spec.ts — desktop/tablet/mobile coverage.
-- docs/digital-signal-processing-fir.md — DSP math, audio implementation, and A/B procedure.
-- stm32/tests/test_rtos.c and fakes/cmsis_os2.h — adapter tests with test doubles.
-- stm32/tests/run_host_tests.py — native compile/run entry point.
-- stm32/tests/compile_arm_objects.py — real ARM object-compilation entry point.
-- docs/freertos-motion-control.md — this architecture, status and bring-up guide.
+## Build, test and flash
 
-Reused the existing UART, body_control, safety and servo C/H files and the IMU header.
-Updated their README files, STM32/body-control/protocol/head-follow/roadmap documentation.
-App.tsx mounts the motion and DSP sections and integrates their navigation links.
-The DSP section uses scoped styles and local synthetic signals. No physical UART/PWM,
-servo output, PCB, wiring, model geometry, or Raspberry device/driver configuration
-was changed. The Raspberry change is limited to the optional microphone-input
-processor before provider send; the existing camera, playback, and music paths remain
-separate. Playwright can select a different port via CUTY_TEST_PORT.
+```bash
+cd stm32
+make                 # dry-run image: build/f401/cuty.{elf,bin,hex}
+make PWM=1           # servo-driving image: build/f401-pwm/
+make test            # host unit tests + FreeRTOS simulator scenario
+make test-qemu       # ARM image in QEMU over USART2
+make flash-dfu       # Black Pill USB DFU: hold BOOT0, tap NRST, release BOOT0
+```
+
+Toolchain: `arm-none-eabi-gcc` (the one inside STM32CubeIDE works; on Debian/Ubuntu
+`apt install gcc-arm-none-eabi libnewlib-arm-none-eabi`), plus `qemu-system-arm` for
+`test-qemu` and `dfu-util` for `flash-dfu`. STM32CubeProgrammer can also flash
+`cuty.bin` at 0x08000000 over DFU, as in the assembly guide. Size today: about 20 KiB
+flash, 30 KiB static RAM (including the 24 KiB FreeRTOS heap). Our sources build with
+`-Wall -Wextra -Werror -Wshadow -Wdouble-promotion`.
+
+Windows users without `make` can still run `python stm32/tests/run_host_tests.py` and
+`python stm32/tests/compile_arm_objects.py --cc ... --cmsis stm32/Drivers/CMSIS/RTOS2/Include`.
+
+## Bring-up on the real robot
+
+Do the steps in order and record the result of each.
+
+1. **Board check.** Read the chip marking (STM32F401CCU6), the Black Pill revision and the
+   25 MHz crystal. `V2,BOOT` reports `HSE` when the crystal and PLL started, `HSI`
+   otherwise.
+2. **Dry-run image, servos unpowered (J3 off).** Flash `make`. On the Pi:
+   `python -m cuty.hardware.stm32_bridge --port /dev/serial0`. Expect `BOOT` and `TEL`
+   at 5 Hz, then `arm`, `start` and `pan 0.5`. Telemetry should show HEAD_PAN rising to
+   500 with `out=0`. Check that the battery reading matches a multimeter at the XT60
+   within ±0.2 V.
+3. **Fault drills, still dry-run.** Quit the console (heartbeat stops): `FAULT,HEARTBEAT`.
+   Send a bad line: `FAULT,RX`. Pull the pack: telemetry battery drops to 0.
+4. **PWM on the scope, J3 still off.** Flash `make PWM=1`. Probe PB6/PB7/PB8:
+   nothing before `start`; then 50 Hz with a 1500 µs pulse; `pan 1` → 1900 µs; quit the
+   console → the pin goes low within 0.6 s with no short pulse.
+5. **One servo, no horn, J3 on.** HEAD_PAN only. Check direction and smoothness, and
+   whether the servo goes limp on FAULT.
+6. **Calibration.** In `stm32/App/servos/calibration.h`, adjust `min_us`/`max_us`/`reversed`
+   per joint until ±1 matches the safe mechanical range. Keep the midpoint at the
+   assembly centre (1500 µs) unless the mechanism was assembled off-centre.
+7. **Full robot.** Head facing forward and arms hanging, then `arm` and `start`. Small
+   targets first.
+
+## Design references
+
+- [ST RM0368 reference manual (STM32F401)](https://www.st.com/resource/en/reference_manual/rm0368-stm32f401xbc-and-stm32f401xde-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
+- [FreeRTOS on Cortex-M: interrupt priorities](https://www.freertos.org/RTOS-Cortex-M3-M4.html)
+- [ARM CMSIS-RTOS2 API](https://arm-software.github.io/CMSIS_6/latest/RTOS2/index.html)
+
+The interactive FreeRTOS section on the website remains an educational visualization; it
+is not connected to the firmware or to live telemetry.
+
+## Web and DSP checks (unchanged)
+
+```bash
+cd web && npm run build && npm run lint && npm test && npm run test:e2e
+```
+
+If port 5173 is busy, set `CUTY_TEST_PORT` first. The HEAD_PAN FIR and the speech
+band-pass are documented in [digital-signal-processing-fir.md](digital-signal-processing-fir.md).
