@@ -55,7 +55,12 @@ def _env_flag(name: str, default: bool) -> bool:
 
 
 class FaceTracker:
-    """Keeps the most recent target; safe to read from the render thread."""
+    """Detecta y suaviza caras; comparte la coordenada con el visor y el seguimiento PAN.
+
+    Dry-run no toca UART. El hardware requiere un adaptador físico implementado
+    e inyectado por quien integra la aplicación, además de una habilitación
+    explícita; el render de ojos permanece independiente.
+    """
 
     def __init__(self, camera_factory: Callable[[], Camera] = open_camera,
                  detector_factory: Callable[[], object] = create_detector,
@@ -110,6 +115,7 @@ class FaceTracker:
         return (1.0 - x if self.mirror else x), y
 
     def process(self, detections: list, frame_w: int, frame_h: int, now: float) -> FaceTarget | None:
+        """Selecciona una detección, la suaviza a coordenadas 0..1 y actualiza PAN."""
         boxes = [d if isinstance(d, Detection) else Detection(*d) for d in detections]
         with self._lock:
             previous = self._target
@@ -134,6 +140,7 @@ class FaceTracker:
         return target
 
     def _update_follow(self, target: FaceTarget | None, now: float) -> None:
+        """Pasa la detección al PID sin alterar el pipeline de render de pantalla."""
         if self.follow is None:
             return
         state = self.follow.update(target, now)
@@ -149,7 +156,7 @@ class FaceTracker:
             )
 
     def set_head_follow_enabled(self, enabled: bool) -> bool:
-        """Internal toggle for simulation; no physical servo path exists."""
+        """Habilita el controlador disponible; el adaptador físico debe inyectarse por separado."""
         if self.follow is None:
             return False
         self.follow.set_enabled(enabled)

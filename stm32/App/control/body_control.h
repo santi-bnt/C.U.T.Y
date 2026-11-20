@@ -10,12 +10,12 @@ typedef struct {
     CutySafety safety; CutyLimits limits[CUTY_AXES]; CutyAxis axes[CUTY_AXES];
     CutyFirFilter head_pan_fir; bool head_pan_fir_enabled; uint32_t steps;
 } CutyController;
-/* Single owner: all calls serialized by ServoControlTask. No physical PWM here. */
+/* Propietario único: ServoControlTask serializa estas llamadas; este módulo no genera PWM. */
 bool cuty_control_init(CutyController *c, const CutyLimits limits[CUTY_AXES], uint32_t timeout_ms, CutyLossPolicy policy);
 bool cuty_control_command(CutyController *c, const CutyCommand *cmd, uint32_t now);
 void cuty_control_invalid(CutyController *c);
 void cuty_control_tick(CutyController *c, uint32_t now, float dt);
 bool cuty_control_output_requested(const CutyController *c);
-/* A/B switch is serialized with control ticks; enabling seeds history to avoid a reference step. */
+/* Cambio A/B serializado con los ticks; activar FIR siembra el historial para evitar un salto. */
 bool cuty_control_set_head_fir(CutyController *c, bool enabled);
 #endif

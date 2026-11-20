@@ -1,9 +1,11 @@
-"""Safe, local face-to-head follow controller.
+"""Seguimiento PAN facial con salida separada del control visual.
 
-Only a normalized PAN simulation is implemented.  The repository has no
-Raspberry/STM32 UART protocol, servo firmware, calibrated directions, or
-verified physical travel/rate limits, so a hardware adapter is deliberately
-not provided.
+FaceTracker entrega una coordenada horizontal normalizada; el PID calcula una
+velocidad y este controlador integra una posición limitada. El adaptador recibe
+esa velocidad y, para hardware, debe convertirla en objetivos STM32, nunca PWM
+desde Raspberry. Dry-run es la opción por defecto; el adaptador físico debe
+gestionar UART, armado y calibración. Este módulo no incluye una implementación
+UART física lista para conectar.
 """
 
 from __future__ import annotations
@@ -143,6 +145,7 @@ class _PID:
         self.filtered_derivative = 0.0
 
     def update(self, error: float, dt: float) -> float:
+        """Calcula la corrección PID, limita salida y evita acumulación integral al saturar."""
         if abs(error) <= self.deadband:
             error = 0.0
         derivative = 0.0
@@ -152,6 +155,7 @@ class _PID:
             self.filtered_derivative += a * (derivative - self.filtered_derivative)
         self.previous_error = error
 
+        # PID discreto: I integra error·segundos; acepta la integral solo si no satura o ayuda a salir de saturación.
         candidate_integral = self.integral + error * dt
         unconstrained = self.kp * error + self.ki * candidate_integral + self.kd * self.filtered_derivative
         output = max(-self.output_limit, min(self.output_limit, unconstrained))
@@ -166,7 +170,7 @@ class _PID:
 
 
 class FaceFollowController:
-    """One PAN-only, dry-run controller consuming the existing FaceTracker output."""
+    """Controla solo PAN desde FaceTracker; el error vertical no activa un eje TILT."""
 
     def __init__(self, config: FaceFollowConfig, adapter: HeadAdapter | None = None,
                  clock=time.monotonic) -> None:
@@ -190,7 +194,7 @@ class FaceFollowController:
         self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0, 0.0, "disabled")
 
     def set_enabled(self, enabled: bool) -> None:
-        """Internal enable/disable; disable is an immediate command stop."""
+        """Activa seguimiento o detiene la salida; el modo físico requiere opt-in y armado."""
         with self._lock:
             if enabled and getattr(self.adapter, "is_physical", False):
                 if not self.adapter.arm():
@@ -211,6 +215,7 @@ class FaceFollowController:
         now = self._clock() if now is None else now
         if not self._enabled:
             return self.status
+        # Una detección ausente o vencida detiene la salida y desarma adaptadores compatibles.
         if target is None or now - target.timestamp >= self.config.lost_timeout:
             self._lose_target()
             return self.status
@@ -227,6 +232,7 @@ class FaceFollowController:
             self._filtered_x += a * (target.x - self._filtered_x)
             self._filtered_y += a * (target.y - self._filtered_y)
         self._last_target_time = target.timestamp
+        # El centro de imagen es 0.5; Y queda en estado/telemetría y no mueve un eje reservado.
         x_error = self._filtered_x - 0.5
         y_error = self._filtered_y - 0.5
 
@@ -257,6 +263,7 @@ class FaceFollowController:
                 self._position == self.config.min_position and self._velocity < 0
             ):
                 self._velocity = 0.0
+        # La Raspberry entrega velocidad normalizada; la trayectoria física corresponde al STM32.
         self.adapter.set_pan_velocity(self._velocity)
         self.status = FollowStatus(True, True, x_error, y_error, output, self._velocity,
                                    self._position, "dry-run PAN; vertical error is telemetry only")

@@ -18,11 +18,14 @@ except ImportError:  # host-side tests on Windows; Raspberry Pi uses flock
 
 
 class STM32Bridge:
+    """Propietario exclusivo de un UART; no arma el controlador al abrirlo."""
+
     def __init__(self, port: str, baudrate: int = 115200, serial_factory: Any = None):
         self.port = port
         self._rx_buffer = bytearray()
         self.events = []
         self._lock_file = None
+        # El lock se toma antes de abrir pyserial para evitar dos propietarios simultáneos.
         try:
             lock_path = Path("/run/lock") / ("cuty-stm32-" + Path(port).name.replace("/", "_") + ".lock")
             self._lock_file = open(lock_path, "w")
@@ -55,6 +58,7 @@ class STM32Bridge:
             self._lock_file = None
 
     def close(self) -> None:
+        """Intenta DISARM antes de cerrar; si el enlace cayó, el STM32 aplica su timeout."""
         try:
             try:
                 self.exchange(command("V2,DISARM"), timeout=0.25)
@@ -65,6 +69,7 @@ class STM32Bridge:
             self._release_lock()
 
     def exchange(self, wire: bytes, timeout: float = 1.0) -> str:
+        """Envía una línea y espera ACK/NACK, guardando STATE/TELEM asíncronos."""
         try:
             self.serial.write(wire)
             self.serial.flush()
@@ -78,6 +83,7 @@ class STM32Bridge:
                         self._rx_buffer = bytearray(remaining)
                         line = raw.decode("ascii", errors="replace").strip()
                         parsed = parse_response(line)
+                        # STATE/TELEM pueden llegar antes de ACK; se conservan y se sigue leyendo.
                         if parsed.kind in {"ACK", "NACK"}:
                             return line
                         self.events.append(parsed)
@@ -86,6 +92,7 @@ class STM32Bridge:
             raise ConnectionError(f"UART {self.port}: {exc}") from exc
 
     def heartbeat(self, interval: float = 0.25, count: int = 1) -> None:
+        """Envía HB a intervalos menores que el timeout del controlador."""
         for _ in range(count):
             print(self.exchange(command("V2,HB")))
             if count > 1:

@@ -2,13 +2,16 @@
 #include <math.h>
 #include <string.h>
 static float bounded(float x, float lo, float hi) { return fminf(hi, fmaxf(lo, x)); }
+/* Promedio móvil de cinco muestras: solo suaviza HEAD_PAN, no los brazos. */
 static const float head_pan_coefficients[5] = {0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 static void freeze(CutyController *c) {
+    /* Congela la consigna lógica y velocidad; no corta por sí solo PWM ni potencia. */
     for (unsigned i=0; i<CUTY_AXES; ++i) {
         c->axes[i].target=c->axes[i].commanded; c->axes[i].velocity=0;
     }
 }
 bool cuty_control_init(CutyController *c, const CutyLimits limits[CUTY_AXES], uint32_t timeout, CutyLossPolicy policy) {
+    /* Valida límites y timeout antes de habilitar comandos; los ejes parten en DISARMED y en cero lógico. */
     memset(c,0,sizeof(*c)); c->safety.state=CUTY_DISARMED;
     if (!timeout || timeout>60000 || (policy!=CUTY_FREEZE_COMMAND && policy!=CUTY_RELEASE_OUTPUT)) return false;
     for (unsigned i=0; i<CUTY_AXES; ++i) {
@@ -25,6 +28,7 @@ bool cuty_control_init(CutyController *c, const CutyLimits limits[CUTY_AXES], ui
 bool cuty_control_set_head_fir(CutyController *c, bool enabled) {
     if (!c) return false;
     if (c->head_pan_fir_enabled != enabled) {
+        /* Sembrar el historial con el objetivo actual evita un salto al cambiar el filtro. */
         cuty_fir_reset(&c->head_pan_fir, c->axes[CUTY_HEAD_PAN].target);
         c->head_pan_fir_enabled = enabled;
     }
@@ -39,6 +43,7 @@ void cuty_control_invalid(CutyController *c) {
 bool cuty_control_command(CutyController *c, const CutyCommand *cmd, uint32_t now) {
     CutySafety *s=&c->safety; cuty_safety_check(s,now);
     switch(cmd->kind) {
+    /* ARM y START son pasos separados: START requiere READY y heartbeat vigente. */
     case CUTY_HEARTBEAT: s->heartbeat_seen=true; s->last_heartbeat_ms=now; return true;
     case CUTY_DISARM:
         if (s->state!=CUTY_FAULT) s->state=CUTY_DISARMED;
@@ -66,6 +71,7 @@ void cuty_control_tick(CutyController *c, uint32_t now, float dt) {
         cuty_fir_reset(&c->head_pan_fir, c->axes[CUTY_HEAD_PAN].commanded);
         freeze(c); return;
     }
+    /* Un intervalo no acotado invalida las derivadas discretas y lleva el control a FAULT. */
     if (!isfinite(dt)||dt<=0||dt>0.04f) { cuty_control_invalid(c); return; }
     for (unsigned i=0; i<CUTY_AXES; ++i) {
         CutyAxis *a=&c->axes[i]; CutyLimits l=c->limits[i];
@@ -77,7 +83,7 @@ void cuty_control_tick(CutyController *c, uint32_t now, float dt) {
             a->filtered_target = bounded(filtered, l.minimum, l.maximum);
         }
         float goal = (i == CUTY_HEAD_PAN && c->head_pan_fir_enabled) ? a->filtered_target : a->target;
-        /* Damped setpoint filter; no measured-position feedback or IMU PID. */
+        /* Filtro amortiguado en unidades normalizadas; dt está en segundos y no hay realimentación ni PID de IMU. */
         float acc=bounded(4*(goal-a->commanded)-4*a->velocity,-l.max_acceleration,l.max_acceleration);
         float v=bounded(a->velocity+acc*dt,-l.max_velocity,l.max_velocity);
         float p=a->commanded+v*dt;

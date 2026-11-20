@@ -1,5 +1,7 @@
 #include "uart_protocol.h"
 #include <string.h>
+
+/* Acepta únicamente V2: ASCII, hasta 63 bytes útiles y posiciones enteras entre -1000 y 1000. */
 bool cuty_parse_line(const char *s, CutyCommand *out) {
     static const char *names[] = {"V2,HB", "V2,ARM", "V2,START", "V2,DISARM", "V2,RESET"};
     if (!s || !out) return false;
@@ -18,6 +20,7 @@ bool cuty_parse_line(const char *s, CutyCommand *out) {
         }
     }
     if (axis == CUTY_AXES) return false;
+    /* El valor del cable está en milésimas; el controlador trabaja en unidades normalizadas. */
     bool negative = *s == '-'; if (negative) ++s;
     int value = 0; unsigned digits = 0;
     while (*s >= '0' && *s <= '9') {
@@ -38,6 +41,7 @@ CutyRxResult cuty_rx_byte(CutyParser *p, uint8_t byte, CutyCommand *out) {
         p->used = 0; p->dropping = false;
         return valid ? CUTY_RX_COMMAND : CUTY_RX_ERROR;
     }
+    /* Tras NUL, no ASCII o exceso de longitud, descarta todo el resto hasta LF para resincronizar. */
     if (p->dropping) return CUTY_RX_NONE;
     if (!byte || byte > 127 || p->used >= CUTY_LINE_CAPACITY-1) { p->dropping = true; return CUTY_RX_NONE; }
     p->line[p->used++] = (char)byte; return CUTY_RX_NONE;

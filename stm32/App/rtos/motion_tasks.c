@@ -4,8 +4,10 @@
 #include <string.h>
 #define INVALID_RX 1U
 #define SUPERVISE 2U
+/* Cada byte conserva su tiempo de recepción para rechazar mensajes que llegan tarde a la tarea. */
 typedef struct { CutyCommand command; uint32_t received_ms, sequence; } Envelope;
 typedef struct { uint8_t byte; uint32_t received_ms; } RxByte;
+/* CommunicationTask produce; ServoControlTask consume. Los buzones de eje guardan solo el objetivo más reciente. */
 static osMessageQueueId_t rx, commands, targets[CUTY_AXES], snapshots, replies, telemetry, frame_errors;
 static osThreadId_t communication, servo, safety, diagnostics;
 static CutyController controller;
@@ -20,6 +22,7 @@ static volatile uint32_t control_progress;
 bool cuty_uart_rx_isr(uint8_t byte) {
     if (!created) return false;
     RxByte item = {byte, osKernelGetTickCount()};
+    /* En ISR solo se copia un byte con timeout cero; la prioridad NVIC debe permitir llamadas al RTOS. */
     if (osMessageQueuePut(rx, &item, 0, 0) == osOK) return true;
     osThreadFlagsSet(servo, INVALID_RX); return false;
 }
@@ -34,6 +37,7 @@ static void communication_task(void *unused) {
     for (;;) {
         RxByte item;
         if (osMessageQueueGet(rx, &item, 0, osWaitForever) != osOK) continue;
+        /* Limita el lote para que un flujo continuo no monopolice la CPU. */
         for (unsigned batch=0; batch<64; ++batch) {
             Envelope e = {0};
             CutyRxResult result = cuty_rx_byte(&parser, item.byte, &e.command);
@@ -47,7 +51,7 @@ static void communication_task(void *unused) {
                 osStatus_t status;
                 if (e.command.kind == CUTY_TARGET) {
                     Envelope old;
-                    /* One producer; consumer may empty it between Get and Put. */
+                    /* Un productor reemplaza el objetivo viejo; así no se acumulan consignas mientras ServoControlTask ejecuta. */
                     osMessageQueueGet(targets[e.command.axis],&old,0,0);
                     status=osMessageQueuePut(targets[e.command.axis],&e,0,0);
                 } else status=osMessageQueuePut(commands,&e,0,0);
@@ -66,9 +70,11 @@ static void servo_task(void *unused) {
         uint32_t now=osKernelGetTickCount();
         ++control_progress;
         uint32_t flags=osThreadFlagsClear(INVALID_RX|SUPERVISE);
+        /* ServoControlTask es el único propietario del controlador y aplica fallos de RX aquí. */
         if (!(flags & osFlagsError) && (flags & INVALID_RX)) { cuty_control_invalid(&controller); ++rx_errors; }
         Envelope e;
         for (unsigned n=0; n<8 && osMessageQueueGet(commands,&e,0,0)==osOK; ++n) {
+            /* Un comando no debe actuar si la cola lo retuvo más de 100 ms. */
             bool fresh=(uint32_t)(now-e.received_ms)<=100;
             bool accepted=false;
             if (fresh) accepted=cuty_control_command(&controller,&e.command,e.received_ms);
@@ -79,12 +85,13 @@ static void servo_task(void *unused) {
                 if (output_enable(true,ready,ready)) output_live=true;
                 else { cuty_control_invalid(&controller); accepted=false; }
             }
-            /* Targets received before a state-changing command are obsolete. */
+            /* La barrera invalida objetivos encolados antes del último ARM/START/DISARM/RESET. */
             if (e.command.kind!=CUTY_HEARTBEAT) barrier=e.sequence;
             CutyReply reply={e.sequence,accepted,controller.safety.state};
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
         }
         cuty_safety_check(&controller.safety,now);
+        /* Una salida física solo puede habilitarse con un driver enlazado y START aceptado. */
         if (controller.safety.state != CUTY_ACTIVE) {
             if (output_live && output_disable) output_disable();
             output_live = false;
@@ -135,6 +142,7 @@ static void safety_task(void *unused) {
         if (control_progress != observed) { observed=control_progress; stalled_ms=0; }
         else if (stalled_ms < 100U) stalled_ms += 10U;
         if (stalled_ms < 100U && watchdog_refresh) watchdog_refresh();
+        /* Si el controlador deja de progresar, deshabilita señales y deja vencer el IWDG. */
         if (stalled_ms >= 100U) {
             if (output_disable) output_disable();
             output_live = false;
@@ -151,12 +159,13 @@ static void diagnostics_task(void *unused) {
     for (;;) {
         CutySnapshot snapshot;
         if (osMessageQueueGet(snapshots,&snapshot,0,0)==osOK)
-            osMessageQueuePut(telemetry,&snapshot,0,0); /* drop, never block control */
+            osMessageQueuePut(telemetry,&snapshot,0,0); /* Descarta si TX se atrasa; nunca bloquea el control. */
         osDelay(200);
     }
 }
 bool cuty_rtos_set_output_driver(CutyOutputEnable enable, CutyOutputDisable disable,
                                  CutyOutputSet set) {
+    /* Un driver parcial sería ambiguo: exige enable/disable/set juntos antes de crear las tareas. */
     if (created || ((enable || disable || set) && !(enable && disable && set))) return false;
     output_enable=enable; output_disable=disable; output_set=set;
     return true;
@@ -184,6 +193,7 @@ bool cuty_rtos_create(void) {
     replies=osMessageQueueNew(8,sizeof(CutyReply),0);
     telemetry=osMessageQueueNew(1,sizeof(CutySnapshot),0);
     frame_errors=osMessageQueueNew(4,sizeof(uint8_t),0);
+    /* Un fallo de reserva impide arrancar el scheduler con colas o tareas incompletas. */
     if (!rx||!commands||!snapshots||!replies||!telemetry||!frame_errors) return false;
     const osThreadAttr_t ca={.name="CommunicationTask",.stack_size=1536,.priority=osPriorityAboveNormal};
     const osThreadAttr_t va={.name="ServoControlTask",.stack_size=1536,.priority=osPriorityHigh};

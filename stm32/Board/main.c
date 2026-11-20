@@ -19,6 +19,7 @@ static void SystemClock_Config(void) {
     osc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
     osc.PLL.PLLState = RCC_PLL_ON;
     osc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+    /* HSI 16 MHz / 16 * 336 / 4 = 84 MHz; APB1 queda a 42 MHz. */
     osc.PLL.PLLM = 16U;
     osc.PLL.PLLN = 336U;
     osc.PLL.PLLP = RCC_PLLP_DIV4;
@@ -51,7 +52,7 @@ int main(void) {
 #if CUTY_PHYSICAL_OUTPUT_ENABLE
     if (!cuty_rtos_set_output_driver(output_enable, output_disable, output_set)) Error_Handler();
 #else
-    /* Stage default: no controller-to-timer callback exists. */
+    /* Por defecto no se enlaza el controlador con TIM4; START solo prueba estados. */
     (void)output_enable; (void)output_disable; (void)output_set;
 #endif
     if (!cuty_rtos_create()) Error_Handler();

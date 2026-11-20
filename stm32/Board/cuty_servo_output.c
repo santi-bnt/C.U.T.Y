@@ -30,6 +30,7 @@ bool cuty_servo_output_init(TIM_HandleTypeDef *timer,
     initialized = false;
     if (timer == NULL || calibration == NULL || timer->Instance != TIM4 ||
         timer->Init.Prescaler != 83U || timer->Init.Period != 19999U) return false;
+    /* Una calibración inválida mantiene el eje bloqueado sin impedir UART de diagnóstico. */
     for (unsigned i = 0; i < 3; ++i) {
         const CutyServoCalibration *c = &calibration[i];
         if (!c->calibration_valid) continue;
@@ -43,6 +44,7 @@ bool cuty_servo_output_init(TIM_HandleTypeDef *timer,
     /* Configure compares at center, but do not start timer output channels. */
     __HAL_RCC_GPIOB_CLK_ENABLE();
     pins_safe_low();
+    /* CCR queda preparado, pero HAL_TIM_PWM_Start no se llama durante el arranque. */
     for (unsigned i = 0; i < 3; ++i)
         __HAL_TIM_SET_COMPARE(timer, channels[i], cal[i].calibration_valid ? cal[i].center_us : 0U);
     initialized = true;
@@ -52,6 +54,7 @@ bool cuty_servo_output_init(TIM_HandleTypeDef *timer,
 bool cuty_servo_output_enable(bool explicit_arm, bool heartbeat_fresh,
                               bool safety_ready) {
     if (!initialized || !explicit_arm || !heartbeat_fresh || !safety_ready) return false;
+/* El interruptor de compilación y la calibración por eje son dos barreras separadas. */
 #if !CUTY_PHYSICAL_OUTPUT_ENABLE
     return false;
 #else
@@ -78,6 +81,7 @@ void cuty_servo_output_disable(void) {
     enabled = false;
     if (servo_timer == NULL) return;
     for (unsigned i = 0; i < 3; ++i) (void)HAL_TIM_PWM_Stop(servo_timer, channels[i]);
+    /* Detener PWM quita la señal; no corta el riel de 6 V ni garantiza torque cero. */
     pins_safe_low();
 }
 

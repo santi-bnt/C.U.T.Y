@@ -10,7 +10,11 @@ class Axis(str, Enum):
 
 
 def command(line: str) -> bytes:
-    """Validate a V2 command and return its LF terminated wire representation."""
+    """Valida un registro V2 y lo serializa con terminador LF.
+
+    `line` no debe incluir CR/LF. Lanza `ValueError` para comandos legacy,
+    campos extra, ejes reservados o posiciones fuera de -1000..1000.
+    """
     if not isinstance(line, str) or "\n" in line or "\r" in line:
         raise ValueError("command must be one line without terminator")
     allowed = {"V2,HB", "V2,ARM", "V2,START", "V2,DISARM", "V2,RESET"}
@@ -26,6 +30,7 @@ def command(line: str) -> bytes:
 
 
 def target(axis: Axis | str, milli_units: int) -> bytes:
+    """Construye una consigna V2 en milésimas de unidad normalizada."""
     if isinstance(milli_units, bool) or int(milli_units) != milli_units:
         raise ValueError("target must be an integer number of milli-units")
     return command(f"V2,TARGET,{Axis(axis).value},{int(milli_units)}")
@@ -46,6 +51,7 @@ class Response:
 
 
 def parse_response(line: str) -> Response:
+    """Comprueba el prefijo y tipo de respuesta antes de exponer sus campos."""
     fields = line.strip().split(",")
     if len(fields) < 3 or fields[0] != "V2" or fields[1] not in {"ACK", "NACK", "STATE", "TELEM"}:
         raise ValueError(f"invalid V2 response: {line!r}")
