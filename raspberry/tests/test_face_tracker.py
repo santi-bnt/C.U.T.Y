@@ -92,7 +92,7 @@ def test_runtime_follow_toggle_is_available_but_inert_by_default(monkeypatch):
     assert tr.set_head_follow_enabled(True)
     assert tr.head_follow_status.enabled
     assert tr.set_head_follow_enabled(False)
-    assert tr.head_follow_status.reason == "manual stop"
+    assert tr.head_follow_status.reason == "simulation disabled"
 
 
 def test_rotation():

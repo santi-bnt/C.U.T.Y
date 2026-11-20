@@ -70,7 +70,7 @@ def test_invalid_dt_stops_output_without_dividing_by_zero():
     adapter = SimulatedHeadAdapter()
     c = primed(config(detection_alpha=1.0, kp=1.0, kd=1.0), adapter=adapter)
     state = c.update(target(x=.9, timestamp=0.0), now=0.0)
-    assert state.reason == "invalid dt; output stopped"
+    assert state.reason == "dry-run PAN; invalid dt; output stopped"
     assert state.velocity == 0 and adapter.velocity == 0
 
 
@@ -106,7 +106,7 @@ def test_manual_disable_is_immediate_and_cannot_be_overridden_by_detections():
     c.set_enabled(False)
     commands = adapter.commands
     assert adapter.velocity == 0
-    assert c.update(target(x=0.0, timestamp=.2), now=.2).reason == "manual stop"
+    assert c.update(target(x=0.0, timestamp=.2), now=.2).reason == "simulation disabled"
     assert adapter.commands == commands
 
 
@@ -164,9 +164,26 @@ def test_physical_mode_stays_disarmed_when_adapter_rejects_arm():
     assert controller.status.reason == "physical adapter available; disarmed"
 
 
+def test_physical_mode_disarms_if_no_face_is_available_after_arm():
+    physical_config = replace(FaceFollowConfig(), dry_run=False, physical_adapter_enabled=True)
+    adapter = PhysicalHeadAdapter()
+    controller = FaceFollowController(physical_config, adapter=adapter)
+    controller.set_enabled(True)
+    waiting = controller.update(None, now=0.0)
+    assert not adapter.is_armed
+    assert not waiting.enabled
+    assert waiting.reason == "physical adapter available; disarmed"
+
+
 def test_default_is_disabled_and_dry_run():
     c = FaceFollowConfig()
     assert not c.enabled and c.dry_run and c.ki == 0
+    controller = FaceFollowController(c)
+    assert controller.status.reason == "simulation disabled"
+    controller.set_enabled(True)
+    assert controller.status.reason == "dry-run PAN; waiting for face"
+    active = controller.update(target(x=.7, timestamp=0.0), now=0.0)
+    assert active.reason == "dry-run PAN; vertical error is telemetry only"
 
 
 def test_follow_controller_does_not_override_voice_or_music_robot_states():

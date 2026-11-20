@@ -179,6 +179,12 @@ class FaceFollowController:
             raise FollowConfigurationError("Physical follow requires explicit opt-in and a physical adapter")
         if config.dry_run and physical_adapter:
             raise FollowConfigurationError("A physical adapter cannot run under dry-run configuration")
+        if physical_adapter and (
+            not callable(getattr(adapter, "arm", None)) or
+            not callable(getattr(adapter, "stop", None)) or
+            not isinstance(getattr(adapter, "is_armed", None), bool)
+        ):
+            raise FollowConfigurationError("Physical adapter must expose arm(), stop(), and boolean is_armed")
         self.config = config
         self.adapter = adapter or SimulatedHeadAdapter()
         self._clock = clock
@@ -191,6 +197,7 @@ class FaceFollowController:
         self._filtered_y: float | None = None
         self._velocity = 0.0
         self._position = 0.0
+        # El adaptador es quien valida calibración, heartbeat y ACK de ARM/START antes de publicar is_armed=True.
         self.status = FollowStatus(
             self._enabled, False, None, None, 0.0, 0.0, 0.0,
             self._mode_reason(tracking=False),
@@ -219,6 +226,11 @@ class FaceFollowController:
             if enabled and self._has_physical_adapter():
                 arm_adapter = getattr(self.adapter, "arm", None)
                 if not callable(arm_adapter) or not arm_adapter() or not self._physical_adapter_is_armed():
+                    self._stop_adapter(disarm=True)
+                    self._enabled = False
+                    self._velocity = 0.0
+                    self.status = FollowStatus(False, False, None, None, 0.0, 0.0,
+                                               self._position, self._mode_reason(tracking=False))
                     raise FollowConfigurationError("STM32 did not accept explicit ARM/START")
             self._enabled = bool(enabled)
             self._velocity = 0.0
@@ -228,7 +240,7 @@ class FaceFollowController:
             self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
                                        self._position, self._mode_reason(tracking=False)
                                        if self._has_physical_adapter() else
-                                       ("waiting" if enabled else "manual stop"))
+                                       ("dry-run PAN; waiting for face" if enabled else "simulation disabled"))
 
     def update(self, target, now: float | None = None) -> FollowStatus:
         with self._lock:
@@ -282,7 +294,7 @@ class FaceFollowController:
                 self._enabled = False
                 reason = self._mode_reason(tracking=False)
             else:
-                reason = "invalid dt; output stopped"
+                reason = "dry-run PAN; invalid dt; output stopped"
             self.status = FollowStatus(self._enabled, False, x_error, y_error, 0.0, 0.0,
                                        self._position, reason)
             return self.status
@@ -311,7 +323,7 @@ class FaceFollowController:
         self._pid.reset_derivative()
         self._last_time = None
         self._filtered_x = self._filtered_y = None
-        if was_tracking:
+        if was_tracking or self._has_physical_adapter():
             self._stop_adapter(disarm=True)
         if self._has_physical_adapter():
             # Para reanudar tras perder la cara, exige otra acción explícita de armado.
@@ -319,6 +331,10 @@ class FaceFollowController:
         if reason is None:
             reason = ("physical adapter available; disarmed" if self._has_physical_adapter()
                       else "face lost; holding simulated position")
+        elif self._has_physical_adapter():
+            reason = f"physical adapter available; disarmed ({reason})"
+        else:
+            reason = f"dry-run PAN; {reason}"
         self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
                                    self._position, reason)
 
