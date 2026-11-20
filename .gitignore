@@ -19,3 +19,6 @@ cuty_touch_calibration.json
 raspberry/.pytest-temp-dsp/
 .mypy_cache/
 *.egg-info/
+
+# STM32 firmware build output
+stm32/build/

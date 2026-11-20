@@ -1,11 +1,30 @@
-# C.U.T.Y STM32F401 Firmware
+# C.U.T.Y STM32F401 firmware
 
-Owns real-time physical control: PWM, servo motion, head PAN, left arm and right arm, future IMU acquisition, and safety limits. J10 and J11 are reserved; physical control remains unvalidated.
+FreeRTOS firmware for the STM32F401CC Black Pill on the [carrier PCB v1.1](../hardware/electronics/kicad/cuty_carrier/README.md).
+It receives high-level goals from the Raspberry Pi over USART2 and owns trajectories,
+limits, PWM and safety for HEAD_PAN (J7), LEFT_ARM (J8) and RIGHT_ARM (J9). J10 and J11
+are reserved and held low.
 
-The current control hardware is an **STM32F401 Black Pill**, also targeted by the [carrier PCB v1.1](../hardware/electronics/kicad/cuty_carrier/README.md). Confirm the exact MCU suffix and board revision before generating firmware.
+![FreeRTOS task architecture](../docs/assets/freertos-firmware-architecture.svg)
 
-`Core/` and `Drivers/` are reserved for the STM32F401 board-specific CubeMX/startup and CMSIS/HAL project. No generated HAL, clock configuration or firmware build system is supplied yet. The carrier's UART/PWM/ADC pin assignments document the PCB design; firmware initialization and physical validation remain pending.
+```bash
+make            # dry-run image (PWM pins never enabled): build/f401/cuty.bin
+make PWM=1      # image that drives the servos after HB + ARM + START
+make test       # host unit tests + FreeRTOS simulator scenario
+make test-qemu  # boot the ARM image in QEMU and talk to it over USART2
+make flash-dfu  # Black Pill DFU: hold BOOT0, tap NRST, release BOOT0
+```
 
-`App/` includes portable C parsing, the HEAD_PAN five-tap FIR and trajectory, limits, heartbeat/state logic and pulse conversion, plus an initial dry-run CMSIS-RTOS2 adapter in `App/rtos/`. The FIR is software logic only; board UART/PWM drivers and a flashable STM32 image do not exist. IMU is an interface only and PID remains a placeholder. See [FIR DSP](../docs/digital-signal-processing-fir.md) and [FreeRTOS architecture, status and tests](../docs/freertos-motion-control.md).
+Architecture, protocol, safety layers, measured timings and the step-by-step bring-up
+are in [docs/freertos-motion-control.md](../docs/freertos-motion-control.md). Hardware
+validation is still pending: start with the dry-run image and the servo switch J3 off.
 
-Read [body control](../docs/body-control.md), [wiring](../docs/wiring.md), and [shared protocol](../docs/protocol/protocol.md). Do not flash or treat this skeleton as safety-ready.
+| Folder | Contents |
+| --- | --- |
+| `App/` | Portable logic, no registers: V2 parser and records, controller and FIR, safety, battery, liveness, servo calibration, CMSIS-RTOS2 task adapter |
+| `App/board/cuty_board.h` | The only interface between the tasks and hardware |
+| `Core/` | Black Pill support: clocks, USART2, TIM4, ADC, IWDG, LED, `main.c`, CMSIS-RTOS2 layer on FreeRTOS, FreeRTOS config, linker script |
+| `sim/` | Same tasks on the FreeRTOS POSIX port, UART on stdin/stdout |
+| `tests/` | Host unit tests, simulator scenario, QEMU test, ARM object check |
+| `Drivers/`, `Middlewares/` | Vendored CMSIS 6.1, ST cmsis_device_f4 2.6.10, FreeRTOS-Kernel V11.1.0 ([THIRD_PARTY.md](THIRD_PARTY.md)) |
+| `tools/` | Diagram generator |

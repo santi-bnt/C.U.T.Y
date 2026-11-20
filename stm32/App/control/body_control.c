@@ -30,11 +30,19 @@ bool cuty_control_set_head_fir(CutyController *c, bool enabled) {
     }
     return true;
 }
-void cuty_control_invalid(CutyController *c) {
-    ++c->safety.invalid_commands;
-    if (c->safety.state!=CUTY_DISARMED) c->safety.state=CUTY_FAULT;
+void cuty_control_fault(CutyController *c, CutyFaultReason reason) {
+    cuty_safety_trip(&c->safety, reason);
     if (c->safety.policy==CUTY_RELEASE_OUTPUT) c->safety.output_requested=false;
     freeze(c);
+}
+void cuty_control_invalid(CutyController *c) {
+    ++c->safety.invalid_commands;
+    cuty_control_fault(c, CUTY_FAULT_INVALID_COMMAND);
+}
+void cuty_control_set_inhibit(CutyController *c, bool inhibited) {
+    c->safety.inhibited = inhibited;
+    if (inhibited && (c->safety.state==CUTY_READY || c->safety.state==CUTY_ACTIVE))
+        cuty_control_fault(c, CUTY_FAULT_LOW_BATTERY);
 }
 bool cuty_control_command(CutyController *c, const CutyCommand *cmd, uint32_t now) {
     CutySafety *s=&c->safety; cuty_safety_check(s,now);
@@ -45,9 +53,10 @@ bool cuty_control_command(CutyController *c, const CutyCommand *cmd, uint32_t no
         s->output_requested=false; freeze(c); return true;
     case CUTY_RESET:
         if (s->state!=CUTY_FAULT) break;
-        s->state=CUTY_DISARMED; s->heartbeat_seen=false; s->output_requested=false; freeze(c); return true;
+        s->state=CUTY_DISARMED; s->heartbeat_seen=false; s->output_requested=false;
+        s->fault_reason=CUTY_FAULT_NONE; freeze(c); return true;
     case CUTY_ARM:
-        if (s->state!=CUTY_DISARMED||!cuty_heartbeat_fresh(s,now)) break;
+        if (s->state!=CUTY_DISARMED||!cuty_heartbeat_fresh(s,now)||s->inhibited) break;
         s->state=CUTY_READY; freeze(c); return true;
     case CUTY_START:
         if (s->state!=CUTY_READY||!cuty_heartbeat_fresh(s,now)) break;
@@ -66,13 +75,13 @@ void cuty_control_tick(CutyController *c, uint32_t now, float dt) {
         cuty_fir_reset(&c->head_pan_fir, c->axes[CUTY_HEAD_PAN].commanded);
         freeze(c); return;
     }
-    if (!isfinite(dt)||dt<=0||dt>0.04f) { cuty_control_invalid(c); return; }
+    if (!isfinite(dt)||dt<=0||dt>0.04f) { ++c->safety.invalid_commands; cuty_control_fault(c, CUTY_FAULT_CONTROL_OVERRUN); return; }
     for (unsigned i=0; i<CUTY_AXES; ++i) {
         CutyAxis *a=&c->axes[i]; CutyLimits l=c->limits[i];
         if (i == CUTY_HEAD_PAN && c->head_pan_fir_enabled) {
             float filtered;
             if (!cuty_fir_process(&c->head_pan_fir, a->target, &filtered)) {
-                cuty_control_invalid(c); return;
+                ++c->safety.invalid_commands; cuty_control_fault(c, CUTY_FAULT_LIMIT); return;
             }
             a->filtered_target = bounded(filtered, l.minimum, l.maximum);
         }
@@ -81,7 +90,7 @@ void cuty_control_tick(CutyController *c, uint32_t now, float dt) {
         float acc=bounded(4*(goal-a->commanded)-4*a->velocity,-l.max_acceleration,l.max_acceleration);
         float v=bounded(a->velocity+acc*dt,-l.max_velocity,l.max_velocity);
         float p=a->commanded+v*dt;
-        if (!isfinite(p)||p<l.minimum||p>l.maximum) { cuty_control_invalid(c); return; }
+        if (!isfinite(p)||p<l.minimum||p>l.maximum) { ++c->safety.invalid_commands; cuty_control_fault(c, CUTY_FAULT_LIMIT); return; }
         a->commanded=p; a->velocity=v;
     }
     ++c->steps;

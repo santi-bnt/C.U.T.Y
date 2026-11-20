@@ -6,7 +6,7 @@ typedef void *osMessageQueueId_t;
 typedef void *osThreadId_t;
 typedef enum { osOK=0, osErrorResource=-3 } osStatus_t;
 typedef enum { osKernelReady=1 } osKernelState_t;
-typedef enum { osPriorityLow=8, osPriorityAboveNormal=32, osPriorityHigh=40, osPriorityHigh1=41 } osPriority_t;
+typedef enum { osPriorityLow=8, osPriorityNormal=24, osPriorityAboveNormal=32, osPriorityHigh=40, osPriorityHigh1=41 } osPriority_t;
 typedef struct { const char *name; uint32_t stack_size; osPriority_t priority; } osThreadAttr_t;
 #define osWaitForever UINT32_MAX
 #define osFlagsError 0x80000000U
@@ -16,6 +16,7 @@ osStatus_t osMessageQueueGet(osMessageQueueId_t queue,void *message,uint8_t *pri
 osThreadId_t osThreadNew(void (*function)(void *),void *argument,const osThreadAttr_t *attr);
 uint32_t osThreadFlagsSet(osThreadId_t thread,uint32_t flags);
 uint32_t osThreadFlagsClear(uint32_t flags);
+uint32_t osThreadGetStackSpace(osThreadId_t thread);
 uint32_t osKernelGetTickCount(void);
 uint32_t osKernelGetTickFreq(void);
 osKernelState_t osKernelGetState(void);
