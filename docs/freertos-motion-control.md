@@ -57,7 +57,8 @@ RTOS resources:
 - Initial adapter requires a 1000 Hz kernel tick and accepts only CUTY_RTOS_DRY_RUN=1.
   Supply CMSIS-RTOS2 headers/library through a compatible STM32Cube FreeRTOS integration.
 - Before scheduler start: osKernelInitialize(), cuty_rtos_create(), cuty_rtos_start().
-  Board initialization must leave actuator outputs disabled; no PWM callbacks are provided.
+  Board initialization configures TIM4 but leaves PB6/PB7/PB8 low, compare at zero and
+  PWM channels stopped. The physical-output compile gate remains disabled by default.
 
 Communication owns the target producer; overwriting uses nonblocking Get + Put with a
 single producer and a single consumer. The consumer processes at most eight state events
@@ -113,7 +114,11 @@ position. Fault/disarm freeze the command immediately; normal trajectory acceler
 limits do not apply to that logical emergency stop. A physical servo may still move
 toward its last commanded position: freezing a setpoint does not prove physical rest.
 
-Fault policies are logical intents only. In the current RTOS adapter `CUTY_FREEZE_COMMAND` is selected; that policy can preserve torque at a stale position and must never be treated as a physically safe failure mode. Stage 1 has no PWM route, so output intent does not energize actuators:
+Fault policies in the portable controller are logical intents. The board driver is
+present, but the default build cannot bind it to the controller; it also rejects output
+without confirmed mechanical calibration and servo-to-joint mapping. `CUTY_FREEZE_COMMAND`
+can preserve torque at a stale position and must never be treated as a physically safe
+failure mode:
 
 - FREEZE_COMMAND retains the last commanded setpoint only if output was previously
   requested by ACTIVE (never energizes a READY or boot fault), useful where releasing torque
@@ -136,29 +141,29 @@ The carrier v1.1 netlist and schematic design specify:
 | --- | --- | --- |
 | Pi TX physical 8 → STM32 RX | PA3 / USART2_RX | AF7 |
 | STM32 TX → Pi RX physical 10 | PA2 / USART2_TX | AF7 |
-| PWM outputs 1–4 | PB6/PB7/PB8/PB9 / TIM4 CH1–4 | AF2 |
-| PWM output 5 | PA8 / TIM1 CH1 | AF1 |
+| Active PWM outputs | PB6/PB7/PB8 / TIM4 CH1–3 to J7/J8/J9 | AF2 |
+| Reserved connectors | PB9/J10 and PA8/J11 | Not configured for servo output |
 
 The repository names STM32F401CCU6 as the design target. The actual chip marking,
 board revision, package, oscillator and memory have not been observed/verified.
 The netlist confirms design intent, not physical continuity or soldering.
 Consult the exact part's ST datasheet AF tables before generating code.
 
-Initial proposal: 115200 baud, 8N1; hardware PWM period 20 ms (50 Hz), 1 us counter
-resolution. Compute each timer clock from the verified RCC/APB/TIMPRE configuration,
-then PSC = timer_clock / 1 MHz - 1 and ARR = 19999 only when division is exact.
-For an illustrative timer input of 84 MHz, PSC would be 83. This is NOT a measured
-clock or a generated board configuration. TIM1 is on APB2 and TIM4 on APB1; do not
-assume their input clocks match PCLK. Respect the TIMPRE/APB rules in RM0368.
-Use CCR preload/latching, configure TIM1 output enable correctly, and verify both
-timers with an oscilloscope before connecting servos.
+USART2 is configured for 115200 baud, 8N1. The board code derives the TIM4 input
+clock from PCLK1 and the APB1 prescaler rule for STM32F401, then computes PSC for a
+1 MHz counter and ARR=19999 (50 Hz). It rejects clocks that cannot produce this exact
+counter rate. PWM output remains disabled until calibration and mapping are confirmed;
+measure the 50 Hz period and pulse widths on PB6/PB7/PB8 with an oscilloscope before
+connecting a servo.
 
 The 20 ms controller update is separate from PWM generation: tick jitter affects
 when the next setpoint is prepared, not pulse timing from a hardware timer. Measure
 execution time, deadlines, phase/latch latency and missed updates under UART load.
-Actual servo pulse endpoints, direction, deadband, velocity, acceleration and current
-limits require joint-by-joint bench calibration. Never use example 1000–2000 us from
-unit tests as mechanically verified endpoints.
+The provisional independent test ranges are 1000–2850 us, 1000–2700 us and
+1000–2850 us, in test-servo order only. About 150 degrees total travel was observed,
+but this does not imply 180 degrees or a center at 75 degrees. They are pulse ceilings,
+not safe mechanism endpoints. Actual center, direction, deadband, velocity,
+acceleration, current limits and mapping require joint-by-joint bench calibration.
 
 Keep the dedicated servo supply; verify current capacity, fusing, polarity, noise and
 ground references. The carrier separates PGND/GND and joins at NT1; validate that

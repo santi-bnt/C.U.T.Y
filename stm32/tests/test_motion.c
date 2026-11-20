@@ -110,6 +110,15 @@ int main(void) {
     assert(cuty_servo_pulse_calibrated(-1.0f,1100,1500,1900,false,&pulse)&&pulse==1100);
     assert(cuty_servo_pulse_calibrated(1.0f,1100,1500,1900,true,&pulse)&&pulse==1100);
     assert(!cuty_servo_pulse_calibrated(0,0,0,0,false,&pulse));
+    uint16_t timer_prescaler;
+    assert(cuty_servo_timer_prescaler(84000000U,1000000U,&timer_prescaler)&&timer_prescaler==83U);
+    assert(cuty_servo_timer_prescaler(72000000U,1000000U,&timer_prescaler)&&timer_prescaler==71U);
+    assert(!cuty_servo_timer_prescaler(84000000U,1300000U,&timer_prescaler));
+    assert(!cuty_servo_timer_prescaler(84000000U,1000000U,NULL));
+    assert(cuty_servo_limits_within_test_range(1100U,1900U,2800U,1000U,2850U));
+    assert(!cuty_servo_limits_within_test_range(999U,1900U,2800U,1000U,2850U));
+    assert(!cuty_servo_limits_within_test_range(1100U,1900U,2851U,1000U,2850U));
+    assert(!cuty_servo_limits_within_test_range(1100U,1100U,2800U,1000U,2850U));
     printf("PASS: framing, parsing, limits, trajectory, states, heartbeat, rollover, pulse conversion\n");
     return 0;
 }

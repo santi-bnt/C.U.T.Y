@@ -2,6 +2,7 @@
 #include "cuty_servo_output.h"
 #include "servo_calibration.h"
 #include "../App/rtos/motion_tasks.h"
+#include "../App/servos/servo.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -53,9 +54,13 @@ bool cuty_board_init(void) {
     huart2.Init.OverSampling = UART_OVERSAMPLING_16;
     if (HAL_UART_Init(&huart2) != HAL_OK) return false;
 
-    /* 84 MHz APB1 timer clock / (83+1) = 1 MHz, ARR=19999 => 50 Hz. */
+    /* Se deriva el reloj real de TIM4; el contador queda a 1 MHz (1 tick = 1 us). */
+    uint32_t tim4_clock_hz = HAL_RCC_GetPCLK1Freq();
+    if ((RCC->CFGR & RCC_CFGR_PPRE1) != 0U) tim4_clock_hz *= 2U;
+    uint16_t timer_prescaler;
+    if (!cuty_servo_timer_prescaler(tim4_clock_hz, 1000000U, &timer_prescaler)) return false;
     htim4.Instance = TIM4;
-    htim4.Init.Prescaler = 83U;
+    htim4.Init.Prescaler = timer_prescaler;
     htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim4.Init.Period = 19999U;
     htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -72,7 +77,7 @@ bool cuty_board_init(void) {
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_1);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_2);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_3);
-    return cuty_servo_output_init(&htim4, cuty_servo_calibration);
+    return cuty_servo_output_init(&htim4, cuty_servo_calibration, cuty_servo_test_ranges);
 }
 
 TIM_HandleTypeDef *cuty_board_tim4(void) { return &htim4; }
