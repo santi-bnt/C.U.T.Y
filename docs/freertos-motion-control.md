@@ -1,6 +1,6 @@
 # Current configuration update
 
-Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes.
+Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes. Stage 1's Raspberry diagnostic serializer exists, but STM32 physical UART and response encoding are not implemented; no live link is claimed.
 
 # FreeRTOS / Motion Control — initial, dry-run only
 
@@ -94,7 +94,7 @@ No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra
 Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Their coordinates remain abstract simulation units, not calibrated physical angles. No degree or PWM commands are accepted. The proposed J7–J9 assignments remain physically unverified. The V2 sketch has no CRC/session handshake, replay protection or
 link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
 must settle integrity, sessions, acknowledgements, error vocabulary and recovery.
-No Raspberry adapter is enabled and no compatibility with older command sketches is claimed.
+The Raspberry diagnostic bridge now serializes V2 only and does not send ARM/START automatically. It cannot communicate with an STM32 build until physical USART2 receive/transmit and response framing are implemented. No compatibility with older command sketches is claimed.
 
 ## Motion and safety
 
@@ -113,7 +113,7 @@ position. Fault/disarm freeze the command immediately; normal trajectory acceler
 limits do not apply to that logical emergency stop. A physical servo may still move
 toward its last commanded position: freezing a setpoint does not prove physical rest.
 
-Fault policies are logical intents only:
+Fault policies are logical intents only. In the current RTOS adapter `CUTY_FREEZE_COMMAND` is selected; that policy can preserve torque at a stale position and must never be treated as a physically safe failure mode. Stage 1 has no PWM route, so output intent does not energize actuators:
 
 - FREEZE_COMMAND retains the last commanded setpoint only if output was previously
   requested by ACTIVE (never energizes a READY or boot fault), useful where releasing torque

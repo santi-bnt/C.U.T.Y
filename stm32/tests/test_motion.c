@@ -105,6 +105,11 @@ int main(void) {
     assert(c.safety.state==CUTY_FAULT && !cuty_control_output_requested(&c));
     uint16_t pulse; assert(cuty_servo_pulse(0,1000,2000,&pulse)&&pulse==1500);
     assert(!cuty_servo_pulse(NAN,1000,2000,&pulse)); assert(!cuty_servo_pulse(2,1000,2000,&pulse));
+    assert(cuty_servo_pulse_calibrated(0.0f,1100,1500,1900,false,&pulse)&&pulse==1500);
+    assert(cuty_servo_pulse_calibrated(1.0f,1100,1500,1900,false,&pulse)&&pulse==1900);
+    assert(cuty_servo_pulse_calibrated(-1.0f,1100,1500,1900,false,&pulse)&&pulse==1100);
+    assert(cuty_servo_pulse_calibrated(1.0f,1100,1500,1900,true,&pulse)&&pulse==1100);
+    assert(!cuty_servo_pulse_calibrated(0,0,0,0,false,&pulse));
     printf("PASS: framing, parsing, limits, trajectory, states, heartbeat, rollover, pulse conversion\n");
     return 0;
 }

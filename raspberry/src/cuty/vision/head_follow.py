@@ -42,6 +42,7 @@ def _bool_env(name: str, default: bool) -> bool:
 class FaceFollowConfig:
     enabled: bool = False
     dry_run: bool = True
+    physical_adapter_enabled: bool = False
     kp: float = 1.2
     ki: float = 0.0
     kd: float = 0.08
@@ -56,7 +57,7 @@ class FaceFollowConfig:
     max_position: float = 1.0
 
     def __post_init__(self) -> None:
-        if self.enabled and not self.dry_run:
+        if self.enabled and not self.dry_run and not self.physical_adapter_enabled:
             raise FollowConfigurationError(
                 "Physical head following is blocked: no verified UART/STM32 adapter, "
                 "servo calibration, direction, or travel limits exist. Keep dry-run enabled."
@@ -83,6 +84,7 @@ class FaceFollowConfig:
         return cls(
             enabled=_bool_env("CUTY_FOLLOW_ENABLED", False),
             dry_run=_bool_env("CUTY_FOLLOW_DRY_RUN", True),
+            physical_adapter_enabled=_bool_env("CUTY_FOLLOW_PHYSICAL_ENABLE", False),
             kp=_float_env("CUTY_FOLLOW_KP", 1.2),
             ki=_float_env("CUTY_FOLLOW_KI", 0.0),
             kd=_float_env("CUTY_FOLLOW_KD", 0.08),
@@ -168,8 +170,11 @@ class FaceFollowController:
 
     def __init__(self, config: FaceFollowConfig, adapter: HeadAdapter | None = None,
                  clock=time.monotonic) -> None:
-        if not config.dry_run:
-            raise FollowConfigurationError("A physical actuator adapter is not implemented")
+        physical_adapter = bool(adapter and getattr(adapter, "is_physical", False))
+        if not config.dry_run and not (config.physical_adapter_enabled and physical_adapter):
+            raise FollowConfigurationError("Physical follow requires explicit opt-in and a physical adapter")
+        if config.dry_run and physical_adapter:
+            raise FollowConfigurationError("A physical adapter cannot run under dry-run configuration")
         self.config = config
         self.adapter = adapter or SimulatedHeadAdapter()
         self._clock = clock
@@ -187,9 +192,12 @@ class FaceFollowController:
     def set_enabled(self, enabled: bool) -> None:
         """Internal enable/disable; disable is an immediate command stop."""
         with self._lock:
+            if enabled and getattr(self.adapter, "is_physical", False):
+                if not self.adapter.arm():
+                    raise FollowConfigurationError("STM32 did not accept explicit ARM/START")
             self._enabled = bool(enabled)
             self._velocity = 0.0
-            self.adapter.set_pan_velocity(0.0)
+            self._stop_adapter(disarm=not enabled)
             self._pid.reset_derivative()
             self._last_time = None
             self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
@@ -232,7 +240,7 @@ class FaceFollowController:
         if not math.isfinite(dt) or dt <= 0:
             self._pid.reset_derivative()
             self._velocity = 0.0
-            self.adapter.set_pan_velocity(0.0)
+            self._stop_adapter(disarm=True)
             self.status = FollowStatus(True, True, x_error, y_error, 0.0, 0.0,
                                        self._position, "invalid dt; output stopped")
             return self.status
@@ -261,7 +269,14 @@ class FaceFollowController:
         self._last_time = None
         self._filtered_x = self._filtered_y = None
         if was_tracking:
-            self.adapter.set_pan_velocity(0.0)
+            self._stop_adapter(disarm=True)
         self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
                                    self._position, reason)
+
+    def _stop_adapter(self, *, disarm: bool) -> None:
+        stop = getattr(self.adapter, "stop", None) if disarm else None
+        if callable(stop):
+            stop()
+        else:
+            self.adapter.set_pan_velocity(0.0)
 

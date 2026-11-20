@@ -10,13 +10,13 @@
 #include "../App/rtos/motion_tasks.c"
 typedef struct { unsigned capacity,size,count,head; unsigned char *data; } Queue;
 typedef struct { void (*function)(void *); void *argument; uint32_t flags; } Thread;
-static Queue *allocated[8]; static unsigned allocations;
+static Queue *allocated[16]; static unsigned allocations;
 static Thread threads[4]; static unsigned thread_count;
 static Thread *running; static uint32_t tick; static jmp_buf boundary;
 osMessageQueueId_t osMessageQueueNew(uint32_t count,uint32_t size,const void *attr) {
     (void)attr; Queue *q=calloc(1,sizeof(*q)); assert(q);
     q->capacity=count; q->size=size; q->data=calloc(count,size); assert(q->data);
-    assert(allocations<8); allocated[allocations++]=q; return q;
+    assert(allocations<16); allocated[allocations++]=q; return q;
 }
 osStatus_t osMessageQueuePut(osMessageQueueId_t id,const void *message,uint8_t priority,uint32_t timeout) {
     (void)priority; assert(timeout==0); Queue *q=id;
@@ -63,6 +63,8 @@ int main(void) {
     CutyReply reply; unsigned replies_read=0;
     while(cuty_take_reply(&reply)) { assert(reply.accepted); ++replies_read; }
     assert(replies_read==4);
+    receive("V2,START,EXTRA\n"); run_once(communication);
+    assert(cuty_take_frame_error());
     receive("V2,TARGET,LEFT_ARM,200\nV2,TARGET,RIGHT_ARM,-300\n");
     run_once(communication); run_once(servo);
     assert(fabs(controller.axes[CUTY_LEFT_ARM].target-0.2)<0.00001);
