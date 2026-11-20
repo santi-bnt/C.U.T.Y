@@ -191,13 +191,34 @@ class FaceFollowController:
         self._filtered_y: float | None = None
         self._velocity = 0.0
         self._position = 0.0
-        self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0, 0.0, "disabled")
+        self.status = FollowStatus(
+            self._enabled, False, None, None, 0.0, 0.0, 0.0,
+            self._mode_reason(tracking=False),
+        )
+
+    def _has_physical_adapter(self) -> bool:
+        """Detecta el adaptador real sin inferirlo solo por la configuración."""
+        return bool(getattr(self.adapter, "is_physical", False))
+
+    def _physical_adapter_is_armed(self) -> bool:
+        """El estado activo solo se reporta si el adaptador confirma su armado."""
+        return self._has_physical_adapter() and bool(getattr(self.adapter, "is_armed", False))
+
+    def _mode_reason(self, *, tracking: bool) -> str:
+        if self._has_physical_adapter():
+            if not self._physical_adapter_is_armed():
+                return "physical adapter available; disarmed"
+            return "physical PAN active" if tracking else "physical PAN armed; waiting for face"
+        if self._enabled:
+            return "dry-run PAN; vertical error is telemetry only"
+        return "simulation disabled"
 
     def set_enabled(self, enabled: bool) -> None:
         """Activa seguimiento o detiene la salida; el modo físico requiere opt-in y armado."""
         with self._lock:
-            if enabled and getattr(self.adapter, "is_physical", False):
-                if not self.adapter.arm():
+            if enabled and self._has_physical_adapter():
+                arm_adapter = getattr(self.adapter, "arm", None)
+                if not callable(arm_adapter) or not arm_adapter() or not self._physical_adapter_is_armed():
                     raise FollowConfigurationError("STM32 did not accept explicit ARM/START")
             self._enabled = bool(enabled)
             self._velocity = 0.0
@@ -205,7 +226,9 @@ class FaceFollowController:
             self._pid.reset_derivative()
             self._last_time = None
             self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
-                                       self._position, "waiting" if enabled else "manual stop")
+                                       self._position, self._mode_reason(tracking=False)
+                                       if self._has_physical_adapter() else
+                                       ("waiting" if enabled else "manual stop"))
 
     def update(self, target, now: float | None = None) -> FollowStatus:
         with self._lock:
@@ -214,6 +237,13 @@ class FaceFollowController:
     def _update(self, target, now: float | None = None) -> FollowStatus:
         now = self._clock() if now is None else now
         if not self._enabled:
+            return self.status
+        if self._has_physical_adapter() and not self._physical_adapter_is_armed():
+            self._stop_adapter(disarm=True)
+            self._enabled = False
+            self._velocity = 0.0
+            self.status = FollowStatus(False, False, None, None, 0.0, 0.0,
+                                       self._position, self._mode_reason(tracking=False))
             return self.status
         # Una detección ausente o vencida detiene la salida y desarma adaptadores compatibles.
         if target is None or now - target.timestamp >= self.config.lost_timeout:
@@ -239,7 +269,8 @@ class FaceFollowController:
         if self._last_time is None:
             self._last_time = now
             self.status = FollowStatus(True, True, x_error, y_error, 0.0,
-                                       self._velocity, self._position, "primed")
+                                       self._velocity, self._position,
+                                       self._mode_reason(tracking=True))
             return self.status
         dt = now - self._last_time
         self._last_time = now
@@ -247,8 +278,13 @@ class FaceFollowController:
             self._pid.reset_derivative()
             self._velocity = 0.0
             self._stop_adapter(disarm=True)
-            self.status = FollowStatus(True, True, x_error, y_error, 0.0, 0.0,
-                                       self._position, "invalid dt; output stopped")
+            if self._has_physical_adapter():
+                self._enabled = False
+                reason = self._mode_reason(tracking=False)
+            else:
+                reason = "invalid dt; output stopped"
+            self.status = FollowStatus(self._enabled, False, x_error, y_error, 0.0, 0.0,
+                                       self._position, reason)
             return self.status
         dt = min(dt, self.config.max_dt)
         output = self._pid.update(x_error, dt)
@@ -266,10 +302,10 @@ class FaceFollowController:
         # La Raspberry entrega velocidad normalizada; la trayectoria física corresponde al STM32.
         self.adapter.set_pan_velocity(self._velocity)
         self.status = FollowStatus(True, True, x_error, y_error, output, self._velocity,
-                                   self._position, "dry-run PAN; vertical error is telemetry only")
+                                   self._position, self._mode_reason(tracking=True))
         return self.status
 
-    def _lose_target(self, reason: str = "face lost; holding simulated position") -> None:
+    def _lose_target(self, reason: str | None = None) -> None:
         was_tracking = self.status.tracking
         self._velocity = 0.0
         self._pid.reset_derivative()
@@ -277,6 +313,12 @@ class FaceFollowController:
         self._filtered_x = self._filtered_y = None
         if was_tracking:
             self._stop_adapter(disarm=True)
+        if self._has_physical_adapter():
+            # Para reanudar tras perder la cara, exige otra acción explícita de armado.
+            self._enabled = False
+        if reason is None:
+            reason = ("physical adapter available; disarmed" if self._has_physical_adapter()
+                      else "face lost; holding simulated position")
         self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,
                                    self._position, reason)
 

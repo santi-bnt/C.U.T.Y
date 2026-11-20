@@ -65,6 +65,20 @@ int main(void) {
     assert(replies_read==4);
     receive("V2,START,EXTRA\n"); run_once(communication);
     assert(cuty_take_frame_error());
+    run_once(servo);
+    assert(controller.safety.state==CUTY_FAULT); /* una trama inválida en ACTIVE enclava el fallo */
+    receive("V2,TARGET,LEFT_ARM,200\nV2,TARGET,RIGHT_ARM,-300\n");
+    run_once(communication); run_once(servo);
+    assert(controller.safety.state==CUTY_FAULT); /* los objetivos no borran FAULT */
+    assert(fabs(controller.axes[CUTY_LEFT_ARM].target)<0.00001);
+    assert(fabs(controller.axes[CUTY_RIGHT_ARM].target)<0.00001);
+    while(cuty_take_reply(&reply)) assert(!reply.accepted);
+    receive("V2,DISARM\n"); run_once(communication); run_once(servo);
+    assert(controller.safety.state==CUTY_FAULT); /* DISARM tampoco recupera un fallo enclavado */
+    receive("V2,RESET\nV2,HB\nV2,ARM\nV2,START\n");
+    run_once(communication); run_once(servo);
+    assert(controller.safety.state==CUTY_ACTIVE); /* solo RESET + HB + ARM + START recupera */
+    while(cuty_take_reply(&reply)) assert(reply.accepted);
     receive("V2,TARGET,LEFT_ARM,200\nV2,TARGET,RIGHT_ARM,-300\n");
     run_once(communication); run_once(servo);
     assert(fabs(controller.axes[CUTY_LEFT_ARM].target-0.2)<0.00001);
