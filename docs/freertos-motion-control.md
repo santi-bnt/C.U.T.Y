@@ -1,8 +1,12 @@
 # Current configuration update
 
-This page covers the portable V2 application only. A separate [simple UART/PWM bench firmware](../stm32/blackpill_uart/README.md) now exists for the supplied STM32F401CCU6 project, adapted to the carrier servo pinout (PB6/PB7/PB8). It does not link these motion/FIR modules.
-
-Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes.
+Three axes are supported: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and
+J11 are reserved. Protocol V2 accepts named axes only. The CubeIDE project at
+[`stm32/blackpill_uart`](../stm32/blackpill_uart/README.md) links this portable
+application to the STM32F401 HAL and FreeRTOS. USART2 receives V2 frames and returns
+ACK/NACK, STATE and TELEM records. PWM remains disconnected from the task callbacks,
+and its outputs remain disabled. Targets are normalized software units, not calibrated
+angles.
 
 # FreeRTOS / Motion Control — initial, dry-run only
 
@@ -11,10 +15,11 @@ Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 
 The portable C modules implement byte-stream framing, strict experimental command parsing,
 three normalized commanded setpoints, a damped trajectory filter, position/velocity/acceleration
 limits, heartbeat checks, a latched safety state machine, and a pure pulse-width conversion.
-They do not initialize pins, start timers, transmit UART, read sensors, or move a servo.
-The CMSIS-RTOS2 adapter is initial integration source, not a validated STM32 firmware image.
-There is no CubeMX project, HAL, linker/startup configuration, or on-board test result.
-IMU is an interface declaration; PID remains a placeholder.
+The board layer initializes USART2, TIM4 with stopped channels, and the UART RX
+interrupt. The CubeIDE project links these modules to HAL, CMSIS and FreeRTOS. The
+application deliberately does not bind physical PWM callbacks; no servo can be driven
+by V2 commands in this build. No on-board test result is claimed. IMU is an interface
+declaration; PID remains a placeholder.
 
 The interactive website is a scripted educational visualization. Its PAN +0.35 example,
 slowed stages and 500 ms fault scenario are illustrative, not live telemetry or a firmware
@@ -56,10 +61,12 @@ RTOS resources:
 - Allocation failure must abort startup; no scheduler start/retry after partial creation.
   The first adapter intentionally treats allocation failure as fatal and does not reclaim
   partial allocations; reset the MCU during development before another create attempt.
-- Initial adapter requires a 1000 Hz kernel tick and accepts only CUTY_RTOS_DRY_RUN=1.
-  Supply CMSIS-RTOS2 headers/library through a compatible STM32Cube FreeRTOS integration.
+- Initial adapter requires a 1000 Hz kernel tick. The CubeIDE project supplies
+  CMSIS-RTOS2 and FreeRTOS from the STM32 project sources.
 - Before scheduler start: osKernelInitialize(), cuty_rtos_create(), cuty_rtos_start().
-  Board initialization must leave actuator outputs disabled; no PWM callbacks are provided.
+  Board initialization configures TIM4 but leaves PB6/PB7/PB8 low, compare at zero and
+  PWM channels stopped. The physical-output compile gate remains disabled by default;
+  this application does not bind output callbacks.
 
 Communication owns the target producer; overwriting uses nonblocking Get + Put with a
 single producer and a single consumer. The consumer processes at most eight state events
@@ -68,12 +75,13 @@ state-change command. Events older than 100 ms are rejected; delayed heartbeat r
 retain their receive timestamps. RX overflow/malformed lines set a fault flag.
 The queue byte timestamp is assigned in the ISR hook, and a frame uses its LF timestamp.
 Real DMA reception must carry equivalent timestamps, enforce fragment timeouts and
-resynchronize after UART framing/overrun errors. That adapter is not implemented.
+resynchronize after UART framing/overrun errors. The board's HAL RX error callback
+aborts and rearms one-byte reception, and posts a fault to the safety owner.
 
 Snapshots, reply queues and telemetry use timeout zero; congestion drops records.
-The future UART TX owner can drain cuty_take_reply and cuty_take_telemetry, but no wire
-encoding or HAL transmit driver is supplied. Replies to malformed/overflow input are
-currently fault counters/flags, not per-frame UART ERR records. Diagnostics counters
+The board TX task drains `cuty_take_reply` and `cuty_take_telemetry`, encodes V2
+ACK/NACK/STATE/TELEM lines, and serializes HAL transmit calls. Malformed or overflow
+frames generate `V2,NACK,FRAME,UNKNOWN`. Diagnostics counters
 include RX fault notifications and reply/snapshot congestion; final TX-queue losses,
 task runtimes and memory high-water marks still need instrumentation.
 
@@ -96,7 +104,7 @@ No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra
 Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Their coordinates remain abstract simulation units, not calibrated physical angles. No degree or PWM commands are accepted. The proposed J7–J9 assignments remain physically unverified. The V2 sketch has no CRC/session handshake, replay protection or
 link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
 must settle integrity, sessions, acknowledgements, error vocabulary and recovery.
-No Raspberry adapter is enabled and no compatibility with older command sketches is claimed.
+The Raspberry diagnostic bridge now serializes V2 only and does not send ARM/START automatically. It cannot communicate with an STM32 build until physical USART2 receive/transmit and response framing are implemented. No compatibility with older command sketches is claimed.
 
 ## Motion and safety
 
@@ -115,7 +123,11 @@ position. Fault/disarm freeze the command immediately; normal trajectory acceler
 limits do not apply to that logical emergency stop. A physical servo may still move
 toward its last commanded position: freezing a setpoint does not prove physical rest.
 
-Fault policies are logical intents only:
+Fault policies in the portable controller are logical intents. The board output driver
+rejects output without confirmed mechanical calibration and servo-to-joint mapping; the
+current CubeIDE application also leaves its output callbacks unbound. `CUTY_FREEZE_COMMAND`
+can preserve torque at a stale position and must never be treated as a physically safe
+failure mode:
 
 - FREEZE_COMMAND retains the last commanded setpoint only if output was previously
   requested by ACTIVE (never energizes a READY or boot fault), useful where releasing torque
@@ -130,7 +142,7 @@ uncalibrated joint; normalized zero is an abstract test initial condition, not p
 neutral. Before adding PWM, require verified initial pose/calibration and a hardware
 arming gate; the core's output_requested function is not such a gate.
 
-## Pins, timers and configuration proposal (not generated initialization)
+## Pins and board initialization
 
 The carrier v1.1 netlist and schematic design specify:
 
@@ -138,29 +150,28 @@ The carrier v1.1 netlist and schematic design specify:
 | --- | --- | --- |
 | Pi TX physical 8 → STM32 RX | PA3 / USART2_RX | AF7 |
 | STM32 TX → Pi RX physical 10 | PA2 / USART2_TX | AF7 |
-| PWM outputs 1–4 | PB6/PB7/PB8/PB9 / TIM4 CH1–4 | AF2 |
-| PWM output 5 | PA8 / TIM1 CH1 | AF1 |
+| Active PWM outputs | PB6/PB7/PB8 / TIM4 CH1–3 to J7/J8/J9 | AF2 |
+| Reserved connectors | PB9/J10 and PA8/J11 | Not configured for servo output |
 
-The repository names STM32F401CCU6 as the design target. The actual chip marking,
-board revision, package, oscillator and memory have not been observed/verified.
-The netlist confirms design intent, not physical continuity or soldering.
-Consult the exact part's ST datasheet AF tables before generating code.
+The repository names STM32F401CCU6 as the design target. Confirm the actual chip
+marking and module revision before programming. The netlist records design intent,
+not physical continuity or soldering.
 
-Initial proposal: 115200 baud, 8N1; hardware PWM period 20 ms (50 Hz), 1 us counter
-resolution. Compute each timer clock from the verified RCC/APB/TIMPRE configuration,
-then PSC = timer_clock / 1 MHz - 1 and ARR = 19999 only when division is exact.
-For an illustrative timer input of 84 MHz, PSC would be 83. This is NOT a measured
-clock or a generated board configuration. TIM1 is on APB2 and TIM4 on APB1; do not
-assume their input clocks match PCLK. Respect the TIMPRE/APB rules in RM0368.
-Use CCR preload/latching, configure TIM1 output enable correctly, and verify both
-timers with an oscilloscope before connecting servos.
+USART2 is configured for 115200 baud, 8N1. The board code derives the TIM4 input
+clock from PCLK1 and the APB1 prescaler rule for STM32F401, then computes PSC for a
+1 MHz counter and ARR=19999 (50 Hz). It rejects clocks that cannot produce this exact
+counter rate. PWM output remains disabled until calibration and mapping are confirmed;
+measure the 50 Hz period and pulse widths on PB6/PB7/PB8 with an oscilloscope before
+connecting a servo.
 
 The 20 ms controller update is separate from PWM generation: tick jitter affects
 when the next setpoint is prepared, not pulse timing from a hardware timer. Measure
 execution time, deadlines, phase/latch latency and missed updates under UART load.
-Actual servo pulse endpoints, direction, deadband, velocity, acceleration and current
-limits require joint-by-joint bench calibration. Never use example 1000–2000 us from
-unit tests as mechanically verified endpoints.
+The provisional independent test ranges are 1000–2850 us, 1000–2700 us and
+1000–2850 us, in test-servo order only. About 150 degrees total travel was observed,
+but this does not imply 180 degrees or a center at 75 degrees. They are pulse ceilings,
+not safe mechanism endpoints. Actual center, direction, deadband, velocity,
+acceleration, current limits and mapping require joint-by-joint bench calibration.
 
 Keep the dedicated servo supply; verify current capacity, fusing, polarity, noise and
 ground references. The carrier separates PGND/GND and joins at NT1; validate that
@@ -219,23 +230,21 @@ PCB or wiring component is restyled.
 
 ## Bringing this to an actual STM32
 
-1. Record chip marking, exact Black Pill revision, oscillator and power arrangement.
-   Confirm RAM/flash, package AF tables and the carrier schematic/physical pin continuity.
+1. The CubeIDE project and ARM build are present at `stm32/blackpill_uart`. Record the
+   chip marking, Black Pill revision, oscillator and power arrangement. Confirm the
+   package AF tables and physical continuity on the carrier.
 2. Agree servo/joint mapping, sign, calibration, mechanical limits and risk-specific fault
    policy. Define safe initial-pose acquisition and explicit physical arming.
-3. Generate a fresh CubeMX/STM32CubeIDE project for that exact MCU with compatible
-   FreeRTOS + CMSIS-RTOS2; set clocks/tick, NVIC syscall priorities, USART2 IRQ or DMA,
-   TIM4/TIM1, timer preloads and disabled initial output. Reserve HAL timebase separately
-   if needed. Version the .ioc and generated build configuration.
-4. Add portable modules and adapter with CUTY_RTOS_DRY_RUN=1 first. Build with the real
-   ARM toolchain and inspect link map, stack/heap and RTOS API compatibility. Do not
-   remove the dry-run guard until independent physical safety integration exists.
-5. Add bounded IRQ/DMA driver/resynchronization, validated TX protocol and a task-liveness
-   watchdog. Confirm timing with stress traffic, queue overflow, scheduler overruns,
-   power interruptions, boot/reset and heartbeat loss while outputs are disconnected.
-6. Measure PWM on a scope first; then one supported/unloaded joint with current-limited
-   supply and physical stop, then mechanical integration. Record actual results.
-   Only then design the opt-in Raspberry adapter; keep existing head follow in dry-run.
+3. Open and build the checked-in CubeIDE project. The standalone build script also
+   generates ELF/BIN/MAP with the installed ARM GCC. Inspect its map, stack/heap and
+   warnings before programming; do not regenerate over the linked application files.
+4. On a board without servos attached, verify boot, V2 heartbeat/ACK, invalid-frame
+   NACK, ARM/START/DISARM/RESET states, heartbeat timeout and UART error recovery.
+   Confirm with an oscilloscope that PB6/PB7/PB8 remain low and no timer output starts.
+5. Before any output integration, validate independent power cutoff, current limit,
+   fusing, grounding, one-servo support, physical stop and mechanism-specific release
+   behavior. Then test one axis at a time and record actual results. Do not remove the
+   default output gate based on host tests or a successful UART link.
 
 ## Primary references
 

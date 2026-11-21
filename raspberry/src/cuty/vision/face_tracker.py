@@ -55,7 +55,12 @@ def _env_flag(name: str, default: bool) -> bool:
 
 
 class FaceTracker:
-    """Keeps the most recent target; safe to read from the render thread."""
+    """Detecta y suaviza caras; comparte la coordenada con el visor y el seguimiento PAN.
+
+    Dry-run no toca UART. El hardware requiere un adaptador físico implementado
+    e inyectado por quien integra la aplicación, además de una habilitación
+    explícita; el render de ojos permanece independiente.
+    """
 
     def __init__(self, camera_factory: Callable[[], Camera] = open_camera,
                  detector_factory: Callable[[], object] = create_detector,
@@ -63,7 +68,7 @@ class FaceTracker:
                  lost_after: float = 0.8, smoothing: float = 0.45,
                  retry_after: float = 5.0, clock: Callable[[], float] = time.monotonic,
                  vision_ipc_path: str | os.PathLike | None = None,
-                 vision_user: str = "santi") -> None:
+                 vision_user: str = "santi", head_adapter=None) -> None:
         self._camera_factory = camera_factory
         self._detector_factory = detector_factory
         self.mirror = _env_flag("CUTY_CAMERA_MIRROR", True) if mirror is None else mirror
@@ -90,14 +95,12 @@ class FaceTracker:
         try:
             follow_config = FaceFollowConfig.from_env()
             if follow_config.enabled:
-                self._log.warning(
-                    "Seguimiento de cabeza habilitado solo en dry-run; "
-                    "no hay protocolo ni actuador STM32 verificado"
-                )
-            if follow_config.dry_run:
+                self._log.warning("Seguimiento facial habilitado; modo=%s",
+                                  "dry-run" if follow_config.dry_run else "adaptador STM32 explícito")
+            if follow_config.dry_run or head_adapter is not None:
                 # Keep an inert controller available for an internal runtime
                 # toggle; it performs no work or I/O while disabled.
-                self.follow = FaceFollowController(follow_config, clock=clock)
+                self.follow = FaceFollowController(follow_config, adapter=head_adapter, clock=clock)
         except FollowConfigurationError as exc:
             self.status = f"seguimiento de cabeza bloqueado: {exc}"
             self._log.error("%s", self.status)
@@ -112,6 +115,7 @@ class FaceTracker:
         return (1.0 - x if self.mirror else x), y
 
     def process(self, detections: list, frame_w: int, frame_h: int, now: float) -> FaceTarget | None:
+        """Selecciona una detección, la suaviza a coordenadas 0..1 y actualiza PAN."""
         boxes = [d if isinstance(d, Detection) else Detection(*d) for d in detections]
         with self._lock:
             previous = self._target
@@ -136,6 +140,7 @@ class FaceTracker:
         return target
 
     def _update_follow(self, target: FaceTarget | None, now: float) -> None:
+        """Pasa la detección al PID sin alterar el pipeline de render de pantalla."""
         if self.follow is None:
             return
         state = self.follow.update(target, now)
@@ -151,7 +156,7 @@ class FaceTracker:
             )
 
     def set_head_follow_enabled(self, enabled: bool) -> bool:
-        """Internal toggle for simulation; no physical servo path exists."""
+        """Habilita el controlador disponible; el adaptador físico debe inyectarse por separado."""
         if self.follow is None:
             return False
         self.follow.set_enabled(enabled)

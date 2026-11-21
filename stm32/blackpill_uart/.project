@@ -4,6 +4,18 @@
 	<comment></comment>
 	<projects>
 	</projects>
+	<linkedResources>
+		<link>
+			<name>App</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/App</locationURI>
+		</link>
+		<link>
+			<name>Board</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Board</locationURI>
+		</link>
+	</linkedResources>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>

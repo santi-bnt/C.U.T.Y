@@ -1,13 +1,39 @@
-# C.U.T.Y STM32F401 Firmware
+# Firmware STM32 de C.U.T.Y.
 
-Owns real-time physical control: PWM, servo motion, head PAN, left arm and right arm, future IMU acquisition, and safety limits. J10 and J11 are reserved; physical control remains unvalidated.
+El proyecto reproducible para la Black Pill STM32F401CCU6 está en
+[`blackpill_uart/`](blackpill_uart/README.md). Integra los módulos portables de
+[`App/`](App/) y la capa HAL de [`Board/`](Board/) con el proyecto STM32CubeIDE,
+USART2 y CMSIS-RTOS2/FreeRTOS. La Raspberry usa GPIO14/pin 8 TX → PA3 USART2_RX;
+PA2 USART2_TX → GPIO15/pin 10 RX. UART: 115200, 8N1, sin control de flujo, lógica
+3.3 V y GND común.
 
-The current control hardware is an **STM32F401 Black Pill**, also targeted by the [carrier PCB v1.1](../hardware/electronics/kicad/cuty_carrier/README.md). Confirm the exact MCU suffix and board revision before generating firmware.
+El firmware del CubeIDE es el responsable de la respuesta V2, los estados y la
+telemetría. USART2 recibe por interrupción y la ISR solo entrega bytes a la cola
+FreeRTOS; las tareas procesan el protocolo y una única tarea transmite respuestas.
+El parser acepta `V2,HB`, `ARM`, `START`, `DISARM`, `RESET` y objetivos V2 para
+HEAD_PAN, LEFT_ARM y RIGHT_ARM. Las respuestas son `V2,ACK,...`, `V2,NACK,...`,
+`V2,STATE,...` y `V2,TELEM,...`.
 
-For a simple UART/servo bench test, use [blackpill_uart](blackpill_uart/README.md). It imports the supplied STM32F401CCU6 CubeIDE project, adds USART2 on PA2/PA3 and controls TIM4 PWM on PB6/PB7/PB8 (J7/J8/J9). It includes a build script and a Raspberry client. These servo pins follow the carrier PCB assignment: HEAD_PAN, LEFT_ARM and RIGHT_ARM. J10/J11 remain reserved. Physical validation remains pending.
+TIM4 está inicializado para PB6/PB7/PB8 → J7/J8/J9, pero los pines arrancan como
+GPIO bajos y ningún canal PWM se inicia. `START` solo cambia el estado lógico en
+esta compilación: no se enlaza una ruta de salida física y no hay barrido de inicio.
+Las mediciones provisionales 1000–2850, 1000–2700 y 1000–2850 µs siguen asociadas
+por número de servo de prueba, no por articulación. Centro, sentido, asignación y
+límites mecánicos seguros requieren validación individual. J10/J11 permanecen
+reservados.
 
-The top-level `Core/` and `Drivers/` remain reserved for future integration of the portable application with the carrier pinout.
+Desde `stm32/blackpill_uart`, compilar con `python build.py` genera ELF, BIN y MAP
+si `arm-none-eabi-gcc` está en PATH o en la instalación local de STM32CubeIDE.
+También se puede importar la carpeta en STM32CubeIDE y compilar Debug. La
+programación por ST-Link usa SWDIO, SWCLK, GND y opcionalmente NRST; verifica antes
+la alimentación y el voltaje objetivo. La compilación host no valida el hardware.
 
-`App/` includes portable C parsing, the HEAD_PAN five-tap FIR and trajectory, limits, heartbeat/state logic and pulse conversion, plus an initial dry-run CMSIS-RTOS2 adapter in `App/rtos/`. It is not linked into the independent bench firmware; its physical integration remains pending. IMU is an interface only and PID remains a placeholder. See [FIR DSP](../docs/digital-signal-processing-fir.md) and [FreeRTOS architecture, status and tests](../docs/freertos-motion-control.md).
+Para pruebas host del controlador y las tareas:
 
-Read [body control](../docs/body-control.md), [wiring](../docs/wiring.md), and [shared protocol](../docs/protocol/protocol.md). Follow the separate bench guide for flashing; the portable application remains a dry-run skeleton.
+```sh
+python stm32/tests/run_host_tests.py
+```
+
+Consulta [arquitectura FreeRTOS](../docs/freertos-motion-control.md),
+[protocolo](../docs/protocol/protocol.md), [cableado](../docs/wiring.md) y la guía
+del [puente UART de Raspberry](../raspberry/src/cuty/hardware/README.md).

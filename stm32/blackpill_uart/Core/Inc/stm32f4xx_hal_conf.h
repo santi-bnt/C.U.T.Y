@@ -55,7 +55,8 @@
 /* #define HAL_HASH_MODULE_ENABLED */
 /* #define HAL_I2C_MODULE_ENABLED */
 /* #define HAL_I2S_MODULE_ENABLED */
-/* #define HAL_IWDG_MODULE_ENABLED */
+/* HAL_IWDG is not part of this project's supplied HAL snapshot. Board code uses
+   the IWDG registers from the official STM32F401 CMSIS device header instead. */
 /* #define HAL_LTDC_MODULE_ENABLED */
 /* #define HAL_RNG_MODULE_ENABLED */
 /* #define HAL_RTC_MODULE_ENABLED */

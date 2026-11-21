@@ -10,6 +10,7 @@ typedef struct {
     size_t taps;
     size_t next;
 } CutyFirFilter;
+/* FIR causal de buffer fijo: no reserva memoria dinámica ni bloquea. */
 
 bool cuty_fir_init(CutyFirFilter *filter, const float *coefficients, size_t taps);
 void cuty_fir_reset(CutyFirFilter *filter, float seed);

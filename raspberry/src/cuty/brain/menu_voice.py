@@ -61,6 +61,38 @@ class MenuVoice:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as command:
             command.sendto(b"next", ("127.0.0.1", interrupt_port()))
 
+    def stop_music(self) -> bool:
+        """Pausa Spotify y libera el dispositivo Connect desde el menú táctil."""
+        home = str(self.raspberry.parent.parent)
+        base_command = ["/usr/local/bin/soloist", "ctl"]
+
+        def run_ctl(*arguments: str) -> subprocess.CompletedProcess:
+            command = [*base_command, *arguments]
+            if os.geteuid() == 0:
+                command = [
+                    "runuser", "-u", self.user, "--", "env", f"HOME={home}", *command,
+                ]
+                environment = None
+            else:
+                environment = os.environ.copy()
+                environment["HOME"] = home
+            try:
+                return subprocess.run(
+                    command, text=True, capture_output=True, timeout=4, check=False,
+                    env=environment,
+                )
+            except (OSError, subprocess.TimeoutExpired):
+                return subprocess.CompletedProcess(command, returncode=1)
+
+        status = run_ctl("status")
+        if status.returncode != 0 or "logged in: yes" not in status.stdout:
+            return False
+
+        # Soloist no tiene una orden stop: se pausa el audio y se libera Connect.
+        paused = run_ctl("pause").returncode == 0
+        deactivated = run_ctl("deactivate").returncode == 0
+        return paused and deactivated
+
     def stop(self) -> None:
         process, self.process = self.process, None
         if process is None or process.poll() is not None:

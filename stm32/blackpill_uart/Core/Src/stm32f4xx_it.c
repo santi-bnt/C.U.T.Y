@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "../../../Board/cuty_board.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -58,7 +59,6 @@
 extern TIM_HandleTypeDef htim5;
 
 /* USER CODE BEGIN EV */
-extern UART_HandleTypeDef huart2;
 
 /* USER CODE END EV */
 
@@ -176,7 +176,7 @@ void TIM5_IRQHandler(void)
 
 void USART2_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&huart2);
+  cuty_board_usart2_irq_handler();
 }
 
 /* USER CODE BEGIN 1 */

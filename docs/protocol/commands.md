@@ -1,6 +1,6 @@
 # Proposed High-Level Commands
 
-Status: examples only; nothing is implemented. Raspberry/behavior produces goals; STM32 is intended to own trajectories, PWM and safety for three active joints. The base, pedestal and torso are fixed.
+Status: table below is historical and not accepted by the implemented experimental V2 parser. V2 commands are documented in [motion control](../freertos-motion-control.md). No physical PWM or STM32 UART driver is implemented in stage 1.
 
 | Example | Proposed intent |
 | --- | --- |

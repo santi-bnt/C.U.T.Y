@@ -134,8 +134,66 @@ def test_external_playback_starts_only_after_voice_stream_closes():
     service._log = logging.getLogger("test")
 
     async def exercise():
-        await service._start_deferred_music_action(False)
+        started = await service._start_deferred_music_action(False)
+        assert started is True
         assert service.state.current == State.MUSIC_PLAYING
         assert events == ["speaker_closed", ("play", "spotify:track:abc")]
+
+    asyncio.run(exercise())
+
+
+def test_external_track_playback_failure_is_not_reported_as_success(caplog):
+    from cuty.brain.conversation import ConversationService
+    from cuty.brain.states import State, StateMachine
+    from cuty.music.protocol import PlaybackState
+
+    class Speaker:
+        async def close(self): pass
+
+    class Music:
+        external_output = True
+        async def play(self, track_id): raise SpotifySoloistError("daemon offline")
+        async def get_playback_state(self): return PlaybackState("stopped", None, 70)
+
+    service = object.__new__(ConversationService)
+    service.music = Music()
+    service.speaker = Speaker()
+    service.state = StateMachine()
+    service._deferred_music_action = ("play", "spotify:track:abc")
+    service._log = logging.getLogger("test")
+
+    async def exercise():
+        started = await service._start_deferred_music_action(False)
+        assert started is False
+        assert service.state.current == State.IDLE
+
+    asyncio.run(exercise())
+    assert "deferred provider action failed" in caplog.text
+
+
+def test_external_track_is_not_confirmed_when_soloist_reports_stopped():
+    from cuty.brain.conversation import ConversationService
+    from cuty.brain.states import State, StateMachine
+    from cuty.music.protocol import PlaybackState
+
+    class Speaker:
+        async def close(self): pass
+
+    class Music:
+        external_output = True
+        async def play(self, track_id): pass
+        async def get_playback_state(self): return PlaybackState("stopped", None, 70)
+
+    service = object.__new__(ConversationService)
+    service.music = Music()
+    service.speaker = Speaker()
+    service.state = StateMachine()
+    service._deferred_music_action = ("play", "spotify:track:abc")
+    service._log = logging.getLogger("test")
+
+    async def exercise():
+        started = await service._start_deferred_music_action(False)
+        assert started is False
+        assert service.state.current == State.IDLE
 
     asyncio.run(exercise())

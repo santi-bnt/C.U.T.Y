@@ -22,7 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "servo_uart.h"
+#include "../../../Board/cuty_board.h"
+#include "../../../App/rtos/motion_tasks.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,9 +91,8 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_TIM4_Init();
-  MX_USART2_UART_Init();
+  /* La capa Board configura UART y TIM4, pero deja PB6-PB8 como GPIO bajos. */
+  if (!cuty_board_init()) Error_Handler();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 
@@ -113,9 +113,15 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  if (defaultTaskHandle == NULL) Error_Handler();
+  /* No se enlaza ningún driver físico: START solo prueba el estado lógico V2. */
+  if (!cuty_rtos_set_watchdog_refresh(cuty_board_watchdog_refresh)) Error_Handler();
+  if (!cuty_rtos_create()) Error_Handler();
+  const osThreadAttr_t tx_attributes = {
+    .name = "UartTxTask", .stack_size = 768, .priority = osPriorityBelowNormal
+  };
+  if (osThreadNew(cuty_board_tx_task, NULL, &tx_attributes) == NULL) Error_Handler();
+  if (!cuty_board_watchdog_init()) Error_Handler();
+  if (!cuty_board_start_uart_rx()) Error_Handler();
   /* USER CODE BEGIN RTOS_THREADS */
   /* USER CODE END RTOS_THREADS */
 
@@ -123,7 +129,7 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  osKernelStart();
+  if (!cuty_rtos_start()) Error_Handler();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -286,10 +292,7 @@ static void MX_GPIO_Init(void)
 
 void StartDefaultTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
   (void)argument;
-  servo_uart_run();
-  /* USER CODE END StartDefaultTask */
 }
 
 /**
@@ -319,7 +322,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+  cuty_board_safe_state();
   __disable_irq();
+  /* En error de arranque se detienen señales; no se intenta recuperar el scheduler. */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8, GPIO_PIN_RESET);
   /* Si ocurre un error fatal despues de iniciar TIM4, quitar sus pulsos. */
   if (htim4.Instance == TIM4) {
     HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);

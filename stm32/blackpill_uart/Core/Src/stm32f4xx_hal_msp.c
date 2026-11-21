@@ -171,7 +171,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uart)
     gpio.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOA, &gpio);
     /* Prioridad compatible con las llamadas a colas de FreeRTOS desde ISR. */
-    HAL_NVIC_SetPriority(USART2_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
   }
 }

@@ -23,18 +23,21 @@ def main():
     root = Path(__file__).resolve().parent
     output = root / "build"
     output.mkdir(exist_ok=True)
-    rtos = Path("Middlewares/Third_Party/FreeRTOS/Source")
+    rtos = root / "Middlewares/Third_Party/FreeRTOS/Source"
     includes = ["Core/Inc", "Drivers/STM32F4xx_HAL_Driver/Inc",
                 "Drivers/CMSIS/Include", "Drivers/CMSIS/Device/ST/STM32F4xx/Include",
                 str(rtos / "include"), str(rtos / "CMSIS_RTOS_V2"),
                 str(rtos / "portable/GCC/ARM_CM4F")]
     sources = sorted(root.glob("Core/Src/*.c"))
     sources += sorted(root.glob("Drivers/STM32F4xx_HAL_Driver/Src/*.c"))
-    sources += sorted((root / rtos).glob("*.c"))
-    sources += [root / rtos / "CMSIS_RTOS_V2/cmsis_os2.c",
-                root / rtos / "portable/GCC/ARM_CM4F/port.c",
-                root / rtos / "portable/MemMang/heap_4.c",
+    sources += sorted(rtos.glob("*.c"))
+    sources += [rtos / "CMSIS_RTOS_V2/cmsis_os2.c",
+                rtos / "portable/GCC/ARM_CM4F/port.c",
+                rtos / "portable/MemMang/heap_4.c",
                 root / "Core/Startup/startup_stm32f401ccux.s"]
+    # El proyecto compila el mismo parser, controlador y tareas que prueban los tests host.
+    sources += sorted((root.parent / "App").rglob("*.c"))
+    sources += sorted((root.parent / "Board").glob("*.c"))
     elf = output / "cuty_arms_pwm_blackpill.elf"
     # Una sola orden mantiene este ejemplo facil de leer y de reproducir.
     command = [cc, "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
@@ -42,6 +45,7 @@ def main():
                "-ffunction-sections", "-fdata-sections", "-DUSE_HAL_DRIVER",
                "-DSTM32F401xC", "--specs=nano.specs", "--specs=nosys.specs"]
     command += ["-I" + str(root / include) for include in includes]
+    command += ["-I" + str(root.parent / "App"), "-I" + str(root.parent / "Board")]
     command += [str(source) for source in sources]
     command += ["-T" + str(root / "STM32F401CCUX_FLASH.ld"),
                 "-Wl,--gc-sections", "-Wl,-Map=" + str(output / "firmware.map"),
