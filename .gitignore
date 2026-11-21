@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-servos/
 .local-tools/
 .env
 .env.*

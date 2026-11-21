@@ -40,7 +40,7 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 - [ ] HEAD_PAN low-pass FIR integration into the board FreeRTOS task
 - [ ] UART and timer/PWM hardware validation (keep actuator outputs disabled until reviewed)
 
-Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. The physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
+Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. A separate [UART/PWM bench firmware and Raspberry client](../stm32/blackpill_uart/README.md) now build for the STM32F401CCU6 project using the carrier servo pinout. It does not implement the V2 motion integration; physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
 
 ## Phase 5 — Electronics and Mechanical Design
 

@@ -22,6 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 face-recognition = ["opencv-contrib-python-headless>=4.8,<5"]
+servos = ["pyserial>=3.5,<4"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

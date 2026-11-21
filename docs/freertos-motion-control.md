@@ -1,5 +1,7 @@
 # Current configuration update
 
+This page covers the portable V2 application only. A separate [simple UART/PWM bench firmware](../stm32/blackpill_uart/README.md) now exists for the supplied STM32F401CCU6 project, adapted to the carrier servo pinout (PB6/PB7/PB8). It does not link these motion/FIR modules.
+
 Three planned joints: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and J11 are reserved. Experimental protocol V2 accepts named joints only; V1 frames and reserved axes are rejected. The controller remains dry-run. References below to a single target mailbox or five axes are historical and superseded by three independent one-entry mailboxes.
 
 # FreeRTOS / Motion Control — initial, dry-run only

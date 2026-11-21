@@ -1,5 +1,7 @@
 # Architecture and Ownership
 
+An independent [Black Pill UART/PWM bench test](../stm32/blackpill_uart/README.md) is available with its own Raspberry script and the carrier servo pinout. The application bridge, named-joint motion integration and carrier firmware described below remain pending.
+
 | Domain | Owner | Boundary |
 | --- | --- | --- |
 | AI/LLM, conversation, speech | Raspberry Pi 5 | brain, llm, audio |

@@ -12,7 +12,7 @@ C.U.T.Y/
 │   ├── tests/
 │   ├── scripts/       Preparación de Windows/Raspberry
 │   └── systemd/       Plantilla futura del servicio de voz
-├── stm32/             Firmware futuro: servos, IMU, PID, UART y seguridad
+├── stm32/             Prueba UART/PWM Black Pill y control portable en dry-run
 ├── hardware/
 │   ├── cad/           SolidWorks y exportaciones STEP/STL/GLB
 │   └── electronics/   KiCad, esquemas y datasheets
@@ -31,7 +31,7 @@ Las entradas de voz, pantalla e instalación están dentro de `raspberry/`. El G
 - Electrónica: [carrier PCB v1.1](hardware/electronics/kicad/cuty_carrier/README.md) para Raspberry Pi 5 y STM32F401 Black Pill, con KiCad, Gerbers, BOM y esquemático. Fabricación, montaje y validación eléctrica pendientes.
 - La versión fija prevé tres servos MG996R: cabeza PAN y ambos brazos. La carrier conserva cinco salidas; dos quedan reservadas. El firmware portable funciona en dry-run; el control físico y su validación siguen pendientes.
 
-Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Los ejemplos UART siguen siendo propuestas.
+Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Para probar tres servos por UART, consulta la [guía Black Pill + Raspberry](stm32/blackpill_uart/README.md): es un firmware de banco independiente con los pines PB6/PB7/PB8 de J7/J8/J9 definidos en el repo. El protocolo V2 y su integración con la aplicación siguen en dry-run.
 
 ## Voz en Windows
 

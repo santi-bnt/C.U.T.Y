@@ -2,6 +2,8 @@
 
 C.U.T.Y is a small voice companion running on a Windows PC. Speak into the computer microphone and hear a streamed reply through the computer speakers. A live audio session keeps conversational context until you quit. No robot hardware is used. Gemini Live is the default provider because its selected native-audio model has a limited free API tier; OpenAI remains optional.
 
+For the separate Raspberry-to-Black-Pill servo test, use the [UART/PWM guide](../stm32/blackpill_uart/README.md). It runs independently of the voice application.
+
 ## Windows 11 setup
 
 In PowerShell, from the repository root, first run `cd raspberry`:
