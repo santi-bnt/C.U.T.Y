@@ -158,8 +158,18 @@ class ConversationService:
                         await self.music.pause()
                     await self._speak_local(response)
                     if external_output and self._deferred_music_action is not None:
-                        await self._start_deferred_music_action(music_was_playing)
+                        playback_started = await self._start_deferred_music_action(music_was_playing)
                         music_was_playing = False
+                        if not playback_started:
+                            try:
+                                await self.speaker.open()
+                                await self._speak_local(
+                                    "No pude iniciar esa canción en Spotify. Revisa que Spotify Soloist esté conectado."
+                                )
+                            except Exception as exc:
+                                self._log.warning(
+                                    "No pude comunicar el fallo de reproducción (%s)", type(exc).__name__
+                                )
                     elif resume_after_response:
                         await self.music.resume()
             if music_was_playing and self.music is not None:
@@ -294,6 +304,7 @@ class ConversationService:
                     parsed = parse_music_command(input_transcript) if self.music is not None else None
                     if self._pending_volume_command is None and parsed is not None:
                         self._pending_music_command = parsed
+                        self._log.info("MUSIC: recognized voice command (%s)", parsed.action)
                     if (self._pending_vision_intent is None and self._pending_volume_command is None
                             and self._pending_music_command is None
                             and not may_be_vision_intent(input_transcript)):
@@ -328,14 +339,8 @@ class ConversationService:
                             await audio_queue.put(audio)
                         held_audio.clear()
                     if self.voice_exit and wants_menu(input_transcript):
-                        if self.music is not None:
-                            try:
-                                await self.music.stop()
-                            except Exception as exc:
-                                self._log.warning(
-                                    "Could not stop external music before returning to menu (%s).",
-                                    type(exc).__name__,
-                                )
+                        # Soloist es un daemon aparte: volver al menú deja sonar
+                        # la pista hasta que el usuario la detenga explícitamente.
                         raise ReturnToMenu
                     if event.tool_calls:
                         for call in event.tool_calls:
@@ -511,13 +516,13 @@ class ConversationService:
             self._log.exception("MUSIC: provider command failed (%s)", type(exc).__name__)
             return "No pude controlar el reproductor de música ahora. Sigo aquí para ayudarte."
 
-    async def _start_deferred_music_action(self, music_was_playing: bool) -> None:
+    async def _start_deferred_music_action(self, music_was_playing: bool) -> bool:
         action, track_id = self._deferred_music_action or ("", None)
         self._deferred_music_action = None
         if self.music is None:
-            return
-        await self.speaker.close()
+            return False
         try:
+            await self.speaker.close()
             if action == "play" and track_id:
                 await self.music.play(track_id)
             elif action == "resume":
@@ -531,9 +536,14 @@ class ConversationService:
                 self.state.set(State.MUSIC_PLAYING)
             elif playback.status == "paused":
                 self.state.set(State.MUSIC_PAUSED)
+            if action in {"play", "resume"} and playback.status != "playing":
+                self._log.warning("MUSIC: Soloist accepted the command but playback is not active")
+                return False
+            return True
         except Exception as exc:
             self._log.exception("MUSIC: deferred provider action failed (%s)", type(exc).__name__)
             self.state.set(State.IDLE)
+            return False
 
     async def _apply_music_command(self, command: MusicCommand) -> str | None:
         if self.music is None:
@@ -564,6 +574,8 @@ class ConversationService:
                     await self.music.play(tracks[0].id)
                     self.state.set(State.MUSIC_PLAYING)
                 self._log.info("MUSIC: selected %s — %s", tracks[0].title, tracks[0].artist)
+                if getattr(self.music, "external_output", False):
+                    return f"Encontré {tracks[0].title} de {tracks[0].artist}; intento iniciar Spotify."
                 return f"Pongo {tracks[0].title} de {tracks[0].artist}."
             else:
                 self._log.info("MUSIC: no local matches for %s", command.query)
@@ -715,14 +727,7 @@ class ConversationService:
                 if not wants_menu(input_transcript):
                     raise ValueError("No explicit exit command was transcribed")
                 await self.provider.submit_tool_result(call.call_id, json.dumps({"ok": True}))
-                if self.music is not None:
-                    try:
-                        await self.music.stop()
-                    except Exception as exc:
-                        self._log.warning(
-                            "Could not stop music before returning to menu (%s).",
-                            type(exc).__name__,
-                        )
+                # El daemon de Soloist sigue activo después de cerrar esta conversación.
                 raise ReturnToMenu
             else:
                 raise ValueError("Unknown tool")

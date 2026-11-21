@@ -152,6 +152,7 @@ class Launcher(wifi.Panel):
         self.last_status_check = 0
         self.voice = MenuVoice(Path(__file__).resolve().parents[1], NORM_USER) if not FACE_ERROR else None
         self.voice_error = ''
+        self.music_notice = ''
         self.power_action = None
         self.power_error = ''
         self.power_busy = ''
@@ -171,8 +172,11 @@ class Launcher(wifi.Panel):
 
     def draw_menu(self, d):
         text(d, (18, 11), 'C.U.T.Y', LARGE)
-        text(d, (18, 43), 'Selecciona un modo', SMALL, MUTED)
+        self.draw_button(d, (135, 8, 280, 55), 'Parar música', ('stop_music',), SMALL,
+                         fill='#8f293d')
         self.draw_button(d, (W-188, 8, W-12, 55), 'Apagar / Reiniciar', ('power_menu',), SMALL)
+        if self.music_notice:
+            text(d, (18, 302), self.music_notice, TINY, MUTED, W-36)
         options = [
             (70, 'Terminal', 'Comandos y diagnóstico', 'terminal'),
             (151, 'Internet', 'Wi-Fi, IP y conexión', 'internet'),
@@ -352,6 +356,10 @@ class Launcher(wifi.Panel):
         self.mode, self.screen = 'face', 'home'
         if FACE_ERROR:
             return
+        # Spotify corre en otro daemon. Pausarlo evita que el micrófono escuche
+        # la música mientras C.U.T.Y. conversa.
+        if self.voice is not None:
+            self.voice.stop_music()
         if self.face is None:
             self.face = Face(W, H, ssaa=FACE_SSAA)
         if self.face_writer is None:
@@ -472,6 +480,11 @@ class Launcher(wifi.Panel):
 
     def action(self, act):
         if self.mode == 'power' and self.screen == 'busy':
+            return
+        if act == ('stop_music',) and self.mode == 'menu':
+            stopped = self.voice.stop_music() if self.voice is not None else False
+            self.music_notice = 'Música detenida' if stopped else 'No hay música activa'
+            self.render()
             return
         if act == ('menu',):
             if self.mode == 'face':
