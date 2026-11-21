@@ -100,6 +100,9 @@ bool cuty_board_watchdog_init(void) {
     if (HAL_RCC_OscConfig(&osc) != HAL_OK) return false;
     /* Acceso directo al IWDG: el snapshot HAL del proyecto no incluye su módulo.
        LSI/64 y reload 1000 dan cerca de 2 s; el LSI tiene tolerancia de frecuencia. */
+    /* Arrancar antes de configurar: sin el reloj interno del IWDG, los bits
+       PVU/RVU no se limpian y el arranque termina en Error_Handler sin UART RX. */
+    IWDG->KR = 0xCCCCU;
     IWDG->KR = 0x5555U;
     IWDG->PR = 4U;
     IWDG->RLR = 1000U;
@@ -108,7 +111,8 @@ bool cuty_board_watchdog_init(void) {
         --attempts;
     }
     if (attempts == 0U) return false;
-    IWDG->KR = 0xCCCCU;
+    /* Recargar con el periodo nuevo antes de entregar la vigilancia a las tareas. */
+    IWDG->KR = 0xAAAAU;
     return true;
 }
 
