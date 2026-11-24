@@ -57,9 +57,9 @@ def _env_flag(name: str, default: bool) -> bool:
 class FaceTracker:
     """Detecta y suaviza caras; comparte la coordenada con el visor y el seguimiento PAN.
 
-    Dry-run no toca UART. El hardware requiere un adaptador físico implementado
-    e inyectado por quien integra la aplicación, además de una habilitación
-    explícita; el render de ojos permanece independiente.
+    Dry-run no toca UART. El launcher puede inyectar IpcHeadAdapter; este envía
+    velocidades al proceso propietario del UART, que exige perfil y
+    habilitación explícita. El render de ojos permanece independiente.
     """
 
     def __init__(self, camera_factory: Callable[[], Camera] = open_camera,
