@@ -27,6 +27,7 @@ from cuty.hardware.calibration_profile import RobotCalibration
 from cuty.hardware.motion_actions import MotionActionGate
 from cuty.hardware.robot_motion import RobotMotionExecutor
 from cuty.hardware.motion_ipc import MotionIpcServer
+from cuty.telemetry.telemetry import TelemetryServer
 from cuty.brain.states import State, StateMachine
 from cuty.config import Config, ConfigurationError
 from cuty.audio.thinking import ThinkingVoice
@@ -193,6 +194,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     prepare_thinking = asyncio.create_task(thinking_voice.prepare())
     physical_executor = None
     motion_ipc_server = None
+    telemetry_server = None
     try:
         await speaker.open()
         await provider.connect()
@@ -237,18 +239,49 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                 calibration = RobotCalibration.load(profile_path)
                 executor = RobotMotionExecutor(uart_port, calibration)
                 # Comprueba enlace y perfil; el STM32 permanece DISARMED al iniciar.
-                await asyncio.to_thread(executor.enable)
+                link_ready = await asyncio.to_thread(executor.enable)
                 physical_executor = executor
-                motion_gate = MotionActionGate(executor)
-                motion_gate.enable_physical(calibration=calibration)
-                if os.name == "posix" and os.getenv("CUTY_FOLLOW_PHYSICAL_ENABLE", "0").lower() in {
+                if link_ready:
+                    motion_gate = MotionActionGate(executor)
+                    motion_gate.enable_physical(calibration=calibration)
+                if link_ready and os.name == "posix" and os.getenv("CUTY_FOLLOW_PHYSICAL_ENABLE", "0").lower() in {
                     "1", "true", "yes", "on",
                 }:
                     motion_ipc_server = MotionIpcServer(executor, motion_gate.physical_enabled)
                     motion_ipc_server.start()
-                log.warning("Movimiento físico autorizado localmente; el STM32 sigue DISARMED")
+                if link_ready:
+                    log.warning("Movimiento físico autorizado localmente; el STM32 sigue DISARMED")
+                else:
+                    log.warning("UART no disponible; se reintentará conexión sin habilitar movimiento")
             except (OSError, RuntimeError, ValueError) as error:
                 log.error("Movimiento físico no habilitado: %s", error)
+        if os.getenv("CUTY_TELEMETRY_ENABLE", "0").strip().lower() in {
+            "1", "true", "yes", "on",
+        }:
+            try:
+                telemetry_server = TelemetryServer(
+                    physical_executor.status_snapshot if physical_executor else lambda: {
+                        "connection": "offline",
+                        "mode": "hardware" if physical_motion_requested else "simulation",
+                        "safety_state": "UNKNOWN",
+                        "motion_authorized": False,
+                        "controller_active": False,
+                        "physical_output_status": "unverified",
+                        "firmware_profile_match": "unverified",
+                        "position_kind": "commanded",
+                        "measured_positions_available": False,
+                        "commanded_milli_units": None,
+                        "telemetry_fresh": False,
+                    },
+                    host=os.getenv("CUTY_TELEMETRY_BIND", "127.0.0.1"),
+                    port=int(os.getenv("CUTY_TELEMETRY_PORT", "8765")),
+                    allowed_origin=os.getenv("CUTY_TELEMETRY_ORIGIN") or None,
+                )
+                address = telemetry_server.start()
+                log.info("Telemetría de solo lectura: http://%s:%d/api/robot/status", *address)
+            except (OSError, ValueError) as error:
+                telemetry_server = None
+                log.error("Telemetría no iniciada: %s", error)
         service = ConversationService(
             provider, microphone, speaker, state, expressions,
             thinking_voice=thinking_voice,
@@ -290,6 +323,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                 await asyncio.gather(stop_task, return_exceptions=True)
         return 0
     finally:
+        if telemetry_server is not None:
+            telemetry_server.stop()
         if motion_ipc_server is not None:
             motion_ipc_server.stop()
         if physical_executor is not None:

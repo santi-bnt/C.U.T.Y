@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from cuty.hardware.robot_commands import command, target
+from cuty.hardware.robot_commands import command, parse_response, parse_telemetry, target
 from cuty.hardware.stm32_bridge import STM32Bridge
 
 
@@ -55,4 +55,33 @@ def test_bridge_timeout_and_disconnect(tmp_path, monkeypatch):
     bridge = STM32Bridge("/dev/ttyS0", serial_factory=lambda *a, **k: fake)
     with pytest.raises(ConnectionError, match="timeout"):
         bridge.exchange(command("V2,HB"), timeout=0)
+    bridge.close()
+
+
+def test_telemetry_parser_distinguishes_commanded_position_and_validates_bounds():
+    sample = parse_telemetry(parse_response(
+        "V2,TELEM,1234,ACTIVE,2,1,-150,250,0,OK"
+    ))
+    assert sample.commanded_milli_units == {
+        "HEAD_PAN": -150, "LEFT_ARM": 250, "RIGHT_ARM": 0,
+    }
+    with pytest.raises(ValueError):
+        parse_telemetry(parse_response(
+            "V2,TELEM,1234,ACTIVE,2,1,-150,1001,0,OK"
+        ))
+
+
+def test_bridge_bounds_unconsumed_periodic_telemetry(tmp_path, monkeypatch):
+    monkeypatch.setattr("cuty.hardware.stm32_bridge.Path", lambda _p: tmp_path)
+    fake = FakeSerial()
+    fake.lines = [
+        *(f"V2,TELEM,{index},DISARMED,0,0,0,0,0,OK\n".encode() for index in range(100)),
+        b"V2,ACK,1,OK,DISARMED\n",
+    ]
+    bridge = STM32Bridge("/dev/ttyS0", serial_factory=lambda *a, **k: fake)
+    bridge.exchange(command("V2,HB"))
+    assert len(bridge.events) == 64
+    events = bridge.drain_events()
+    assert len(events) == 64
+    assert not bridge.events
     bridge.close()

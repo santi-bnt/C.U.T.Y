@@ -19,12 +19,13 @@ El parser acepta `V2,HB`, `ARM`, `START`, `DISARM`, `RESET` y objetivos V2 para
 HEAD_PAN, LEFT_ARM y RIGHT_ARM. Las respuestas son `V2,ACK,...`, `V2,NACK,...`,
 `V2,STATE,...` y `V2,TELEM,...`.
 
-TIM4 está inicializado para PB6/PB7/PB8 → J7/J8/J9, pero los pines arrancan como
-GPIO bajos y ningún canal PWM se inicia. `START` solo cambia el estado lógico en
-esta compilación: no se enlaza una ruta de salida física y no hay barrido de inicio.
-Las mediciones provisionales 1000–2850, 1000–2700 y 1000–2850 µs siguen asociadas
-por número de servo de prueba, no por articulación. Centro, sentido, asignación y
-límites mecánicos seguros requieren validación individual. J10/J11 permanecen
+TIM4 corresponde a PB6/PB7/PB8 → J7/J8/J9. El build normal deja las salidas
+deshabilitadas. `--profile perfil-confirmado.json` genera una imagen separada que
+enlaza el PWM de los tres ejes con sus límites, centro, sentido, velocidad y
+aceleración validados. Arranca sin PWM; ARM y START explícitos habilitan los
+objetivos. `--calibration` genera otra imagen independiente para mover un eje a
+la vez en modo manual. Las medidas antiguas 1000–2850, 1000–2700 y 1000–2850 µs
+siguen sin asignación por articulación; no se usan como perfil. J10/J11 siguen
 reservados.
 
 Desde `stm32/blackpill_uart`, compilar con `python build.py` genera ELF, BIN y MAP

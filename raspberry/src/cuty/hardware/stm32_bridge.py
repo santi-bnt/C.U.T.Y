@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import deque
 import os
 import sys
 import time
@@ -23,7 +24,8 @@ class STM32Bridge:
     def __init__(self, port: str, baudrate: int = 115200, serial_factory: Any = None):
         self.port = port
         self._rx_buffer = bytearray()
-        self.events = []
+        # El STM32 puede emitir TELEM cada 10 ms; conservar solo un lote acotado.
+        self.events = deque(maxlen=64)
         self._lock_file = None
         # El lock se toma antes de abrir pyserial para evitar dos propietarios simultáneos.
         try:
@@ -94,6 +96,12 @@ class STM32Bridge:
             raise TimeoutError("STM32 did not return a line before timeout")
         except (OSError, TimeoutError) as exc:
             raise ConnectionError(f"UART {self.port}: {exc}") from exc
+
+    def drain_events(self) -> tuple:
+        """Retira STATE/TELEM asíncronos sin permitir crecimiento ilimitado."""
+        events = tuple(self.events)
+        self.events.clear()
+        return events
 
     def heartbeat(self, interval: float = 0.25, count: int = 1) -> None:
         """Envía HB a intervalos menores que el timeout del controlador."""

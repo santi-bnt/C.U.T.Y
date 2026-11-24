@@ -54,6 +54,52 @@ class Response:
         return None
 
 
+@dataclass(frozen=True)
+class RobotTelemetry:
+    """Instantánea V2: las posiciones son consignas, no mediciones físicas."""
+
+    timestamp_ms: int
+    state: str
+    rx_errors: int
+    dropped_tx: int
+    commanded_milli_units: dict[str, int]
+    uart_status: str
+
+
+def parse_telemetry(response: Response) -> RobotTelemetry:
+    """Valida el registro TELEM que emite cuty_board_tx_task."""
+    states = {"DISARMED", "READY", "ACTIVE", "FAULT"}
+    fields = response.fields
+    if response.kind != "TELEM" or len(fields) != 8:
+        raise ValueError("invalid V2 telemetry shape")
+    timestamp, state, rx_errors, dropped_tx, head, left, right, uart_status = fields
+    if state not in states or uart_status not in {"OK", "UART_FAULT"}:
+        raise ValueError("invalid V2 telemetry status")
+    counters = (timestamp, rx_errors, dropped_tx)
+    positions_raw = (head, left, right)
+    if any(not value.isascii() or not value.isdigit() for value in counters):
+        raise ValueError("invalid V2 telemetry number")
+    if any(
+        not value.isascii()
+        or not value.lstrip("-").isdigit()
+        or value.startswith("--")
+        or value == "-"
+        for value in positions_raw
+    ):
+        raise ValueError("invalid V2 commanded position")
+    positions = tuple(map(int, positions_raw))
+    if any(not -1000 <= position <= 1000 for position in positions):
+        raise ValueError("V2 commanded position outside normalized range")
+    return RobotTelemetry(
+        timestamp_ms=int(timestamp), state=state, rx_errors=int(rx_errors),
+        dropped_tx=int(dropped_tx),
+        commanded_milli_units=dict(zip(
+            (Axis.HEAD_PAN.value, Axis.LEFT_ARM.value, Axis.RIGHT_ARM.value), positions,
+        )),
+        uart_status=uart_status,
+    )
+
+
 def parse_response(line: str) -> Response:
     """Comprueba el prefijo y tipo de respuesta antes de exponer sus campos."""
     fields = line.strip().split(",")

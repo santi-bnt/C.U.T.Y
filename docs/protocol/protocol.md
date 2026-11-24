@@ -1,6 +1,6 @@
-# Proposed Human-Readable UART Protocol
+# Protocolo UART V2
 
-Status: experimental V2 is implemented in the portable STM32 parser and Raspberry serializer; physical UART driver/firmware image and response encoder remain pending. V2 is the current code reference and is not wire-compatible with the historical `SET_*` examples below.
+Status: V2 parser, USART2 board adapter, response encoder and Raspberry serializer are implemented. Raspberry/Black Pill UART communication and the three carrier servo channels were previously exercised physically; the current integrated firmware/profile and final safety behavior still require supervised validation. V2 is not wire-compatible with historical `SET_*` examples below.
 
 Raspberry sends high-level goals; STM32 converts them into safe physical movement and emits status/measurements. Do not stream raw servo PWM continuously from Raspberry.
 
@@ -15,14 +15,12 @@ Current V2 input format: LF terminated, optional CR before LF; `V2,HB`, `V2,ARM`
 
 See [commands](commands.md) and [telemetry](telemetry.md).
 
-## Decisions required before implementation
+## Checks before final physical operation
 
 - Confirm the carrier design target STM32F401CCU6 against the actual module marking/revision and validate PA3/PA2 continuity, 115200 8N1, 3.3 V levels and common GND before live use.
-- Units, coordinate frames, calibrated limits, and target versus measured meaning.
-- Startup/version negotiation, acknowledgements, errors, sequencing, retries.
-- Heartbeat, stale command timeout, disconnect behavior, and recovery.
-- Framing, partial/truncated/invalid data, bounds, overflow, and checksum policy.
-- Telemetry rates, timestamps, validity, and safety-state reporting.
-- Whether a binary format is later needed; do not finalize it in this task.
+- Per-axis neutral, direction and mechanically safe limits must come from physical calibration.
+- Confirm the firmware was built with the same reviewed profile loaded by Raspberry; V2 has no profile fingerprint handshake yet.
+- Exercise heartbeat timeout, UART loss, FAULT and explicit recovery on the assembled hardware.
+- Confirm actual telemetry freshness and UART error behavior under sustained operation.
 
-Firmware must validate commands and apply safety limits locally. The future dashboard is not part of a real-time control loop.
+Firmware validates commands and applies configured limits locally. The optional Raspberry dashboard endpoint is read-only and is not part of a real-time control loop.

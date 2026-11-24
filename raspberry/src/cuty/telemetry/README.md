@@ -1,5 +1,16 @@
-# C.U.T.Y Telemetry
+# Telemetría C.U.T.Y.
 
-Future aggregation/server boundary for Raspberry status, provider status, vision/expression status, and STM32 telemetry. `telemetry.py` contains only a TODO.
+`hardware.robot_motion.RobotMotionExecutor.status_snapshot()` expone el estado
+de seguridad y la última posición **comandada** recibida desde STM32. La
+telemetría se valida en el parser UART; el puente limita a 64 los eventos
+pendientes aunque el firmware emita datos más rápido que el consumidor.
 
-The web dashboard should consume this boundary rather than reading devices or sending PWM itself. Transport, authentication, update rates, storage, and command authority are undecided. No HTTP/WebSocket server or dependency is added.
+`TelemetryServer` publica esa instantánea en `GET /api/robot/status`. No
+implementa rutas de control, inicia deshabilitado y solo permite enlazar una
+dirección loopback. Para habilitarlo desde `cuty --hands-free`, configura
+`CUTY_TELEMETRY_ENABLE=1`; `CUTY_TELEMETRY_PORT` elige el puerto y
+`CUTY_TELEMETRY_ORIGIN` autoriza un origen CORS exacto. Consulta
+`docs/protocol/telemetry.md` para el contrato y la integración con el dashboard.
+
+Sin un ejecutor físico habilitado, la respuesta indica enlace offline y modo
+simulación. No se exponen posición medida, batería ni periféricos no observados.

@@ -4,27 +4,29 @@ Three axes are supported: HEAD_PAN (J7), LEFT_ARM (J8), RIGHT_ARM (J9). J10 and
 J11 are reserved. Protocol V2 accepts named axes only. The CubeIDE project at
 [`stm32/blackpill_uart`](../stm32/blackpill_uart/README.md) links this portable
 application to the STM32F401 HAL and FreeRTOS. USART2 receives V2 frames and returns
-ACK/NACK, STATE and TELEM records. PWM remains disconnected from the task callbacks,
-and its outputs remain disabled. Targets are normalized software units, not calibrated
-angles.
+ACK/NACK, STATE and TELEM records. The default build keeps PWM disconnected; the
+profile build links calibrated outputs to the motion tasks. Targets are normalized
+software units, not calibrated angles.
 
-# FreeRTOS / Motion Control — initial, dry-run only
+# FreeRTOS / Motion Control
 
 ## Actual implementation boundary
 
-The portable C modules implement byte-stream framing, strict experimental command parsing,
-three normalized commanded setpoints, a damped trajectory filter, position/velocity/acceleration
-limits, heartbeat checks, a latched safety state machine, and a pure pulse-width conversion.
-The board layer initializes USART2, TIM4 with stopped channels, and the UART RX
-interrupt. The CubeIDE project links these modules to HAL, CMSIS and FreeRTOS. The
-application deliberately does not bind physical PWM callbacks; no servo can be driven
-by V2 commands in this build. No on-board test result is claimed. IMU is an interface
-declaration; PID remains a placeholder.
+The portable C modules implement byte-stream framing, strict V2 command parsing, three
+normalized setpoints, bounded trajectories, heartbeat checks, a latched safety state
+machine, and pulse-width conversion. The board layer initializes USART2, TIM4 and UART
+RX. The default build leaves PWM disabled. A separate `build.py --profile` image binds
+all three PWM callbacks using a validated per-axis profile; it still starts DISARMED
+with outputs off until explicit ARM and START. Raspberry supplies the matching profile,
+heartbeat, high-level gestures and guarded face-follow goals. V2 has no profile identity
+handshake, so firmware/profile correspondence and all physical safety behavior still
+require supervised confirmation. IMU remains an interface declaration; PID is not part
+of the fixed-base motion path.
 
-The interactive website is a scripted educational visualization. Its PAN +0.35 example,
-slowed stages and 500 ms fault scenario are illustrative, not live telemetry or a firmware
-emulator. It has no serial, Bluetooth, WebSocket, HTTP command or robot-control transport.
-Raspberry head_follow.py remains dry-run; no Raspberry configuration or drivers were changed.
+The interactive website retains its scripted architecture visualization. A separately
+configured read-only HTTP transport can display Raspberry/STM32 status and commanded
+positions; it cannot send motion commands. Physical output and loaded-profile match are
+shown as unverified until confirmed on hardware.
 
 ## Ownership and tasks
 

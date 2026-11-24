@@ -146,6 +146,11 @@ solo publica velocidades recientes por socket Unix local al proceso que posee
 UART. Al perder la cara, el launcher desarma y requiere otro toque para reanudar.
 El enlace limita PAN a ±0.15 normalizado.
 
+Si se pierde el UART, Raspberry reintenta cada segundo, pero deja la autorización
+de movimiento desactivada al recuperar conexión. Reinicia el servicio para volver
+a habilitar acciones; si STM32 quedó en FAULT, ejecuta primero RESET manual y
+comprueba DISARMED. Ningún gesto o seguimiento interrumpido se reanuda solo.
+
 Las órdenes de Gemini solo aceptan frases explícitas del allowlist y la acción
 debe coincidir con la transcripción. Los gestos usan el mismo ejecutor y perfil.
 El dueño de movimiento es exclusivo: seguimiento y gestos no escriben objetivos

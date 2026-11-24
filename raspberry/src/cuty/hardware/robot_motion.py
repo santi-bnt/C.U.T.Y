@@ -6,7 +6,7 @@ import threading
 
 from .calibration_profile import RobotCalibration
 from .motion_actions import MotionAction
-from .robot_commands import command, parse_response, target
+from .robot_commands import RobotTelemetry, command, parse_response, parse_telemetry, target
 from .stm32_bridge import STM32Bridge
 
 AXES = ("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM")
@@ -42,11 +42,15 @@ class RobotMotionExecutor:
         self._sleep = sleep
         self._bridge = None
         self._port = port
+        self.connected = False
         self.enabled = False
         self._last_sequence: int | None = None
         self._io_lock = threading.RLock()
-        self._heartbeat_stop = threading.Event()
-        self._heartbeat_thread = None
+        self._telemetry: RobotTelemetry | None = None
+        self._telemetry_received_at: float | None = None
+        self._last_state = "UNKNOWN"
+        self._monitor_stop = threading.Event()
+        self._monitor_thread = None
         self._active = False
         self._owner_lock = threading.Lock()
         self._motion_owner: str | None = None
@@ -55,49 +59,72 @@ class RobotMotionExecutor:
         """Verifica enlace y perfil; no arma ni inicia el movimiento físico."""
         if self.enabled:
             return True
+        if self._monitor_thread is not None and self._monitor_thread.is_alive():
+            return False
+        try:
+            self._connect(require_disarmed=True, authorize=True)
+        except (OSError, RuntimeError, ConnectionError, TimeoutError):
+            # El monitor puede recuperar el enlace, pero la puerta de movimiento
+            # requiere que el llamador vuelva a autorizar la sesión explícitamente.
+            self._monitor_stop.clear()
+            self._start_monitor()
+            return False
+        self._monitor_stop.clear()
+        self._start_monitor()
+        return True
+
+    def _connect(self, *, require_disarmed: bool, authorize: bool) -> None:
         bridge = self._bridge_factory(self._port)
+        self._last_sequence = None
         try:
             state = self._exchange(bridge, "V2,HB")
             if state != "DISARMED":
-                raise RuntimeError(f"STM32 debe estar DISARMED para habilitar control local (estado {state})")
+                if not require_disarmed and state in {"READY", "ACTIVE"}:
+                    state = self._exchange(bridge, "V2,DISARM", expected="DISARMED")
+                else:
+                    raise RuntimeError(
+                        f"STM32 debe estar DISARMED para habilitar control local (estado {state})"
+                    )
         except Exception:
             bridge.close()
             raise
         self._bridge = bridge
-        self.enabled = True
+        self.connected = True
+        self.enabled = authorize
         self._last_sequence = None
-        return True
 
     def disable(self) -> None:
         """Desarma y libera UART, incluso después de un error de comunicación."""
+        self._monitor_stop.set()
+        worker = self._monitor_thread
+        self._monitor_thread = None
+        if worker is not None and worker is not threading.current_thread():
+            worker.join(timeout=1.2)
+        self._drop_link()
+
+    def _drop_link(self) -> None:
         bridge, self._bridge = self._bridge, None
+        self.connected = False
         self.enabled = False
         self._active = False
-        self._heartbeat_stop.set()
-        worker = self._heartbeat_thread
-        self._heartbeat_thread = None
-        if worker is not None and worker is not threading.current_thread():
-            worker.join(timeout=0.6)
         self._last_sequence = None
         with self._owner_lock:
             self._motion_owner = None
         if bridge is not None:
-            bridge.close()
+            try:
+                bridge.close()
+            except Exception:
+                pass
 
     def stop(self) -> None:
         if not self.enabled or self._bridge is None:
             self._active = False
             return
         bridge = self._require_enabled()
-        self._heartbeat_stop.set()
-        worker = self._heartbeat_thread
-        self._heartbeat_thread = None
-        if worker is not None and worker is not threading.current_thread():
-            worker.join(timeout=0.6)
         try:
             self._exchange(bridge, "V2,DISARM")
         except Exception:
-            self.disable()
+            self._drop_link()
             raise
         self._active = False
         with self._owner_lock:
@@ -111,6 +138,8 @@ class RobotMotionExecutor:
             return {"accepted": True, "action": action.value, "mode": "stopped"}
         if action not in POSES:
             raise ValueError("Acción sin trayectoria implementada")
+        if not self.enabled or not self.connected:
+            raise RuntimeError("Movimiento desautorizado hasta revalidar el enlace localmente")
         if not self.claim("voice"):
             raise RuntimeError("Otro controlador posee los ejes físicos")
         bridge = None
@@ -124,7 +153,7 @@ class RobotMotionExecutor:
                 self._sleep(STEP_SECONDS)
             return {"accepted": True, "action": action.value, "mode": "hardware"}
         except Exception:
-            self.disable()
+            self._drop_link()
             raise
         finally:
             self.release("voice")
@@ -136,7 +165,7 @@ class RobotMotionExecutor:
             self._ensure_active(bridge)
             return True
         except Exception:
-            self.disable()
+            self._drop_link()
             raise
 
     def set_axis_target(self, axis: str, milli_units: int, *, owner: str = "voice") -> bool:
@@ -155,7 +184,7 @@ class RobotMotionExecutor:
             self._exchange(bridge, target(axis, milli_units), expected="ACTIVE")
             return True
         except Exception:
-            self.disable()
+            self._drop_link()
             raise
 
     def claim(self, owner: str) -> bool:
@@ -172,6 +201,35 @@ class RobotMotionExecutor:
             if self._motion_owner == owner:
                 self._motion_owner = None
 
+    def status_snapshot(self) -> dict[str, object]:
+        """Devuelve observabilidad de solo lectura; nunca informa posición medida."""
+        with self._io_lock:
+            telemetry = self._telemetry
+            age = (
+                max(0.0, self._clock() - self._telemetry_received_at)
+                if self._telemetry_received_at is not None else None
+            )
+            telemetry_fresh = age is not None and age <= 1.0
+            return {
+                "connection": "connected" if self.connected else "offline",
+                "mode": "hardware",
+                "safety_state": telemetry.state if telemetry_fresh and telemetry else self._last_state,
+                "motion_authorized": self.enabled,
+                "controller_active": bool(self.enabled and self._active),
+                "physical_output_status": "unverified",
+                "firmware_profile_match": "unverified",
+                "telemetry_age_seconds": age,
+                "telemetry_fresh": telemetry_fresh,
+                "position_kind": "commanded",
+                "measured_positions_available": False,
+                "commanded_milli_units": (
+                    dict(telemetry.commanded_milli_units) if telemetry else None
+                ),
+                "rx_errors": telemetry.rx_errors if telemetry else None,
+                "dropped_tx": telemetry.dropped_tx if telemetry else None,
+                "uart_status": telemetry.uart_status if telemetry else None,
+            }
+
     def _ensure_active(self, bridge) -> None:
         if self._active:
             return
@@ -182,27 +240,39 @@ class RobotMotionExecutor:
         elif state != "ACTIVE":
             raise RuntimeError(f"No se inicia movimiento desde estado {state}")
         self._active = True
-        self._heartbeat_stop.clear()
-        self._heartbeat_thread = threading.Thread(
-            target=self._heartbeat_loop, name="cuty-motion-heartbeat", daemon=True,
+
+    def _start_monitor(self) -> None:
+        worker = self._monitor_thread
+        if worker is not None and worker.is_alive():
+            return
+        self._monitor_thread = threading.Thread(
+            target=self._monitor_loop, name="cuty-motion-link-monitor", daemon=True,
         )
-        self._heartbeat_thread.start()
+        self._monitor_thread.start()
 
     def _require_enabled(self):
-        if not self.enabled or self._bridge is None:
+        if not self.connected or not self.enabled or self._bridge is None:
             raise RuntimeError("Controlador físico deshabilitado localmente")
         return self._bridge
 
-    def _heartbeat_loop(self) -> None:
-        while not self._heartbeat_stop.wait(0.15):
-            if not self._active or not self.enabled:
-                return
+    def _monitor_loop(self) -> None:
+        while not self._monitor_stop.wait(0.15):
+            if not self.connected:
+                if self._monitor_stop.wait(0.85):
+                    return
+                try:
+                    # Reconectar solo observa DISARMED; READY/ACTIVE se desarman,
+                    # y FAULT requiere recuperación explícita fuera del monitor.
+                    self._connect(require_disarmed=False, authorize=False)
+                except (OSError, RuntimeError, ConnectionError, TimeoutError, ValueError):
+                    continue
+                continue
             try:
-                self._exchange(self._require_enabled(), "V2,HB", expected="ACTIVE")
+                # HB en DISARMED solo mantiene enlace/telemetría; nunca arma.
+                self._exchange(self._bridge, "V2,HB")
             except Exception:
-                # Un heartbeat perdido invalida la sesión; liberar UART sin rearmado automático.
-                self.disable()
-                return
+                # Se cierra la sesión y se vuelve a intentar sin reanudar objetivos.
+                self._drop_link()
 
     def _exchange(self, bridge, wire: bytes | str, *, expected: str | None = None) -> str:
         if isinstance(wire, str):
@@ -218,6 +288,20 @@ class RobotMotionExecutor:
             if self._last_sequence is not None and sequence_number != self._last_sequence + 1:
                 raise RuntimeError("Secuencia UART perdida; se cancela el movimiento")
             self._last_sequence = sequence_number
+            self._last_state = state
+            drain_events = getattr(bridge, "drain_events", None)
+            if drain_events is not None:
+                for event in drain_events():
+                    try:
+                        if event.kind == "TELEM":
+                            self._telemetry = parse_telemetry(event)
+                            self._telemetry_received_at = self._clock()
+                        elif event.kind == "STATE" and len(event.fields) == 2:
+                            if event.fields[0] in {"DISARMED", "READY", "ACTIVE", "FAULT"}:
+                                self._last_state = event.fields[0]
+                    except ValueError:
+                        # Un registro de diagnóstico malformado no autoriza movimiento.
+                        continue
             if expected is not None and state != expected:
                 raise RuntimeError(f"Estado STM32 {state}; se esperaba {expected}")
             return state
