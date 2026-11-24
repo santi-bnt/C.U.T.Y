@@ -1,3 +1,4 @@
+import threading
 import time
 
 import pytest
@@ -39,7 +40,7 @@ class FakeBridge:
             self.events.append(parse_response(
                 "V2,TELEM,9876,DISARMED,3,1,-125,200,0,OK"
             ))
-        return f"V2,ACK,{self.sequence},OK,{self.state}\n".encode()
+        return f"V2,ACK,{self.sequence},OK,{self.state}\n"
 
     def drain_events(self):
         events, self.events = tuple(self.events), []
@@ -59,7 +60,7 @@ def test_gesture_uses_v2_targets_and_stop_disarms():
     assert "V2,TARGET,LEFT_ARM,200" in bridge.commands
     assert "V2,TARGET,RIGHT_ARM,200" in bridge.commands
     executor.stop()
-    assert "V2,DISARM\n" in bridge.commands
+    assert "V2,DISARM" in bridge.commands
     assert not bridge.closed
     executor.disable()
     assert bridge.closed
@@ -85,6 +86,7 @@ def test_status_snapshot_reports_commanded_telemetry_without_claiming_measuremen
         "HEAD_PAN": -125, "LEFT_ARM": 200, "RIGHT_ARM": 0,
     }
     executor.disable()
+    assert "V2,DISARM" in bridge.commands
 
 
 def test_reconnect_never_restores_motion_authorization_or_restarts_motion():
@@ -120,3 +122,35 @@ def test_reconnect_never_restores_motion_authorization_or_restarts_motion():
         assert "V2,DISARM" in bridges[0].commands
     finally:
         executor.disable()
+
+
+def test_stop_cancels_a_gesture_before_any_later_target_is_sent():
+    entered_step = threading.Event()
+    release_step = threading.Event()
+
+    def paused_sleep(_seconds):
+        entered_step.set()
+        release_step.wait(1)
+
+    bridge = FakeBridge()
+    executor = RobotMotionExecutor(
+        "/dev/test", profile(), bridge_factory=lambda *_: bridge, sleep=paused_sleep,
+    )
+    assert executor.enable()
+    result = []
+    action = threading.Thread(target=lambda: result.append(executor.execute(MotionAction.WAVE_BOTH)))
+    action.start()
+    assert entered_step.wait(1)
+    stopper = threading.Thread(target=executor.stop)
+    stopper.start()
+    assert executor._motion_cancel.wait(1)
+    release_step.set()
+    action.join(1)
+    stopper.join(1)
+    assert not action.is_alive() and not stopper.is_alive()
+    disarm = max(index for index, line in enumerate(bridge.commands) if line == "V2,DISARM")
+    assert all(line.split(",")[1] not in {"ARM", "START", "TARGET"}
+               for line in bridge.commands[disarm + 1:])
+    assert result == [{"accepted": False, "action": "wave_both", "mode": "robot",
+                       "reason": "cancelled by stop"}]
+    executor.disable()

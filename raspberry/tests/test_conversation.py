@@ -438,10 +438,11 @@ def test_voice_motion_tool_requires_matching_user_words_and_stays_simulated():
         ToolCall("move", "request_motion", '{"action":"head_left"}'),
         input_transcript="Cuty, mira a la izquierda",
     ))
-    assert provider.results[-1] == ("move", {
-        "accepted": False, "action": "head_left", "mode": "simulation",
-        "reason": "physical motion is not enabled",
-    })
+    result = provider.results[-1][1]
+    assert provider.results[-1][0] == "move"
+    assert result["accepted"] is True and result["simulated"] is True
+    assert result["mode"] == "simulation"
+    assert result["commanded_milli_units"]["HEAD_PAN"] == -150
 
 
 def test_model_cannot_invent_motion_and_stop_has_priority():
@@ -450,15 +451,15 @@ def test_model_cannot_invent_motion_and_stop_has_priority():
         ToolCall("move", "request_motion", '{"action":"head_right"}'),
         input_transcript="Cuty, mira a la izquierda",
     ))
-    assert not provider.results[-1][1]["accepted"]
-    assert "rejected" in provider.results[-1][1]["error"].lower()
+    assert provider.results[-1][1]["ok"] is False
+    assert "does not match" in provider.results[-1][1]["error"].lower()
 
     asyncio.run(service._handle_tool(
         ToolCall("stop", "request_motion", '{"action":"wave_both"}'),
         input_transcript="Cuty, saluda, detente",
     ))
     assert provider.results[-1] == ("stop", {
-        "accepted": True, "action": "stop", "mode": "stopped",
+        "accepted": True, "action": "stop", "mode": "simulation",
     })
 
 

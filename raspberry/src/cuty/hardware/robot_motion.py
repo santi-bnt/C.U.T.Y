@@ -5,29 +5,12 @@ import time
 import threading
 
 from .calibration_profile import RobotCalibration
-from .motion_actions import MotionAction
+from .motion_actions import MotionAction, POSES
 from .robot_commands import RobotTelemetry, command, parse_response, parse_telemetry, target
 from .stm32_bridge import STM32Bridge
 
 AXES = ("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM")
 STEP_SECONDS = 0.25
-
-# Posiciones normalizadas pequeñas dentro del recorrido confirmado por eje.
-POSES = {
-    MotionAction.HEAD_LEFT: ({"HEAD_PAN": -0.15},),
-    MotionAction.HEAD_RIGHT: ({"HEAD_PAN": 0.15},),
-    MotionAction.HEAD_CENTER: ({"HEAD_PAN": 0.0},),
-    MotionAction.ARM_LEFT: ({"LEFT_ARM": 0.20},),
-    MotionAction.ARM_RIGHT: ({"RIGHT_ARM": 0.20},),
-    MotionAction.WAVE_LEFT: ({"LEFT_ARM": 0.20}, {"LEFT_ARM": 0.08}, {"LEFT_ARM": 0.20}, {"LEFT_ARM": 0.0}),
-    MotionAction.WAVE_RIGHT: ({"RIGHT_ARM": 0.20}, {"RIGHT_ARM": 0.08}, {"RIGHT_ARM": 0.20}, {"RIGHT_ARM": 0.0}),
-    MotionAction.WAVE_BOTH: (
-        {"LEFT_ARM": 0.20, "RIGHT_ARM": 0.20},
-        {"LEFT_ARM": 0.08, "RIGHT_ARM": 0.08},
-        {"LEFT_ARM": 0.20, "RIGHT_ARM": 0.20},
-        {"LEFT_ARM": 0.0, "RIGHT_ARM": 0.0},
-    ),
-}
 
 
 class RobotMotionExecutor:
@@ -54,6 +37,10 @@ class RobotMotionExecutor:
         self._active = False
         self._owner_lock = threading.Lock()
         self._motion_owner: str | None = None
+        self._motion_lock = threading.RLock()
+        self._motion_cancel = threading.Event()
+        self._stopping = threading.Event()
+        self._motion_generation = 0
 
     def enable(self) -> bool:
         """Verifica enlace y perfil; no arma ni inicia el movimiento físico."""
@@ -70,6 +57,7 @@ class RobotMotionExecutor:
             self._start_monitor()
             return False
         self._monitor_stop.clear()
+        self._motion_cancel.clear()
         self._start_monitor()
         return True
 
@@ -94,13 +82,24 @@ class RobotMotionExecutor:
         self._last_sequence = None
 
     def disable(self) -> None:
-        """Desarma y libera UART, incluso después de un error de comunicación."""
+        """Cancela trayectorias, intenta DISARM y libera UART."""
+        self._motion_generation += 1
+        self._motion_cancel.set()
+        self._stopping.set()
         self._monitor_stop.set()
         worker = self._monitor_thread
         self._monitor_thread = None
         if worker is not None and worker is not threading.current_thread():
             worker.join(timeout=1.2)
-        self._drop_link()
+        with self._motion_lock:
+            try:
+                self.stop()
+            except Exception:
+                # Si el enlace no acepta DISARM, cerrar UART deja actuar el watchdog local.
+                pass
+            finally:
+                self._drop_link()
+                self._stopping.clear()
 
     def _drop_link(self) -> None:
         bridge, self._bridge = self._bridge, None
@@ -117,18 +116,25 @@ class RobotMotionExecutor:
                 pass
 
     def stop(self) -> None:
-        if not self.enabled or self._bridge is None:
-            self._active = False
-            return
-        bridge = self._require_enabled()
-        try:
-            self._exchange(bridge, "V2,DISARM")
-        except Exception:
-            self._drop_link()
-            raise
-        self._active = False
-        with self._owner_lock:
-            self._motion_owner = None
+        # Incrementa antes de esperar el lock para interrumpir una secuencia en curso.
+        self._motion_generation += 1
+        generation = self._motion_generation
+        self._motion_cancel.set()
+        self._stopping.set()
+        with self._motion_lock:
+            try:
+                if self.enabled and self._bridge is not None:
+                    bridge = self._require_enabled()
+                    self._exchange(bridge, "V2,DISARM")
+            except Exception:
+                self._drop_link()
+                raise
+            finally:
+                self._active = False
+                with self._owner_lock:
+                    self._motion_owner = None
+                if generation == self._motion_generation:
+                    self._stopping.clear()
 
     def execute(self, action: MotionAction) -> dict[str, object]:
         if not isinstance(action, MotionAction):
@@ -140,35 +146,69 @@ class RobotMotionExecutor:
             raise ValueError("Acción sin trayectoria implementada")
         if not self.enabled or not self.connected:
             raise RuntimeError("Movimiento desautorizado hasta revalidar el enlace localmente")
+        generation = self._motion_generation
         if not self.claim("voice"):
             raise RuntimeError("Otro controlador posee los ejes físicos")
-        bridge = None
         try:
-            bridge = self._require_enabled()
-            self.activate()
-            for keyframe in POSES[action]:
-                # Actualiza todos los ejes del fotograma antes de avanzar al siguiente.
-                for axis, position in keyframe.items():
-                    self.set_axis_target(axis, round(position * 1000), owner="voice")
-                self._sleep(STEP_SECONDS)
-            return {"accepted": True, "action": action.value, "mode": "hardware"}
+            with self._motion_lock:
+                if generation != self._motion_generation or self._stopping.is_set():
+                    return {"accepted": False, "action": action.value,
+                            "mode": "robot", "reason": "cancelled by stop"}
+                self._motion_cancel.clear()
+                bridge = self._require_enabled()
+                if not self.activate(_generation=generation):
+                    return {"accepted": False, "action": action.value,
+                            "mode": "robot", "reason": "cancelled by stop"}
+                for keyframe in POSES[action]:
+                    if self._motion_cancelled(generation):
+                        return {"accepted": False, "action": action.value,
+                                "mode": "robot", "reason": "cancelled by stop"}
+                    # Actualiza todos los ejes del fotograma antes de avanzar.
+                    for axis, position in keyframe.items():
+                        if self._motion_cancelled(generation):
+                            return {"accepted": False, "action": action.value,
+                                    "mode": "robot", "reason": "cancelled by stop"}
+                        self.set_axis_target(
+                            axis, round(position * 1000), owner="voice", _generation=generation,
+                        )
+                    if self._sleep is time.sleep:
+                        cancelled = self._motion_cancel.wait(STEP_SECONDS)
+                    else:
+                        self._sleep(STEP_SECONDS)
+                        cancelled = self._motion_cancelled(generation)
+                    if cancelled or self._motion_cancelled(generation):
+                        return {"accepted": False, "action": action.value,
+                                "mode": "robot", "reason": "cancelled by stop"}
+                return {"accepted": True, "action": action.value, "mode": "robot"}
         except Exception:
             self._drop_link()
             raise
         finally:
             self.release("voice")
 
-    def activate(self) -> bool:
+    def activate(self, *, _generation: int | None = None) -> bool:
         """Arma explícitamente desde DISARMED y deja el heartbeat supervisor activo."""
-        bridge = self._require_enabled()
-        try:
-            self._ensure_active(bridge)
-            return True
-        except Exception:
-            self._drop_link()
-            raise
+        explicit_request = _generation is None
+        generation = self._motion_generation if explicit_request else _generation
+        with self._motion_lock:
+            if generation != self._motion_generation or self._stopping.is_set():
+                return False
+            if explicit_request:
+                self._motion_cancel.clear()
+            elif self._motion_cancelled(generation):
+                return False
+            bridge = self._require_enabled()
+            try:
+                self._ensure_active(bridge, generation)
+                return not self._motion_cancelled(generation)
+            except Exception:
+                self._drop_link()
+                raise
 
-    def set_axis_target(self, axis: str, milli_units: int, *, owner: str = "voice") -> bool:
+    def set_axis_target(
+        self, axis: str, milli_units: int, *, owner: str = "voice",
+        _generation: int | None = None,
+    ) -> bool:
         """Reemplaza el objetivo actual de un eje; el STM32 mailbox descarta objetivos viejos."""
         if axis not in self.profile or isinstance(milli_units, bool) or not isinstance(milli_units, int):
             raise ValueError("Eje o consigna inválidos")
@@ -177,15 +217,26 @@ class RobotMotionExecutor:
         with self._owner_lock:
             if self._motion_owner != owner:
                 raise RuntimeError("El controlador no posee autorización exclusiva de movimiento")
-        bridge = self._require_enabled()
-        try:
-            self._ensure_active(bridge)
-            self._exchange(bridge, "V2,HB", expected="ACTIVE")
-            self._exchange(bridge, target(axis, milli_units), expected="ACTIVE")
-            return True
-        except Exception:
-            self._drop_link()
-            raise
+        generation = self._motion_generation if _generation is None else _generation
+        with self._motion_lock:
+            if self._stopping.is_set() or self._motion_cancelled(generation):
+                return False
+            bridge = self._require_enabled()
+            try:
+                self._ensure_active(bridge, generation)
+                if self._motion_cancelled(generation):
+                    return False
+                self._exchange(bridge, "V2,HB", expected="ACTIVE")
+                if self._motion_cancelled(generation):
+                    return False
+                self._exchange(bridge, target(axis, milli_units), expected="ACTIVE")
+                return not self._motion_cancelled(generation)
+            except Exception:
+                self._drop_link()
+                raise
+
+    def _motion_cancelled(self, generation: int) -> bool:
+        return generation != self._motion_generation or self._motion_cancel.is_set()
 
     def claim(self, owner: str) -> bool:
         if owner not in {"voice", "face_follow"}:
@@ -212,7 +263,7 @@ class RobotMotionExecutor:
             telemetry_fresh = age is not None and age <= 1.0
             return {
                 "connection": "connected" if self.connected else "offline",
-                "mode": "hardware",
+                "mode": "robot",
                 "safety_state": (
                     telemetry.state if self.connected and telemetry_fresh and telemetry
                     else self._last_state if self.connected else "UNKNOWN"
@@ -234,16 +285,23 @@ class RobotMotionExecutor:
                 "uart_status": telemetry.uart_status if telemetry else None,
             }
 
-    def _ensure_active(self, bridge) -> None:
+    def _ensure_active(self, bridge, generation: int) -> None:
+        if self._motion_cancelled(generation):
+            return
         if self._active:
             return
         state = self._exchange(bridge, "V2,HB")
+        if self._motion_cancelled(generation):
+            return
         if state == "DISARMED":
             self._exchange(bridge, "V2,ARM", expected="READY")
+            if self._motion_cancelled(generation):
+                return
             self._exchange(bridge, "V2,START", expected="ACTIVE")
         elif state != "ACTIVE":
             raise RuntimeError(f"No se inicia movimiento desde estado {state}")
-        self._active = True
+        if not self._motion_cancelled(generation):
+            self._active = True
 
     def _start_monitor(self) -> None:
         worker = self._monitor_thread
