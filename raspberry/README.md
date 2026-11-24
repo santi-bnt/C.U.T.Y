@@ -125,6 +125,14 @@ La CLI habitual `python -m cuty` conserva los turnos con ENTER.
 
 ## Tests
 
+Instala las dependencias del proyecto y pytest desde `raspberry/`:
+
+```powershell
+python -m pip install -e ".[test]"
+```
+
+Después ejecuta:
+
 ```powershell
 python -m pytest -q
 ```
