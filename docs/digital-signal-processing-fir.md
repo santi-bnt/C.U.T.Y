@@ -1,10 +1,10 @@
 # C.U.T.Y. — FIR digital: seguimiento PAN y voz
 
-Estado: filtros integrados en código portable C y Python; pruebas reproducibles en host; el FIR de voz se desactiva por defecto. La ruta Pi→UART→STM32 y la salida PWM no están integradas en hardware, y no hay mediciones físicas ni comparación de reconocimiento de voz. Las gráficas de la web son cálculos sobre señales sintéticas.
+Estado: filtros integrados en código C y Python; el FIR de voz se desactiva por defecto. El flujo de seguimiento PAN llega por UART al firmware perfilado y este genera PWM cuando se habilita físicamente. Los builds/tests de software no son mediciones físicas; faltan calibración y validación del servo, y no hay comparación de reconocimiento de voz con el FIR activado. Las gráficas de la web son cálculos sobre señales sintéticas.
 
 ## Señales y límites de integración
 
-El tracker actual suaviza detecciones con EMA `detection_alpha=0.35`, filtra la derivada del PID con `derivative_alpha=0.25`, usa banda muerta y límites de aceleración/velocidad. El simulador de seguimiento no escribe UART: no existe todavía enlace físico a STM32. El firmware portable STM32 acepta objetivos abstractos V2 y `ServoControlTask` invoca `cuty_control_tick` cada 20 ms nominales (50 Hz), con supervisión cada 10 ms. La trayectoria ya limita velocidad y aceleración. Se añade el pasa-bajas a HEAD_PAN en ese tick; los dos brazos conservan su trayectoria y las cinco salidas de PCB permanecen intactas.
+El tracker actual suaviza detecciones con EMA `detection_alpha=0.35`, filtra la derivada del PID con `derivative_alpha=0.25`, usa banda muerta y límites de aceleración/velocidad. En simulación no escribe UART; en modo físico, el adaptador de seguimiento manda objetivos limitados por socket al único dueño UART de Raspberry. STM32 acepta objetivos V2 y `ServoControlTask` invoca `cuty_control_tick` cada 20 ms nominales (50 Hz), con supervisión cada 10 ms. La trayectoria ya limita velocidad y aceleración. El pasa-bajas actúa sobre HEAD_PAN en ese tick; los dos brazos conservan su trayectoria y las cinco salidas de PCB permanecen intactas.
 
 Así, los 40 ms de retardo FIR son adicionales al suavizado EMA, la dinámica del controlador de Pi y la trayectoria STM32. Esos retardos anteriores dependen de la tasa de cámara y de su dinámica; no se pueden resumir honestamente en un número sin medir la ruta completa. El filtro web ilustra solamente la media móvil y una variación sintética de referencia.
 
@@ -37,7 +37,7 @@ Complejidad por muestra: 5 multiplicaciones y 4 sumas, 250 multiplicaciones/s y 
 
 ### A/B y seguridad
 
-`cuty_control_set_head_fir(controller, enabled)` cambia el modo desde el dueño serializado del controlador. Al cambiarlo, llena el historial con el objetivo PAN actual; las muestras viejas no reaparecen y activar el FIR no inserta un paso inicial. Al salir de ACTIVE, se reinicia al objetivo comandado y la política de seguridad congela la trayectoria existente. No cambia PWM ni habilita hardware. La configuración inicial del módulo de control lo deja activo en la lógica portable; para A/B se llama explícitamente al setter. No hay UART ni interfaz de configuración de placa implementadas todavía.
+`cuty_control_set_head_fir(controller, enabled)` cambia el modo desde el dueño serializado del controlador. Al cambiarlo, llena el historial con el objetivo PAN actual; las muestras viejas no reaparecen y activar el FIR no inserta un paso inicial. Al salir de ACTIVE, se reinicia al objetivo comandado y la política de seguridad congela la trayectoria existente. El filtro no habilita el driver PWM. La configuración inicial del módulo de control lo deja activo en la lógica portable; para A/B se llama explícitamente al setter. No hay comando V2 para cambiarlo durante una sesión física.
 
 ## FIR pasa-banda de audio
 
@@ -78,6 +78,6 @@ Se puede hacer A/B en Raspberry al reiniciar el proceso con `CUTY_SPEECH_FIR_ENA
 
 Raspberry: `cd raspberry; .venv/bin/python -m pytest tests/test_speech_bandpass.py tests/test_conversation.py` (en Windows: `.venv\Scripts\python.exe -m pytest ...`). Las pruebas revisan simetría, ganancia, atenuación, retardo, impulso, escalón, mezcla de tonos en banda/fuera de banda, clipping/formato, canales, continuidad de dos particiones equivalentes, bypass y validación de Nyquist. El test de integración usa proveedor falso y comprueba que el bloque filtrado, de la misma longitud, llega a `send_audio`; no conecta a Gemini ni a hardware.
 
-STM32 host: compilar `stm32/tests/test_motion.c` junto con `App/control/fir_filter.c`, `App/control/body_control.c`, `App/communication/uart_protocol.c`, `App/safety/safety.c` y `App/servos/servo.c`, enlazando `libm` en toolchains GCC. Ejecutar prueba de protocolo/estados/trayectoria y FIR. Se comprueba entrada constante, reinicio/semilla, entrada no finita y setter A/B. No hay build system CubeMX ni firmware flasheable/FreeRTOS binario; la integración RTOS es adaptador CMSIS-RTOS2 dry-run. `vTaskDelay` no genera PWM; no existe salida de temporizador implementada.
+STM32 host: las pruebas C compilan protocolo/estados/trayectoria y FIR mediante `stm32/tests/run_host_tests.py` cuando hay un compilador C de host. El build ARM del proyecto `stm32/blackpill_uart` enlaza FreeRTOS, HAL F401 y callbacks PWM de TIM4; `--profile` habilita salida únicamente con un perfil que confirmó mecánica/mapeo. El build normal conserva PWM bloqueado. `vTaskDelay` no genera PWM; los pulsos se generan con TIM4. La compilación no verifica el comportamiento físico.
 
-La comparación de voz con transcripciones y latencia de CPU, el resultado final del reconocimiento, el ruido real del cuarto, la integración UART de PAN y la respuesta mecánica quedan pendientes de hardware. No reportar la demo sintética del sitio como medición.
+La latencia del loop físico de seguimiento, el resultado del reconocimiento con el FIR de voz, el ruido real del cuarto y la respuesta mecánica quedan pendientes de medición en el robot. No reportar la demo sintética del sitio ni la consigna STM32 como medición física.

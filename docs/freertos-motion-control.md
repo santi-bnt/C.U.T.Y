@@ -87,7 +87,7 @@ frames generate `V2,NACK,FRAME,UNKNOWN`. Diagnostics counters
 include RX fault notifications and reply/snapshot congestion; final TX-queue losses,
 task runtimes and memory high-water marks still need instrumentation.
 
-## Experimental protocol V2 (host/dry-run only)
+## Protocol V2 (implemented; still experimental)
 
 Separate from the legacy SET_HEAD/SET_BODY design sketches in docs/protocol.
 LF terminated, optional single CR before LF. Max 63 stored bytes, ASCII only;
@@ -103,16 +103,16 @@ No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra
 | V2,RESET | FAULT → DISARMED; clears heartbeat validity |
 | V2,TARGET,HEAD_PAN,350 | Joint HEAD_PAN, LEFT_ARM or RIGHT_ARM; signed integer -1000..1000 milli-units → -1..1 |
 
-Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Their coordinates remain abstract simulation units, not calibrated physical angles. No degree or PWM commands are accepted. The proposed J7–J9 assignments remain physically unverified. The V2 sketch has no CRC/session handshake, replay protection or
+Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Coordinates are normalized to each calibrated axis range, not physical angles. No degree or raw PWM commands are accepted. The design maps J7–J9 to these axes; final continuity and servo mapping still require physical confirmation. V2 has no CRC/session handshake, replay protection or
 link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
 must settle integrity, sessions, acknowledgements, error vocabulary and recovery.
-The Raspberry diagnostic bridge now serializes V2 only and does not send ARM/START automatically. It cannot communicate with an STM32 build until physical USART2 receive/transmit and response framing are implemented. No compatibility with older command sketches is claimed.
+The Raspberry bridge and STM32 USART2 RX/TX implementation communicate using V2 records. Connecting the bridge does not send ARM/START; the executor verifies DISARMED and requires an explicit action to activate. No compatibility with older command sketches is claimed.
 
 ## Motion and safety
 
 The core starts DISARMED. HB → ARM → START is explicit. A goal in the wrong state,
 nonfinite/out-of-range value, invalid command or excessive control dt faults an armed
-controller. Heartbeat expiry at >=500 ms in the dry-run profile latches FAULT.
+controller. Heartbeat expiry at >=500 ms latches FAULT in the STM32 firmware.
 HB alone never recovers; RESET, fresh HB, ARM and START are needed. DISARM is always
 accepted and inhibits output intent, but cannot clear a latched fault. Wrap-safe unsigned elapsed arithmetic
 is used; it assumes polling within the 32-bit millisecond wrap interval.
@@ -126,8 +126,9 @@ limits do not apply to that logical emergency stop. A physical servo may still m
 toward its last commanded position: freezing a setpoint does not prove physical rest.
 
 Fault policies in the portable controller are logical intents. The board output driver
-rejects output without confirmed mechanical calibration and servo-to-joint mapping; the
-current CubeIDE application also leaves its output callbacks unbound. `CUTY_FREEZE_COMMAND`
+rejects output without confirmed mechanical calibration and servo-to-joint mapping. The
+default CubeIDE build leaves PWM callbacks unbound; a profile build binds them only
+after validating all three axes. `CUTY_FREEZE_COMMAND`
 can preserve torque at a stale position and must never be treated as a physically safe
 failure mode:
 
@@ -137,12 +138,12 @@ failure mode:
 - RELEASE_OUTPUT requests no output, useful where continuing torque is dangerous.
   It can let a gravity-loaded joint fall.
 
-Neither policy is approved for the real mechanism. There is no universal 90-degree
-safe position. Mechanical risk assessment, torque support, power removal and operator
-recovery must determine the physical policy. Startup/reset must never energize an
-uncalibrated joint; normalized zero is an abstract test initial condition, not physical
-neutral. Before adding PWM, require verified initial pose/calibration and a hardware
-arming gate; the core's output_requested function is not such a gate.
+Neither policy is certified safe for the assembled mechanism. There is no universal
+90-degree safe position. Mechanical risk assessment, torque support, power removal and
+operator recovery must determine the physical policy. Startup/reset never energizes a
+joint. Normalized zero is the confirmed calibrated center in a profile build, not an
+independent position measurement. The output driver additionally requires a valid
+profile and explicit ARM/START; its `output_requested` flag alone is not an arming gate.
 
 ## Pins and board initialization
 
@@ -156,23 +157,24 @@ The carrier v1.1 netlist and schematic design specify:
 | Reserved connectors | PB9/J10 and PA8/J11 | Not configured for servo output |
 
 The repository names STM32F401CCU6 as the design target. Confirm the actual chip
-marking and module revision before programming. The netlist records design intent,
-not physical continuity or soldering.
+marking and module revision before programming. The netlist records design intent;
+final carrier continuity and soldering still require inspection.
 
 USART2 is configured for 115200 baud, 8N1. The board code derives the TIM4 input
 clock from PCLK1 and the APB1 prescaler rule for STM32F401, then computes PSC for a
 1 MHz counter and ARR=19999 (50 Hz). It rejects clocks that cannot produce this exact
-counter rate. PWM output remains disabled until calibration and mapping are confirmed;
-measure the 50 Hz period and pulse widths on PB6/PB7/PB8 with an oscilloscope before
-connecting a servo.
+counter rate. The default firmware keeps PWM disabled; the profile build enables the
+three outputs only after profile validation and explicit ARM/START. Before attaching
+the assembled mechanism, measure the 50 Hz period and pulse widths on PB6/PB7/PB8 with
+an oscilloscope.
 
 The 20 ms controller update is separate from PWM generation: tick jitter affects
 when the next setpoint is prepared, not pulse timing from a hardware timer. Measure
 execution time, deadlines, phase/latch latency and missed updates under UART load.
-The provisional independent test ranges are 1000–2850 us, 1000–2700 us and
-1000–2850 us, in test-servo order only. About 150 degrees total travel was observed,
-but this does not imply 180 degrees or a center at 75 degrees. They are pulse ceilings,
-not safe mechanism endpoints. Actual center, direction, deadband, velocity,
+The historical independent test ranges are 1000–2850 us, 1000–2700 us and
+1000–2850 us, in test-servo order only. About 125 degrees of total travel was
+reported during bench trials, but that does not define a safe range or center.
+These ranges are pulse ceilings, not safe mechanism endpoints. Actual center, direction, deadband, velocity,
 acceleration, current limits and mapping require joint-by-joint bench calibration.
 
 Keep the dedicated servo supply; verify current capacity, fusing, polarity, noise and
@@ -230,23 +232,20 @@ outro to preserve the existing chapter positions/3D shot order; the only navigat
 addition uses the current link style. No existing global palette, font, shot, animation,
 PCB or wiring component is restyled.
 
-## Bringing this to an actual STM32
+## Remaining physical verification
 
-1. The CubeIDE project and ARM build are present at `stm32/blackpill_uart`. Record the
-   chip marking, Black Pill revision, oscillator and power arrangement. Confirm the
-   package AF tables and physical continuity on the carrier.
-2. Agree servo/joint mapping, sign, calibration, mechanical limits and risk-specific fault
-   policy. Define safe initial-pose acquisition and explicit physical arming.
-3. Open and build the checked-in CubeIDE project. The standalone build script also
-   generates ELF/BIN/MAP with the installed ARM GCC. Inspect its map, stack/heap and
-   warnings before programming; do not regenerate over the linked application files.
-4. On a board without servos attached, verify boot, V2 heartbeat/ACK, invalid-frame
-   NACK, ARM/START/DISARM/RESET states, heartbeat timeout and UART error recovery.
-   Confirm with an oscilloscope that PB6/PB7/PB8 remain low and no timer output starts.
-5. Before any output integration, validate independent power cutoff, current limit,
-   fusing, grounding, one-servo support, physical stop and mechanism-specific release
-   behavior. Then test one axis at a time and record actual results. Do not remove the
-   default output gate based on host tests or a successful UART link.
+1. Confirm the exact STM32F401CCU6 board revision, power arrangement, pin continuity
+   and the fixed PB6/PB7/PB8 to J7/J8/J9 carrier mapping.
+2. Complete supervised per-axis center, direction and safe-range calibration. The
+   observed 125° sweep and historical pulse ranges are not safety limits.
+3. Compile and flash the manual-calibration firmware first. Only after reviewing and
+   explicitly confirming the three measured axes should the profile build be generated.
+4. Verify the already-built profile firmware with the 19-stage sequence in
+   [`robot-validation.md`](robot-validation.md): isolated axes, coordinated motion,
+   head following, voice, UART loss, stop, restart, power and temperature.
+5. The profile-gated build uses explicit ARM/START; the default build keeps PWM
+   disabled. Host tests and successful UART ACKs do not certify servo output or
+   mechanical release behavior. PWM disable is not an electrical power cutoff.
 
 ## Primary references
 

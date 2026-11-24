@@ -138,5 +138,6 @@ separate from the cloud scene-description request.
 - CPU/RSS sampling is per matching process; it does not measure GPU/ISP load,
   total system memory, audio device underruns directly, or touchscreen frame
   presentation latency. Correlate logs with `vcgencmd` and audio errors.
-- PAN remains simulated. The measured frame-to-PAN value is software path
-  latency, not servo response time.
+- Physical PAN following is implemented behind explicit opt-in. A measured
+  frame-to-PAN value remains software-path latency, not servo response time;
+  the real servo response has not been benchmarked here.
