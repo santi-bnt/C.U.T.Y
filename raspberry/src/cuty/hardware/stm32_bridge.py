@@ -132,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             if args.action == "status":
                 print(bridge.exchange(command("V2,HB"), args.timeout))
+                print(bridge.exchange(command("V2,INFO"), args.timeout))
             elif args.action == "heartbeat":
                 while True:
                     try:

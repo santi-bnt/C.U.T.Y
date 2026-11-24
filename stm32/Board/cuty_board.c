@@ -4,8 +4,10 @@
 #include "cuty_servo_bench.h"
 #if defined(CUTY_PHYSICAL_OUTPUT_ENABLE) && CUTY_PHYSICAL_OUTPUT_ENABLE
 #include "servo_calibration_profile.h"
+#define CUTY_ACTIVE_PROFILE_ID CUTY_SERVO_PROFILE_ID
 #else
 #include "servo_calibration.h"
+#define CUTY_ACTIVE_PROFILE_ID "none"
 #endif
 #include "../App/rtos/motion_tasks.h"
 #include "../App/servos/servo.h"
@@ -174,9 +176,16 @@ void cuty_board_tx_task(void *argument) {
         CutyReply reply;
         while (cuty_take_reply(&reply)) {
             char line[128];
-            (void)snprintf(line, sizeof(line), "V2,%s,%lu,%s,%s\n",
-                reply.accepted ? "ACK" : "NACK", (unsigned long)reply.sequence,
-                reply.accepted ? "OK" : "REJECTED", state_name(reply.state));
+            if (reply.include_profile_id) {
+                (void)snprintf(line, sizeof(line), "V2,%s,%lu,%s,%s,%s\n",
+                    reply.accepted ? "ACK" : "NACK", (unsigned long)reply.sequence,
+                    reply.accepted ? "OK" : "REJECTED", state_name(reply.state),
+                    CUTY_ACTIVE_PROFILE_ID);
+            } else {
+                (void)snprintf(line, sizeof(line), "V2,%s,%lu,%s,%s\n",
+                    reply.accepted ? "ACK" : "NACK", (unsigned long)reply.sequence,
+                    reply.accepted ? "OK" : "REJECTED", state_name(reply.state));
+            }
             if (!uart_transmit_line(line)) { uart_faulted = true; cuty_uart_fault_isr(); }
             last_state = (uint32_t)reply.state;
         }

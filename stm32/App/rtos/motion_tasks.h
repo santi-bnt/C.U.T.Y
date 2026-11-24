@@ -7,7 +7,7 @@ typedef struct {
     uint32_t timestamp_ms, rx_errors, dropped_tx;
     CutyController controller; /* Consignas calculadas; no son posiciones medidas del servo. */
 } CutySnapshot;
-typedef struct { uint32_t sequence; bool accepted; CutyState state; } CutyReply;
+typedef struct { uint32_t sequence; bool accepted; bool include_profile_id; CutyState state; } CutyReply;
 /* Callbacks de hardware; si quedan nulos, el controlador funciona sin salida física. */
 typedef bool (*CutyOutputEnable)(bool explicit_arm, bool heartbeat_fresh, bool safety_ready);
 typedef void (*CutyOutputDisable)(void);

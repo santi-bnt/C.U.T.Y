@@ -56,9 +56,11 @@ def main():
         sys.path.insert(0, str(root.parents[1] / "raspberry" / "src"))
         from cuty.hardware.calibration_profile import RobotCalibration
         profile = RobotCalibration.load(args.profile)
+        profile_id = profile.fingerprint
         profile_header = output / "servo_calibration_profile.h"
         lines = ["#ifndef CUTY_SERVO_CALIBRATION_PROFILE_H", "#define CUTY_SERVO_CALIBRATION_PROFILE_H",
-                 '#include "cuty_servo_output.h"', "/* Generado desde un perfil validado por eje. */"]
+                 '#include "cuty_servo_output.h"', "/* Generado desde un perfil validado por eje. */",
+                 f'#define CUTY_SERVO_PROFILE_ID "{profile_id}"']
         axes = {axis.axis: axis for axis in profile.axes}
         lines.append("static const CutyServoTestRange cuty_servo_test_ranges[3] = {")
         for axis_name in ("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"):

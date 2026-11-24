@@ -91,7 +91,10 @@ static void servo_task(void *unused) {
             /* Un comando no debe actuar si la cola lo retuvo más de 100 ms. */
             bool fresh=(uint32_t)(now-e.received_ms)<=100;
             bool accepted=false;
-            if (fresh && !supervisor_fault && e.command.kind == CUTY_CALIBRATE) {
+            if (e.command.kind == CUTY_INFO) {
+                /* INFO es diagnóstico; no altera el estado ni la barrera de consignas. */
+                accepted = true;
+            } else if (fresh && !supervisor_fault && e.command.kind == CUTY_CALIBRATE) {
                 bool ready = controller.safety.state == CUTY_READY &&
                              cuty_heartbeat_fresh(&controller.safety, now);
                 accepted = ready && calibration_pulse &&
@@ -111,8 +114,8 @@ static void servo_task(void *unused) {
                 else { cuty_control_invalid(&controller); accepted=false; }
             }
             /* La barrera invalida objetivos encolados antes del último ARM/START/DISARM/RESET. */
-            if (e.command.kind!=CUTY_HEARTBEAT) barrier=e.sequence;
-            CutyReply reply={e.sequence,accepted,controller.safety.state};
+            if (e.command.kind!=CUTY_HEARTBEAT && e.command.kind!=CUTY_INFO) barrier=e.sequence;
+            CutyReply reply={e.sequence,accepted,e.command.kind==CUTY_INFO,controller.safety.state};
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
         }
         cuty_safety_check(&controller.safety,now);
@@ -131,7 +134,7 @@ static void servo_task(void *unused) {
             bool newer=(int32_t)(e.sequence-barrier)>0;
             bool accepted=newer && (uint32_t)(now-e.received_ms)<=100 &&
                 cuty_control_command(&controller,&e.command,now);
-            CutyReply reply={e.sequence,accepted,controller.safety.state};
+            CutyReply reply={e.sequence,accepted,false,controller.safety.state};
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
             if (controller.safety.state != CUTY_READY) stop_calibration();
           }

@@ -6,7 +6,7 @@
 #include <stddef.h>
 #define CUTY_LINE_CAPACITY 64
 /* TARGET transmite enteros en milésimas; el controlador usa valores float normalizados. */
-typedef enum { CUTY_HEARTBEAT, CUTY_ARM, CUTY_START, CUTY_DISARM, CUTY_RESET, CUTY_TARGET, CUTY_CALIBRATE } CutyCommandKind;
+typedef enum { CUTY_HEARTBEAT, CUTY_ARM, CUTY_START, CUTY_DISARM, CUTY_RESET, CUTY_TARGET, CUTY_CALIBRATE, CUTY_INFO } CutyCommandKind;
 typedef struct { CutyCommandKind kind; unsigned axis; float target; uint16_t pulse_us; } CutyCommand;
 typedef enum { CUTY_RX_NONE, CUTY_RX_COMMAND, CUTY_RX_ERROR } CutyRxResult;
 typedef struct { char line[CUTY_LINE_CAPACITY]; size_t used; bool dropping; } CutyParser;

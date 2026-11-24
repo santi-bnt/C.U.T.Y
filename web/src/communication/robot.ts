@@ -7,7 +7,7 @@ export interface RobotSnapshot {
   motionAuthorized: boolean;
   controllerActive: boolean;
   physicalOutputStatus: "unverified";
-  firmwareProfileMatch: "unverified";
+  firmwareProfileMatch: "unverified" | "matched" | "mismatch";
   telemetryFresh: boolean;
   positionKind: "commanded";
   measuredPositionsAvailable: false;
@@ -64,7 +64,9 @@ function parseSnapshot(payload: unknown): RobotSnapshot | null {
     typeof value.motion_authorized !== "boolean" ||
     typeof value.controller_active !== "boolean" ||
     value.physical_output_status !== "unverified" ||
-    value.firmware_profile_match !== "unverified" ||
+    !(value.firmware_profile_match === "unverified" ||
+      value.firmware_profile_match === "matched" ||
+      value.firmware_profile_match === "mismatch") ||
     value.position_kind !== "commanded" ||
     value.measured_positions_available !== false ||
     typeof value.telemetry_fresh !== "boolean"
@@ -77,7 +79,7 @@ function parseSnapshot(payload: unknown): RobotSnapshot | null {
     motionAuthorized: value.motion_authorized,
     controllerActive: value.controller_active,
     physicalOutputStatus: "unverified",
-    firmwareProfileMatch: "unverified",
+    firmwareProfileMatch: value.firmware_profile_match as RobotSnapshot["firmwareProfileMatch"],
     telemetryFresh: value.telemetry_fresh,
     positionKind: "commanded",
     measuredPositionsAvailable: false,

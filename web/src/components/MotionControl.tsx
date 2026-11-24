@@ -127,7 +127,12 @@ export default function MotionControl() {
           {t(bi("Physical output", "Salida física"))}: {t(bi("unverified", "sin verificar"))}
         </span>
         <span>
-          {t(bi("Firmware/profile match", "Coincidencia firmware/perfil"))}: {t(bi("unverified", "sin verificar"))}
+          {t(bi("Firmware/profile match", "Coincidencia firmware/perfil"))}: {t(bi(
+            robot.firmwareProfileMatch === "matched" ? "matched" :
+              robot.firmwareProfileMatch === "mismatch" ? "mismatch" : "unverified",
+            robot.firmwareProfileMatch === "matched" ? "coincide" :
+              robot.firmwareProfileMatch === "mismatch" ? "no coincide" : "sin verificar",
+          ))}
         </span>
         <span>
           {robot.telemetryFresh

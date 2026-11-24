@@ -111,7 +111,12 @@ PYTHONPATH=src python -m cuty.hardware.stm32_bridge --port /dev/ttyAMA0 target H
 PYTHONPATH=src python -m cuty.hardware.stm32_bridge --port /dev/ttyAMA0 send V2,DISARM
 ```
 
-`status` envía un heartbeat y presenta el ACK, sin armar ni iniciar. Los objetivos
+`status` presenta el ACK de heartbeat y la respuesta `V2,INFO`, sin armar ni iniciar.
+El firmware predeterminado, de banco o de calibración reporta `none`; el firmware
+físico generado con `build.py --profile perfil.json` reporta la huella `sha256:...`
+de ese JSON. El ejecutor Raspberry exige que coincida con el perfil cargado y rechaza
+firmware antiguo que aún no implemente `V2,INFO`. Cada cambio del JSON requiere volver
+a compilar y programar la imagen física desde el mismo archivo. Los objetivos
 solo cambian consignas software y requieren ACTIVE; no producen movimiento en esta
 compilación. El puente desarma al cerrar y toma un lock exclusivo del puerto. Si la
 prueba informa una respuesta inválida, captura la línea UART cruda y el estado del

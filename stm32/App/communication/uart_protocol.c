@@ -9,6 +9,7 @@ bool cuty_parse_line(const char *s, CutyCommand *out) {
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); ++i) {
         if (!strcmp(s, names[i])) { c.kind = (CutyCommandKind)i; *out = c; return true; }
     }
+    if (!strcmp(s, "V2,INFO")) { c.kind = CUTY_INFO; *out = c; return true; }
     bool calibration = strncmp(s, "V2,CAL,", 7) == 0;
     if (!calibration && strncmp(s, "V2,TARGET,", 10)) return false;
     s += calibration ? 7 : 10;

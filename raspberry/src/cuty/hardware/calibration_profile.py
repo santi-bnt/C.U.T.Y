@@ -1,7 +1,8 @@
 """Perfil confirmado de calibración mecánica requerido para modo robot."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -43,6 +44,18 @@ class AxisCalibration:
 @dataclass(frozen=True)
 class RobotCalibration:
     axes: tuple[AxisCalibration, ...]
+
+    @property
+    def fingerprint(self) -> str:
+        """Identificador estable de los valores que también compila el firmware."""
+        payload = {
+            "schema": 1,
+            "axes": [asdict(axis) for axis in sorted(self.axes, key=lambda item: item.axis)],
+        }
+        canonical = json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), allow_nan=False,
+        ).encode("ascii")
+        return "sha256:" + hashlib.sha256(canonical).hexdigest()
 
     def validate_complete(self) -> None:
         by_axis = {axis.axis: axis for axis in self.axes}

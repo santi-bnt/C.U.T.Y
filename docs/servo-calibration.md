@@ -121,6 +121,10 @@ python stm32/blackpill_uart/build.py --profile ruta\a\perfil-confirmado.json
 
 Se genera un firmware físico separado en `build/physical/`. El encabezado C
 queda en la misma carpeta y registra los límites y parámetros exactos del JSON.
+También incorpora su huella SHA-256. Usa el mismo archivo JSON en Raspberry y al
+compilar el STM32; si cambias un límite, centro, sentido o parámetro dinámico, vuelve
+a generar y programar el firmware. El ejecutor no autoriza movimiento si `V2,INFO`
+no devuelve la misma huella.
 El build normal sigue bloqueado, el modo calibración sigue siendo manual, y
 ninguno se sobreescribe. Solo carga este ELF después de completar la revisión
 física del perfil; el arranque deja PWM apagado y el movimiento requiere

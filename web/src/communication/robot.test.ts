@@ -14,7 +14,7 @@ describe("read-only robot telemetry", () => {
       motion_authorized: true,
       controller_active: false,
       physical_output_status: "unverified",
-      firmware_profile_match: "unverified",
+      firmware_profile_match: "matched",
       telemetry_fresh: true,
       position_kind: "commanded",
       measured_positions_available: false,
@@ -28,6 +28,7 @@ describe("read-only robot telemetry", () => {
     await waitFor(() => expect(transport.getSnapshot().connection).toBe("connected"));
     expect(transport.getSnapshot()).toMatchObject({
       safetyState: "DISARMED",
+      firmwareProfileMatch: "matched",
       positionKind: "commanded",
       measuredPositionsAvailable: false,
       commandedMilliUnits: { HEAD_PAN: -100, LEFT_ARM: 200, RIGHT_ARM: 0 },
@@ -65,6 +66,31 @@ describe("read-only robot telemetry", () => {
     const transport = new HttpRobotTransport("http://127.0.0.1:8765/api/robot/status", request);
     const unsubscribe = transport.subscribe(() => {});
     await waitFor(() => expect(transport.getSnapshot().mode).toBe("test"));
+    unsubscribe();
+  });
+
+  it("shows a firmware/profile mismatch without motion authorization", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+      connection: "offline",
+      mode: "simulation",
+      safety_state: "UNKNOWN",
+      last_known_state: "UNKNOWN",
+      motion_authorized: false,
+      controller_active: false,
+      physical_output_status: "unverified",
+      firmware_profile_match: "mismatch",
+      telemetry_fresh: false,
+      position_kind: "commanded",
+      measured_positions_available: false,
+      commanded_milli_units: null,
+      rx_errors: null,
+      dropped_tx: null,
+      uart_status: null,
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const transport = new HttpRobotTransport("http://127.0.0.1:8765/api/robot/status", request);
+    const unsubscribe = transport.subscribe(() => {});
+    await waitFor(() => expect(transport.getSnapshot().firmwareProfileMatch).toBe("mismatch"));
+    expect(transport.getSnapshot().motionAuthorized).toBe(false);
     unsubscribe();
   });
 });

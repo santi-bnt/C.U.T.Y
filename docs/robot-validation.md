@@ -72,6 +72,12 @@ PYTHONPATH=src python -m cuty.hardware.stm32_bridge --port /dev/ttyAMA0 status
 
 **Aprobado:** tres respuestas V2 válidas, estado inicial DISARMED y ningún servo se mueve. La consulta de estado no comprueba PWM bajo carga.
 
+`status` también consulta `V2,INFO`. En el firmware predeterminado, banco o calibración
+debe reportar `none`. Un firmware físico compilado con perfil reporta su huella
+`sha256:...`; la aplicación Raspberry compara esa huella con el JSON cargado antes de
+autorizar el control. Una huella ausente o distinta bloquea el modo robot. La coincidencia
+confirma identidad del archivo compilado, no seguridad mecánica.
+
 ## 8. Identificación de conectores y ejes
 
 Usa las asignaciones fijas de la carrier: HEAD_PAN=PB6/TIM4_CH1/J7, LEFT_ARM=PB7/TIM4_CH2/J8, RIGHT_ARM=PB8/TIM4_CH3/J9. J10/J11 están reservados. Comprueba continuidad/señal con sistema apagado y etiqueta cables/conectores. Si la identidad física de un servo no se puede confirmar sin movimiento, deja ese eje descargado/desacoplado y usa la calibración manual de los siguientes pasos para comprobar un conector por sesión.

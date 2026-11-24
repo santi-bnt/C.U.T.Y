@@ -17,7 +17,7 @@ def command(line: str) -> bytes:
     """
     if not isinstance(line, str) or "\n" in line or "\r" in line:
         raise ValueError("command must be one line without terminator")
-    allowed = {"V2,HB", "V2,ARM", "V2,START", "V2,DISARM", "V2,RESET"}
+    allowed = {"V2,HB", "V2,ARM", "V2,START", "V2,DISARM", "V2,RESET", "V2,INFO"}
     valid = line in allowed
     fields = line.split(",")
     if len(fields) == 4 and fields[:2] == ["V2", "TARGET"]:

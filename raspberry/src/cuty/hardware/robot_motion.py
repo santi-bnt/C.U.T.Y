@@ -21,6 +21,9 @@ class RobotMotionExecutor:
     def __init__(self, port: str, calibration: RobotCalibration, *, bridge_factory=STM32Bridge,
                  clock=time.monotonic, sleep=time.sleep) -> None:
         calibration.validate_complete()
+        self._profile_fingerprint = calibration.fingerprint
+        self._firmware_profile_id: str | None = None
+        self._firmware_profile_match = "unverified"
         self.profile = {axis.axis: axis for axis in calibration.axes}
         self._bridge_factory = bridge_factory
         self._clock = clock
@@ -52,7 +55,7 @@ class RobotMotionExecutor:
             return False
         try:
             self._connect(require_disarmed=True, authorize=True)
-        except (OSError, RuntimeError, ConnectionError, TimeoutError):
+        except (OSError, RuntimeError, ConnectionError, TimeoutError, ValueError):
             # El monitor puede recuperar el enlace, pero la puerta de movimiento
             # requiere que el llamador vuelva a autorizar la sesión explícitamente.
             self._monitor_stop.clear()
@@ -66,6 +69,8 @@ class RobotMotionExecutor:
     def _connect(self, *, require_disarmed: bool, authorize: bool) -> None:
         bridge = self._bridge_factory(self._port)
         self._last_sequence = None
+        self._firmware_profile_id = None
+        self._firmware_profile_match = "unverified"
         try:
             state = self._exchange(bridge, "V2,HB")
             if state != "DISARMED":
@@ -75,13 +80,18 @@ class RobotMotionExecutor:
                     raise RuntimeError(
                         f"STM32 debe estar DISARMED para habilitar control local (estado {state})"
                     )
+            self._exchange(bridge, "V2,INFO", expected=state)
+            self._firmware_profile_match = (
+                "matched" if self._firmware_profile_id == self._profile_fingerprint else "mismatch"
+            )
+            if self._firmware_profile_match != "matched":
+                raise RuntimeError("El perfil del firmware STM32 no coincide con el perfil Raspberry")
         except Exception:
             bridge.close()
             raise
         self._bridge = bridge
         self.connected = True
         self.enabled = authorize
-        self._last_sequence = None
 
     def disable(self) -> None:
         """Cancela trayectorias, intenta DISARM y libera UART."""
@@ -109,6 +119,8 @@ class RobotMotionExecutor:
         self.enabled = False
         self._active = False
         self._last_sequence = None
+        self._firmware_profile_id = None
+        self._firmware_profile_match = "unverified"
         with self._owner_lock:
             self._motion_owner = None
         if bridge is not None:
@@ -326,7 +338,7 @@ class RobotMotionExecutor:
                 "motion_authorized": self.enabled,
                 "controller_active": bool(self.enabled and self._active),
                 "physical_output_status": "unverified",
-                "firmware_profile_match": "unverified",
+                "firmware_profile_match": self._firmware_profile_match,
                 "telemetry_age_seconds": age,
                 "telemetry_fresh": telemetry_fresh,
                 "position_kind": "commanded",
@@ -393,11 +405,18 @@ class RobotMotionExecutor:
     def _exchange(self, bridge, wire: bytes | str, *, expected: str | None = None) -> str:
         if isinstance(wire, str):
             wire = command(wire)
+        is_info = wire.rstrip(b"\r\n") == b"V2,INFO"
         with self._io_lock:
             response = parse_response(bridge.exchange(wire, timeout=0.4))
-            if response.kind != "ACK" or len(response.fields) != 3:
+            if response.kind != "ACK" or len(response.fields) != (4 if is_info else 3):
                 raise RuntimeError("STM32 rechazó o devolvió una respuesta UART inválida")
-            sequence, result, state = response.fields
+            sequence, result, state = response.fields[:3]
+            if is_info:
+                profile_id = response.fields[3]
+                if (len(profile_id) != 71 or not profile_id.startswith("sha256:") or
+                        any(char not in "0123456789abcdef" for char in profile_id[7:])):
+                    raise RuntimeError("STM32 devolvió un identificador de perfil inválido")
+                self._firmware_profile_id = profile_id
             if not sequence.isascii() or not sequence.isdigit() or result != "OK":
                 raise RuntimeError("ACK V2 inválido")
             sequence_number = int(sequence)

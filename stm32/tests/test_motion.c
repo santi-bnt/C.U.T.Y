@@ -38,6 +38,7 @@ int main(void) {
     assert(!cuty_fir_process(&fir,NAN,&value));
     assert(!cuty_fir_init(&fir,moving_average,0));
     CutyParser p={0}; CutyCommand cmd;
+    assert(cuty_parse_line("V2,INFO",&cmd) && cmd.kind==CUTY_INFO);
     const char *valid="V2,TARGET,HEAD_PAN,350\r\n";
     for (size_t i=0;i<strlen(valid);++i)
         assert(cuty_rx_byte(&p,(uint8_t)valid[i],&cmd)==(i==strlen(valid)-1?CUTY_RX_COMMAND:CUTY_RX_NONE));

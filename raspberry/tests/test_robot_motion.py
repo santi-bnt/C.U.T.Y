@@ -1,5 +1,6 @@
 import threading
 import time
+from dataclasses import replace
 
 import pytest
 
@@ -20,13 +21,14 @@ def profile():
 
 
 class FakeBridge:
-    def __init__(self, *_args, auto_advance_targets=True):
+    def __init__(self, *_args, auto_advance_targets=True, profile_id=None):
         self.sequence = 0
         self.state = "DISARMED"
         self.commands = []
         self.closed = False
         self.events = []
         self.auto_advance_targets = auto_advance_targets
+        self.profile_id = profile_id or profile().fingerprint
         self.positions = {"HEAD_PAN": -125, "LEFT_ARM": 200, "RIGHT_ARM": 0}
 
     def exchange(self, wire, timeout=1):
@@ -41,6 +43,8 @@ class FakeBridge:
             self.state = "DISARMED"
         elif verb[1] == "TARGET" and self.auto_advance_targets:
             self.positions[verb[2]] = int(verb[3])
+        if verb[1] == "INFO":
+            return f"V2,ACK,{self.sequence},OK,{self.state},{self.profile_id}\n"
         if verb[1] == "HB":
             self.events.append(parse_response(
                 "V2,TELEM,9876," + self.state + ",3,1," +
@@ -72,6 +76,29 @@ def test_gesture_uses_v2_targets_and_stop_disarms():
     assert not bridge.closed
     executor.disable()
     assert bridge.closed
+
+
+def test_profile_fingerprint_is_order_independent_and_covers_axis_settings():
+    calibration = profile()
+    reordered = RobotCalibration(tuple(reversed(calibration.axes)))
+    modified = RobotCalibration((replace(calibration.axes[0], center_us=1510), *calibration.axes[1:]))
+
+    assert calibration.fingerprint.startswith("sha256:")
+    assert calibration.fingerprint == reordered.fingerprint
+    assert calibration.fingerprint != modified.fingerprint
+
+
+def test_profile_handshake_blocks_mismatch_and_reports_it():
+    bridge = FakeBridge(profile_id="sha256:" + "0" * 64)
+    executor = RobotMotionExecutor("/dev/test", profile(), bridge_factory=lambda *_: bridge)
+
+    with pytest.raises(RuntimeError, match="no coincide"):
+        executor._connect(require_disarmed=True, authorize=True)
+
+    assert "V2,INFO" in bridge.commands
+    assert bridge.closed
+    assert executor.enabled is False
+    assert executor.status_snapshot()["firmware_profile_match"] == "mismatch"
 
 
 def test_coordinated_greeting_targets_all_three_axes():

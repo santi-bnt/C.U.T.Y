@@ -18,10 +18,12 @@ machine, and pulse-width conversion. The board layer initializes USART2, TIM4 an
 RX. The default build leaves PWM disabled. A separate `build.py --profile` image binds
 all three PWM callbacks using a validated per-axis profile; it still starts DISARMED
 with outputs off until explicit ARM and START. Raspberry supplies the matching profile,
-heartbeat, high-level gestures and guarded face-follow goals. V2 has no profile identity
-handshake, so firmware/profile correspondence and all physical safety behavior still
-require supervised confirmation. IMU remains an interface declaration; PID is not part
-of the fixed-base motion path.
+heartbeat, high-level gestures and guarded face-follow goals. `V2,INFO` reports the
+SHA-256 fingerprint generated from the same profile JSON. The Raspberry executor
+requires an exact match while the STM32 is DISARMED before authorizing physical control;
+default, bench and calibration firmware report `none`. The handshake verifies profile
+identity, not the physical calibration or safety of the assembled robot. IMU remains an
+interface declaration; PID is not part of the fixed-base motion path.
 
 The interactive website retains its scripted architecture visualization. A separately
 configured read-only HTTP transport can display Raspberry/STM32 status and commanded
@@ -97,11 +99,17 @@ No whitespace trimming, exponent/NaN/Infinity, plus sign, decimal point or extra
 | Record without LF | Meaning |
 | --- | --- |
 | V2,HB | Refresh heartbeat (does not recover a fault) |
+| V2,INFO | Return the loaded profile ID without changing state or motion targets |
 | V2,ARM | DISARMED → READY, only with fresh heartbeat |
 | V2,START | READY → ACTIVE, only with fresh heartbeat |
 | V2,DISARM | Inhibit output and discard movement; FAULT stays latched, other states → DISARMED |
 | V2,RESET | FAULT → DISARMED; clears heartbeat validity |
 | V2,TARGET,HEAD_PAN,350 | Joint HEAD_PAN, LEFT_ARM or RIGHT_ARM; signed integer -1000..1000 milli-units → -1..1 |
+
+`V2,INFO` returns `V2,ACK,<sequence>,OK,<state>,sha256:<64 lowercase hex>` on a
+physical profile build and `... ,none` on other builds. The integrated Raspberry
+executor requires the SHA-256 value to match its loaded profile. This check does not
+replace per-axis calibration or supervised physical validation.
 
 Joints are named HEAD_PAN, LEFT_ARM and RIGHT_ARM. Coordinates are normalized to each calibrated axis range, not physical angles. No degree or raw PWM commands are accepted. The design maps J7–J9 to these axes; final continuity and servo mapping still require physical confirmation. V2 has no CRC/session handshake, replay protection or
 link authentication; corrupted yet valid ASCII may pass parsing. A production protocol
