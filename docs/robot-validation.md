@@ -153,7 +153,7 @@ Configura el entorno privado de voz y del launcher con `CUTY_ROBOT_MODE=robot`, 
 
 Con modo `robot`, cabeza/brazos en sus centros y supervisión presencial, solicita de uno en uno «saluda con el brazo izquierdo», «saluda con el brazo derecho» y, solo si ambos brazos pasaron la fase 12, «saluda con ambos brazos».
 
-**Aprobado:** cada gesto usa el perfil y la ruta de movimiento compartida, completa posiciones cortas y termina en centro; sin conflicto con seguimiento. Un gesto no calibrado se rechaza o no se prueba.
+**Aprobado:** cada gesto usa el perfil y la ruta de movimiento compartida, espera que la telemetría comandada llegue cerca de cada fotograma, y termina en centro; sin conflicto con seguimiento. Esa telemetría es consigna calculada, no medición de posición; confirma el movimiento observando el mecanismo. Un gesto no calibrado se rechaza o no se prueba.
 
 ## 16. Comandos por voz
 

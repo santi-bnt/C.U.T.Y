@@ -3,6 +3,7 @@ import time
 
 import pytest
 
+import cuty.hardware.robot_motion as robot_motion
 from cuty.hardware.calibration_profile import AxisCalibration, RobotCalibration
 from cuty.hardware.motion_actions import MotionAction
 from cuty.hardware.robot_commands import parse_response
@@ -19,12 +20,14 @@ def profile():
 
 
 class FakeBridge:
-    def __init__(self, *_args):
+    def __init__(self, *_args, auto_advance_targets=True):
         self.sequence = 0
         self.state = "DISARMED"
         self.commands = []
         self.closed = False
         self.events = []
+        self.auto_advance_targets = auto_advance_targets
+        self.positions = {"HEAD_PAN": -125, "LEFT_ARM": 200, "RIGHT_ARM": 0}
 
     def exchange(self, wire, timeout=1):
         self.commands.append(wire.decode("ascii").strip())
@@ -36,9 +39,14 @@ class FakeBridge:
             self.state = "ACTIVE"
         elif verb[1] == "DISARM":
             self.state = "DISARMED"
+        elif verb[1] == "TARGET" and self.auto_advance_targets:
+            self.positions[verb[2]] = int(verb[3])
         if verb[1] == "HB":
             self.events.append(parse_response(
-                "V2,TELEM,9876,DISARMED,3,1,-125,200,0,OK"
+                "V2,TELEM,9876," + self.state + ",3,1," +
+                ",".join(str(self.positions[axis]) for axis in (
+                    "HEAD_PAN", "LEFT_ARM", "RIGHT_ARM",
+                )) + ",OK"
             ))
         return f"V2,ACK,{self.sequence},OK,{self.state}\n"
 
@@ -76,6 +84,24 @@ def test_coordinated_greeting_targets_all_three_axes():
     assert "V2,TARGET,HEAD_PAN,120" in bridge.commands
     assert "V2,TARGET,LEFT_ARM,150" in bridge.commands
     assert "V2,TARGET,RIGHT_ARM,150" in bridge.commands
+    executor.disable()
+
+
+def test_unsettled_commanded_trajectory_sends_disarm(monkeypatch):
+    monkeypatch.setattr(robot_motion, "MAX_SETTLE_TIMEOUT_SECONDS", 0.05)
+    bridge = FakeBridge(auto_advance_targets=False)
+    executor = RobotMotionExecutor("/dev/test", profile(), bridge_factory=lambda *_: bridge)
+    assert executor.enable()
+
+    result = executor.execute(MotionAction.HEAD_RIGHT)
+
+    assert result == {
+        "accepted": False,
+        "action": "head_right",
+        "mode": "robot",
+        "reason": "commanded trajectory did not settle; disarmed",
+    }
+    assert bridge.commands[-1] == "V2,DISARM"
     executor.disable()
 
 

@@ -11,6 +11,8 @@ from .stm32_bridge import STM32Bridge
 
 AXES = ("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM")
 STEP_SECONDS = 0.25
+SETTLE_TOLERANCE_MILLI_UNITS = 12
+MAX_SETTLE_TIMEOUT_SECONDS = 30.0
 
 
 class RobotMotionExecutor:
@@ -163,14 +165,25 @@ class RobotMotionExecutor:
                     if self._motion_cancelled(generation):
                         return {"accepted": False, "action": action.value,
                                 "mode": "robot", "reason": "cancelled by stop"}
+                    frame_targets = {}
                     # Actualiza todos los ejes del fotograma antes de avanzar.
                     for axis, position in keyframe.items():
                         if self._motion_cancelled(generation):
                             return {"accepted": False, "action": action.value,
                                     "mode": "robot", "reason": "cancelled by stop"}
+                        target_position = round(position * 1000)
                         self.set_axis_target(
-                            axis, round(position * 1000), owner="voice", _generation=generation,
+                            axis, target_position, owner="voice", _generation=generation,
                         )
+                        frame_targets[axis] = target_position
+                    if not self._wait_for_commanded_targets(frame_targets, generation):
+                        if self._motion_cancelled(generation):
+                            return {"accepted": False, "action": action.value,
+                                    "mode": "robot", "reason": "cancelled by stop"}
+                        # Si la consigna no llega, desarma antes de descartar el gesto.
+                        self.stop()
+                        return {"accepted": False, "action": action.value, "mode": "robot",
+                                "reason": "commanded trajectory did not settle; disarmed"}
                     if self._sleep is time.sleep:
                         cancelled = self._motion_cancel.wait(STEP_SECONDS)
                     else:
@@ -185,6 +198,47 @@ class RobotMotionExecutor:
             raise
         finally:
             self.release("voice")
+
+    def _wait_for_commanded_targets(self, targets: dict[str, int], generation: int) -> bool:
+        """Espera la consigna reportada por STM32; no se interpreta como posición medida."""
+        with self._io_lock:
+            telemetry = self._telemetry
+        starts = telemetry.commanded_milli_units if telemetry is not None else {}
+        expected_seconds = 0.0
+        for axis, target_milli_units in targets.items():
+            calibration = self.profile[axis]
+            start = starts.get(axis, 0)
+            distance = abs(target_milli_units - start) / 1000.0
+            velocity = calibration.max_velocity_per_s
+            acceleration = calibration.max_acceleration_per_s2
+            ramp_distance = velocity * velocity / acceleration
+            if distance <= ramp_distance:
+                travel_seconds = 2.0 * (distance / acceleration) ** 0.5
+            else:
+                ramp_seconds = velocity / acceleration
+                travel_seconds = 2.0 * ramp_seconds + (distance - ramp_distance) / velocity
+            expected_seconds = max(expected_seconds, travel_seconds)
+
+        timeout = min(MAX_SETTLE_TIMEOUT_SECONDS, max(2.0, expected_seconds * 3.0 + 1.0))
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if self._motion_cancelled(generation):
+                return False
+            with self._io_lock:
+                telemetry = self._telemetry
+                received_at = self._telemetry_received_at
+            if telemetry is not None and received_at is not None:
+                age = self._clock() - received_at
+                if age <= 1.0 and telemetry.state == "FAULT":
+                    raise RuntimeError("STM32 entró en FAULT durante la trayectoria")
+                if age <= 1.0 and telemetry.state == "ACTIVE" and all(
+                    abs(telemetry.commanded_milli_units.get(axis, 2001) - target)
+                    <= SETTLE_TOLERANCE_MILLI_UNITS
+                    for axis, target in targets.items()
+                ):
+                    return True
+            self._motion_cancel.wait(0.05)
+        return False
 
     def activate(self, *, _generation: int | None = None) -> bool:
         """Arma explícitamente desde DISARMED y deja el heartbeat supervisor activo."""
