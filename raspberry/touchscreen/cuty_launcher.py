@@ -29,6 +29,7 @@ try:
     from cuty.vision.camera import camera_mode
     from cuty.vision.face_tracker import FaceTracker
     from cuty.vision.ipc import socket_path_for_user
+    from cuty.hardware.motion_ipc import IpcHeadAdapter
     FACE_ERROR = ''
 except ImportError as error:  # e.g. NumPy missing: keep menus working.
     FACE_ERROR = f'Cara no disponible: {error}'
@@ -366,8 +367,14 @@ class Launcher(wifi.Panel):
             self.face_writer = FramebufferWriter(FB, W, H)
         self.face_writer.invalidate()
         if self.tracker is None and camera_mode() != 'off':
+            head_adapter = (
+                IpcHeadAdapter()
+                if os.getenv('CUTY_FOLLOW_PHYSICAL_ENABLE', '0').lower() in ('1', 'true', 'yes', 'on')
+                else None
+            )
             self.tracker = FaceTracker(
                 vision_ipc_path=socket_path_for_user(NORM_USER), vision_user=NORM_USER,
+                head_adapter=head_adapter,
             )
         if self.tracker is not None:
             self.tracker.start()
@@ -610,8 +617,9 @@ class Launcher(wifi.Panel):
                                     self.ignore_next_release = False
                                     continue
                                 if self.mode == 'face':
-                                    short_press = (self.hold_since is not None and
-                                                   now-self.hold_since < 0.7)
+                                    held_seconds = (now - self.hold_since
+                                                    if self.hold_since is not None else 0.0)
+                                    short_press = held_seconds < 0.7
                                     self.hold_since = None
                                     self.released_at = now
                                     if short_press and self.face is not None:
@@ -626,6 +634,15 @@ class Launcher(wifi.Panel):
                                                     print('C.U.T.Y music next:', error, flush=True)
                                             else:
                                                 self.pending_face_tap_at = now
+                                    elif 0.7 <= held_seconds < 5.0 and self.tracker is not None:
+                                        follow = self.tracker.follow
+                                        if follow is not None and getattr(follow.adapter, 'is_physical', False):
+                                            try:
+                                                enabled = not follow.status.enabled
+                                                self.tracker.set_head_follow_enabled(enabled)
+                                                print('Seguimiento físico:', 'armado' if enabled else 'detenido', flush=True)
+                                            except (OSError, RuntimeError, ValueError) as error:
+                                                print('Seguimiento físico no habilitado:', error, flush=True)
                                 else:
                                     if (self.raw_x is not None and self.raw_y is not None
                                             and now-self.last_release >= 0.16):

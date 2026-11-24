@@ -144,6 +144,7 @@ def test_physical_mode_reports_adapter_disarmed_then_active_and_disarms_on_face_
     controller.set_enabled(True)
     assert controller.status.reason == "physical PAN armed; waiting for face"
     assert "dry-run" not in controller.status.reason
+    assert not adapter.velocities  # Armar no debe solicitar por sí solo la posición central.
     controller.update(target(x=.8, timestamp=0.0), now=0.0)
     active = controller.update(target(x=.9, timestamp=.1), now=.1)
     assert active.reason == "physical PAN active"

@@ -48,6 +48,8 @@ class RobotMotionExecutor:
         self._heartbeat_stop = threading.Event()
         self._heartbeat_thread = None
         self._active = False
+        self._owner_lock = threading.Lock()
+        self._motion_owner: str | None = None
 
     def enable(self) -> bool:
         """Verifica enlace y perfil; no arma ni inicia el movimiento físico."""
@@ -77,19 +79,29 @@ class RobotMotionExecutor:
         if worker is not None and worker is not threading.current_thread():
             worker.join(timeout=0.6)
         self._last_sequence = None
+        with self._owner_lock:
+            self._motion_owner = None
         if bridge is not None:
             bridge.close()
 
     def stop(self) -> None:
         if not self.enabled or self._bridge is None:
-            self.disable()
+            self._active = False
             return
         bridge = self._require_enabled()
+        self._heartbeat_stop.set()
+        worker = self._heartbeat_thread
+        self._heartbeat_thread = None
+        if worker is not None and worker is not threading.current_thread():
+            worker.join(timeout=0.6)
         try:
             self._exchange(bridge, "V2,DISARM")
-        finally:
-            # DISARM cancela objetivos y quita PWM en el STM32; cerrar también libera el puerto.
+        except Exception:
             self.disable()
+            raise
+        self._active = False
+        with self._owner_lock:
+            self._motion_owner = None
 
     def execute(self, action: MotionAction) -> dict[str, object]:
         if not isinstance(action, MotionAction):
@@ -99,25 +111,43 @@ class RobotMotionExecutor:
             return {"accepted": True, "action": action.value, "mode": "stopped"}
         if action not in POSES:
             raise ValueError("Acción sin trayectoria implementada")
-        bridge = self._require_enabled()
+        if not self.claim("voice"):
+            raise RuntimeError("Otro controlador posee los ejes físicos")
+        bridge = None
         try:
-            self._ensure_active(bridge)
+            bridge = self._require_enabled()
+            self.activate()
             for keyframe in POSES[action]:
                 # Actualiza todos los ejes del fotograma antes de avanzar al siguiente.
                 for axis, position in keyframe.items():
-                    self.set_axis_target(axis, round(position * 1000))
+                    self.set_axis_target(axis, round(position * 1000), owner="voice")
                 self._sleep(STEP_SECONDS)
             return {"accepted": True, "action": action.value, "mode": "hardware"}
         except Exception:
             self.disable()
             raise
+        finally:
+            self.release("voice")
 
-    def set_axis_target(self, axis: str, milli_units: int) -> bool:
+    def activate(self) -> bool:
+        """Arma explícitamente desde DISARMED y deja el heartbeat supervisor activo."""
+        bridge = self._require_enabled()
+        try:
+            self._ensure_active(bridge)
+            return True
+        except Exception:
+            self.disable()
+            raise
+
+    def set_axis_target(self, axis: str, milli_units: int, *, owner: str = "voice") -> bool:
         """Reemplaza el objetivo actual de un eje; el STM32 mailbox descarta objetivos viejos."""
         if axis not in self.profile or isinstance(milli_units, bool) or not isinstance(milli_units, int):
             raise ValueError("Eje o consigna inválidos")
         if not -1000 <= milli_units <= 1000:
             raise ValueError("La consigna normalizada debe estar entre -1000 y 1000")
+        with self._owner_lock:
+            if self._motion_owner != owner:
+                raise RuntimeError("El controlador no posee autorización exclusiva de movimiento")
         bridge = self._require_enabled()
         try:
             self._ensure_active(bridge)
@@ -127,6 +157,20 @@ class RobotMotionExecutor:
         except Exception:
             self.disable()
             raise
+
+    def claim(self, owner: str) -> bool:
+        if owner not in {"voice", "face_follow"}:
+            return False
+        with self._owner_lock:
+            if self._motion_owner not in {None, owner}:
+                return False
+            self._motion_owner = owner
+            return True
+
+    def release(self, owner: str) -> None:
+        with self._owner_lock:
+            if self._motion_owner == owner:
+                self._motion_owner = None
 
     def _ensure_active(self, bridge) -> None:
         if self._active:

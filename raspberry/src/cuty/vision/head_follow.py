@@ -234,7 +234,8 @@ class FaceFollowController:
                     raise FollowConfigurationError("STM32 did not accept explicit ARM/START")
             self._enabled = bool(enabled)
             self._velocity = 0.0
-            self._stop_adapter(disarm=not enabled)
+            if not enabled or not self._has_physical_adapter():
+                self._stop_adapter(disarm=not enabled)
             self._pid.reset_derivative()
             self._last_time = None
             self.status = FollowStatus(self._enabled, False, None, None, 0.0, 0.0,

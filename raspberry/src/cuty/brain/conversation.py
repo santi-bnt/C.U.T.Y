@@ -750,10 +750,10 @@ class ConversationService:
         except WebSearchError as exc:
             logging.getLogger("WEB").warning("%s", exc)
             result = {"ok": False, "error": str(exc), "results": []}
-        except (ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+        except (RuntimeError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
             self._log.warning("Rejected tool %s: %s", call.name, exc)
             error = ("Invalid search arguments" if call.name == "search_web" else
-                     "Movement request rejected; physical motion requires an allowed spoken command and local authorization"
+                     f"Movement request rejected: {str(exc)[:160]}"
                      if call.name == "request_motion" else
                      "Exit not confirmed by the user's transcription; continue the conversation"
                      if call.name == "return_to_menu" else "Invalid expression arguments")

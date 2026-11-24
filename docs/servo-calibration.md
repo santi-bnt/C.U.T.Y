@@ -126,6 +126,32 @@ ninguno se sobreescribe. Solo carga este ELF después de completar la revisión
 física del perfil; el arranque deja PWM apagado y el movimiento requiere
 `ARM` + `START` explícitos.
 
+## Seguimiento facial y acciones por voz
+
+Después de cargar el firmware físico correspondiente al mismo perfil, configura
+en el entorno del servicio de voz:
+
+    CUTY_ROBOT_PHYSICAL_ENABLE=1
+    CUTY_SERVO_CALIBRATION_PROFILE=/ruta/perfil-confirmado.json
+    CUTY_STM32_PORT=/dev/ttyAMA0
+    CUTY_FOLLOW_PHYSICAL_ENABLE=1
+    CUTY_FOLLOW_DRY_RUN=0
+
+Deja CUTY_FOLLOW_ENABLED en 0; el seguimiento se arma mediante el toque. Reinicia
+el servicio de voz y confirma que su registro indique enlace válido y
+STM32 en DISARMED. CUTY_FOLLOW_PHYSICAL_ENABLE también debe estar en el entorno
+del launcher de pantalla. En la cara animada, mantén presionado el táctil entre
+0.7 y 5 segundos para armar o detener seguimiento. El PID corre en Raspberry;
+solo publica velocidades recientes por socket Unix local al proceso que posee
+UART. Al perder la cara, el launcher desarma y requiere otro toque para reanudar.
+El enlace limita PAN a ±0.15 normalizado.
+
+Las órdenes de Gemini solo aceptan frases explícitas del allowlist y la acción
+debe coincidir con la transcripción. Los gestos usan el mismo ejecutor y perfil.
+El dueño de movimiento es exclusivo: seguimiento y gestos no escriben objetivos
+simultáneamente. “Detente” envía DISARM; quitar PWM no corta la alimentación
+de los servos.
+
 ## Verificación realizada
 
 Se prueban el parser y los límites, la tarea RTOS con UART simulado y el driver

@@ -26,6 +26,7 @@ from cuty.brain.conversation import ConversationService, ReturnToMenu
 from cuty.hardware.calibration_profile import RobotCalibration
 from cuty.hardware.motion_actions import MotionActionGate
 from cuty.hardware.robot_motion import RobotMotionExecutor
+from cuty.hardware.motion_ipc import MotionIpcServer
 from cuty.brain.states import State, StateMachine
 from cuty.config import Config, ConfigurationError
 from cuty.audio.thinking import ThinkingVoice
@@ -191,6 +192,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     thinking_voice = ThinkingVoice()
     prepare_thinking = asyncio.create_task(thinking_voice.prepare())
     physical_executor = None
+    motion_ipc_server = None
     try:
         await speaker.open()
         await provider.connect()
@@ -239,6 +241,11 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                 physical_executor = executor
                 motion_gate = MotionActionGate(executor)
                 motion_gate.enable_physical(calibration=calibration)
+                if os.name == "posix" and os.getenv("CUTY_FOLLOW_PHYSICAL_ENABLE", "0").lower() in {
+                    "1", "true", "yes", "on",
+                }:
+                    motion_ipc_server = MotionIpcServer(executor, motion_gate.physical_enabled)
+                    motion_ipc_server.start()
                 log.warning("Movimiento físico autorizado localmente; el STM32 sigue DISARMED")
             except (OSError, RuntimeError, ValueError) as error:
                 log.error("Movimiento físico no habilitado: %s", error)
@@ -283,6 +290,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                 await asyncio.gather(stop_task, return_exceptions=True)
         return 0
     finally:
+        if motion_ipc_server is not None:
+            motion_ipc_server.stop()
         if physical_executor is not None:
             await asyncio.to_thread(physical_executor.disable)
         prepare_thinking.cancel()

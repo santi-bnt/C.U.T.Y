@@ -160,7 +160,8 @@ class FaceTracker:
         if self.follow is None:
             return False
         self.follow.set_enabled(enabled)
-        self._log.info("Seguimiento facial %s (solo simulación)", "activado" if enabled else "detenido")
+        self._log.info("Seguimiento facial %s (%s)", "activado" if enabled else "detenido",
+                        self.follow.status.reason)
         return True
 
     @property
