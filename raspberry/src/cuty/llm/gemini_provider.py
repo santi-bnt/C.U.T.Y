@@ -52,12 +52,12 @@ _CONFIG = {
     }, {
         "name": "request_motion",
         "behavior": "BLOCKING",
-        "description": "Request one allowed high-level C.U.T.Y. movement. Physical execution requires explicit local authorization and complete calibration.",
+        "description": "Request one allowed high-level C.U.T.Y. movement, including a coordinated head-and-arms greeting. Physical execution requires explicit local authorization and complete calibration.",
         "parameters": {
             "type": "OBJECT",
             "properties": {"action": {"type": "STRING", "enum": [
                 "stop", "wave_left", "wave_right", "wave_both", "head_left",
-                "head_right", "head_center", "arm_left", "arm_right",
+                "head_right", "head_center", "arm_left", "arm_right", "greet_right",
             ]}},
             "required": ["action"],
         },

@@ -66,6 +66,19 @@ def test_gesture_uses_v2_targets_and_stop_disarms():
     assert bridge.closed
 
 
+def test_coordinated_greeting_targets_all_three_axes():
+    bridge = FakeBridge()
+    executor = RobotMotionExecutor("/dev/test", profile(), bridge_factory=lambda *_: bridge,
+                                   sleep=lambda _seconds: None)
+    assert executor.enable()
+    result = executor.execute(MotionAction.GREET_RIGHT)
+    assert result["accepted"] is True
+    assert "V2,TARGET,HEAD_PAN,120" in bridge.commands
+    assert "V2,TARGET,LEFT_ARM,150" in bridge.commands
+    assert "V2,TARGET,RIGHT_ARM,150" in bridge.commands
+    executor.disable()
+
+
 def test_motion_requires_local_enable_and_rejects_unexpected_state():
     executor = RobotMotionExecutor("/dev/test", profile(), bridge_factory=lambda *_: FakeBridge())
     with pytest.raises(RuntimeError):

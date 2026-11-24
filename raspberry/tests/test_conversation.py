@@ -445,6 +445,17 @@ def test_voice_motion_tool_requires_matching_user_words_and_stays_simulated():
     assert result["commanded_milli_units"]["HEAD_PAN"] == -150
 
 
+def test_user_requested_gesture_sets_its_matching_face_expression():
+    service, provider, _, _, _ = make_service([])
+    asyncio.run(service._handle_tool(
+        ToolCall("greet", "request_motion", '{"action":"greet_right"}'),
+        input_transcript="Cuty, saluda y mira a la derecha",
+    ))
+    result = provider.results[-1][1]
+    assert result["accepted"] is True and result["simulated"] is True
+    assert result["expression"]["expression"] == "happy"
+
+
 def test_model_cannot_invent_motion_and_stop_has_priority():
     service, provider, _, _, _ = make_service([])
     asyncio.run(service._handle_tool(

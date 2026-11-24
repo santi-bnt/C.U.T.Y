@@ -25,6 +25,7 @@ class MotionAction(str, Enum):
     HEAD_CENTER = "head_center"
     ARM_LEFT = "arm_left"
     ARM_RIGHT = "arm_right"
+    GREET_RIGHT = "greet_right"
 
 
 class OperationMode(str, Enum):
@@ -40,6 +41,10 @@ POSES = {
     MotionAction.HEAD_CENTER: ({"HEAD_PAN": 0.0},),
     MotionAction.ARM_LEFT: ({"LEFT_ARM": 0.20},),
     MotionAction.ARM_RIGHT: ({"RIGHT_ARM": 0.20},),
+    MotionAction.GREET_RIGHT: (
+        {"HEAD_PAN": 0.12, "LEFT_ARM": 0.15, "RIGHT_ARM": 0.15},
+        {"HEAD_PAN": 0.0, "LEFT_ARM": 0.0, "RIGHT_ARM": 0.0},
+    ),
     MotionAction.WAVE_LEFT: (
         {"LEFT_ARM": 0.20}, {"LEFT_ARM": 0.08}, {"LEFT_ARM": 0.20}, {"LEFT_ARM": 0.0},
     ),
@@ -68,6 +73,7 @@ _PHRASES = {
     "saluda con el brazo izquierdo": MotionAction.WAVE_LEFT,
     "saluda con el brazo derecho": MotionAction.WAVE_RIGHT,
     "saluda con ambos brazos": MotionAction.WAVE_BOTH,
+    "saluda y mira a la derecha": MotionAction.GREET_RIGHT,
     "levanta el brazo izquierdo": MotionAction.ARM_LEFT,
     "levanta el brazo derecho": MotionAction.ARM_RIGHT,
     "mueve la cabeza a la izquierda": MotionAction.HEAD_LEFT,

@@ -15,6 +15,7 @@ from cuty.hardware.calibration_profile import AxisCalibration, RobotCalibration
     ("levanta el brazo izquierdo", MotionAction.ARM_LEFT),
     ("Mira a la derecha", MotionAction.HEAD_RIGHT),
     ("regresa al centro", MotionAction.HEAD_CENTER),
+    ("Cuty, saluda y mira a la derecha", MotionAction.GREET_RIGHT),
     ("por favor detente ahora", MotionAction.STOP),
 ])
 def test_allowlisted_voice_requests(spoken, action):
@@ -34,6 +35,10 @@ def test_simulation_is_default_and_stop_has_priority():
     assert result["mode"] == "simulation"
     assert result["simulated"] is True
     assert gate.submit(parse_motion_request("mira a la izquierda"))["commanded_milli_units"]["HEAD_PAN"] == -150
+    greeting = gate.submit(parse_motion_request("saluda y mira a la derecha"))
+    assert greeting["commanded_milli_units"] == {
+        "HEAD_PAN": 0, "LEFT_ARM": 0, "RIGHT_ARM": 0,
+    }
     assert gate.status_snapshot()["position_kind"] == "commanded"
     assert gate.status_snapshot()["measured_positions_available"] is False
     assert gate.status_snapshot()["motion_authorized"] is False

@@ -737,6 +737,13 @@ class ConversationService:
                 result = await asyncio.to_thread(
                     self.motion_gate.submit, MotionRequest(requested),
                 )
+                if result.get("accepted") and requested in {
+                    MotionAction.WAVE_LEFT, MotionAction.WAVE_RIGHT,
+                    MotionAction.WAVE_BOTH, MotionAction.GREET_RIGHT,
+                }:
+                    # La expresión acompaña un gesto que el usuario pidió explícitamente.
+                    event = self.expressions.set_emotion(Expression.HAPPY, 0.85)
+                    result["expression"] = event.as_dict()
             elif call.name == "return_to_menu" and self.voice_exit:
                 if args:
                     raise ValueError("Return to menu takes no arguments")

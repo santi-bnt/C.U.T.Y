@@ -155,6 +155,7 @@ def test_menu_config_adds_exit_tool_without_changing_keyboard_config():
     assert captured[0].input_audio_transcription.language_codes in (None, [])
     assert len(_CONFIG["tools"][0]["function_declarations"]) == 3
     assert _CONFIG["tools"][0]["function_declarations"][2]["name"] == "request_motion"
+    assert "greet_right" in _CONFIG["tools"][0]["function_declarations"][2]["parameters"]["properties"]["action"]["enum"]
 
 
 def test_grounded_search_sources_are_emitted_before_done_and_deduplicated_per_turn():
