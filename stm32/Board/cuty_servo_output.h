@@ -37,5 +37,7 @@ bool cuty_servo_output_test_pulse(unsigned test_servo_number, uint16_t pulse_us,
 void cuty_servo_output_disable(void);
 bool cuty_servo_output_set(unsigned axis, float normalized_position);
 bool cuty_servo_output_is_enabled(void);
+/* Solo para el build de calibración: un canal, pulsos crudos; no confirma la mecánica. */
+bool cuty_servo_output_calibrate(unsigned axis, uint16_t pulse_us);
 
 #endif

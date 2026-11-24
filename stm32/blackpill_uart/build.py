@@ -8,8 +8,11 @@ import subprocess
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cc", help="Ruta a arm-none-eabi-gcc, si no esta en PATH")
-    parser.add_argument("--bench-channel", type=int, choices=(1, 2, 3),
-                        help="PWM de banco en un solo canal: 1=J7/PB6, 2=J8/PB7, 3=J9/PB8; solo servo suelto")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--bench-channel", type=int, choices=(1, 2, 3),
+                      help="PWM de banco en un canal: 1=J7/PB6, 2=J8/PB7, 3=J9/PB8")
+    mode.add_argument("--calibration", action="store_true",
+                      help="Genera firmware separado para calibración manual de un servo")
     args = parser.parse_args()
     cc = args.cc or shutil.which("arm-none-eabi-gcc")
     if not cc:
@@ -26,6 +29,8 @@ def main():
     output = root / "build"
     if args.bench_channel:
         output = output / f"bench-j{args.bench_channel + 6}"
+    if args.calibration:
+        output = output / "calibration"
     output.mkdir(parents=True, exist_ok=True)
     rtos = root / "Middlewares/Third_Party/FreeRTOS/Source"
     includes = ["Core/Inc", "Drivers/STM32F4xx_HAL_Driver/Inc",
@@ -42,7 +47,8 @@ def main():
     # El proyecto compila el mismo parser, controlador y tareas que prueban los tests host.
     sources += sorted((root.parent / "App").rglob("*.c"))
     sources += sorted((root.parent / "Board").glob("*.c"))
-    elf = output / "cuty_arms_pwm_blackpill.elf"
+    name = "cuty_arms_pwm_blackpill_calibration" if args.calibration else "cuty_arms_pwm_blackpill"
+    elf = output / (name + ".elf")
     # Una sola orden mantiene este ejemplo facil de leer y de reproducir.
     command = [cc, "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
                "-mfloat-abi=hard", "-std=gnu11", "-Og", "-g3", "-Wall", "-Wextra",
@@ -51,6 +57,8 @@ def main():
     command += ["-I" + str(root / include) for include in includes]
     if args.bench_channel:
         command += [f"-DCUTY_BENCH_CHANNEL={args.bench_channel}"]
+    if args.calibration:
+        command += ["-DCUTY_CALIBRATION_ENABLE=1"]
     command += ["-I" + str(root.parent / "App"), "-I" + str(root.parent / "Board")]
     command += [str(source) for source in sources]
     command += ["-T" + str(root / "STM32F401CCUX_FLASH.ld"),

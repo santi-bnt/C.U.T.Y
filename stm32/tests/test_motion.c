@@ -93,7 +93,7 @@ int main(void) {
     assert(send(&c,"V2,RESET",8502)); assert(!send(&c,"V2,ARM",8502));
     arm(&c,8503); assert(send(&c,"V2,TARGET,HEAD_PAN,1000",8503));
     assert(send(&c,"V2,DISARM",8504)); assert(!cuty_control_output_requested(&c));
-    arm(&c,8505); cmd=(CutyCommand){CUTY_TARGET,5,0}; assert(!cuty_control_command(&c,&cmd,8505));
+    arm(&c,8505); cmd=(CutyCommand){.kind=CUTY_TARGET,.axis=5}; assert(!cuty_control_command(&c,&cmd,8505));
     assert(c.safety.state==CUTY_FAULT);
     c=make(CUTY_RELEASE_OUTPUT); arm(&c,UINT32_MAX-100);
     cuty_control_tick(&c,398,0.02f); assert(c.safety.state==CUTY_ACTIVE);

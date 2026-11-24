@@ -1,5 +1,10 @@
 # Firmware STM32 de C.U.T.Y.
 
+Para la primera prueba de movimiento, usa el [modo de calibración manual](../docs/servo-calibration.md):
+`python stm32/blackpill_uart/build.py --calibration` genera un ELF separado que
+acepta `V2,CAL` para un único eje. La descripción de PWM bloqueado que sigue
+corresponde al build normal; la calibración no habilita el control automático.
+
 El proyecto reproducible para la Black Pill STM32F401CCU6 está en
 [`blackpill_uart/`](blackpill_uart/README.md). Integra los módulos portables de
 [`App/`](App/) y la capa HAL de [`Board/`](Board/) con el proyecto STM32CubeIDE,

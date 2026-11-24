@@ -78,8 +78,13 @@ bool cuty_board_init(void) {
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_1);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_2);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_3);
-    return cuty_servo_output_init(&htim4, cuty_servo_calibration, cuty_servo_test_ranges) &&
-           cuty_servo_bench_bind();
+    if (!cuty_servo_output_init(&htim4, cuty_servo_calibration, cuty_servo_test_ranges)) return false;
+#if defined(CUTY_CALIBRATION_ENABLE) && CUTY_CALIBRATION_ENABLE
+    /* CAL solo produce PWM en READY; no habilita TARGET ni el modo robot. */
+    if (!cuty_rtos_set_calibration_driver(cuty_servo_output_calibrate, cuty_servo_output_disable))
+        return false;
+#endif
+    return cuty_servo_bench_bind();
 }
 
 TIM_HandleTypeDef *cuty_board_tim4(void) { return &htim4; }

@@ -9,8 +9,9 @@ bool cuty_parse_line(const char *s, CutyCommand *out) {
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); ++i) {
         if (!strcmp(s, names[i])) { c.kind = (CutyCommandKind)i; *out = c; return true; }
     }
-    if (strncmp(s, "V2,TARGET,", 10)) return false;
-    s += 10;
+    bool calibration = strncmp(s, "V2,CAL,", 7) == 0;
+    if (!calibration && strncmp(s, "V2,TARGET,", 10)) return false;
+    s += calibration ? 7 : 10;
     static const char *joints[CUTY_AXES] = {"HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"};
     unsigned axis;
     for (axis = 0; axis < CUTY_AXES; ++axis) {
@@ -20,6 +21,17 @@ bool cuty_parse_line(const char *s, CutyCommand *out) {
         }
     }
     if (axis == CUTY_AXES) return false;
+    if (calibration) {
+        /* CAL usa exactamente cuatro dígitos en microsegundos, sin signo. */
+        unsigned value = 0;
+        for (unsigned i = 0; i < 4; ++i) {
+            if (*s < '0' || *s > '9') return false;
+            value = value * 10U + (unsigned)(*s++ - '0');
+        }
+        if (*s || value < 1000U || value > 2000U) return false;
+        c.kind = CUTY_CALIBRATE; c.pulse_us = (uint16_t)value;
+        *out = c; return true;
+    }
     /* El valor del cable está en milésimas; el controlador trabaja en unidades normalizadas. */
     bool negative = *s == '-'; if (negative) ++s;
     int value = 0; unsigned digits = 0;

@@ -1,6 +1,7 @@
 /* CMSIS-RTOS2 application core; physical output requires an explicitly bound board driver. */
 #include "motion_tasks.h"
 #include "cmsis_os2.h"
+#include "../control/manual_calibration.h"
 #include <string.h>
 #define INVALID_RX 1U
 #define SUPERVISE 2U
@@ -18,6 +19,15 @@ static CutyOutputSet output_set;
 static bool output_live;
 static CutyWatchdogRefresh watchdog_refresh;
 static volatile uint32_t control_progress;
+static CutyManualCalibration calibration;
+static CutyCalibrationPulse calibration_pulse;
+static CutyOutputDisable calibration_disable;
+static volatile bool supervisor_fault;
+
+static void stop_calibration(void) {
+    if (calibration.active && calibration_disable) calibration_disable();
+    calibration = (CutyManualCalibration){0};
+}
 /* At the required 1 kHz kernel tick, timestamps are milliseconds. */
 bool cuty_uart_rx_isr(uint8_t byte) {
     if (!created) return false;
@@ -72,13 +82,28 @@ static void servo_task(void *unused) {
         uint32_t flags=osThreadFlagsClear(INVALID_RX|SUPERVISE);
         /* ServoControlTask es el único propietario del controlador y aplica fallos de RX aquí. */
         if (!(flags & osFlagsError) && (flags & INVALID_RX)) { cuty_control_invalid(&controller); ++rx_errors; }
+        if (supervisor_fault || cuty_calibration_expired(&calibration, now))
+            cuty_control_invalid(&controller);
+        cuty_safety_check(&controller.safety, now);
+        if (controller.safety.state != CUTY_READY) stop_calibration();
         Envelope e;
         for (unsigned n=0; n<8 && osMessageQueueGet(commands,&e,0,0)==osOK; ++n) {
             /* Un comando no debe actuar si la cola lo retuvo más de 100 ms. */
             bool fresh=(uint32_t)(now-e.received_ms)<=100;
             bool accepted=false;
-            if (fresh) accepted=cuty_control_command(&controller,&e.command,e.received_ms);
-            else cuty_control_invalid(&controller);
+            if (fresh && !supervisor_fault && e.command.kind == CUTY_CALIBRATE) {
+                bool ready = controller.safety.state == CUTY_READY &&
+                             cuty_heartbeat_fresh(&controller.safety, now);
+                accepted = ready && calibration_pulse &&
+                    cuty_calibration_request(&calibration, e.command.axis, e.command.pulse_us, now);
+                if (accepted) accepted = calibration_pulse(e.command.axis, e.command.pulse_us);
+                if (!accepted) cuty_control_invalid(&controller);
+            } else if (fresh && !supervisor_fault &&
+                       !(calibration.active && e.command.kind == CUTY_START)) {
+                accepted=cuty_control_command(&controller,&e.command,e.received_ms);
+            } else cuty_control_invalid(&controller);
+            /* DISARM y los rechazos apagan antes de contestar, incluso en el mismo lote. */
+            if (controller.safety.state != CUTY_READY) stop_calibration();
             if (accepted && e.command.kind==CUTY_START && output_enable) {
                 bool ready=controller.safety.state==CUTY_ACTIVE &&
                            cuty_heartbeat_fresh(&controller.safety,now);
@@ -91,6 +116,7 @@ static void servo_task(void *unused) {
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
         }
         cuty_safety_check(&controller.safety,now);
+        if (controller.safety.state != CUTY_READY) stop_calibration();
         /* Una salida física solo puede habilitarse con un driver enlazado y START aceptado. */
         if (controller.safety.state != CUTY_ACTIVE) {
             if (output_live && output_disable) output_disable();
@@ -107,6 +133,7 @@ static void servo_task(void *unused) {
                 cuty_control_command(&controller,&e.command,now);
             CutyReply reply={e.sequence,accepted,controller.safety.state};
             if (osMessageQueuePut(replies,&reply,0,0)!=osOK) ++dropped_tx;
+            if (controller.safety.state != CUTY_READY) stop_calibration();
           }
         }
         uint32_t elapsed=now-last_step;
@@ -130,6 +157,7 @@ static void servo_task(void *unused) {
         deadline+=10;
         if ((int32_t)(deadline-osKernelGetTickCount())<=0) {
             cuty_control_invalid(&controller); deadline=osKernelGetTickCount()+10;
+            stop_calibration();
         }
         osDelayUntil(deadline);
     }
@@ -144,6 +172,8 @@ static void safety_task(void *unused) {
         if (stalled_ms < 100U && watchdog_refresh) watchdog_refresh();
         /* Si el controlador deja de progresar, deshabilita señales y deja vencer el IWDG. */
         if (stalled_ms >= 100U) {
+            supervisor_fault = true;
+            if (calibration_disable) calibration_disable();
             if (output_disable) output_disable();
             output_live = false;
             /* Stop feeding the independent IWDG; it resets a stalled controller. */
@@ -175,12 +205,19 @@ bool cuty_rtos_set_watchdog_refresh(CutyWatchdogRefresh refresh) {
     watchdog_refresh=refresh;
     return true;
 }
+bool cuty_rtos_set_calibration_driver(CutyCalibrationPulse pulse, CutyOutputDisable disable) {
+    if (created || ((pulse || disable) && !(pulse && disable))) return false;
+    calibration_pulse = pulse; calibration_disable = disable;
+    return true;
+}
 bool cuty_rtos_create(void) {
     if (created || osKernelGetState()!=osKernelReady || osKernelGetTickFreq()!=1000) return false;
     CutyLimits limits[CUTY_AXES];
     for (unsigned i=0;i<CUTY_AXES;++i) limits[i]=(CutyLimits){-1,1,0.8f,1.5f};
     output_live=false;
     control_progress=0;
+    supervisor_fault=false;
+    calibration=(CutyManualCalibration){0};
     if (output_disable) output_disable();
     if (!cuty_control_init(&controller,limits,500,CUTY_RELEASE_OUTPUT)) return false;
     rx=osMessageQueueNew(256,sizeof(RxByte),0);

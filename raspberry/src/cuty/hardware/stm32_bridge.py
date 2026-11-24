@@ -42,7 +42,9 @@ class STM32Bridge:
             if serial_factory is None:
                 import serial
                 serial_factory = serial.Serial
-            self.serial = serial_factory(port, baudrate=baudrate, timeout=0.1, write_timeout=1)
+            # En Linux también evita que otro programa abra el mismo dispositivo.
+            options = {"exclusive": True} if fcntl is not None else {}
+            self.serial = serial_factory(port, baudrate=baudrate, timeout=0.1, write_timeout=1, **options)
         except Exception:
             self._release_lock()
             raise
@@ -62,11 +64,13 @@ class STM32Bridge:
         try:
             try:
                 self.exchange(command("V2,DISARM"), timeout=0.25)
-            except (OSError, ConnectionError, TimeoutError):
+            except (OSError, ConnectionError, TimeoutError, ValueError):
                 pass
-            self.serial.close()
         finally:
-            self._release_lock()
+            try:
+                self.serial.close()
+            finally:
+                self._release_lock()
 
     def exchange(self, wire: bytes, timeout: float = 1.0) -> str:
         """Envía una línea y espera ACK/NACK, guardando STATE/TELEM asíncronos."""

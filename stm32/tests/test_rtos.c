@@ -49,6 +49,7 @@ static void run_once(osThreadId_t id) {
 static void receive(const char *line) {
     for(size_t i=0;i<strlen(line);++i) assert(cuty_uart_rx_isr((uint8_t)line[i]));
 }
+#ifndef CUTY_TEST_CALIBRATION
 int main(void) {
     assert(!cuty_uart_rx_isr('x'));
     assert(cuty_rtos_create() && cuty_rtos_start());
@@ -107,3 +108,74 @@ int main(void) {
     puts("PASS: adapter latest-target queue, barriers, stale goals, replies, snapshots, RX overflow");
     return 0;
 }
+#else
+static bool physical_on, fail_driver;
+static unsigned selected_axis;
+static uint16_t physical_pulse;
+static unsigned disable_count;
+static bool fake_pulse(unsigned axis, uint16_t pulse) {
+    physical_on = true; selected_axis = axis; physical_pulse = pulse;
+    return !fail_driver;
+}
+static void fake_disable(void) { physical_on = false; ++disable_count; }
+static bool process(const char *line, uint32_t now) {
+    tick = now; receive(line);
+    while (((Queue *)rx)->count) run_once(communication);
+    run_once(servo);
+    CutyReply reply; bool accepted = false;
+    while (cuty_take_reply(&reply)) accepted = reply.accepted;
+    return accepted;
+}
+static void begin(uint32_t now) {
+    assert(process("V2,RESET\nV2,HB\nV2,ARM\nV2,CAL,LEFT_ARM,1500\n", now));
+    assert(controller.safety.state == CUTY_READY && physical_on);
+    assert(selected_axis == CUTY_LEFT_ARM && physical_pulse == 1500);
+}
+int main(void) {
+    assert(cuty_rtos_set_calibration_driver(fake_pulse, fake_disable));
+    assert(cuty_rtos_create());
+    assert(!physical_on);
+    assert(!process("V2,CAL,LEFT_ARM,1500\n", 0));
+    assert(!physical_on);
+    assert(process("V2,HB\nV2,ARM\nV2,CAL,LEFT_ARM,1500\n", 0));
+    assert(physical_on && controller.safety.state == CUTY_READY);
+    assert(process("V2,CAL,LEFT_ARM,1510\n", 100));
+    assert(physical_pulse == 1510);
+    assert(!process("V2,CAL,RIGHT_ARM,1500\n", 200));
+    assert(!physical_on && controller.safety.state == CUTY_FAULT);
+    begin(300);
+    assert(!process("V2,CAL,LEFT_ARM,1510\n", 310));
+    assert(!physical_on); /* Demasiado rápido; nunca aplica el paso. */
+    begin(400);
+    assert(!process("V2,START\n", 410));
+    assert(!physical_on); /* START no puede cambiar de modo con CAL activo. */
+    begin(500);
+    assert(!process("V2,TARGET,HEAD_PAN,100\n", 510));
+    assert(!physical_on);
+    begin(600);
+    assert(process("V2,DISARM\n", 610));
+    assert(!physical_on && controller.safety.state == CUTY_DISARMED);
+    assert(process("V2,HB\nV2,ARM\nV2,CAL,LEFT_ARM,1500\n", 700));
+    tick = 1200; run_once(servo);
+    assert(!physical_on && controller.safety.state == CUTY_FAULT);
+    begin(1300);
+    process("INVALID\n", 1310);
+    assert(!physical_on && controller.safety.state == CUTY_FAULT);
+    begin(1400);
+    fail_driver = true;
+    assert(!process("V2,CAL,LEFT_ARM,1510\n", 1500));
+    assert(!physical_on); fail_driver = false;
+    begin(1600);
+    for (unsigned elapsed = 250; elapsed < CUTY_CAL_SESSION_MS; elapsed += 250)
+        assert(process("V2,HB\n", 1600 + elapsed));
+    process("V2,HB\n", 1600 + CUTY_CAL_SESSION_MS);
+    assert(!physical_on && controller.safety.state == CUTY_FAULT);
+    begin(62000);
+    for (unsigned i = 0; i < 256; ++i) assert(cuty_uart_rx_isr('x'));
+    assert(!cuty_uart_rx_isr('x')); run_once(servo);
+    assert(!physical_on && controller.safety.state == CUTY_FAULT && disable_count > 0);
+    for (unsigned i = 0; i < allocations; ++i) { free(allocated[i]->data); free(allocated[i]); }
+    puts("PASS: CAL arm/HB, one axis, reject START/TARGET, DISARM, timeout, errors, driver failure, RX overflow");
+    return 0;
+}
+#endif

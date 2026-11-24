@@ -33,6 +33,8 @@ Las entradas de voz, pantalla e instalación están dentro de `raspberry/`. El G
 
 Raspberry posee IA, voz, pantalla, visión y comportamiento. STM32 poseerá PWM, movimiento, IMU, PID y seguridad: recibirá objetivos de alto nivel, no PWM continuo. Para probar tres servos por UART, consulta la [guía Black Pill + Raspberry](stm32/blackpill_uart/README.md): es un firmware de banco independiente con los pines PB6/PB7/PB8 de J7/J8/J9 definidos en el repo. El protocolo V2 y su integración con la aplicación siguen en dry-run.
 
+Para la primera prueba física de los tres servos, consulta la [calibración manual por UART V2](docs/servo-calibration.md). Usa un firmware separado y activa solo un eje por sesión; el control automático continúa pendiente de calibración.
+
 ## Voz en Windows
 
 Desde la raíz, entra al proyecto de Raspberry y utiliza su entorno:
