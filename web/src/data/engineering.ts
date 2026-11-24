@@ -10,6 +10,7 @@ export const wiringStates = {
   confirmed: bi("Builder-confirmed", "Confirmado por el usuario"),
   proposed: bi("Proposed carrier wiring", "Cableado propuesto"),
   unverified: bi("Unverified", "Sin verificar"),
+  reserved: bi("Reserved · do not use", "Reservado · no usar"),
 };
 export type WiringStatus = keyof typeof wiringStates;
 export const filters = [

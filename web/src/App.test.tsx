@@ -44,10 +44,10 @@ describe("portfolio interactions", () => {
       screen.getByText(/100 × 92 mm, two-layer KiCad carrier/),
     ).toBeTruthy();
     fireEvent.click(
-      screen.getByRole("button", { name: /FUTURE REAL-TIME CONTROL/ }),
+      screen.getByRole("button", { name: /PROFILE-GATED MOTION CONTROL/ }),
     );
     expect(
-      screen.getByText(/Portable C logic exists; board integration is pending/),
+      screen.getByText(/FreeRTOS motion control, V2 telemetry and profile-gated PWM/),
     ).toBeTruthy();
   });
   it("changes face illustration and toggles synthetic mouth motion", () => {
@@ -87,8 +87,19 @@ describe("3D normalization and communication boundary", () => {
   it("does not invent telemetry while offline", () => {
     expect(offlineRobot.getSnapshot()).toEqual({
       connection: "offline",
-      expression: null,
-      batteryVolts: null,
+      mode: "simulation",
+      safetyState: "UNKNOWN",
+      motionAuthorized: false,
+      controllerActive: false,
+      physicalOutputStatus: "unverified",
+      firmwareProfileMatch: "unverified",
+      telemetryFresh: false,
+      positionKind: "commanded",
+      measuredPositionsAvailable: false,
+      commandedMilliUnits: null,
+      rxErrors: null,
+      droppedTx: null,
+      uartStatus: null,
     });
   });
 });

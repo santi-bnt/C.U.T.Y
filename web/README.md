@@ -1,6 +1,6 @@
 # C.U.T.Y. — cinematic engineering portfolio
 
-Frontend-only React / TypeScript / Vite app using React Three Fiber, Drei, Three.js and GSAP. No backend, authentication, database, AI requests or live robot connection is added. Robot source, GPIO, overlays, services and domain configuration are untouched.
+React / TypeScript / Vite app using React Three Fiber, Drei, Three.js and GSAP. The experience remains frontend-only by default. An optional read-only status transport can display Raspberry/STM32 telemetry; it has no movement API. Robot source, GPIO, overlays and services are not managed by this frontend.
 
 ## Run
 
@@ -46,9 +46,9 @@ Latest builder update: camera operation and facial tracking are confirmed on the
 
 `src/data/operationalWiring.ts` and `public/engineering/hardware-connections.md` record the builder's supplied table. Display and ReSpeaker operation together is confirmed. Display DC is BCM24 / physical18; RESET is BCM25 / physical22; touch IRQ is BCM17 / physical11. The latest explicit ReSpeaker table uses 5 V physical4, 3.3 V physical1, GND physical6, I2C physical3/5, MCLK physical7 / BCM4, I2S physical12/35/38/40 and AUD_RST physical37 / BCM26. These 11 rows supersede the earlier audio hookup list.
 
-UART is proposed at Pi physical8/10; final STM32 RX/TX and all five PWM pins remain unassigned. Backlight/overlay, exact buck current rating, protection/fuses/distribution, battery-to-Pi regulator and final PCB connectors remain pending. These are independent of the confirmed audio/display test. Preserve the working GPIO configuration.
+The builder confirmed Raspberry/Black Pill UART communication at 115200 8N1: Pi physical 8 / GPIO14 TX → STM32 PA3 RX and STM32 PA2 TX → Pi physical 10 / GPIO15 RX, with common GND. Servo channels were physically moved on the carrier: HEAD_PAN PB6/J7, LEFT_ARM PB7/J8 and RIGHT_ARM PB8/J9. J10/J11 remain reserved. This does not establish calibrated neutral, safe mechanical limits, or final firmware/profile correspondence. Backlight/overlay, exact buck current rating, protection/fuses/distribution, battery-to-Pi regulator and final PCB connectors remain pending. Preserve the working GPIO configuration.
 
-`src/data/engineering.ts` and `carrier.generated.json` remain the separate native KiCad source, including proposed PA2/PA3 and PWM design assignments. The 3D/source preview does not promote those proposals into tested wiring. No firmware or electrical configuration is changed.
+`src/data/engineering.ts` and `carrier.generated.json` remain the separate native KiCad source. The operational wiring table now distinguishes the builder-confirmed UART and three active PWM channels from reserved connectors and still-pending power work. The 3D/source preview does not certify mechanical safety or measured servo position.
 
 ## Assets and performance
 
@@ -87,9 +87,9 @@ Native KiCad export: from repository root, `raspberry/.venv/Scripts/python.exe w
 - `components/PcbDesign.tsx`, `WiringConnections.tsx`, `EngineeringViewport.tsx`, `viewer/EngineeringScene.tsx`: native layout and spatial inspection.
 - `data/operationalWiring.ts`, `engineering.ts`, `nido.generated.json`: confirmed hookup table, separate native electrical design and measured geometry.
 - `scripts/import-nido.py`, `build-current-nido-model.py`, `export-current-nido-model.mjs`, `export-current-nido.py`: archive references, current CadQuery build, validated GLB export and print-package export.
-- Existing `communication/robot.ts`, `faceFrames.ts` and `state/FaceFrames.tsx`: future transport/decoded-frame boundaries, independent of database state. No socket or credentials.
+- `communication/robot.ts`: optional read-only HTTP polling for the robot status panel. `faceFrames.ts` and `state/FaceFrames.tsx` remain decoded-frame boundaries, independent of database state.
 
-Live is offline by default. Optional public HTTPS `VITE_CUTY_DASHBOARD_URL` links to a separately deployed dashboard; its authentication stays there. No dashboard/auth/database existed to migrate.
+Live is offline by default. To show Raspberry telemetry, build with `VITE_ROBOT_STATUS_URL=http://127.0.0.1:8765/api/robot/status` and enable the Pi endpoint using `CUTY_TELEMETRY_ENABLE=1`. The endpoint must remain bound to loopback; set the exact frontend origin in `CUTY_TELEMETRY_ORIGIN` when cross-origin access is needed. From a development PC, forward that loopback port over SSH (`ssh -L 8765:127.0.0.1:8765 <user>@<raspberry-ip>`). The endpoint only serves GET status and cannot move the robot. Values are commanded references, not measured positions; firmware/profile match and physical output stay marked unverified. No remote motion API, authentication service or database is provided.
 
 ## Static deployment
 

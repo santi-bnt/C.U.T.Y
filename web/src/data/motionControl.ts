@@ -136,8 +136,8 @@ export const motionTasks: MotionTask[] = [
       "Reporta posiciones comandadas y contadores sin bloquear el control.",
     ),
     implementation: bi(
-      "Board integration pending",
-      "Integración en placa pendiente",
+      "V2 UART telemetry implemented",
+      "Telemetría UART V2 implementada",
     ),
     activation: bi(
       "200 ms / at most 5 Hz proposed",
@@ -157,8 +157,8 @@ export const motionTasks: MotionTask[] = [
     ),
     files: ["stm32/App/rtos/motion_tasks.c"],
     status: bi(
-      "Planned: board transport, task timing and stack/heap measurements. No live telemetry.",
-      "Planned: transporte en placa, tiempos de tareas y mediciones de stack/heap. Sin telemetría en vivo.",
+      "Board TX task emits timestamped commanded positions and counters. Task timing and stack/heap measurements still require measurement.",
+      "La tarea TX de placa emite consignas con timestamp y contadores. Aún falta medir tiempos de tarea y uso de pila/heap.",
     ),
   },
   {

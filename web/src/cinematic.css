@@ -1482,6 +1482,9 @@ summary::-webkit-details-marker {
 .connection-status.unverified {
   color: #e9b97f;
 }
+.connection-status.reserved {
+  color: #aeb6c3;
+}
 .connection-table a {
   font-size: 10px;
   text-decoration: underline;

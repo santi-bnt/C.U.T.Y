@@ -87,7 +87,7 @@ export default function Architecture() {
         </button>
         <div className="future-bus">
           <span />
-          <span>UART · {t(bi("planned", "planeado"))}</span>
+          <span>UART V2 · {t(bi("implemented", "integrado"))}</span>
           <ArrowDown size={17} />
         </div>
         <button
@@ -99,15 +99,15 @@ export default function Architecture() {
           <div>
             <small>
               {t(
-                bi("FUTURE REAL-TIME CONTROL", "FUTURO CONTROL EN TIEMPO REAL"),
+                bi("PROFILE-GATED MOTION CONTROL", "CONTROL PROTEGIDO POR PERFIL"),
               )}
             </small>
             <strong>STM32F401</strong>
             <span>
               {t(
                 bi(
-                  "PWM · Servo limits · Motor safety",
-                  "PWM · Límites · Seguridad de motores",
+                  "FreeRTOS · calibrated PWM · local safety",
+                  "FreeRTOS · PWM calibrado · seguridad local",
                 ),
               )}
             </span>
@@ -129,7 +129,7 @@ export default function Architecture() {
           </span>
           <span>
             <i className="dashed" />
-            {t(bi("Planned interface", "Interfaz planeada"))}
+            {t(bi("Profile-gated physical interface", "Interfaz física protegida por perfil"))}
           </span>
         </div>
       </div>

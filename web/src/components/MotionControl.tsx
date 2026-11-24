@@ -11,6 +11,7 @@ import {
 import { bi, source } from "../data/project";
 import { useLocale } from "../state/Locale";
 import { useMedia } from "../state/useMedia";
+import { robotTransport, type RobotSnapshot } from "../communication/robot";
 import "./motion-control.css";
 
 type NodeId = "raspberry" | "stm32" | "servos";
@@ -22,6 +23,9 @@ export default function MotionControl() {
   const [playing, setPlaying] = useState(false);
   const [selectedNode, setSelectedNode] = useState<NodeId | null>(null);
   const [selectedTask, setSelectedTask] = useState("servo");
+  const [robot, setRobot] = useState<RobotSnapshot>(() => robotTransport.getSnapshot());
+
+  useEffect(() => robotTransport.subscribe(setRobot), []);
 
   useEffect(() => {
     if (!playing || reduced) return;
@@ -72,8 +76,8 @@ export default function MotionControl() {
           <span className="mc-state-dot" aria-hidden="true" />
           {t(
             bi(
-              "In development — Hardware integration pending",
-              "En desarrollo — Integración de hardware pendiente",
+              "Software path integrated — calibration validation pending",
+              "Ruta de software integrada — falta validar calibración",
             ),
           )}
         </div>
@@ -89,17 +93,51 @@ export default function MotionControl() {
         </li>
         <li>
           <strong>CMSIS-RTOS2</strong>
-          <span>{t(bi("preliminary dry-run", "dry-run preliminar"))}</span>
+          <span>{t(bi("compiled; physical profile pending", "compilado; perfil físico pendiente"))}</span>
         </li>
         <li>
           <strong>UART / PWM</strong>
-          <span>{t(bi("not validated", "sin validar"))}</span>
+          <span>{t(bi("UART tested; integrated image pending recheck", "UART probado; falta revalidar imagen integrada"))}</span>
         </li>
         <li>
           <strong>{t(bi("Physical motion", "Movimiento físico"))}</strong>
-          <span>{t(bi("unconfirmed", "sin confirmar"))}</span>
+          <span>{t(bi("integrated motion unverified", "movimiento integrado sin validar"))}</span>
         </li>
       </ul>
+
+      <div className="mc-live-status" aria-live="polite">
+        <strong>{t(bi("Robot status", "Estado del robot"))}</strong>
+        <span>{t(bi("Link", "Enlace"))}: {robot.connection}</span>
+        <span>{t(bi("Mode", "Modo"))}: {robot.mode}</span>
+        <span>{t(bi("Safety", "Seguridad"))}: {robot.safetyState}</span>
+        <span>
+          {t(bi("Motion authorization", "Autorización de movimiento"))}: {robot.motionAuthorized
+            ? t(bi("enabled", "habilitada"))
+            : t(bi("disabled", "deshabilitada"))}
+        </span>
+        <span>
+          {t(bi("Controller", "Controlador"))}: {robot.controllerActive ? "ACTIVE" : "inactive"}
+        </span>
+        <span>
+          {t(bi("Physical output", "Salida física"))}: {t(bi("unverified", "sin verificar"))}
+        </span>
+        <span>
+          {t(bi("Firmware/profile match", "Coincidencia firmware/perfil"))}: {t(bi("unverified", "sin verificar"))}
+        </span>
+        <span>
+          {robot.telemetryFresh
+            ? t(bi("Telemetry current", "Telemetría actual"))
+            : t(bi("Telemetry unavailable or stale", "Telemetría no disponible o vencida"))}
+        </span>
+        <span>
+          {robot.commandedMilliUnits
+            ? `PAN ${robot.commandedMilliUnits.HEAD_PAN} · L ${robot.commandedMilliUnits.LEFT_ARM} · R ${robot.commandedMilliUnits.RIGHT_ARM} mU`
+            : t(bi("No commanded positions received", "Sin consignas recibidas"))}
+        </span>
+        <small>
+          {t(bi("Commanded references only; no position sensors are installed.", "Solo referencias comandadas; no hay sensores de posición instalados."))}
+        </small>
+      </div>
 
       <div className="mc-diagram-shell">
         <div className="mc-diagram-heading">
@@ -156,8 +194,8 @@ export default function MotionControl() {
             title="STM32F401 + FreeRTOS"
             meta={t(
               bi(
-                "REAL-TIME CONTROL / IN DEVELOPMENT",
-                "CONTROL EN TIEMPO REAL / EN DESARROLLO",
+                "V2 CONTROL / PROFILE-GATED OUTPUT",
+                "CONTROL V2 / SALIDA PROTEGIDA POR PERFIL",
               ),
             )}
             activeLine={
@@ -189,8 +227,8 @@ export default function MotionControl() {
             title={t(bi("3 × MG996R", "3 × MG996R"))}
             meta={t(
               bi(
-                "PHYSICAL OUTPUTS / UNCONFIRMED",
-                "SALIDAS FÍSICAS / SIN CONFIRMAR",
+                "J7–J9 TESTED / PROFILE OUTPUT UNVERIFIED",
+                "J7–J9 PROBADOS / SALIDA POR PERFIL SIN VALIDAR",
               ),
             )}
             lines={["HEAD_PAN · J7", "LEFT_ARM · J8", "RIGHT_ARM · J9"]}

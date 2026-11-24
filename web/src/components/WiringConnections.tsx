@@ -370,8 +370,8 @@ export default function WiringConnections() {
         {rows.length}{" "}
         {t(
           bi(
-            "connections shown. Pi numbers are physical header pins; BCM is separate. Display/audio follow the builder's confirmed table. TBD marks future pin assignments.",
-            "conexiones. Los números Pi son pines físicos; BCM es independiente. Pantalla/audio siguen la tabla confirmada. TBD indica pines futuros pendientes.",
+            "connections shown. Pi numbers are physical header pins; BCM is separate. Display/audio and the builder-confirmed UART/active servo pinout are distinguished from pending power and reserved connectors.",
+            "conexiones. Los números Pi son pines físicos; BCM es independiente. Pantalla/audio y UART/pines servo confirmados se distinguen de potencia pendiente y conectores reservados.",
           ),
         )}
       </p>
@@ -453,8 +453,8 @@ export default function WiringConnections() {
           <li>
             {t(
               bi(
-                "Backlight, final overlay, STM32 UART and all five PWM pin assignments remain pending. CAD pin suggestions are separate from the confirmed hookup list.",
-                "Retroiluminación, overlay final, UART STM32 y los cinco pines PWM siguen pendientes. Las propuestas CAD se mantienen separadas del cableado confirmado.",
+                "Backlight and final overlay remain pending. UART uses PA3/PA2; active servo outputs use PB6/PB7/PB8 at J7/J8/J9. J10/J11 are reserved.",
+                "Retroiluminación y overlay final siguen pendientes. UART usa PA3/PA2; las salidas activas usan PB6/PB7/PB8 en J7/J8/J9. J10/J11 están reservados.",
               ),
             )}
           </li>

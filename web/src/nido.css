@@ -507,6 +507,10 @@
 .wire-edge.confirmed path {
   stroke-dasharray: none;
 }
+.wire-edge.reserved path {
+  stroke-dasharray: 5 5;
+  opacity: 0.45;
+}
 .badge.fabrication {
   color: var(--orange-on-dark);
   border-color: var(--orange-line);

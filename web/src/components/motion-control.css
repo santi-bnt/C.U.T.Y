@@ -97,6 +97,21 @@
 .mc-status-strip span {
   color: var(--muted);
 }
+.mc-live-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  max-width: 1440px;
+  margin: -18px auto 34px;
+  padding: 14px 18px;
+  border: 1px solid var(--mc-panel-line);
+  border-radius: 10px;
+  background: var(--mc-panel-raised);
+  font-size: 13px;
+}
+.mc-live-status strong { color: var(--orange-strong); }
+.mc-live-status small { flex-basis: 100%; color: var(--muted); }
 .mc-diagram-shell {
   max-width: 1440px;
   margin: 0 auto;

@@ -118,10 +118,10 @@ add(
   "stm",
   "UART TXD",
   "Pi 8 / TXD",
-  "STM32 RX — TBD / por confirmar",
+  "STM32 PA3 / USART2_RX",
   "UART",
-  "proposed",
-  "3.3 V",
+  "confirmed",
+  "3.3 V logic · 115200 8N1",
   8,
 );
 add(
@@ -129,24 +129,40 @@ add(
   "stm",
   "pi",
   "UART RXD",
-  "STM32 TX — TBD / por confirmar",
+  "STM32 PA2 / USART2_TX",
   "Pi 10 / RXD",
   "UART",
-  "proposed",
-  "3.3 V",
+  "confirmed",
+  "3.3 V logic · 115200 8N1",
   10,
 );
-for (let i = 1; i <= 5; i++)
+for (const [axis, pin, connector] of [
+  ["HEAD_PAN", "PB6 / TIM4_CH1", "J7"],
+  ["LEFT_ARM", "PB7 / TIM4_CH2", "J8"],
+  ["RIGHT_ARM", "PB8 / TIM4_CH3", "J9"],
+] as const)
   add(
-    "pwm" + i,
+    "servo-" + axis,
     "stm",
     "servos",
-    `PWM ${i} — TBD / por asignar`,
-    "STM32 PWM — TBD",
-    `Servo ${i} orange/yellow / naranja/amarillo`,
+    axis + " PWM",
+    pin,
+    connector + " signal / señal → MG996R",
     "servo",
-    "proposed",
-    "3.3 V signal; 6 V supply / señal; alimentación",
+    "confirmed",
+    "3.3 V logic; servo rail separately powered / lógica; alimentación separada",
+  );
+for (const [pin, connector] of [["PB9", "J10"], ["PA8", "J11"]] as const)
+  add(
+    "servo-reserved-" + connector,
+    "stm",
+    "servos",
+    "Reserved / reservado",
+    pin,
+    connector + " · do not use / no usar",
+    "servo",
+    "reserved",
+    "Reserved output / salida reservada",
   );
 add(
   "battery-in",
@@ -201,7 +217,7 @@ for (const from of ["pi", "stm", "servos"])
     from + " GND",
     "Common ground / tierra común",
     "ground",
-    "proposed",
+    from === "pi" || from === "stm" ? "confirmed" : "proposed",
     "0 V reference / referencia",
   );
 add(
@@ -240,12 +256,12 @@ const detail: Record<string, ReturnType<typeof bi>> = {
     "I2C/I2S y alimentación confirmados. No usar LED RGB (BCM10/11) ni botón HAT (BCM17): son de la pantalla. BCM18 se reserva para I2S BCLK.",
   ),
   stm: bi(
-    "Proposed 3.3 V UART, crossed TX/RX with shared ground. STM32 UART pins and all five PWM pins still await final assignment.",
-    "UART de 3.3 V propuesto, TX/RX cruzados y tierra común. Pines UART STM32 y los cinco PWM aún por asignar.",
+    "UART physically communicates at 115200 8N1: Pi GPIO14/TX physical 8 → PA3/RX and PA2/TX → Pi GPIO15/RX physical 10, with common GND. Active PWM is PB6/PB7/PB8; J10/J11 are reserved.",
+    "UART comunica físicamente a 115200 8N1: Pi GPIO14/TX pin 8 → PA3/RX y PA2/TX → Pi GPIO15/RX pin 10, con GND común. PWM activo PB6/PB7/PB8; J10/J11 reservados.",
   ),
   servos: bi(
-    "Three MG996R planned: red to regulated 6 V, brown/black to servo ground, orange/yellow to assigned STM32 PWM. Final PWM assignments are pending.",
-    "Tres MG996R previstos: rojo a 6 V regulados, marrón/negro a GND y naranja/amarillo a PWM STM32. Asignaciones PWM pendientes.",
+    "The builder confirmed all three carrier channels can move servos: HEAD_PAN PB6/J7, LEFT_ARM PB7/J8, RIGHT_ARM PB8/J9. This does not confirm a safe mechanical range or calibrated neutral. J10/J11 stay unused.",
+    "El constructor confirmó movimiento de servos en los tres canales: HEAD_PAN PB6/J7, LEFT_ARM PB7/J8, RIGHT_ARM PB8/J9. Esto no confirma rango mecánico seguro ni neutro calibrado. J10/J11 no se usan.",
   ),
   camera: bi(
     "The builder confirmed camera operation and facial tracking. OV5647 15-pin CSI connects to Pi 5 CAM/DISP 22-pin through a compatible adapter. Power and image travel through CSI; individual contacts are not enumerated.",
@@ -274,7 +290,7 @@ export const wiringNodes = cadNodes.map((n) => ({
   detail: detail[n.id] ?? n.detail,
   voltage:
     n.id === "stm"
-      ? bi("3.3 V UART / PWM pins pending", "UART 3.3 V / PWM pendientes")
+      ? bi("115200 8N1 · PB6/PB7/PB8 active · J10/J11 reserved", "115200 8N1 · PB6/PB7/PB8 activos · J10/J11 reservados")
       : n.id === "battery"
         ? bi(
             "11.1 V / 12.6 V · 2200 mAh · 24.42 Wh",
@@ -353,15 +369,15 @@ export const wiringEdges = [
     from: "pi",
     to: "stm",
     kind: "UART",
-    label: "3.3 V / STM pins TBD",
-    status: "proposed",
+    label: "3.3 V · 115200 8N1 · PA3/PA2",
+    status: "confirmed",
   },
   {
     from: "stm",
     to: "servos",
     kind: "servo",
-    label: "PWM pins TBD",
-    status: "proposed",
+    label: "PB6/PB7/PB8 · J7/J8/J9",
+    status: "confirmed",
   },
   {
     from: "battery",
@@ -396,7 +412,7 @@ export const wiringEdges = [
     to: "ground",
     kind: "ground",
     label: "Common GND",
-    status: "proposed",
+    status: from === "pi" || from === "stm" ? "confirmed" : "proposed",
   })),
 ] as {
   from: string;

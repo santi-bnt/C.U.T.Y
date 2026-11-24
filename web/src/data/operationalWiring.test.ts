@@ -28,16 +28,24 @@ describe("user-confirmed wiring and revised assets", () => {
       ["Pi 38", "I2S DIN", "BCM 20"],
       ["Pi 40", "I2S DOUT", "BCM 21"],
     ]);
-    expect(
-      connectionRows
-        .filter((r) => matchesFilter(r, "UART"))
-        .every(
-          (r) => r.status === "proposed" && !/PA2|PA3/.test(r.destination),
-        ),
-    ).toBe(true);
+    const uart = connectionRows.filter((r) => matchesFilter(r, "UART"));
+    expect(uart).toHaveLength(2);
+    expect(uart.every((r) => r.status === "confirmed")).toBe(true);
+    expect(uart.map((r) => r.destination)).toEqual([
+      "STM32 PA3 / USART2_RX",
+      "Pi 10 / RXD",
+    ]);
     const pwm = connectionRows.filter((r) => matchesFilter(r, "servo"));
     expect(pwm).toHaveLength(5);
-    expect(pwm.every((r) => r.net.includes("TBD"))).toBe(true);
+    expect(pwm.filter((r) => r.status === "confirmed").map((r) => r.net)).toEqual([
+      "HEAD_PAN PWM",
+      "LEFT_ARM PWM",
+      "RIGHT_ARM PWM",
+    ]);
+    expect(pwm.filter((r) => r.status === "reserved").map((r) => r.destination)).toEqual([
+      "J10 · do not use / no usar",
+      "J11 · do not use / no usar",
+    ]);
   });
   it("ships the optimized revised model and all supplied assembly imagery with provenance", () => {
     const manifest = JSON.parse(
