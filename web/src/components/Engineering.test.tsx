@@ -54,7 +54,7 @@ describe("source-backed engineering interfaces", () => {
     ).toHaveLength(1);
     expect(
       document.querySelector(".connection-table tbody")?.textContent,
-    ).toContain("STM32 RX");
+    ).toContain("STM32 PA3 / USART2_RX");
     fireEvent.click(
       screen.getByRole("button", {
         name: "Adjustable servo buck",

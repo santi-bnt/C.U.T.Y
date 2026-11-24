@@ -115,7 +115,7 @@ describe("FreeRTOS motion section", () => {
       fireEvent.click(screen.getByText("ES"));
       expect(screen.getByRole("button", { name: "Siguiente" })).toBeTruthy();
       expect(
-        screen.getByText(/En desarrollo — Integración de hardware pendiente/),
+        screen.getByText(/Ruta de software integrada — falta validar calibración/),
       ).toBeTruthy();
       const communication = within(
         screen.getByRole("group", { name: "Tareas FreeRTOS" }),
