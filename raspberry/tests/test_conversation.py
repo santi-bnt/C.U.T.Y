@@ -432,6 +432,36 @@ def test_model_cannot_close_menu_for_an_unrelated_transcription():
     assert provider.continued == 1 and speaker.audio and state.current == State.IDLE
 
 
+def test_voice_motion_tool_requires_matching_user_words_and_stays_simulated():
+    service, provider, _, _, _ = make_service([])
+    asyncio.run(service._handle_tool(
+        ToolCall("move", "request_motion", '{"action":"head_left"}'),
+        input_transcript="Cuty, mira a la izquierda",
+    ))
+    assert provider.results[-1] == ("move", {
+        "accepted": False, "action": "head_left", "mode": "simulation",
+        "reason": "physical motion is not enabled",
+    })
+
+
+def test_model_cannot_invent_motion_and_stop_has_priority():
+    service, provider, _, _, _ = make_service([])
+    asyncio.run(service._handle_tool(
+        ToolCall("move", "request_motion", '{"action":"head_right"}'),
+        input_transcript="Cuty, mira a la izquierda",
+    ))
+    assert not provider.results[-1][1]["accepted"]
+    assert "rejected" in provider.results[-1][1]["error"].lower()
+
+    asyncio.run(service._handle_tool(
+        ToolCall("stop", "request_motion", '{"action":"wave_both"}'),
+        input_transcript="Cuty, saluda, detente",
+    ))
+    assert provider.results[-1] == ("stop", {
+        "accepted": True, "action": "stop", "mode": "stopped",
+    })
+
+
 def test_keyboard_mode_does_not_exit_on_spoken_salir():
     service, _, speaker, _, state = make_service([
         AIEvent(EventKind.INPUT_TRANSCRIPT, transcript="Quiero salir."),
