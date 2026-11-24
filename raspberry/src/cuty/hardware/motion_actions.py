@@ -10,6 +10,8 @@ from enum import Enum
 import re
 import unicodedata
 
+from .calibration_profile import RobotCalibration
+
 
 class MotionAction(str, Enum):
     STOP = "stop"
@@ -77,8 +79,14 @@ class MotionActionGate:
     def physical_enabled(self) -> bool:
         return self._physical_enabled
 
-    def enable_physical(self, *, link_valid: bool, calibration_complete: bool) -> None:
-        if not link_valid or not calibration_complete or self._executor is None:
+    def enable_physical(self, *, link_valid: bool, calibration: RobotCalibration | None) -> None:
+        try:
+            if calibration is None:
+                raise ValueError("perfil ausente")
+            calibration.validate_complete()
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise RuntimeError("Movimiento físico requiere calibración completa y válida") from exc
+        if not link_valid or self._executor is None:
             raise RuntimeError("Movimiento físico requiere enlace, calibración completa y ejecutor")
         self._physical_enabled = True
 
