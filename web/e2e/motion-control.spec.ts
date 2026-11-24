@@ -21,10 +21,13 @@ test("motion section explains architecture, tasks and safe local simulation", as
     ),
   ).toBeVisible();
   await expect(
-    section.getByText(`In development \u2014 Hardware integration pending`),
+    section.getByText(`Software path integrated \u2014 calibration validation pending`),
   ).toBeVisible();
   await expect(section.locator(".mc-status-strip")).toContainText(
-    "preliminary dry-run",
+    "integrated motion unverified",
+  );
+  await expect(section.locator(".mc-live-status")).toContainText(
+    "Firmware/profile match: unverified",
   );
 
   const diagram = section.locator(".mc-diagram");

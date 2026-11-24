@@ -249,7 +249,7 @@ test("actual PCB inspection, electrical search, filters and source downloads", a
     .fill("BCM 14");
   await expect(page.locator(".connection-table tbody tr")).toHaveCount(1);
   await expect(page.locator(".connection-table tbody")).toContainText(
-    "STM32 RX",
+    "STM32 PA3 / USART2_RX",
   );
   await page.getByRole("searchbox", { name: "Search connections" }).fill("");
   await page
