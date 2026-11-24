@@ -13,6 +13,9 @@ typedef bool (*CutyOutputEnable)(bool explicit_arm, bool heartbeat_fresh, bool s
 typedef void (*CutyOutputDisable)(void);
 typedef bool (*CutyOutputSet)(unsigned axis, float normalized_position);
 typedef void (*CutyWatchdogRefresh)(void);
+typedef bool (*CutyCalibrationPulse)(unsigned axis, uint16_t pulse_us);
+/* CAL tiene su propio driver; no habilita los objetivos automáticos de TARGET. */
+bool cuty_rtos_set_calibration_driver(CutyCalibrationPulse pulse, CutyOutputDisable disable);
 /* Bind board outputs before create. Null callbacks leave this controller dry-run. */
 bool cuty_rtos_set_output_driver(CutyOutputEnable enable, CutyOutputDisable disable,
                                  CutyOutputSet set);

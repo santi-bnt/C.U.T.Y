@@ -24,6 +24,10 @@ def command(line: str) -> bytes:
         axis, raw = fields[2:]
         if axis in {a.value for a in Axis} and raw and raw.lstrip("-").isdigit():
             valid = raw != "-" and len(raw.lstrip("-")) <= 4 and -1000 <= int(raw) <= 1000
+    if len(fields) == 4 and fields[:2] == ["V2", "CAL"]:
+        axis, raw = fields[2:]
+        valid = (axis in {a.value for a in Axis} and len(raw) == 4 and
+                 raw.isascii() and raw.isdigit() and 1000 <= int(raw) <= 2000)
     if not valid:
         raise ValueError(f"invalid V2 command: {line!r}")
     return (line + "\n").encode("ascii")

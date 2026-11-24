@@ -1,5 +1,11 @@
 # CubeIDE STM32F401: UART V2 con PWM bloqueado
 
+Existe un [build separado de calibración manual](../../docs/servo-calibration.md).
+Genera con `python stm32/blackpill_uart/build.py --calibration` desde la raíz.
+Solo ese build permite `V2,CAL` en READY para un servo; START/TARGET no mueven
+los motores. Las indicaciones de PWM bloqueado de esta página describen el build
+normal, sin esa opción.
+
 Este proyecto parte del proyecto STM32CubeIDE de la Black Pill STM32F401CCU6 y
 compila la aplicación portable de C.U.T.Y. en `../App` junto con HAL de USART2/TIM4,
 FreeRTOS y CMSIS-RTOS2 incluidos en el proyecto. No usa la antigua prueba

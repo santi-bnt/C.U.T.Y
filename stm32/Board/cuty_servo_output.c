@@ -1,10 +1,14 @@
 #include "cuty_servo_output.h"
 #include "../App/servos/servo.h"
+#include "../App/control/manual_calibration.h"
 #include <math.h>
 #include <string.h>
 
 #ifndef CUTY_PHYSICAL_OUTPUT_ENABLE
 #define CUTY_PHYSICAL_OUTPUT_ENABLE 0
+#endif
+#ifndef CUTY_CALIBRATION_ENABLE
+#define CUTY_CALIBRATION_ENABLE 0
 #endif
 
 /* Independent software gate. A reset always leaves channels stopped. */
@@ -12,8 +16,11 @@ static TIM_HandleTypeDef *servo_timer;
 static CutyServoCalibration cal[3];
 static bool initialized;
 static bool enabled;
+static unsigned manual_axis = 3U;
 static const uint32_t channels[3] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3};
+#if CUTY_PHYSICAL_OUTPUT_ENABLE || CUTY_CALIBRATION_ENABLE
 static const uint16_t pins[3] = {GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8};
+#endif
 
 static uint32_t tim4_input_clock_hz(void) {
     uint32_t clock_hz = HAL_RCC_GetPCLK1Freq();
@@ -37,6 +44,7 @@ bool cuty_servo_output_init(TIM_HandleTypeDef *timer,
                             const CutyServoTestRange test_ranges[3]) {
     enabled = false;
     initialized = false;
+    manual_axis = 3U;
     uint16_t expected_prescaler;
     if (timer == NULL || calibration == NULL || test_ranges == NULL || timer->Instance != TIM4 ||
         timer->Init.Period != 19999U ||
@@ -111,6 +119,7 @@ bool cuty_servo_output_test_pulse(unsigned test_servo_number, uint16_t pulse_us,
     if (!initialized || !explicit_arm || !heartbeat_fresh || !safety_ready ||
         test_servo_number == 0U || test_servo_number > 3U) return false;
 #if !CUTY_PHYSICAL_OUTPUT_ENABLE
+    (void)pulse_us;
     return false;
 #else
     unsigned axis;
@@ -142,9 +151,10 @@ bool cuty_servo_output_test_pulse(unsigned test_servo_number, uint16_t pulse_us,
 
 void cuty_servo_output_disable(void) {
     enabled = false;
+    manual_axis = 3U;
     if (servo_timer == NULL) return;
     for (unsigned i = 0; i < 3; ++i) (void)HAL_TIM_PWM_Stop(servo_timer, channels[i]);
-    /* Detener PWM quita la señal; no corta el riel de 6 V ni garantiza torque cero. */
+    /* Detener PWM quita la señal; no corta la alimentación ni garantiza torque cero. */
     pins_safe_low();
 }
 
@@ -161,3 +171,36 @@ bool cuty_servo_output_set(unsigned axis, float position) {
 }
 
 bool cuty_servo_output_is_enabled(void) { return enabled; }
+
+bool cuty_servo_output_calibrate(unsigned axis, uint16_t pulse_us) {
+#if !CUTY_CALIBRATION_ENABLE
+    (void)axis; (void)pulse_us;
+    return false;
+#else
+    if (!initialized || axis >= 3U || pulse_us < CUTY_CAL_MIN_US || pulse_us > CUTY_CAL_MAX_US)
+        return false;
+    if (manual_axis < 3U && manual_axis != axis) return false;
+    if (manual_axis == 3U) {
+        cuty_servo_output_disable();
+        if (pulse_us != 1500U) return false;
+        /* Solo este pin pasa a función de timer; los otros dos permanecen bajos. */
+        GPIO_InitTypeDef gpio = {0};
+        gpio.Pin = pins[axis];
+        gpio.Mode = GPIO_MODE_AF_PP;
+        gpio.Pull = GPIO_NOPULL;
+        gpio.Speed = GPIO_SPEED_FREQ_LOW;
+        gpio.Alternate = GPIO_AF2_TIM4;
+        __HAL_TIM_SET_COMPARE(servo_timer, channels[axis], pulse_us);
+        HAL_GPIO_Init(GPIOB, &gpio);
+        if (HAL_TIM_PWM_Start(servo_timer, channels[axis]) != HAL_OK) {
+            cuty_servo_output_disable();
+            return false;
+        }
+        manual_axis = axis;
+        enabled = true;
+    } else {
+        __HAL_TIM_SET_COMPARE(servo_timer, channels[axis], pulse_us);
+    }
+    return true;
+#endif
+}

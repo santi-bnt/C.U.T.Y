@@ -8,6 +8,8 @@ import subprocess
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cc", help="Ruta a arm-none-eabi-gcc, si no esta en PATH")
+    parser.add_argument("--calibration", action="store_true",
+                        help="Genera un firmware separado con calibración manual de un servo")
     args = parser.parse_args()
     cc = args.cc or shutil.which("arm-none-eabi-gcc")
     if not cc:
@@ -22,7 +24,9 @@ def main():
 
     root = Path(__file__).resolve().parent
     output = root / "build"
-    output.mkdir(exist_ok=True)
+    if args.calibration:
+        output = output / "calibration"
+    output.mkdir(parents=True, exist_ok=True)
     rtos = root / "Middlewares/Third_Party/FreeRTOS/Source"
     includes = ["Core/Inc", "Drivers/STM32F4xx_HAL_Driver/Inc",
                 "Drivers/CMSIS/Include", "Drivers/CMSIS/Device/ST/STM32F4xx/Include",
@@ -38,13 +42,16 @@ def main():
     # El proyecto compila el mismo parser, controlador y tareas que prueban los tests host.
     sources += sorted((root.parent / "App").rglob("*.c"))
     sources += sorted((root.parent / "Board").glob("*.c"))
-    elf = output / "cuty_arms_pwm_blackpill.elf"
+    name = "cuty_arms_pwm_blackpill_calibration" if args.calibration else "cuty_arms_pwm_blackpill"
+    elf = output / (name + ".elf")
     # Una sola orden mantiene este ejemplo facil de leer y de reproducir.
     command = [cc, "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
                "-mfloat-abi=hard", "-std=gnu11", "-Og", "-g3", "-Wall", "-Wextra",
                "-ffunction-sections", "-fdata-sections", "-DUSE_HAL_DRIVER",
                "-DSTM32F401xC", "--specs=nano.specs", "--specs=nosys.specs"]
     command += ["-I" + str(root / include) for include in includes]
+    if args.calibration:
+        command += ["-DCUTY_CALIBRATION_ENABLE=1"]
     command += ["-I" + str(root.parent / "App"), "-I" + str(root.parent / "Board")]
     command += [str(source) for source in sources]
     command += ["-T" + str(root / "STM32F401CCUX_FLASH.ld"),
