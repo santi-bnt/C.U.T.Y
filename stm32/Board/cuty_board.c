@@ -2,7 +2,11 @@
 #include "cmsis_os2.h"
 #include "cuty_servo_output.h"
 #include "cuty_servo_bench.h"
+#if defined(CUTY_PHYSICAL_OUTPUT_ENABLE) && CUTY_PHYSICAL_OUTPUT_ENABLE
+#include "servo_calibration_profile.h"
+#else
 #include "servo_calibration.h"
+#endif
 #include "../App/rtos/motion_tasks.h"
 #include "../App/servos/servo.h"
 #include <stdio.h>
@@ -83,6 +87,12 @@ bool cuty_board_init(void) {
     /* CAL solo produce PWM en READY; no habilita TARGET ni el modo robot. */
     if (!cuty_rtos_set_calibration_driver(cuty_servo_output_calibrate, cuty_servo_output_disable))
         return false;
+#endif
+#if defined(CUTY_PHYSICAL_OUTPUT_ENABLE) && CUTY_PHYSICAL_OUTPUT_ENABLE
+    /* Solo un perfil validado permite enlazar TARGET con las salidas físicas. */
+    if (!cuty_rtos_set_output_driver(cuty_servo_output_enable,
+                                     cuty_servo_output_disable,
+                                     cuty_servo_output_set)) return false;
 #endif
     return cuty_servo_bench_bind();
 }

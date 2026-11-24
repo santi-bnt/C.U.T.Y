@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 
 def main():
@@ -13,6 +14,8 @@ def main():
                       help="PWM de banco en un canal: 1=J7/PB6, 2=J8/PB7, 3=J9/PB8")
     mode.add_argument("--calibration", action="store_true",
                       help="Genera firmware separado para calibración manual de un servo")
+    mode.add_argument("--profile", type=Path,
+                      help="Perfil JSON confirmado para habilitar los tres ejes físicos")
     args = parser.parse_args()
     cc = args.cc or shutil.which("arm-none-eabi-gcc")
     if not cc:
@@ -31,6 +34,8 @@ def main():
         output = output / f"bench-j{args.bench_channel + 6}"
     if args.calibration:
         output = output / "calibration"
+    if args.profile:
+        output = output / "physical"
     output.mkdir(parents=True, exist_ok=True)
     rtos = root / "Middlewares/Third_Party/FreeRTOS/Source"
     includes = ["Core/Inc", "Drivers/STM32F4xx_HAL_Driver/Inc",
@@ -47,7 +52,31 @@ def main():
     # El proyecto compila el mismo parser, controlador y tareas que prueban los tests host.
     sources += sorted((root.parent / "App").rglob("*.c"))
     sources += sorted((root.parent / "Board").glob("*.c"))
-    name = "cuty_arms_pwm_blackpill_calibration" if args.calibration else "cuty_arms_pwm_blackpill"
+    if args.profile:
+        sys.path.insert(0, str(root.parents[1] / "raspberry" / "src"))
+        from cuty.hardware.calibration_profile import RobotCalibration
+        profile = RobotCalibration.load(args.profile)
+        profile_header = output / "servo_calibration_profile.h"
+        lines = ["#ifndef CUTY_SERVO_CALIBRATION_PROFILE_H", "#define CUTY_SERVO_CALIBRATION_PROFILE_H",
+                 '#include "cuty_servo_output.h"', "/* Generado desde un perfil validado por eje. */"]
+        axes = {axis.axis: axis for axis in profile.axes}
+        lines.append("static const CutyServoTestRange cuty_servo_test_ranges[3] = {")
+        for axis_name in ("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"):
+            axis = axes[axis_name]
+            lines.append(f"    {{{axis.min_us}U, {axis.max_us}U}},")
+        lines.append("};")
+        lines.append("static const CutyServoCalibration cuty_servo_calibration[3] = {")
+        for index, axis_name in enumerate(("HEAD_PAN", "LEFT_ARM", "RIGHT_ARM"), 1):
+            axis = axes[axis_name]
+            reverse = "true" if axis.reverse else "false"
+            lines.append(
+                f"    {{{axis.min_us}U, {axis.center_us}U, {axis.max_us}U, "
+                f"{axis.max_velocity_per_s:.9g}f, {axis.max_acceleration_per_s2:.9g}f, "
+                f"{reverse}, true, true, {index}U}},")
+        lines += ["};", "#endif", ""]
+        profile_header.write_text("\n".join(lines), encoding="ascii")
+    name = ("cuty_arms_pwm_blackpill_physical" if args.profile else
+            "cuty_arms_pwm_blackpill_calibration" if args.calibration else "cuty_arms_pwm_blackpill")
     elf = output / (name + ".elf")
     # Una sola orden mantiene este ejemplo facil de leer y de reproducir.
     command = [cc, "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
@@ -55,6 +84,8 @@ def main():
                "-ffunction-sections", "-fdata-sections", "-DUSE_HAL_DRIVER",
                "-DSTM32F401xC", "--specs=nano.specs", "--specs=nosys.specs"]
     command += ["-I" + str(root / include) for include in includes]
+    if args.profile:
+        command += ["-I" + str(output), "-DCUTY_PHYSICAL_OUTPUT_ENABLE=1"]
     if args.bench_channel:
         command += [f"-DCUTY_BENCH_CHANNEL={args.bench_channel}"]
     if args.calibration:

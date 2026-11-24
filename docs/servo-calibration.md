@@ -100,6 +100,32 @@ El paso posterior será revisar esos datos, verificar `min < centro < max`,
 asignación y sentido, y configurar por articulación el movimiento automático.
 Esta herramienta no hace esa habilitación por sí sola.
 
+## Perfil confirmado para firmware normal
+
+Tras completar y revisar las tres sesiones, crea manualmente un archivo JSON
+nuevo con `schema: 1` y `axes`: exactamente un registro por articulación. Cada
+registro debe incluir `axis`, `pin`, `min_us`, `center_us`, `max_us`, `reverse`,
+`max_velocity_per_s`, `max_acceleration_per_s2`,
+`mechanical_calibration_confirmed` y `joint_mapping_confirmed`. Los dos últimos
+solo pueden ser `true` tras inspeccionar y confirmar físicamente esas mediciones.
+Usa los conectores fijos HEAD_PAN=PB6/J7, LEFT_ARM=PB7/J8 y RIGHT_ARM=PB8/J9.
+El generador rechaza datos faltantes, rangos fuera de 1000–2000 us, mapeos
+incorrectos y valores duplicados o inválidos; no convierte los grados observados
+en límites automáticamente.
+
+Con ese perfil revisado se compila el firmware de operación normal:
+
+```powershell
+python stm32/blackpill_uart/build.py --profile ruta\a\perfil-confirmado.json
+```
+
+Se genera un firmware físico separado en `build/physical/`. El encabezado C
+queda en la misma carpeta y registra los límites y parámetros exactos del JSON.
+El build normal sigue bloqueado, el modo calibración sigue siendo manual, y
+ninguno se sobreescribe. Solo carga este ELF después de completar la revisión
+física del perfil; el arranque deja PWM apagado y el movimiento requiere
+`ARM` + `START` explícitos.
+
 ## Verificación realizada
 
 Se prueban el parser y los límites, la tarea RTOS con UART simulado y el driver
