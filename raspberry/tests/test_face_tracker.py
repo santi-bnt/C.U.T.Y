@@ -84,6 +84,32 @@ def test_physical_follow_configuration_is_blocked_without_affecting_tracker(monk
     assert "bloqueado" in tr.status
 
 
+def test_physical_follow_log_does_not_label_commanded_velocity_as_simulation(monkeypatch, caplog):
+    class PhysicalAdapter:
+        is_physical = True
+        is_armed = False
+
+        def arm(self):
+            self.is_armed = True
+            return True
+
+        def stop(self):
+            self.is_armed = False
+
+        def set_pan_velocity(self, _velocity):
+            pass
+
+    caplog.set_level("INFO")
+    monkeypatch.setenv("CUTY_FOLLOW_ENABLED", "0")
+    monkeypatch.setenv("CUTY_FOLLOW_DRY_RUN", "0")
+    monkeypatch.setenv("CUTY_FOLLOW_PHYSICAL_ENABLE", "1")
+    tr = tracker(head_adapter=PhysicalAdapter())
+    tr.process([Detection(140, 100, 40, 40)], 320, 240, 1.0)
+
+    assert "[HEAD FOLLOW PHYSICAL]" in caplog.text
+    assert "sim_position" not in caplog.text
+
+
 def test_runtime_follow_toggle_is_available_but_inert_by_default(monkeypatch):
     monkeypatch.delenv("CUTY_FOLLOW_ENABLED", raising=False)
     monkeypatch.delenv("CUTY_FOLLOW_DRY_RUN", raising=False)

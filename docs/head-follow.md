@@ -1,127 +1,88 @@
-# Seguimiento facial de cabeza — estado y calibración
+# Seguimiento facial PAN
 
-## Alcance actual
+## Flujo y modos
 
-El seguimiento de rostros ya existente (`raspberry/src/cuty/vision/face_tracker.py`)
-abre la cámara una sola vez y obtiene detecciones localmente con YuNet o Haar.
-El controlador nuevo consume ese mismo `FaceTarget`; no inicia otra cámara,
-no transmite ni guarda imágenes y no toca audio, expresiones, pantalla, GPIO,
-overlays ni firmware.
+El `FaceTracker` existente abre una sola cámara, detecta con YuNet o Haar y produce un `FaceTarget` normalizado. El mismo objetivo alimenta los ojos de pantalla y, si se habilita, el PID PAN.
 
-El CAD V17 coloca la referencia y el soporte de cámara dentro del conjunto
-`head`, y define un servo `servo_head` en la base de cabeza, descrito en el CAD
-como PAN. Esto confirma la intención del diseño, no el montaje físico actual.
-Ahora existe [lógica STM32 portable](freertos-motion-control.md) para framing,
-consignas y límites simulados; faltan UART/PWM físicos y calibración. Por ello no hay adaptador de hardware
-y el modo físico se rechaza. No se afirma seguimiento físico funcional.
+- `CUTY_FOLLOW_DRY_RUN=1`: conserva una simulación en memoria; no abre UART ni activa servos.
+- Seguimiento físico: está implementado con `IpcHeadAdapter`. La cámara envía velocidades recientes por socket Unix local; el proceso de conversación es el único dueño del UART y el STM32 genera PWM y limita la trayectoria.
+- El seguimiento físico está deshabilitado por defecto. Requiere `CUTY_ROBOT_MODE=robot`, un perfil completo y confirmado, enlace UART válido en DISARMED, `CUTY_FOLLOW_PHYSICAL_ENABLE=1` en el proceso de voz y en el launcher de pantalla, y una pulsación manual de 0.7 a menos de 5 segundos para armar.
+- Al perder la detección por 0.5 s, ante una detección inválida, una desconexión o un error de tiempo, el adaptador se detiene y desarma. Para reanudar hace falta otra pulsación explícita. No devuelve la cabeza a un extremo ni reanuda automáticamente.
+- Ojos y cabeza usan el mismo detector, pero los ojos siguen funcionando independientemente del actuador.
 
-Solo se calcula PID PAN en **unidades normalizadas simuladas**, no grados,
-grados/s ni PWM. El error vertical se calcula y se muestra como diagnóstico;
-no se acciona porque no hay un eje TILT confirmado. El sentido positivo PAN es
-una convención del simulador, no una dirección del servo físico.
+El eje vertical solo se conserva como diagnóstico; no hay un eje TILT conectado. El controlador Raspberry mide error de imagen normalizado, no grados. El estado disponible es una consigna/velocidad comandada, no una medición de posición.
 
-## Prueba dry-run en la Raspberry
+## Habilitación física
 
-Por defecto `CUTY_FOLLOW_ENABLED=0`; no cambia el comportamiento de la cara.
-Para habilitar la simulación sin cambiar archivos de hardware, crea un override
-local de systemd:
+No actives seguimiento hasta que cada articulación tenga calibración física revisada y el firmware corresponda al mismo perfil. Añade al entorno privado cargado por los servicios (no al repositorio ni a la web):
+
+```dotenv
+CUTY_ROBOT_MODE=robot
+CUTY_SERVO_CALIBRATION_PROFILE=/ruta/al/perfil-confirmado.json
+CUTY_STM32_PORT=/dev/ttyAMA0
+CUTY_FOLLOW_PHYSICAL_ENABLE=1
+CUTY_FOLLOW_DRY_RUN=0
+```
+
+La variable `CUTY_FOLLOW_PHYSICAL_ENABLE=1` debe estar disponible también para `cuty-launcher.service`, que crea el adaptador en el proceso de cámara. El proceso de voz debe registrar UART válido y estado DISARMED; el launcher y la conversación deben ejecutarse con el mismo usuario IPC configurado. Reinicia ambos procesos después de cambiar el entorno:
 
 ```sh
 sudo systemctl edit cuty-launcher.service
 ```
 
-Añade:
+Añade al override:
 
 ```ini
 [Service]
-Environment=CUTY_FOLLOW_ENABLED=1
-Environment=CUTY_FOLLOW_DRY_RUN=1
+Environment=CUTY_FOLLOW_PHYSICAL_ENABLE=1
 ```
 
-Guarda y reinicia el launcher. El registro muestra `[HEAD FOLLOW DRY-RUN]`,
-errores normalizados X/Y, salida PID PAN y velocidad/posición simuladas:
+Guarda y aplica el cambio:
 
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl restart cuty-launcher.service
-journalctl -u cuty-launcher.service -f
 ```
 
-El seguimiento del rostro y la cara animada continúan en el hilo actual.
-La posición simulada se mantiene al perder el rostro; a los 0.5 s se pone la
-velocidad simulada en cero. La parada interna prevalece sobre las detecciones.
-Al apagar el launcher no queda un proceso ni salida física.
-
-Para probar en desarrollo sin cámara ni Raspberry:
+Configura `CUTY_ROBOT_MODE`, el perfil, el puerto y `CUTY_FOLLOW_DRY_RUN=0` en el `raspberry/.env` privado; `app.py` lo carga para el proceso de voz. El launcher es root y no carga ese `.env`, por eso el opt-in físico también debe ir en el override del servicio. Al reiniciarlo se recrean el launcher y su proceso de voz. Comprueba el estado sin exponer `.env` ni claves:
 
 ```sh
-cd raspberry
-python -m pytest tests/test_head_follow.py tests/test_face_tracker.py
+sudo journalctl -u cuty-launcher.service -n 60 --no-pager
 ```
 
-Las pruebas construyen detecciones falsas y un actuador en memoria; no prueban
-la cámara real, el altavoz ni el movimiento del robot.
+En la cara, mantén pulsado entre 0.7 y 5 segundos para armar o detener. La orden de armado reclama el control exclusivo, ejecuta ARM/START explícitos y solo entonces admite consignas. La pérdida de cara desarma; otra pulsación es necesaria.
 
-## Parámetros
+## Límites implementados
 
-Todos se leen del entorno al crear `FaceTracker`:
-
-| Variable | Valor inicial | Significado |
+| Parámetro | Predeterminado | Uso |
 | --- | ---: | --- |
-| `CUTY_FOLLOW_ENABLED` | `0` | Seguimiento de cabeza habilitado (solo simulación) |
-| `CUTY_FOLLOW_DRY_RUN` | `1` | Obligatorio para habilitar; `0` con seguimiento activo se bloquea |
-| `CUTY_FOLLOW_KP` | `1.2` | Ganancia proporcional PAN |
+| `CUTY_FOLLOW_KP` | `1.2` | Ganancia proporcional sobre error normalizado |
 | `CUTY_FOLLOW_KI` | `0` | Ganancia integral; comienza desactivada |
-| `CUTY_FOLLOW_KD` | `0.08` | Ganancia derivativa PAN |
-| `CUTY_FOLLOW_DETECTION_ALPHA` | `0.35` | Suavizado exponencial de la detección, (0, 1] |
-| `CUTY_FOLLOW_DERIVATIVE_ALPHA` | `0.25` | Suavizado exponencial de la derivada, (0, 1] |
-| `CUTY_FOLLOW_DEADBAND` | `0.035` | Zona muerta del error normalizado |
-| `CUTY_FOLLOW_LOST_TIMEOUT` | `0.5` s | Tiempo sin detección antes de detener salida |
-| `CUTY_FOLLOW_MAX_DT` | `0.25` s | Tope de dt usado para limitar saltos por pausas |
-| `CUTY_FOLLOW_SIM_MAX_VELOCITY` | `0.8` | Límite de velocidad en unidades simuladas/s |
-| `CUTY_FOLLOW_SIM_MAX_ACCELERATION` | `1.5` | Límite de aceleración en unidades simuladas/s² |
-| `CUTY_FOLLOW_SIM_MIN_POSITION` | `-1.0` | Extremo simulado; no representa ángulo físico |
-| `CUTY_FOLLOW_SIM_MAX_POSITION` | `1.0` | Extremo simulado; no representa ángulo físico |
+| `CUTY_FOLLOW_KD` | `0.08` | Ganancia derivativa filtrada |
+| `CUTY_FOLLOW_DETECTION_ALPHA` | `0.35` | Suavizado exponencial de detección, `(0, 1]` |
+| `CUTY_FOLLOW_DERIVATIVE_ALPHA` | `0.25` | Suavizado de derivada, `(0, 1]` |
+| `CUTY_FOLLOW_DEADBAND` | `0.035` | Zona muerta de error normalizado |
+| `CUTY_FOLLOW_LOST_TIMEOUT` | `0.5 s` | Antigüedad máxima del objetivo para mantener seguimiento |
+| `CUTY_FOLLOW_MAX_DT` | `0.25 s` | Tope de intervalo usado en la aceleración calculada en Raspberry |
+| Socket físico | `±0.15` posición normalizada | El servidor IPC limita el recorrido acumulado del objetivo facial |
+| IPC | `0.35 s` | Rechaza consignas vencidas |
 
-La frecuencia de detección proviene de `CUTY_TRACK_FPS` (12 Hz por defecto).
-El controlador mide `dt` con reloj monotónico; un `dt` cero/negativo detiene la
-salida y reinicia la derivada. El derivativo se filtra y el integrador usa
-anti-windup condicional. Las ganancias operan sobre error normalizado y la
-salida simulada se expresa en unidades normalizadas/s; no son parámetros
-angulares transferibles al servo.
+Además, el STM32 aplica los límites de pulso, velocidad y aceleración del perfil activo. El controlador de Raspberry limita velocidad/aceleración antes de enviar. Estos valores no son ángulos ni límites mecánicos medidos. No se afinen ganancias hasta completar la prueba supervisada de [validación física](robot-validation.md).
 
-## Calibración futura del mecanismo físico
+## Pruebas de software
 
-No habilites actuadores reales con esta versión. Cuando exista firmware y
-protocolo revisados, valida en este orden, con el robot sostenido y un límite
-de parada manual accesible:
+Desde `raspberry/`:
 
-1. Verifica continuidad mecánica entre cámara y cabeza ensamblada; si la cámara
-   queda fija al cuerpo, el error de imagen no cierra el lazo de PAN.
-2. Identifica el eje, centro mecánico y recorrido permitido consultando el
-   servo, montaje y topes reales; no copies los barridos CAD como límites.
-3. Con movimiento mínimo, comprueba qué signo del comando lleva el centro de
-   imagen hacia el rostro. Si aumenta el error, invierte la dirección antes de
-   seguir: eso detecta retroalimentación positiva.
-4. Con `Ki=0`, aumenta `Kp` gradualmente hasta respuesta clara sin oscilación;
-   reduce `Kp` si sobrepasa o vibra.
-5. Aumenta `Kd` poco a poco para amortiguar sobrepaso. Mantén el filtrado si
-   suaviza ruido sin retraso excesivo.
-6. Solo tras observar error persistente bajo carga, probar un `Ki` pequeño,
-   vigilando saturación y viento del integrador.
-7. Reemplaza límites normalizados por límites medidos del mecanismo, y verifica
-   velocidad, aceleración, pérdida de detección, parada manual y estado de
-   fallo dentro del STM32 antes de cualquier uso autónomo.
+```sh
+python -m pytest tests/test_head_follow.py tests/test_face_tracker.py tests/test_motion_ipc.py
+```
 
-La activación también necesita confirmar el pinout UART de la placa montada,
-framing/baud/validación del protocolo, canales PWM, direcciones, límites
-angulares, alimentación de servos y paradas de seguridad. No se deben alterar
-las asignaciones actuales de Raspberry Pi, ReSpeaker o pantalla.
+Las pruebas usan detecciones y adaptadores falsos; no validan la cámara real ni el movimiento físico.
 
-## Archivos de referencia
+## Referencias
 
-- `raspberry/src/cuty/vision/face_tracker.py` — cámara única y detección existente.
-- `raspberry/src/cuty/vision/head_follow.py` — PID y adaptador simulado.
-- `raspberry/src/cuty/hardware/README.md` y `stm32/README.md` — interfaz aún pendiente.
-- `hardware/cad/carcasa_v17/fuente_cad/v17/head.py`, `build.py`, `refs.py` —
-  colocación de cámara y servo PAN prevista por CAD.
+- `raspberry/src/cuty/vision/face_tracker.py`: cámara única, detección y objetivo.
+- `raspberry/src/cuty/vision/head_follow.py`: PID y política de pérdida de rostro.
+- `raspberry/src/cuty/hardware/motion_ipc.py`: socket local y adaptador de cabeza.
+- `raspberry/src/cuty/hardware/robot_motion.py`: propietario UART y trayectoria STM32.
+- `raspberry/touchscreen/cuty_launcher.py`: habilitación por entorno y pulsación manual.

@@ -29,15 +29,18 @@ opposite way on your mounting.
 | `CUTY_TRACK_FPS` | `12` | detection rate |
 | `CUTY_CAMERA_HIGH_RES_SNAPSHOT` | `0` | Optional PiCamera2 main=1296×972 + lores=320×240 dual stream; off pending Pi validation |
 
-Head following is an optional layer over this same camera loop. It is disabled
-by default and only supports an in-memory dry-run PAN simulation. See
-[`docs/head-follow.md`](../../../../docs/head-follow.md) for parameters,
-validation and the hardware blockers. No second camera, PWM, UART, or servo
-output is introduced.
+Head following is an optional layer over this same camera loop. Dry-run is
+in-memory and disabled by default. Physical PAN following is implemented but
+stays disabled unless both the conversation process and screen launcher opt in,
+robot mode has a complete confirmed profile and live DISARMED UART link, and
+the user manually arms it on the touchscreen. The camera process sends only
+fresh, bounded velocity requests over a local Unix socket; the conversation
+process remains the sole UART owner. Face loss stops and disarms following, so
+another touch is required to resume. See [`docs/head-follow.md`](../../../../docs/head-follow.md)
+and the [19-stage physical validation guide](../../../../docs/robot-validation.md).
 
-Vision never produces PWM, drives servos, implements body PID or renders the
-display. The same target can later feed high-level head goals through the
-hardware bridge. Optional voice-triggered vision and local face templates are
+Vision never produces PWM, implements body PID or renders the display. The
+same target can feed the optional head-follow goal path. Optional voice-triggered vision and local face templates are
 documented in [`docs/face-vision.md`](../../../../docs/face-vision.md). They
 reuse this tracker and camera; they do not add another capture device. SFace
 needs a separately installed OpenCV-contrib runtime and model, is disabled in

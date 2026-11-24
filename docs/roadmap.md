@@ -1,6 +1,6 @@
 # Roadmap
 
-Status reviewed on 2026-11-04. Checked implementation items mean code or design files exist; they do not certify hardware reliability or electrical safety. Physical checks are listed separately. Current targets are Raspberry Pi 5 and STM32F401 Black Pill.
+Status reviewed on 2026-11-24. Checked implementation items mean code or design files exist; they do not certify hardware reliability or electrical safety. Physical checks are listed separately. Current targets are Raspberry Pi 5 and STM32F401 Black Pill.
 
 ## Phase 1 — Brain
 
@@ -30,17 +30,17 @@ Status reviewed on 2026-11-04. Checked implementation items mean code or design 
 - [x] Visual eye tracking connected to the animated face
 - [x] Local consent-based face enrollment/matching and request-only Gemini image descriptions (software; SFace model and Pi validation pending)
 - [ ] End-to-end physical camera/detector/gaze validation (camera startup has been observed)
-- [ ] Physical head tracking through STM32 goals and servos
+- [x] Optional face-follow path through a local socket, the sole UART owner and STM32 goals (software; physical validation pending)
 
 ## Phase 4 — STM32F401 Firmware
 
-- [ ] Board-specific startup, clock configuration and HAL/CMSIS project for the Black Pill
-- [ ] UART protocol implementation and validated Pi-to-STM32 link
-- [ ] Three-servo control integration: HEAD_PAN, LEFT_ARM, RIGHT_ARM
-- [ ] HEAD_PAN low-pass FIR integration into the board FreeRTOS task
-- [ ] UART and timer/PWM hardware validation (keep actuator outputs disabled until reviewed)
+- [x] Board-specific startup, clock configuration and HAL/CMSIS project for the Black Pill
+- [x] UART V2 protocol, ACK/NACK and Raspberry link implementation (user reports physical link; supervised recheck pending)
+- [x] Three-servo control integration: HEAD_PAN, LEFT_ARM, RIGHT_ARM (profile-gated; per-axis calibration pending)
+- [x] HEAD_PAN low-pass FIR integration into the board FreeRTOS task
+- [ ] Per-axis calibration, profile review and supervised UART/timer/PWM hardware validation
 
-Portable parsing, commanded-position control and safety logic plus an initial dry-run CMSIS-RTOS2 adapter now exist under `stm32/App/`. A separate [UART/PWM bench firmware and Raspberry client](../stm32/blackpill_uart/README.md) now build for the STM32F401CCU6 project using the carrier servo pinout. It does not implement the V2 motion integration; physical firmware milestones above remain pending. See [implementation boundary and tests](freertos-motion-control.md). Carrier pin assignments do not replace physical tests.
+Portable parsing, trajectory control, safety logic, the CMSIS-RTOS2 adapter and HAL UART/PWM callbacks exist under `stm32/App/`, `stm32/Board/` and `stm32/blackpill_uart/`. Separate normal, manual-calibration, bench and profile-gated physical builds are available. See [implementation boundary and tests](freertos-motion-control.md). The [19-stage validation guide](robot-validation.md) tracks the remaining physical profile and system checks.
 
 ## Phase 5 — Electronics and Mechanical Design
 
@@ -55,11 +55,11 @@ Portable parsing, commanded-position control and safety logic plus an initial dr
 
 ## Phase 6 — Dashboard
 
-- [ ] Telemetry
+- [x] Optional read-only Raspberry status API for connection, safety state and commanded targets
 - [ ] Three-axis telemetry
 - [ ] Digital twin
 
-The website contains the fixed CAD reference, FreeRTOS motion explanation and local FIR demonstrations. These displays are not connected to physical telemetry or actuators.
+The website contains the fixed CAD reference, FreeRTOS motion explanation and local FIR demonstrations. The static dashboard is not connected to the Raspberry telemetry API or actuators; remote control remains disabled.
 
 ## Phase 7 — Recognition validation
 

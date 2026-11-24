@@ -8,7 +8,7 @@
 - Face enrollment and matching are local SFace operations. Enrollment requires an explicit second spoken confirmation and collects five separate tracker frames by default. Only the user-provided name and embedding vectors are stored. No enrollment image is retained or sent to a provider.
 - `¿Quién soy?` returns a name only when the local match passes both score and separation thresholds; otherwise it says it cannot recognize the face reliably. `Olvida mi rostro` asks for explicit confirmation and removes only the currently visible profile if it can be matched reliably. Other profiles are preserved.
 - `FaceTracker` sends snapshots and recognition requests to the voice child over a private Unix socket under `/run`, mode `0600`, with Linux peer-UID verification. It is not an HTTP endpoint and is not reachable over the LAN.
-- PAN head-follow remains a separate, disabled-by-default dry-run path. No GPIO, camera driver, display, ReSpeaker, STM32 or servo wiring has changed.
+- PAN head-follow remains a separate, disabled-by-default path. It supports in-memory dry-run and an opt-in physical adapter through the motion IPC socket; see [head-follow setup](head-follow.md). No GPIO, camera driver, display, ReSpeaker, STM32 or servo wiring has changed.
 
 Voice intent recognition is deterministic over the existing Gemini input transcription. C.U.T.Y. does not gain a new wake-word engine: hands-free activation and turn boundaries remain those of the existing menu voice session. When no local SFace model is installed, identity commands fail closed and answer that local recognition is unavailable.
 
@@ -58,7 +58,7 @@ The profile file contains sensitive biometric templates and a chosen display nam
 
 Snapshot conversion, JPEG encoding, Gemini requests, SFace enrollment and comparison are outside the display render loop. Recognition IPC and SFace work run off the voice asyncio loop. The existing camera detector loop continues as before; color conversion happens only when requested. No CPU, memory or latency figures are claimed because this implementation has not been measured on the Pi 5.
 
-Tests use synthetic pixel arrays, fake detector observations, fake voice/provider objects and temporary profile files. No authorized human sample images were included in the repository, so biometric accuracy has not been tested. Before enabling enrollment on the robot, validate the SFace OpenCV build, YuNet frame alignment, camera/lighting quality, profile permissions, thresholds, voice confirmation, capture behavior while the animated face and audio are running, Pi resource use, and network-loss recovery. The physical camera/voice/display/audio combination was not exercised in this implementation session. Head-follow remains simulation only.
+Tests use synthetic pixel arrays, fake detector observations, fake voice/provider objects and temporary profile files. No authorized human sample images were included in the repository, so biometric accuracy has not been tested. Before enabling enrollment on the robot, validate the SFace OpenCV build, YuNet frame alignment, camera/lighting quality, profile permissions, thresholds, voice confirmation, capture behavior while the animated face and audio are running, Pi resource use, and network-loss recovery. The physical camera/voice/display/audio combination and physical head-follow still require supervised validation.
 
 ## References
 

@@ -146,14 +146,25 @@ class FaceTracker:
         state = self.follow.update(target, now)
         if now - self._last_follow_log >= 1.0:
             self._last_follow_log = now
-            self._log.info(
-                "[HEAD FOLLOW DRY-RUN] active=%s track=%s err=(%+.3f,%+.3f) "
-                "pid_pan=%+.3f sim_velocity=%+.3f sim_position=%+.3f (%s)",
-                state.enabled, state.tracking,
-                state.x_error if state.x_error is not None else 0.0,
-                state.y_error if state.y_error is not None else 0.0,
-                state.pid_output, state.velocity, state.simulated_position, state.reason,
-            )
+            physical = bool(getattr(self.follow.adapter, "is_physical", False))
+            log_prefix = "[HEAD FOLLOW PHYSICAL]" if physical else "[HEAD FOLLOW DRY-RUN]"
+            if physical:
+                self._log.info(
+                    "%s active=%s track=%s err=(%+.3f,%+.3f) pid_pan=%+.3f velocity=%+.3f (%s)",
+                    log_prefix, state.enabled, state.tracking,
+                    state.x_error if state.x_error is not None else 0.0,
+                    state.y_error if state.y_error is not None else 0.0,
+                    state.pid_output, state.velocity, state.reason,
+                )
+            else:
+                self._log.info(
+                    "%s active=%s track=%s err=(%+.3f,%+.3f) "
+                    "pid_pan=%+.3f sim_velocity=%+.3f sim_position=%+.3f (%s)",
+                    log_prefix, state.enabled, state.tracking,
+                    state.x_error if state.x_error is not None else 0.0,
+                    state.y_error if state.y_error is not None else 0.0,
+                    state.pid_output, state.velocity, state.simulated_position, state.reason,
+                )
 
     def set_head_follow_enabled(self, enabled: bool) -> bool:
         """Habilita el controlador disponible; el adaptador físico debe inyectarse por separado."""

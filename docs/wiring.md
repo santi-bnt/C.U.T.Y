@@ -1,6 +1,6 @@
 # Wiring
 
-For the independent UART/PWM test, see [Black Pill bench firmware](../stm32/blackpill_uart/README.md). It uses PB6/PB7/PB8 (J7/J8/J9), matching the carrier servo assignments below. This page describes the carrier design; its firmware integration remains pending.
+For the UART/PWM firmware and pin assignments, see [Black Pill firmware](../stm32/blackpill_uart/README.md). It uses PB6/PB7/PB8 (J7/J8/J9), matching the carrier servo assignments below. This page describes the carrier design; assembled carrier power/electrical validation remains pending.
 
 Interactive reference: [block connection diagram (standalone HTML)](conexiones.html), with signal/power views and pin tables generated from the carrier netlist. Static images: [signals](assets/conexiones-senales.svg) and [power](assets/conexiones-alimentacion.svg). It documents the carrier design, not a verified physical wiring inspection.
 
@@ -8,4 +8,4 @@ The carrier PCB v1.1 is designed for Raspberry Pi 5 and STM32F401 Black Pill: [h
 
 Links on the board: Raspberry Pi 5 ↔ STM32 UART (Pi TX pin 8 → PA3, PA2 → Pi RX pin 10); the PCB retains five 6 V servo connectors. The current design uses J7–J9 for HEAD_PAN, LEFT_ARM and RIGHT_ARM; J10/J11 are reserved. Proposed PWM-capable pins are not physically verified. Battery divider on PA1; Pi header → Display-G 26-pin and ReSpeaker 2-Mics HAT (same physical pin numbering); LiPo 3S → fuses → servo buck (6 V) and Pi regulator (5.1 V USB-C). Power ground (PGND) and logic ground (GND) meet only at net tie NT1.
 
-Already tested in the manually wired Pi setup: ReSpeaker capture and speaker playback, plus the SPI touchscreen. These tests do not validate the unassembled carrier. Still to validate on the carrier: fabrication/assembly, Pi-to-STM32F401 UART, audio/display routing and power distribution, including the proposed 5.1 V / 5 A regulator. Full application firmware integration remains pending. The board design includes fuses only; LiPo over-discharge protection and a balance charger remain separate requirements.
+Already tested in the manually wired Pi setup: ReSpeaker capture and speaker playback, plus the SPI touchscreen. The user also reports Pi-to-STM32 UART and movement on all three carrier servo channels. These tests do not certify the assembled carrier. Still to validate on the carrier: fabrication/assembly, UART and servo power distribution, audio/display routing and power distribution, including the proposed 5.1 V / 5 A regulator. Per-axis profile confirmation and full application tests follow the [19-stage physical validation guide](robot-validation.md). The board design includes fuses only; LiPo over-discharge protection and a balance charger remain separate requirements.
