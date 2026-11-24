@@ -24,6 +24,7 @@ from cuty.brain.voice_commands import wants_menu
 from cuty.music.commands import MusicCommand, parse_music_command
 from cuty.music.protocol import MusicProvider
 from cuty.brain.volume_commands import VolumeCommand, parse_volume_command
+from cuty.hardware.motion_actions import MotionAction, MotionActionGate, MotionRequest, parse_motion_request
 from cuty.vision.voice_commands import (
     confirmed_enrollment_name, confirmed_forget, is_explicit_cancel,
     may_be_vision_intent, vision_intent,
@@ -52,6 +53,7 @@ class ConversationService:
         vision=None,
         voice_volume: VoiceVolume | None = None,
         speech_filter: SpeechBandpass | None = None,
+        motion_gate: MotionActionGate | None = None,
     ) -> None:
         self.provider = provider
         self.microphone = microphone
@@ -66,6 +68,7 @@ class ConversationService:
         self.vision = vision
         self.voice_volume = voice_volume or VoiceVolume.from_env()
         self.speech_filter = speech_filter
+        self.motion_gate = motion_gate or MotionActionGate()
         self._pending_music_command: MusicCommand | None = None
         self._deferred_music_action: tuple[str, str | None] | None = None
         self._pending_volume_command: VolumeCommand | None = None
@@ -721,6 +724,17 @@ class ConversationService:
                 expression = Expression(args["expression"])
                 event = self.expressions.set_emotion(expression, args["intensity"])
                 result = {"ok": True, "event": event.as_dict()}
+            elif call.name == "request_motion":
+                if set(args) != {"action"} or not isinstance(args["action"], str):
+                    raise ValueError("Malformed motion arguments")
+                requested = MotionAction(args["action"])
+                # La transcripción del usuario debe validar la misma acción solicitada por Gemini.
+                spoken = parse_motion_request(input_transcript)
+                if spoken.action is MotionAction.STOP:
+                    requested = MotionAction.STOP
+                elif spoken.action is not requested:
+                    raise ValueError("Motion request does not match the user's explicit words")
+                result = self.motion_gate.submit(MotionRequest(requested))
             elif call.name == "return_to_menu" and self.voice_exit:
                 if args:
                     raise ValueError("Return to menu takes no arguments")
@@ -737,6 +751,8 @@ class ConversationService:
         except (ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
             self._log.warning("Rejected tool %s: %s", call.name, exc)
             error = ("Invalid search arguments" if call.name == "search_web" else
+                     "Movement request rejected; physical motion requires an allowed spoken command and local authorization"
+                     if call.name == "request_motion" else
                      "Exit not confirmed by the user's transcription; continue the conversation"
                      if call.name == "return_to_menu" else "Invalid expression arguments")
             result = {"ok": False, "error": error}
