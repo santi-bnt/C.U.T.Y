@@ -3,6 +3,7 @@ export interface RobotSnapshot {
   connection: "offline" | "connected";
   mode: "simulation" | "hardware";
   safetyState: string;
+  lastKnownState: string;
   motionAuthorized: boolean;
   controllerActive: boolean;
   physicalOutputStatus: "unverified";
@@ -25,6 +26,7 @@ const offlineSnapshot: RobotSnapshot = {
   connection: "offline",
   mode: "simulation",
   safetyState: "UNKNOWN",
+  lastKnownState: "UNKNOWN",
   motionAuthorized: false,
   controllerActive: false,
   physicalOutputStatus: "unverified",
@@ -58,6 +60,7 @@ function parseSnapshot(payload: unknown): RobotSnapshot | null {
     !(value.connection === "offline" || value.connection === "connected") ||
     !(value.mode === "simulation" || value.mode === "hardware") ||
     typeof value.safety_state !== "string" ||
+    typeof value.last_known_state !== "string" ||
     typeof value.motion_authorized !== "boolean" ||
     typeof value.controller_active !== "boolean" ||
     value.physical_output_status !== "unverified" ||
@@ -70,6 +73,7 @@ function parseSnapshot(payload: unknown): RobotSnapshot | null {
     connection: value.connection,
     mode: value.mode,
     safetyState: value.safety_state,
+    lastKnownState: value.last_known_state,
     motionAuthorized: value.motion_authorized,
     controllerActive: value.controller_active,
     physicalOutputStatus: "unverified",

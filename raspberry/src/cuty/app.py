@@ -264,6 +264,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                         "connection": "offline",
                         "mode": "hardware" if physical_motion_requested else "simulation",
                         "safety_state": "UNKNOWN",
+                        "last_known_state": "UNKNOWN",
                         "motion_authorized": False,
                         "controller_active": False,
                         "physical_output_status": "unverified",

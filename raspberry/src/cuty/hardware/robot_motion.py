@@ -213,7 +213,11 @@ class RobotMotionExecutor:
             return {
                 "connection": "connected" if self.connected else "offline",
                 "mode": "hardware",
-                "safety_state": telemetry.state if telemetry_fresh and telemetry else self._last_state,
+                "safety_state": (
+                    telemetry.state if self.connected and telemetry_fresh and telemetry
+                    else self._last_state if self.connected else "UNKNOWN"
+                ),
+                "last_known_state": self._last_state,
                 "motion_authorized": self.enabled,
                 "controller_active": bool(self.enabled and self._active),
                 "physical_output_status": "unverified",

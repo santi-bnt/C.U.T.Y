@@ -89,6 +89,7 @@ describe("3D normalization and communication boundary", () => {
       connection: "offline",
       mode: "simulation",
       safetyState: "UNKNOWN",
+      lastKnownState: "UNKNOWN",
       motionAuthorized: false,
       controllerActive: false,
       physicalOutputStatus: "unverified",

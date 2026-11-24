@@ -1,11 +1,10 @@
 """Seguimiento PAN facial con salida separada del control visual.
 
 FaceTracker entrega una coordenada horizontal normalizada; el PID calcula una
-velocidad y este controlador integra una posición limitada. El adaptador recibe
-esa velocidad y, para hardware, debe convertirla en objetivos STM32, nunca PWM
-desde Raspberry. Dry-run es la opción por defecto; el adaptador físico debe
-gestionar UART, armado y calibración. Este módulo no incluye una implementación
-UART física lista para conectar.
+velocidad limitada. En dry-run el adaptador conserva solo estado simulado. Para
+hardware, IpcHeadAdapter envía velocidades recientes al proceso que posee UART;
+el ejecutor Raspberry valida perfil y estado STM32. La activación requiere
+habilitación física y armado manual; este módulo nunca genera PWM.
 """
 
 from __future__ import annotations
@@ -61,8 +60,7 @@ class FaceFollowConfig:
     def __post_init__(self) -> None:
         if self.enabled and not self.dry_run and not self.physical_adapter_enabled:
             raise FollowConfigurationError(
-                "Physical head following is blocked: no verified UART/STM32 adapter, "
-                "servo calibration, direction, or travel limits exist. Keep dry-run enabled."
+                "Physical head following is blocked: explicit adapter enablement and a validated servo profile are required."
             )
         if not 0 < self.detection_alpha <= 1:
             raise FollowConfigurationError("CUTY_FOLLOW_DETECTION_ALPHA must be in (0, 1]")

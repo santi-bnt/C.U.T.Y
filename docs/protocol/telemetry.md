@@ -11,6 +11,8 @@ ejecutor mantiene la última instantánea válida. Los contadores permiten ver
 errores de recepción y registros descartados por congestión. Una instantánea
 se considera reciente durante un segundo; la ausencia o antigüedad de datos no
 autoriza movimiento.
+Con UART desconectado, `safety_state` pasa a `UNKNOWN` y `last_known_state`
+conserva por separado el último estado recibido.
 
 Tras una pérdida de UART, el monitor Raspberry reintenta cada segundo. Al
 reconectar no restaura autorización de movimiento: acepta DISARMED, desarma

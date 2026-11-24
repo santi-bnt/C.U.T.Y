@@ -110,6 +110,11 @@ export default function MotionControl() {
         <span>{t(bi("Link", "Enlace"))}: {robot.connection}</span>
         <span>{t(bi("Mode", "Modo"))}: {robot.mode}</span>
         <span>{t(bi("Safety", "Seguridad"))}: {robot.safetyState}</span>
+        {robot.connection === "offline" && (
+          <span>
+            {t(bi("Last known state", "Último estado conocido"))}: {robot.lastKnownState}
+          </span>
+        )}
         <span>
           {t(bi("Motion authorization", "Autorización de movimiento"))}: {robot.motionAuthorized
             ? t(bi("enabled", "habilitada"))

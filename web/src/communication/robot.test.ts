@@ -10,6 +10,7 @@ describe("read-only robot telemetry", () => {
       connection: "connected",
       mode: "hardware",
       safety_state: "DISARMED",
+      last_known_state: "DISARMED",
       motion_authorized: true,
       controller_active: false,
       physical_output_status: "unverified",
