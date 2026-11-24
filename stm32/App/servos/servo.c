@@ -1,5 +1,6 @@
 #include "servo.h"
 #include <math.h>
+#include <stddef.h>
 bool cuty_servo_pulse(float x,uint16_t lo,uint16_t hi,uint16_t *out) {
     /* Conversión simétrica heredada; es matemática portable, no inicia un timer. */
     if (!out||!isfinite(x)||x < -1||x > 1||!lo||lo>=hi||hi>=20000) return false;
