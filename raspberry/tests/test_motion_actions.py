@@ -37,9 +37,9 @@ def test_simulation_is_default_and_stop_has_priority():
 def test_physical_enable_requires_link_and_complete_calibration():
     gate = MotionActionGate(executor=object())
     with pytest.raises(RuntimeError):
-        gate.enable_physical(link_valid=True, calibration=None)
+        gate.enable_physical(calibration=None)
     with pytest.raises(RuntimeError):
-        gate.enable_physical(link_valid=False, calibration=RobotCalibration(()))
+        gate.enable_physical(calibration=RobotCalibration(()))
 
 
 def test_calibration_profile_requires_all_confirmed_mapped_axes():

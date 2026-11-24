@@ -79,21 +79,24 @@ class MotionActionGate:
     def physical_enabled(self) -> bool:
         return self._physical_enabled
 
-    def enable_physical(self, *, link_valid: bool, calibration: RobotCalibration | None) -> None:
+    def enable_physical(self, *, calibration: RobotCalibration | None) -> None:
         try:
             if calibration is None:
                 raise ValueError("perfil ausente")
             calibration.validate_complete()
         except (AttributeError, TypeError, ValueError) as exc:
             raise RuntimeError("Movimiento físico requiere calibración completa y válida") from exc
-        if not link_valid or self._executor is None:
-            raise RuntimeError("Movimiento físico requiere enlace, calibración completa y ejecutor")
+        if self._executor is None:
+            raise RuntimeError("Movimiento físico requiere un ejecutor")
+        enable = getattr(self._executor, "enable", None)
+        if not callable(enable) or enable() is not True:
+            raise RuntimeError("El ejecutor no confirmó el enlace y el estado seguro")
         self._physical_enabled = True
 
     def disable_physical(self) -> None:
         self._physical_enabled = False
         if self._executor is not None:
-            self._executor.stop()
+            self._executor.disable()
 
     def submit(self, request: MotionRequest) -> dict[str, object]:
         if not isinstance(request, MotionRequest):

@@ -23,6 +23,9 @@ from cuty.audio.speaker import SoundDeviceSpeaker
 from cuty.audio.volume import VoiceVolume, VolumeSpeaker
 from cuty.audio.remote import RemoteSpeaker, serve_audio
 from cuty.brain.conversation import ConversationService, ReturnToMenu
+from cuty.hardware.calibration_profile import RobotCalibration
+from cuty.hardware.motion_actions import MotionActionGate
+from cuty.hardware.robot_motion import RobotMotionExecutor
 from cuty.brain.states import State, StateMachine
 from cuty.config import Config, ConfigurationError
 from cuty.audio.thinking import ThinkingVoice
@@ -187,6 +190,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
     speaker = VolumeSpeaker(speaker, voice_volume)
     thinking_voice = ThinkingVoice()
     prepare_thinking = asyncio.create_task(thinking_voice.prepare())
+    physical_executor = None
     try:
         await speaker.open()
         await provider.connect()
@@ -218,6 +222,26 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             ) if hands_free else None
         if hands_free:
             microphone = SpeechMicrophone.from_env(microphone, input_rate)
+        motion_gate = MotionActionGate()
+        physical_motion_requested = os.getenv("CUTY_ROBOT_PHYSICAL_ENABLE", "0").strip().lower() in {
+            "1", "true", "yes", "on",
+        }
+        if physical_motion_requested:
+            try:
+                profile_path = os.getenv("CUTY_SERVO_CALIBRATION_PROFILE", "").strip()
+                uart_port = os.getenv("CUTY_STM32_PORT", "").strip()
+                if not profile_path or not uart_port:
+                    raise ValueError("Configura CUTY_SERVO_CALIBRATION_PROFILE y CUTY_STM32_PORT")
+                calibration = RobotCalibration.load(profile_path)
+                executor = RobotMotionExecutor(uart_port, calibration)
+                # Comprueba enlace y perfil; el STM32 permanece DISARMED al iniciar.
+                await asyncio.to_thread(executor.enable)
+                physical_executor = executor
+                motion_gate = MotionActionGate(executor)
+                motion_gate.enable_physical(calibration=calibration)
+                log.warning("Movimiento físico autorizado localmente; el STM32 sigue DISARMED")
+            except (OSError, RuntimeError, ValueError) as error:
+                log.error("Movimiento físico no habilitado: %s", error)
         service = ConversationService(
             provider, microphone, speaker, state, expressions,
             thinking_voice=thinking_voice,
@@ -226,6 +250,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
             vision=LocalVisionClient.from_env() if hands_free else None,
             voice_volume=voice_volume,
             speech_filter=speech_filter,
+            motion_gate=motion_gate,
         )
         if hands_free:
             music_interrupt = asyncio.Event()
@@ -258,6 +283,8 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
                 await asyncio.gather(stop_task, return_exceptions=True)
         return 0
     finally:
+        if physical_executor is not None:
+            await asyncio.to_thread(physical_executor.disable)
         prepare_thinking.cancel()
         await asyncio.gather(prepare_thinking, return_exceptions=True)
         try:

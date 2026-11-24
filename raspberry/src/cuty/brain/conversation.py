@@ -734,7 +734,9 @@ class ConversationService:
                     requested = MotionAction.STOP
                 elif spoken.action is not requested:
                     raise ValueError("Motion request does not match the user's explicit words")
-                result = self.motion_gate.submit(MotionRequest(requested))
+                result = await asyncio.to_thread(
+                    self.motion_gate.submit, MotionRequest(requested),
+                )
             elif call.name == "return_to_menu" and self.voice_exit:
                 if args:
                     raise ValueError("Return to menu takes no arguments")
