@@ -8,7 +8,7 @@ describe("read-only robot telemetry", () => {
   it("maps commanded positions and does not claim physical measurements", async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
       connection: "connected",
-      mode: "hardware",
+      mode: "robot",
       safety_state: "DISARMED",
       last_known_state: "DISARMED",
       motion_authorized: true,
@@ -44,6 +44,27 @@ describe("read-only robot telemetry", () => {
     const unsubscribe = transport.subscribe(() => {});
     await waitFor(() => expect(transport.getSnapshot().connection).toBe("offline"));
     expect(transport.getSnapshot().mode).toBe("simulation");
+    unsubscribe();
+  });
+
+  it("preserves the explicitly selected single-axis test mode", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+      connection: "connected",
+      mode: "test",
+      safety_state: "DISARMED",
+      last_known_state: "DISARMED",
+      motion_authorized: true,
+      controller_active: false,
+      physical_output_status: "unverified",
+      firmware_profile_match: "unverified",
+      telemetry_fresh: true,
+      position_kind: "commanded",
+      measured_positions_available: false,
+      commanded_milli_units: { HEAD_PAN: 0, LEFT_ARM: 0, RIGHT_ARM: 0 },
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const transport = new HttpRobotTransport("http://127.0.0.1:8765/api/robot/status", request);
+    const unsubscribe = transport.subscribe(() => {});
+    await waitFor(() => expect(transport.getSnapshot().mode).toBe("test"));
     unsubscribe();
   });
 });

@@ -128,6 +128,14 @@ física del perfil; el arranque deja PWM apagado y el movimiento requiere
 
 ## Seguimiento facial y acciones por voz
 
+La aplicación usa `CUTY_ROBOT_MODE=simulation` por defecto. En este modo las
+acciones permitidas actualizan referencias virtuales para el gemelo digital y no
+abren UART. `CUTY_ROBOT_MODE=test` exige el perfil completo, enlace DISARMED y
+`CUTY_TEST_AXIS`; solo deja pasar acciones del eje seleccionado. `robot` abre el
+allowlist completo una vez verificados perfil y enlace. Para calibrar un eje aún
+no confirmado, usa el comando interactivo de `servo_calibration` descrito arriba;
+no selecciones `test` como sustituto de esa calibración manual.
+
 Después de cargar el firmware físico correspondiente al mismo perfil, configura
 en el entorno del servicio de voz:
 

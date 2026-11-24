@@ -24,7 +24,7 @@ from cuty.audio.volume import VoiceVolume, VolumeSpeaker
 from cuty.audio.remote import RemoteSpeaker, serve_audio
 from cuty.brain.conversation import ConversationService, ReturnToMenu
 from cuty.hardware.calibration_profile import RobotCalibration
-from cuty.hardware.motion_actions import MotionActionGate
+from cuty.hardware.motion_actions import MotionActionGate, OperationMode
 from cuty.hardware.robot_motion import RobotMotionExecutor
 from cuty.hardware.motion_ipc import MotionIpcServer
 from cuty.telemetry.telemetry import TelemetryServer
@@ -227,30 +227,57 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         if hands_free:
             microphone = SpeechMicrophone.from_env(microphone, input_rate)
         motion_gate = MotionActionGate()
-        physical_motion_requested = os.getenv("CUTY_ROBOT_PHYSICAL_ENABLE", "0").strip().lower() in {
+        configured_mode = os.getenv("CUTY_ROBOT_MODE", OperationMode.SIMULATION.value).strip().lower()
+        try:
+            requested_mode = OperationMode(configured_mode)
+        except ValueError:
+            log.error("CUTY_ROBOT_MODE inválido; se mantiene SIMULATION")
+            requested_mode = OperationMode.SIMULATION
+        legacy_physical_enable = os.getenv("CUTY_ROBOT_PHYSICAL_ENABLE", "0").strip().lower() in {
             "1", "true", "yes", "on",
         }
+        # La variable anterior sigue siendo una autorización explícita de modo ROBOT.
+        if legacy_physical_enable and requested_mode is OperationMode.SIMULATION:
+            requested_mode = OperationMode.ROBOT
+        physical_motion_requested = requested_mode is not OperationMode.SIMULATION
         if physical_motion_requested:
             try:
                 profile_path = os.getenv("CUTY_SERVO_CALIBRATION_PROFILE", "").strip()
                 uart_port = os.getenv("CUTY_STM32_PORT", "").strip()
                 if not profile_path or not uart_port:
                     raise ValueError("Configura CUTY_SERVO_CALIBRATION_PROFILE y CUTY_STM32_PORT")
+                test_axis = os.getenv("CUTY_TEST_AXIS", "").strip().upper()
+                if requested_mode is OperationMode.TEST and test_axis not in {
+                    "HEAD_PAN", "LEFT_ARM", "RIGHT_ARM",
+                }:
+                    raise ValueError("CUTY_ROBOT_MODE=test requiere CUTY_TEST_AXIS válido")
                 calibration = RobotCalibration.load(profile_path)
                 executor = RobotMotionExecutor(uart_port, calibration)
+                motion_gate = MotionActionGate(executor)
                 # Comprueba enlace y perfil; el STM32 permanece DISARMED al iniciar.
                 link_ready = await asyncio.to_thread(executor.enable)
                 physical_executor = executor
                 if link_ready:
-                    motion_gate = MotionActionGate(executor)
-                    motion_gate.enable_physical(calibration=calibration)
-                if link_ready and os.name == "posix" and os.getenv("CUTY_FOLLOW_PHYSICAL_ENABLE", "0").lower() in {
-                    "1", "true", "yes", "on",
-                }:
+                    if requested_mode is OperationMode.TEST:
+                        motion_gate.enable_test(axis=test_axis, calibration=calibration)
+                    else:
+                        motion_gate.enable_physical(calibration=calibration)
+                follow_physical_enabled = os.getenv(
+                    "CUTY_FOLLOW_PHYSICAL_ENABLE", "0",
+                ).lower() in {"1", "true", "yes", "on"}
+                if (
+                    link_ready
+                    and requested_mode is OperationMode.ROBOT
+                    and os.name == "posix"
+                    and follow_physical_enabled
+                ):
                     motion_ipc_server = MotionIpcServer(executor, motion_gate.physical_enabled)
                     motion_ipc_server.start()
                 if link_ready:
-                    log.warning("Movimiento físico autorizado localmente; el STM32 sigue DISARMED")
+                    log.warning(
+                        "Modo %s autorizado localmente; el STM32 sigue DISARMED",
+                        motion_gate.mode.value,
+                    )
                 else:
                     log.warning("UART no disponible; se reintentará conexión sin habilitar movimiento")
             except (OSError, RuntimeError, ValueError) as error:
@@ -260,20 +287,7 @@ async def run(config: Config, *, hands_free: bool = False) -> int:
         }:
             try:
                 telemetry_server = TelemetryServer(
-                    physical_executor.status_snapshot if physical_executor else lambda: {
-                        "connection": "offline",
-                        "mode": "hardware" if physical_motion_requested else "simulation",
-                        "safety_state": "UNKNOWN",
-                        "last_known_state": "UNKNOWN",
-                        "motion_authorized": False,
-                        "controller_active": False,
-                        "physical_output_status": "unverified",
-                        "firmware_profile_match": "unverified",
-                        "position_kind": "commanded",
-                        "measured_positions_available": False,
-                        "commanded_milli_units": None,
-                        "telemetry_fresh": False,
-                    },
+                    motion_gate.status_snapshot,
                     host=os.getenv("CUTY_TELEMETRY_BIND", "127.0.0.1"),
                     port=int(os.getenv("CUTY_TELEMETRY_PORT", "8765")),
                     allowed_origin=os.getenv("CUTY_TELEMETRY_ORIGIN") or None,

@@ -136,7 +136,7 @@ export default function MotionControl() {
         </span>
         <span>
           {robot.commandedMilliUnits
-            ? `PAN ${robot.commandedMilliUnits.HEAD_PAN} · L ${robot.commandedMilliUnits.LEFT_ARM} · R ${robot.commandedMilliUnits.RIGHT_ARM} mU`
+            ? `${robot.mode === "simulation" ? t(bi("Simulated targets", "Objetivos simulados")) : t(bi("Commanded targets", "Objetivos ordenados"))}: PAN ${robot.commandedMilliUnits.HEAD_PAN} · L ${robot.commandedMilliUnits.LEFT_ARM} · R ${robot.commandedMilliUnits.RIGHT_ARM} mU`
             : t(bi("No commanded positions received", "Sin consignas recibidas"))}
         </span>
         <small>

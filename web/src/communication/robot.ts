@@ -1,7 +1,7 @@
 /** Contrato de telemetría de solo lectura; el transporte no tiene API de movimiento. */
 export interface RobotSnapshot {
   connection: "offline" | "connected";
-  mode: "simulation" | "hardware";
+  mode: "simulation" | "test" | "robot";
   safetyState: string;
   lastKnownState: string;
   motionAuthorized: boolean;
@@ -58,7 +58,7 @@ function parseSnapshot(payload: unknown): RobotSnapshot | null {
       : null;
   if (
     !(value.connection === "offline" || value.connection === "connected") ||
-    !(value.mode === "simulation" || value.mode === "hardware") ||
+    !(value.mode === "simulation" || value.mode === "test" || value.mode === "robot") ||
     typeof value.safety_state !== "string" ||
     typeof value.last_known_state !== "string" ||
     typeof value.motion_authorized !== "boolean" ||
@@ -144,5 +144,5 @@ export class HttpRobotTransport implements RobotTransport {
 
 const statusUrl = import.meta.env.VITE_ROBOT_STATUS_URL?.trim();
 export const robotTransport: RobotTransport = statusUrl
-  ? new HttpRobotTransport(statusUrl)
+  ? new HttpRobotTransport(statusUrl, fetch, 100)
   : offlineRobot;
