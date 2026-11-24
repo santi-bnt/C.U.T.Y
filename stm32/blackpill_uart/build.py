@@ -8,6 +8,8 @@ import subprocess
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cc", help="Ruta a arm-none-eabi-gcc, si no esta en PATH")
+    parser.add_argument("--bench-channel", type=int, choices=(1, 2, 3),
+                        help="PWM de banco en un solo canal: 1=J7/PB6, 2=J8/PB7, 3=J9/PB8; solo servo suelto")
     args = parser.parse_args()
     cc = args.cc or shutil.which("arm-none-eabi-gcc")
     if not cc:
@@ -22,7 +24,9 @@ def main():
 
     root = Path(__file__).resolve().parent
     output = root / "build"
-    output.mkdir(exist_ok=True)
+    if args.bench_channel:
+        output = output / f"bench-j{args.bench_channel + 6}"
+    output.mkdir(parents=True, exist_ok=True)
     rtos = root / "Middlewares/Third_Party/FreeRTOS/Source"
     includes = ["Core/Inc", "Drivers/STM32F4xx_HAL_Driver/Inc",
                 "Drivers/CMSIS/Include", "Drivers/CMSIS/Device/ST/STM32F4xx/Include",
@@ -45,6 +49,8 @@ def main():
                "-ffunction-sections", "-fdata-sections", "-DUSE_HAL_DRIVER",
                "-DSTM32F401xC", "--specs=nano.specs", "--specs=nosys.specs"]
     command += ["-I" + str(root / include) for include in includes]
+    if args.bench_channel:
+        command += [f"-DCUTY_BENCH_CHANNEL={args.bench_channel}"]
     command += ["-I" + str(root.parent / "App"), "-I" + str(root.parent / "Board")]
     command += [str(source) for source in sources]
     command += ["-T" + str(root / "STM32F401CCUX_FLASH.ld"),
@@ -56,6 +62,8 @@ def main():
     objcopy = str(Path(cc).with_name("arm-none-eabi-objcopy" + suffix))
     subprocess.run([objcopy, "-O", "binary", str(elf), str(elf.with_suffix(".bin"))], check=True)
     print("Firmware generado:", elf)
+    if args.bench_channel:
+        print("MODO BANCO: solo un canal, 1400-1600 us. START activa 1500 us; no es calibracion mecanica.")
 
 
 if __name__ == "__main__":

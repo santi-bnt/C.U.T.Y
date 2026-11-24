@@ -7,6 +7,38 @@ FreeRTOS y CMSIS-RTOS2 incluidos en el proyecto. No usa la antigua prueba
 
 ## Build
 
+### Prueba física de un servo suelto por V2
+
+Para probar movimiento sin declarar calibrado el robot, el build optativo
+`python stm32/blackpill_uart/build.py --bench-channel 1` habilita solo PB6/J7.
+`2` selecciona PB7/J8 y `3`, PB8/J9. El ELF/BIN queda separado en
+`build/bench-j7/` (o `bench-j8/`, `bench-j9/`); hay que cargar ese firmware.
+El build normal y el de CubeIDE mantienen las salidas físicas bloqueadas.
+
+Conecta un solo servo suelto, sin el mecanismo: señal al pin seleccionado,
+alimentación regulada para el servo y GND común. No alimentes el servo desde
+3V3 ni desde ST-Link. La alimentación de servos de la carrier está diseñada
+para 6 V. La prueba no valida la alimentación ni los límites mecánicos.
+
+En Raspberry, desde `raspberry/`, con `pyserial` instalado:
+
+```bash
+PYTHONPATH=src python -m cuty.hardware.servo_bench --port /dev/ttyAMA0 --channel 1 --target 1000 --seconds 3
+PYTHONPATH=src python -m cuty.hardware.servo_bench --port /dev/ttyAMA0 --channel 1 --target -1000 --seconds 3
+```
+
+El canal del comando debe coincidir con el build. Los índices son eléctricos,
+no confirman a qué articulación corresponde el servo conectado. `START` aplica
+1500 us; la consigna pasa por el controlador de trayectoria hasta 1600 o 1400 us,
+respectivamente. Esta ventana reducida tampoco es segura por definición para
+un mecanismo montado. No se usan aquí los extremos experimentales de 2700/2850 us.
+No hay barrido al encender. El script mantiene HB en una única sesión y desarma
+al terminar, ante NACK, error o Ctrl+C. El timeout de heartbeat de 500 ms quita
+PWM si se pierde el enlace; quitar PWM no corta alimentación ni garantiza torque
+cero. No uses el antiguo `servos_uart.py`, que habla otro protocolo.
+
+### Compilación normal sin movimiento
+
 Abre esta carpeta en STM32CubeIDE y compila `Debug`, o desde la raíz del repositorio
 ejecuta:
 

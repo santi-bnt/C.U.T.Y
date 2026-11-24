@@ -1,6 +1,7 @@
 #include "cuty_board.h"
 #include "cmsis_os2.h"
 #include "cuty_servo_output.h"
+#include "cuty_servo_bench.h"
 #include "servo_calibration.h"
 #include "../App/rtos/motion_tasks.h"
 #include "../App/servos/servo.h"
@@ -77,7 +78,8 @@ bool cuty_board_init(void) {
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_1);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_2);
     __HAL_TIM_ENABLE_OCxPRELOAD(&htim4, TIM_CHANNEL_3);
-    return cuty_servo_output_init(&htim4, cuty_servo_calibration, cuty_servo_test_ranges);
+    return cuty_servo_output_init(&htim4, cuty_servo_calibration, cuty_servo_test_ranges) &&
+           cuty_servo_bench_bind();
 }
 
 TIM_HandleTypeDef *cuty_board_tim4(void) { return &htim4; }
